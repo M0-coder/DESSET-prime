@@ -53,7 +53,7 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
 .solutions,.ecosystem,.audiences{padding:75px var(--edge)}.section-head h2{font-size:clamp(34px,8vw,55px)}.section-head>p{font-size:15px}.solutions-grid{grid-template-columns:1fr}.service,.service--main{grid-column:1;min-height:330px}.service-body h3{font-size:40px}.ecosystem-board{padding:14px}.ecosystem-board-top{font-size:8px}.roles{grid-template-columns:1fr 1fr}.role{padding:19px 12px;min-height:220px}.role:first-child{padding-left:0}.role strong{font-size:19px}.role p{font-size:12px}.contact{padding:75px var(--edge) 58px}.contact h2{font-size:clamp(40px,9vw,74px)}.site-footer{display:block}.footer-brand,.site-footer>span,.site-footer>p{margin:0 0 14px}.site-footer>span{display:block}
 }
 @media(max-width:360px){.motion-headline{font-size:37px}.hero-actions{display:grid;justify-items:start}.role strong{font-size:16px}.role p{font-size:11px}.service-body h3{font-size:36px}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.motion-line__inner..hero-lead,.hero-actions,.hero-meta{animation:none!important;opacity:1!important;transform:none!important}*{transition:none!important}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.motion-line__inner,.hero-lead,.hero-actions,.hero-meta{animation:none!important;opacity:1!important;transform:none!important}*{transition:none!important}}
 
 /* DESSET PRIME V4 — KINETIC EDITORIAL / 2026-11-19
    Lenguaje: original legacy palette (#1551D8, #FFC62F, #FF3328),
