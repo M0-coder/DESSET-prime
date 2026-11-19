@@ -20,14 +20,8 @@ jobs:
         run: node --check scripts/app.js
       - name: Static contracts and original logo integrity
         run: node --test tests/*.test.mjs
-      - name: Chrome desktop/mobile screenshots (NO DEPLOY)
-        run: |
-          mkdir -p reports/browser
-          google-chrome --version
-          google-chrome --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --window-size=1440,900 --virtual-time-budget=3500 --screenshot=reports/browser/desktop.png "file://$PWD/index.html"
-          google-chrome --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --window-size=390,844 --virtual-time-budget=3500 --screenshot=reports/browser/mobile.png "file://$PWD/index.html"
-          test -s reports/browser/desktop.png
-          test -s reports/browser/mobile.png
+      - name: Instrumented Chrome audit (responsive, interaction, motion, screenshots)
+        run: node scripts/browser-audit.mjs
       - name: Upload browser evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

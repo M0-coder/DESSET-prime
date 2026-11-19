@@ -21,7 +21,7 @@ test("Animación tipográfica y marca: duración finita, reducción de movimient
  assert.doesNotMatch(css,/animation-iteration-count:\s*infinite|animation:\s*[^;}]*infinite/i);
 });
 test("Se conserva CSP, noindex y la hoja de movimiento está enlazada",()=>{
- assert.match(source,/href="\.\/styles-motion-v2\.css"/);
+ assert.match(source,/href="\.\/styles\.css"/);
  assert.match(source,/name="robots" content="noindex,nofollow"/);
  assert.match(source,/Content-Security-Policy/);
 });
