@@ -11,6 +11,7 @@
   <link rel="icon" type="image/png" href="./assets/deliver-assets-mark.png">
   <link rel="stylesheet" href="./styles.css">
   <script defer src="./scripts/app.js"></script>
+  <script defer src="./scripts/motion.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -46,6 +47,7 @@
           <div class="v4-shape v4-shape-blue" aria-hidden="true"></div>
           <div class="v4-shape v4-shape-yellow" aria-hidden="true"></div>
           <div class="v4-shape v4-shape-red" aria-hidden="true"></div>
+          <span class="motion-brand-thread" aria-hidden="true"></span>
           <span class="v4-canvas-top" aria-hidden="true">CONEXIÓN / 001</span>
           <div class="v4-canvas-type" aria-hidden="true"><span>IDEAS</span><span>EN</span><span>ACCIÓN.</span></div>
           <div class="v4-canvas-stamp"><img src="./assets/deliver-assets-mark.png" width="96" height="73" alt=""></div>
@@ -106,12 +108,33 @@
       </div>
       <div class="ecosystem-board v4-flow-board">
         <div class="ecosystem-board-top"><span>UNA EXPERIENCIA / TRES MOMENTOS</span><span>DESSET — FLUJO CONCEPTUAL</span></div>
-        <div class="v4-flow" aria-label="Concepto de un pedido: explorar opciones, preparar en el negocio y coordinar una entrega">
-          <div class="v4-flow-step"><span class="v4-flow-number">01 / DESCUBRIR</span><strong>ELEGIR.</strong><p>Las personas encuentran opciones.</p></div>
-          <div class="v4-flow-arrow" aria-hidden="true">↗</div>
-          <div class="v4-flow-step"><span class="v4-flow-number">02 / PREPARAR</span><strong>ORGANIZAR.</strong><p>Los negocios gestionan la preparación.</p></div>
-          <div class="v4-flow-arrow" aria-hidden="true">↗</div>
-          <div class="v4-flow-step"><span class="v4-flow-number">03 / DISTRIBUIR</span><strong>MOVER.</strong><p>La logística conecta los puntos.</p></div>
+        <div class="v4-flow motion-story" aria-label="Tres momentos conceptuales de un pedido: elegir, organizar y mover">
+          <div class="motion-story-bridge" aria-hidden="true">
+            <span class="motion-story-bridge-start"></span>
+            <span class="motion-story-bridge-line"></span>
+            <span class="motion-story-bridge-end"></span>
+          </div>
+          <div class="motion-story-grid">
+            <div class="motion-story-unit motion-story-unit--choose">
+              <span class="motion-story-index">01 / PERSONAS</span>
+              <div class="motion-story-art motion-story-art--choose" aria-hidden="true"><span></span><span></span><span></span></div>
+              <h3>ELEGIR<span>.</span></h3>
+              <p>Explorar opciones y solicitar cuando el servicio esté habilitado.</p>
+            </div>
+            <div class="motion-story-unit motion-story-unit--organize">
+              <span class="motion-story-index">02 / COMERCIOS</span>
+              <div class="motion-story-art motion-story-art--organize" aria-hidden="true"><span></span><span></span><span></span></div>
+              <h3>ORGANIZAR<span>.</span></h3>
+              <p>Preparar los pedidos y coordinar el trabajo del negocio.</p>
+            </div>
+            <div class="motion-story-unit motion-story-unit--move">
+              <span class="motion-story-index">03 / LOGÍSTICA</span>
+              <div class="motion-story-art motion-story-art--move" aria-hidden="true"><span></span><span></span><span></span></div>
+              <h3>MOVER<span>.</span></h3>
+              <p>Conectar los puntos mediante una distribución coordinada.</p>
+            </div>
+          </div>
+          <p class="motion-story-status">MODELO CONCEPTUAL · NO REPRESENTA UNA OPERACIÓN ACTIVA</p>
         </div>
         <details class="v4-architecture-details">
           <summary>Explorar la arquitectura de Customer, Business, Rider y Control <span aria-hidden="true">↗</span></summary>
@@ -146,8 +169,8 @@
     </section>
 
     <section class="contact" id="contacto" aria-labelledby="contact-title">
-      <p class="kicker">06 / CONTACTO Y RELACIONES</p>
-      <h2 id="contact-title">LAS BUENAS<br>CONEXIONES <em>COMIENZAN AQUÍ.</em></h2>
+      <p class="kicker">06 / CONTACTO Y RELACIONES <span class="closing-kicker-signal" aria-hidden="true">↗</span></p>
+      <h2 id="contact-title" class="closing-title"><span class="closing-line">LAS BUENAS</span><span class="closing-line closing-line--middle">CONEXIONES</span><span class="closing-line closing-line--final"><em>COMIENZAN AQUÍ.</em></span></h2>
       <div class="contact-bottom"><p>¿Representas un negocio o tienes experiencia para aportar al desarrollo de DESSET? Hablemos a través de nuestros canales públicos.</p>
         <div class="social-links"><a href="https://www.instagram.com/deliver_assets/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span></a><a href="https://x.com/deliver_assets" target="_blank" rel="noopener noreferrer">X <span aria-hidden="true">↗</span></a><a href="https://www.facebook.com/share/1EtpsZNFwQ/" target="_blank" rel="noopener noreferrer">Facebook <span aria-hidden="true">↗</span></a></div>
       </div>
