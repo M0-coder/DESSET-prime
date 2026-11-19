@@ -78,6 +78,9 @@ async function viewport(width,height,reduce=false){
   return {text:el.innerText,contentWidth:Math.round(r.getBoundingClientRect().width),visibleWidth:Math.round(el.getBoundingClientRect().width),clientWidth:el.clientWidth,scrollWidth:el.scrollWidth};
  });
  const nodes=[...document.querySelectorAll('body *')].filter(el=>{
+  // Visual montage intentionally clips decorative children; keep checking parent bounds and headline text.
+  const clip=el.closest(".v4-motion-canvas,.v4-hero-rail");
+  if(clip&&clip!==el)return false;
   const s=getComputedStyle(el),r=el.getBoundingClientRect();
   return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.left < -2 || (s.display!=='none'&&s.visibility!=='hidden'&&r.right>viewport+2&&r.width>0);
  }).slice(0,12).map(el=>({tag:el.tagName,className:typeof el.className==='string'?el.className.slice(0,70):'',right:Math.round(el.getBoundingClientRect().right),left:Math.round(el.getBoundingClientRect().left)}));
