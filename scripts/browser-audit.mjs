@@ -78,10 +78,24 @@ async function viewport(width,height,reduce=false){
   return {text:el.innerText,contentWidth:Math.round(r.getBoundingClientRect().width),visibleWidth:Math.round(el.getBoundingClientRect().width),clientWidth:el.clientWidth,scrollWidth:el.scrollWidth};
  });
  const nodes=[...document.querySelectorAll('body *')].filter(el=>{
+  // Visual montage intentionally clips decorative children; keep checking parent bounds and headline text.
+  const clip=el.closest(".v4-motion-canvas,.v4-hero-rail");
+  if(clip&&clip!==el)return false;
   const s=getComputedStyle(el),r=el.getBoundingClientRect();
   return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.left < -2 || (s.display!=='none'&&s.visibility!=='hidden'&&r.right>viewport+2&&r.width>0);
  }).slice(0,12).map(el=>({tag:el.tagName,className:typeof el.className==='string'?el.className.slice(0,70):'',right:Math.round(el.getBoundingClientRect().right),left:Math.round(el.getBoundingClientRect().left)}));
- return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ const rail=document.querySelector(".v4-hero-rail");
+ const railBox=rail.getBoundingClientRect();
+ const railWords=[...rail.querySelectorAll("span")].map(el=>{
+  const r=el.getBoundingClientRect(),style=getComputedStyle(el);
+  return {text:el.textContent.trim(),visible:style.display!=="none"&&style.visibility!=="hidden",inside:r.left>=railBox.left-2&&r.right<=railBox.right+2,width:Math.round(r.width)};
+ });
+ const typeSizes={
+  heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
+  sectionTitle:parseFloat(getComputedStyle(document.querySelector(".section-head h2")).fontSize),
+  storyTitle:parseFloat(getComputedStyle(document.querySelector(".motion-story-unit h3")).fontSize)
+ };
+ return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
@@ -89,6 +103,10 @@ async function viewport(width,height,reduce=false){
  if(diag.logo.some(x=>!x.complete||x.naturalWidth===0))fails.push("broken image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
+ if(width<=700){
+  if(diag.railWords.length!==4||diag.railWords.some(w=>!w.visible||!w.inside||w.width<45))fails.push("mobile editorial keyword rail clips or hides a word: "+JSON.stringify(diag.railWords));
+  if(diag.typeSizes.heroLead<14||diag.typeSizes.sectionTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
+ }
  report.viewports.push({width,height,reduce,...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
  return diag;
@@ -103,19 +121,93 @@ try{
  await call("Page.enable");
  await call("Runtime.enable");
  const d=await viewport(1440,900);
+ const motionMode=await js("document.documentElement.dataset.motionSystem");
+ if(motionMode!=="ready")report.failures.push("Intersection motion system unavailable: "+String(motionMode));
+ report.tests.push({name:"Progressive motion system active",mode:motionMode});
+ const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src"),flow:!!document.querySelector(".v4-flow-board"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
+ if(!heroQuality.headline?.includes("EL COMERCIO")||!heroQuality.headline?.includes("SE MUEVE")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
+ report.tests.push({name:"V4 motion/design contract",heroQuality});
+ const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,mark:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src")}))()');
+ if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<110||kineticIntro.blue!=="v45-blue-strike"||kineticIntro.mark!=="v45-mark-lock"||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png"))report.failures.push("V4.5 hero kinetic introduction failed: "+JSON.stringify(kineticIntro));
+ report.tests.push({name:"V4.5 hero scale and original mark motion",kineticIntro});
+ const smallUI=await js('(()=>{const selector=".header-descriptor,.v4-hero-caption,.hero-kicker,.v4-canvas-top,.v4-canvas-bottom,.hero-meta,.section-label,.kicker,.service-top,.ecosystem-board-top,.motion-story-index,.motion-story-status,.audience-no,.audience-tag,.business-pitch-top,.closing-kicker-signal";return {decorativeLabelCount:document.querySelectorAll(selector).length,numberedTokens:document.body.textContent.match(/\\b0[1-9]\\s*\\/\\s*/g)||[],statusVisible:document.querySelector(".trust-ledger-item strong")?.textContent?.trim()}})()');
+ if(smallUI.decorativeLabelCount!==0||smallUI.numberedTokens.length!==0||!smallUI.statusVisible)report.failures.push("Editorial numeric labels survived cleanup: "+JSON.stringify(smallUI));
+ report.tests.push({name:"Zero editorial numeric labels and redundant tiny captions",smallUI});
  await capture("desktop-entry.png");
  await sleep(1100);
  await capture("desktop-transition.png");
  await sleep(2050);
  await capture("desktop-final.png");
  await capture("desktop-full.png",true);
- assert.equal(d.logo.length>=4,true,"Expected original brand mark and concept artwork");
+ await js('document.querySelector(".motion-story").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(450);
+ const storyState=await js('({sequence:document.querySelector(".motion-story").classList.contains("motion-active"),cards:[...document.querySelectorAll(".motion-story-unit")].map(x=>({text:x.querySelector("h3")?.textContent,active:x.classList.contains("motion-active")}))})');
+ if(!storyState.sequence||storyState.cards.length!==3||storyState.cards.some(x=>!x.active))report.failures.push("Narrative motion sequence not activated: "+JSON.stringify(storyState));
+ report.tests.push({name:"Scroll-bound narrative sequence",storyState});
+ const scenes=await js('(()=>[...document.querySelectorAll(".motion-story-art img")].map(el=>({src:el.getAttribute("src"),complete:el.complete,width:el.naturalWidth,height:el.naturalHeight,rendered:el.getBoundingClientRect().width})))()');
+ if(scenes.length!==3||scenes.some(x=>!x.complete||x.width<100||x.height<100||x.rendered<45))report.failures.push("Commercial narrative illustrations missing or too small: "+JSON.stringify(scenes));
+ report.tests.push({name:"Original semantic illustration assets render",scenes});
+ await capture("desktop-story-motion.png");
+ const kineticJourney=await js('(()=>{const cards=[...document.querySelectorAll(".motion-story-unit")].map(c=>({active:c.classList.contains("motion-active"),animation:getComputedStyle(c.querySelector("img")).animationName}));const route=getComputedStyle(document.querySelector(".motion-story-bridge-line")).animationName;return {cards,route}})()');
+ if(kineticJourney.cards.length!==3||kineticJourney.cards.some(x=>!x.active||x.animation!=="v45-scene-illustration")||kineticJourney.route!=="prime-bridge-draw")report.failures.push("Three-beat narrative sequence failed: "+JSON.stringify(kineticJourney));
+ report.tests.push({name:"V4.5 staggered real-scene illustration motion",kineticJourney});
+ await sleep(1250);
+ await capture("desktop-story-final.png");
+ await js('document.querySelector("#contacto").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(450);
+ const closing=await js('[...document.querySelectorAll(".closing-line")].map(x=>({word:x.textContent.trim(),active:x.classList.contains("motion-active")}))');
+ if(closing.length!==3||closing.some(x=>!x.active))report.failures.push("Closing editorial sequence not activated: "+JSON.stringify(closing));
+ report.tests.push({name:"Brand closing motion",closing});
+ await capture("desktop-closing-motion.png");
+ const kineticFinale=await js('(()=>{const contact=document.querySelector("#contacto"),middle=contact.querySelector(".closing-line--middle");return {active:contact.classList.contains("motion-active"),lineAnimation:getComputedStyle(middle).animationName,underlineAnimation:getComputedStyle(middle,"::after").animationName,slashAnimation:getComputedStyle(contact,"::after").animationName}})()');
+ if(!kineticFinale.active||kineticFinale.lineAnimation!=="v45-closing-reveal"||kineticFinale.underlineAnimation!=="v45-underline"||kineticFinale.slashAnimation!=="v45-contact-slash")report.failures.push("Kinetic final contact scene failed: "+JSON.stringify(kineticFinale));
+ report.tests.push({name:"V4.5 closing scene and finite underline",kineticFinale});
+ await sleep(1250);
+ await capture("desktop-closing-final.png");
+ await js('document.querySelector(".business-pitch").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(350);
+ const pitch=await js('(()=>{const section=document.querySelector(".business-pitch");const anchor=section.querySelector("a.business-pitch-cta");return {heading:section.querySelector("h3")?.textContent?.replace(/\\s+/g," ").trim(),href:anchor?.getAttribute("href"),label:anchor?.textContent?.trim(),visible:section.getBoundingClientRect().height>180}})()');
+ if(!pitch.visible||pitch.href!=="#contacto"||!pitch.heading.includes("NEGOCIO")||!pitch.label.includes("Conversemos"))report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
+ report.tests.push({name:"Commercial pitch CTA",pitch});
+ await capture("desktop-business-pitch.png");
+ const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const future=document.querySelector(".future-services");const prim=document.querySelector(".contact-primary");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),futureCollapsed:!future.open,futureCards:future.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.textContent.trim(),contactTarget:prim.getAttribute("target"),candidateStatus:document.querySelector(".contact-status")?.textContent,headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');
+ if(rc.primaryHref!=="#contacto"||!rc.futureCollapsed||rc.futureCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||!rc.candidateStatus.includes("no procesa pedidos ni pagos")||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
+ report.tests.push({name:"V4.3 commercial focus & primary contact",rc});
+ await js('document.querySelector(".future-services summary").click()');
+ const expandedFuture=await js('(()=>{const d=document.querySelector(".future-services");return {open:d.open,cards:[...d.querySelectorAll(".service")].map(e=>({height:Math.round(e.getBoundingClientRect().height),description:e.querySelector(".service-body p")?.textContent?.trim()}))}})()');
+ if(!expandedFuture.open||expandedFuture.cards.length!==2||expandedFuture.cards.some(x=>x.height<170||!x.description?.startsWith("Horizonte futuro:")))report.failures.push("Future services toggle contract failed: "+JSON.stringify(expandedFuture));
+ report.tests.push({name:"Deferred expansion accordion",expandedFuture});
+ await js('document.querySelector(".future-services").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(120);
+ await capture("desktop-expansion-optional.png");
+ await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(180);
+ const trustDesktop=await js('(()=>{const el=document.querySelector(".trust-ledger"),cards=[...el.querySelectorAll(".trust-ledger-item")],grid=el.querySelector(".trust-ledger-grid"),v=document.documentElement.clientWidth;return {cards:cards.map(x=>({title:x.querySelector("strong")?.textContent?.trim(),right:Math.round(x.getBoundingClientRect().right),width:Math.round(x.getBoundingClientRect().width),font:parseFloat(getComputedStyle(x.querySelector("p")).fontSize)})),gridCols:getComputedStyle(grid).gridTemplateColumns.split(" ").length,viewport:v,heading:el.querySelector("h3")?.textContent?.trim()}})()');
+ if(trustDesktop.cards.length!==3||trustDesktop.gridCols!==3||trustDesktop.cards.some(x=>x.right>trustDesktop.viewport+2||x.font<14)||!trustDesktop.heading.includes("CLARIDAD"))report.failures.push("Trust content broken on desktop: "+JSON.stringify(trustDesktop));
+ report.tests.push({name:"Credibility status ledger desktop",trustDesktop});
+ await capture("desktop-trust-status.png");
+ assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
   if(w===390){
    await sleep(3200);
    await capture("mobile-final.png");
    await capture("mobile-full.png",true);
+   await js('document.querySelector(".business-pitch").scrollIntoView({block:"start",behavior:"instant"})');
+   await sleep(240);
+   await capture("mobile-business-pitch.png");
+   await js('document.querySelector(".contact-primary").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(100);
+   const mobileContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {label:a.textContent.trim(),left:r.left,right:r.right,height:r.height,viewport:v}})()');
+   if(mobileContact.left < -2||mobileContact.right>mobileContact.viewport+2||mobileContact.height<48)report.failures.push("Primary mobile contact clipped or too small: "+JSON.stringify(mobileContact));
+   report.tests.push({name:"Mobile primary contact tap target",mobileContact});
+   await capture("mobile-contact-final.png");
+   await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(160);
+   const trustMobile=await js('(()=>{const el=document.querySelector(".trust-ledger"),cards=[...el.querySelectorAll(".trust-ledger-item")],v=document.documentElement.clientWidth;return {viewport:v,cols:getComputedStyle(el.querySelector(".trust-ledger-grid")).gridTemplateColumns.split(" ").length,cards:cards.map(c=>({right:Math.round(c.getBoundingClientRect().right),left:Math.round(c.getBoundingClientRect().left),height:Math.round(c.getBoundingClientRect().height),font:parseFloat(getComputedStyle(c.querySelector("p")).fontSize)}))}})()');
+   if(trustMobile.cards.length!==3||trustMobile.cols!==1||trustMobile.cards.some(c=>c.left < -2||c.right>trustMobile.viewport+2||c.height<70||c.font<14))report.failures.push("Trust content clipped or unreadable on mobile: "+JSON.stringify(trustMobile));
+   report.tests.push({name:"Credibility status ledger mobile",trustMobile});
+   await capture("mobile-trust-status.png");
    await js("document.querySelector('.menu-button').click()");
    const menu=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),display:getComputedStyle(document.querySelector('.main-nav')).display})");
    if(menu.expanded!=="true"||menu.display==="none")report.failures.push("Mobile navigation did not open");
@@ -124,9 +216,30 @@ try{
    const after=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),focused:document.activeElement===document.querySelector('.menu-button')})");
    if(after.expanded!=="false"||!after.focused)report.failures.push("Escape did not close and focus mobile menu");
    report.tests.push({name:"mobile navigation + Escape",menu,after});
+   const details=await js('document.querySelector(".v4-architecture-details")?.open');
+   if(details)report.failures.push("Technical roles should be collapsed by default");
+   await js('document.querySelector(".v4-architecture-details summary").click()');
+   const detailOpen=await js('(()=>{const d=document.querySelector(".v4-architecture-details");const cards=[...d.querySelectorAll(".role")];return {open:d.open,visible:cards.every(c=>c.getBoundingClientRect().height>40),roles:cards.length}})()');
+   if(!detailOpen.open||!detailOpen.visible||detailOpen.roles!==4)report.failures.push("Technical roles accordion failed: "+JSON.stringify(detailOpen));
+   await js('document.querySelector(".v4-architecture-details").scrollIntoView({block:"start",behavior:"instant"})');
+   await sleep(100);
+   await capture("mobile-architecture-expanded.png");
+   report.tests.push({name:"mobile technical detail expandable",detailOpen});
+  }
+  if(w===320){
+   const narrowContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {left:r.left,right:r.right,height:r.height,viewport:v}})()');
+   if(narrowContact.left < -2||narrowContact.right>narrowContact.viewport+2||narrowContact.height<48)report.failures.push("320px contact button fail: "+JSON.stringify(narrowContact));
+   await sleep(3200);
+   await capture("mobile-320-final.png");
+   await capture("mobile-320-full.png",true);
   }
  }
  const reduced=await viewport(390,844,true);
+ const reducedMode=await js("document.documentElement.dataset.motionSystem");
+ if(reducedMode!=="reduced")report.failures.push("Motion fallback failed for reduced preference: "+String(reducedMode));
+ const reducedAnimations=await js('(()=>({blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,stamp:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,headline:document.querySelector(".motion-headline").textContent.trim(),cta:document.querySelector(".hero-cta").getAttribute("href"),closing:document.querySelector("#contact-title").textContent.trim()}))()');
+ if(reducedAnimations.blue!=="none"||reducedAnimations.stamp!=="none"||!reducedAnimations.headline.includes("EL COMERCIO")||reducedAnimations.cta!=="#contacto"||!reducedAnimations.closing.includes("CONEXIONES"))report.failures.push("V4.5 reduced motion/essential information failed: "+JSON.stringify(reducedAnimations));
+ report.tests.push({name:"V4.5 full-fidelity reduced motion fallback",reducedAnimations});
  await capture("mobile-reduced-motion.png");
  report.tests.push({name:"reduced motion",animation:reduced.animation});
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}

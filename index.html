@@ -4,13 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="theme-color" content="#F7F5EE">
-  <meta name="description" content="DESSET reúne comercio, logística y tecnología en una visión empresarial de plataformas conectadas.">
+  <meta name="theme-color" content="#111111">
+  <meta name="description" content="DESSET construye una plataforma que conecte pedidos, comercios y logística de última milla. Proyecto en desarrollo; conoce su enfoque y etapa actual.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>DESSET — Comercio, logística y tecnología</title>
+  <title>DESSET — Comercio en movimiento</title>
   <link rel="icon" type="image/png" href="./assets/deliver-assets-mark.png">
   <link rel="stylesheet" href="./styles.css">
   <script defer src="./scripts/app.js"></script>
+  <script defer src="./scripts/motion.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -19,10 +20,9 @@
       <img class="brand-mark" src="./assets/deliver-assets-mark.png" width="96" height="73" alt="" decoding="async">
       <span class="brand-name">DESSET</span>
     </a>
-    <span class="header-descriptor">Comercio / Logística / Tecnología</span>
     <button class="menu-button" aria-controls="main-nav" aria-expanded="false" aria-label="Abrir navegación" type="button">Menú <span aria-hidden="true">+</span></button>
     <nav class="main-nav" id="main-nav" aria-label="Navegación principal">
-      <a href="#vision">Empresa</a>
+      <a href="#vision">Nuestro enfoque</a>
       <a href="#soluciones">Soluciones</a>
       <a href="#ecosistema">Nuestro sistema</a>
       <a href="#negocios">Para quiénes</a>
@@ -31,109 +31,158 @@
   </header>
 
   <main id="contenido">
-    <section id="inicio" class="hero hero--motion" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <p class="hero-kicker"><span class="hero-kicker-line" aria-hidden="true"></span> DESSET / UNA VISIÓN QUE CONECTA</p>
-        <h1 id="hero-title" class="motion-headline">
-          <span class="motion-line"><span class="motion-line__inner">COMERCIO.</span></span>
-          <span class="motion-line"><span class="motion-line__inner">LOGÍSTICA.</span></span>
-          <span class="motion-line motion-line--accent"><span class="motion-line__inner">CONEXIÓN.</span></span>
-        </h1>
-        <p class="hero-lead">Desarrollamos una plataforma para acercar personas, negocios y servicios mediante tecnología y distribución.</p>
-        <div class="hero-actions">
-          <a class="hero-cta" href="#soluciones">Conoce nuestra propuesta <span aria-hidden="true">↗</span></a>
-          <a class="hero-secondary" href="#negocios">Para negocios y aliados <span aria-hidden="true">↗</span></a>
+    <section id="inicio" class="hero hero--motion" data-variant="v4" aria-labelledby="hero-title">
+      <div class="v4-hero-composition">
+        <div class="v4-hero-type">
+          <h1 id="hero-title" class="motion-headline">
+            <span class="motion-line v4-headline-a"><span class="motion-line__inner">EL COMERCIO</span></span>
+            <span class="motion-line v4-headline-b"><span class="motion-line__inner">SE MUEVE<span class="v4-fullstop">.</span></span></span>
+          </h1>
+          <p class="v4-hero-declaration">PERSONAS. NEGOCIOS. ENTREGAS.<span aria-hidden="true"> ↗</span></p>
+        </div>
+        <div class="v4-motion-canvas" role="img" aria-label="Composición editorial abstracta en azul, amarillo y rojo sobre el concepto de comercio en movimiento.">
+          <div class="v4-shape v4-shape-blue" aria-hidden="true"></div>
+          <div class="v4-shape v4-shape-yellow" aria-hidden="true"></div>
+          <div class="v4-shape v4-shape-red" aria-hidden="true"></div>
+          <span class="motion-brand-thread" aria-hidden="true"></span>
+          <div class="v4-canvas-type" aria-hidden="true"><span>IDEAS</span><span>EN</span><span>ACCIÓN.</span></div>
+          <div class="v4-canvas-stamp"><img src="./assets/deliver-assets-mark.png" width="96" height="73" alt=""></div>
         </div>
       </div>
-      <figure class="hero-stage">
-        <div class="hero-stage-inner">
-          <div class="stage-meta"><span>01 / VISIÓN DE PLATAFORMA</span><span>DESSET SYSTEM</span></div>
-          <img class="system-illustration" src="./assets/roles-geometry-v2.svg" width="720" height="380" alt="Diseño conceptual aprobado: Customer solicita, Business prepara, Rider mueve y Control supervisa.">
-          <figcaption>Cuatro funciones conectadas. Una misma arquitectura de servicio. <strong>Diseño conceptual, no operación en vivo.</strong></figcaption>
-        </div>
-        
-      </figure>
-      <div class="hero-meta"><span>COMERCIO + OPERACIÓN + TECNOLOGÍA</span><a href="#vision">DESCUBRIR DESSET <span aria-hidden="true">↓</span></a></div>
+      <div class="v4-hero-bottom">
+        <p class="hero-lead">En DESSET estamos construyendo un sistema para conectar pedidos, comercios y entregas. Comenzamos por la última milla y buscamos conocer las necesidades reales de los negocios antes del lanzamiento.</p>
+        <div class="hero-actions"><a class="hero-cta" href="#contacto">Hablemos de tu negocio <span aria-hidden="true">↗</span></a><a class="hero-secondary" href="#ecosistema">Ver cómo funcionaría <span aria-hidden="true">↗</span></a></div>
+      </div>
+      <div class="v4-hero-rail" aria-hidden="true"><span>COMERCIO</span><b>×</b><span>CONEXIÓN</span><b>×</b><span>LOGÍSTICA</span><b>×</b><span>FUTURO</span></div>
     </section>
 
     <section class="statement" id="vision" aria-labelledby="vision-title">
-      <div class="section-label"><span>01 / QUÉ NOS MUEVE</span><span>Una empresa, múltiples posibilidades</span></div>
       <div class="statement-body">
         <h2 id="vision-title">NO ES SOLO<br><span>ENTREGAR.</span><br><strong class="statement-last">ES CONECTAR.</strong></h2>
         <div class="statement-side">
           <span class="statement-symbol" aria-hidden="true">↗</span>
-          <p>DESSET busca unir el comercio digital con el movimiento físico de productos y servicios. El delivery es el punto de partida, no el límite de la visión.</p>
-          <a class="text-cta" href="#ecosistema">Así se articula nuestro sistema <span aria-hidden="true">↗</span></a>
+          <p>Nuestra tarea es concreta: desarrollar herramientas para conectar a las personas, los negocios y la distribución.</p>
+          <a class="text-cta" href="#ecosistema">Ver el recorrido <span aria-hidden="true">↗</span></a>
         </div>
       </div>
-      <div class="statement-track" aria-label="Principios de DESSET">
-        <span>CONEXIÓN</span><span>CONFIANZA</span><span>EVOLUCIÓN</span>
+      <div class="trust-ledger" aria-labelledby="trust-ledger-title">
+        <div class="trust-ledger-head">
+          <h3 id="trust-ledger-title">CLARIDAD DESDE EL PRINCIPIO.</h3>
+        </div>
+        <div class="trust-ledger-grid">
+          <div class="trust-ledger-item"><strong>Pedidos y última milla.</strong><p>El primer servicio que buscamos desarrollar y validar.</p></div>
+          <div class="trust-ledger-item"><strong>En construcción.</strong><p>Diseño y estructura tecnológica en desarrollo. Siguiente paso: validar necesidades con comercios.</p></div>
+          <div class="trust-ledger-item"><strong>Aún sin operación comercial.</strong><p>No se reciben pedidos, pagos ni contrataciones desde esta web.</p></div>
+        </div>
       </div>
     </section>
 
     <section class="solutions" id="soluciones" aria-labelledby="solutions-title">
       <div class="section-head">
-        <div><p class="kicker">02 / QUÉ ESTAMOS CONSTRUYENDO</p><h2 id="solutions-title">Un punto de partida.<br>Un horizonte más amplio.</h2></div>
-        <p>No presentamos todas las líneas de nuestra visión como negocios disponibles. Distinguimos el primer enfoque de la expansión proyectada.</p>
+        <div><h2 id="solutions-title">Pedidos, comercios<br>y última milla.</h2></div>
+        <p>Nuestro primer enfoque es conectar solicitudes de clientes, preparación en comercios y distribución. Las demás líneas están planteadas para etapas posteriores.</p>
       </div>
       <div class="solutions-grid">
         <article class="service service--main">
-          <div class="service-top"><span>01 / PRIMER ENFOQUE</span><span class="status status--initial">DESARROLLO INICIAL</span></div>
-          <div class="service-body"><h3>Pedidos y<br>última milla.</h3><p>Una solución prevista para coordinar pedidos entre clientes, comercios y distribución urbana.</p></div>
-          <span class="service-arrow" aria-hidden="true">↗</span>
-        </article>
-        <article class="service">
-          <div class="service-top"><span>02 / EXPANSIÓN</span><span class="status">HORIZONTE</span></div>
-          <div class="service-body"><h3>Paquetería<br>y transporte.</h3><p>Desarrollo futuro de capacidades para trasladar bienes y conectar puntos de distribución.</p></div>
-          <span class="service-arrow" aria-hidden="true">↗</span>
-        </article>
-        <article class="service">
-          <div class="service-top"><span>03 / EXPANSIÓN</span><span class="status">HORIZONTE</span></div>
-          <div class="service-body"><h3>Comercio<br>y servicios.</h3><p>Un ecosistema proyectado para compradores, negocios y nuevas modalidades comerciales.</p></div>
+          <div class="service-body"><h3>Pedidos y<br>última milla.</h3><p>En desarrollo: una plataforma para vincular solicitudes, preparación comercial y coordinación de entregas locales.</p></div>
           <span class="service-arrow" aria-hidden="true">↗</span>
         </article>
       </div>
+      <details class="future-services">
+        <summary>Explorar posibles líneas de expansión <span aria-hidden="true">↗</span></summary>
+        <div class="future-grid">
+          <article class="service">
+            <div class="service-body"><h3>Paquetería y transporte.</h3><p>Horizonte futuro: capacidades de distribución adicionales, sujetas a validación posterior.</p></div>
+          </article>
+          <article class="service">
+            <div class="service-body"><h3>Comercio y servicios.</h3><p>Horizonte futuro: nuevas funcionalidades comerciales, todavía fuera del primer lanzamiento.</p></div>
+          </article>
+        </div>
+      </details>
     </section>
 
     <section class="ecosystem" id="ecosistema" aria-labelledby="ecosystem-title">
       <div class="section-head">
-        <div><p class="kicker">03 / CÓMO SE ARTICULA</p><h2 id="ecosystem-title">Cuatro funciones.<br>Un sistema conectado.</h2></div>
-        <p>Nuestra arquitectura separa las necesidades de cada participante, con aplicaciones especializadas que deben validarse antes de su habilitación.</p>
+        <div><h2 id="ecosystem-title">Elegir. Preparar.<br>Entregar.</h2></div>
+        <p>El recorrido conceptual conecta tres momentos: solicitud del cliente, preparación en el negocio y coordinación de una entrega futura.</p>
       </div>
-      <div class="ecosystem-board">
-        <div class="ecosystem-board-top"><span>ESTRUCTURA DE PLATAFORMA</span><span>ORIGINAL DESSET / 04 FUNCIONES</span></div>
-        <img src="./assets/roles-geometry-v2.svg" width="720" height="380" alt="Gráfico institucional original con las cuatro funciones de DESSET conectadas entre sí.">
+      <div class="ecosystem-board v4-flow-board">
+        <div class="v4-flow motion-story" aria-label="Tres momentos conceptuales de un pedido: elegir, organizar y mover">
+          <div class="motion-story-bridge" aria-hidden="true">
+            <span class="motion-story-bridge-start"></span>
+            <span class="motion-story-bridge-line"></span>
+            <span class="motion-story-bridge-end"></span>
+          </div>
+          <div class="motion-story-grid">
+            <div class="motion-story-unit motion-story-unit--choose">
+              <div class="motion-story-art motion-story-art--choose" aria-hidden="true"><img src="./assets/scene-choose.svg" width="320" height="220" alt="" decoding="async"></div>
+              <h3>ELEGIR<span>.</span></h3>
+              <p>Descubrir opciones y solicitar pedidos cuando el servicio se habilite.</p>
+            </div>
+            <div class="motion-story-unit motion-story-unit--organize">
+              <div class="motion-story-art motion-story-art--organize" aria-hidden="true"><img src="./assets/scene-prepare.svg" width="320" height="220" alt="" decoding="async"></div>
+              <h3>ORGANIZAR<span>.</span></h3>
+              <p>Organizar las solicitudes y la preparación de cada pedido.</p>
+            </div>
+            <div class="motion-story-unit motion-story-unit--move">
+              <div class="motion-story-art motion-story-art--move" aria-hidden="true"><img src="./assets/scene-move.svg" width="320" height="220" alt="" decoding="async"></div>
+              <h3>MOVER<span>.</span></h3>
+              <p>Coordinar las futuras entregas entre comercios y clientes.</p>
+            </div>
+          </div>
+        </div>
+        <details class="v4-architecture-details">
+          <summary>Explorar la arquitectura de Customer, Business, Rider y Control <span aria-hidden="true">↗</span></summary>
+          <div class="v4-architecture-inner">
+            <img src="./assets/roles-geometry-v2.svg" width="720" height="380" alt="Diagrama conceptual de Customer, Business, Rider y Control. No representa una operación en vivo.">
+            <div class="roles" role="list">
+        <div class="role" role="listitem"><strong>Para personas</strong><p>Explorar opciones y gestionar solicitudes cuando el servicio esté habilitado.</p></div>
+        <div class="role" role="listitem"><strong>Para comercios</strong><p>Preparar pedidos y organizar la relación con sus clientes.</p></div>
+        <div class="role" role="listitem"><strong>Para entregas</strong><p>Coordinar el movimiento físico de bienes en el sistema.</p></div>
+        <div class="role" role="listitem"><strong>Para la operación</strong><p>Supervisar procesos y apoyar la trazabilidad prevista.</p></div>
       </div>
-      <div class="roles" role="list">
-        <div class="role" role="listitem"><span>01 / CUSTOMER</span><strong>Para personas</strong><p>Explorar opciones y gestionar solicitudes cuando el servicio esté habilitado.</p></div>
-        <div class="role" role="listitem"><span>02 / BUSINESS</span><strong>Para comercios</strong><p>Preparar pedidos y organizar la relación con sus clientes.</p></div>
-        <div class="role" role="listitem"><span>03 / RIDER</span><strong>Para entregas</strong><p>Coordinar el movimiento físico de bienes en el sistema.</p></div>
-        <div class="role" role="listitem"><span>04 / CONTROL</span><strong>Para la operación</strong><p>Supervisar procesos y apoyar la trazabilidad prevista.</p></div>
+          </div>
+        </details>
       </div>
-      <p class="ecosystem-footnote">Arquitectura conceptual. No se anuncia disponibilidad de aplicaciones, seguimiento operativo ni contratación desde esta web.</p>
+      <p class="ecosystem-footnote">Este recorrido es conceptual y no representa una operación activa. Las aplicaciones comerciales todavía no están disponibles.</p>
     </section>
 
     <section class="audiences" id="negocios" aria-labelledby="audiences-title">
-      <div class="section-head section-head--light"><div><p class="kicker">04 / CON QUIÉNES CONSTRUIMOS</p><h2 id="audiences-title">Personas, comercios<br>y aliados.</h2></div><p>Una plataforma comercial solo tiene sentido cuando crea valor para quienes participan en ella.</p></div>
-      <div class="audience-grid">
-        <article class="audience"><span class="audience-no">01</span><h3>Personas.</h3><p>Una experiencia más clara para encontrar opciones y organizar solicitudes cuando el servicio esté disponible.</p><span class="audience-tag">EXPERIENCIA</span></article>
-        <article class="audience"><span class="audience-no">02</span><h3>Negocios.</h3><p>Una futura conexión entre canales de venta, preparación de pedidos y entregas.</p><a href="#contacto">Explora una colaboración <span aria-hidden="true">↗</span></a></article>
-        <article class="audience"><span class="audience-no">03</span><h3>Aliados.</h3><p>Relaciones que aporten experiencia comercial, logística, tecnología y capacidad de ejecución.</p><a href="#contacto">Conversemos <span aria-hidden="true">↗</span></a></article>
+      <div class="section-head section-head--light"><div><h2 id="audiences-title">Para negocios<br>y aliados.</h2></div><p>Buscamos conversaciones concretas con negocios y aliados para definir prioridades antes de lanzar.</p></div>
+      <div class="business-pitch">
+        <div class="business-pitch-body">
+          <div><span class="business-pitch-symbol" aria-hidden="true">↗</span><h3>¿TU NEGOCIO<br>RECIBE PEDIDOS?</h3></div>
+          <div class="business-pitch-right"><p>Partimos de una necesidad concreta: organizar la relación entre pedidos, preparación y distribución. Queremos escuchar cómo trabaja hoy tu negocio para construir una solución que responda a problemas reales.</p>
+          <a class="business-pitch-cta" href="#contacto">Conversemos sobre tu comercio <span aria-hidden="true">↗</span></a></div>
+        </div>
       </div>
-    </section>
-
-    <section class="responsibility" aria-labelledby="responsibility-title">
-      <p class="kicker">05 / NUESTRO COMPROMISO</p>
-      <div class="responsibility-content"><h2 id="responsibility-title">VISIÓN AMPLIA.<br><span>AVANCE VERIFICABLE.</span></h2>
-        <div><p>La confianza no se construye con cifras inventadas ni con promesas de cobertura. DESSET distingue la visión empresarial, los prototipos tecnológicos y los servicios que realmente pueden contratarse.</p><p class="status-line"><span aria-hidden="true"></span> La web es informativa. Pedidos, pagos y aplicaciones comerciales aún no están habilitados aquí.</p></div>
+      <div class="audience-grid audience-grid--compact">
+        <article class="audience">
+<h3>Personas.</h3>
+          <p>La futura experiencia permitirá encontrar opciones y solicitar pedidos cuando las aplicaciones estén habilitadas.</p>
+        </article>
+        <article class="audience">
+<h3>Aliados.</h3>
+          <p>Buscamos experiencia empresarial, tecnológica y logística para desarrollar el proyecto con criterios verificables.</p>
+          <a href="#contacto">Plantear una colaboración <span aria-hidden="true">↗</span></a>
+        </article>
       </div>
     </section>
 
     <section class="contact" id="contacto" aria-labelledby="contact-title">
-      <p class="kicker">06 / CONTACTO Y RELACIONES</p>
-      <h2 id="contact-title">LAS BUENAS<br>CONEXIONES <em>COMIENZAN AQUÍ.</em></h2>
-      <div class="contact-bottom"><p>¿Representas un negocio o tienes experiencia para aportar al desarrollo de DESSET? Hablemos a través de nuestros canales públicos.</p>
-        <div class="social-links"><a href="https://www.instagram.com/deliver_assets/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span></a><a href="https://x.com/deliver_assets" target="_blank" rel="noopener noreferrer">X <span aria-hidden="true">↗</span></a><a href="https://www.facebook.com/share/1EtpsZNFwQ/" target="_blank" rel="noopener noreferrer">Facebook <span aria-hidden="true">↗</span></a></div>
+      <h2 id="contact-title" class="closing-title"><span class="closing-line">LAS BUENAS</span><span class="closing-line closing-line--middle">CONEXIONES</span><span class="closing-line closing-line--final"><em>COMIENZAN AQUÍ.</em></span></h2>
+      <div class="contact-bottom contact-bottom--rc">
+        <div class="contact-copy">
+          <p>¿Tienes un comercio o experiencia que aportar? Cuéntanos cómo gestionas tus pedidos o qué colaboración planteas. Nuestra prioridad es escuchar antes de ofrecer un servicio.</p>
+          <p class="contact-status">DESSET está en desarrollo. Esta página informa sobre la propuesta; no procesa pedidos ni pagos.</p>
+        </div>
+        <div class="contact-actions">
+          <a class="contact-primary" href="https://www.instagram.com/deliver_assets/" target="_blank" rel="noopener noreferrer" data-channel-review="pending">Ver perfil en Instagram <span aria-hidden="true">↗</span></a>
+          <div class="social-links social-links--secondary" aria-label="Otros perfiles publicados">
+            <a href="https://x.com/deliver_assets" target="_blank" rel="noopener noreferrer" data-channel-review="pending">X <span aria-hidden="true">↗</span></a>
+            <a href="https://www.facebook.com/share/1EtpsZNFwQ/" target="_blank" rel="noopener noreferrer" data-channel-review="pending">Facebook <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
       </div>
     </section>
   </main>
