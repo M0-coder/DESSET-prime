@@ -512,3 +512,33 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
 @media(prefers-reduced-motion:reduce){
  .future-services summary span{transition:none!important;transform:none!important}
 }
+
+
+/* V4.4 — trust from truthful operating status, not visual seals or unverifiable claims. */
+.trust-ledger{border-top:1px solid #66655e;padding-top:23px;margin-top:5px}
+.trust-ledger-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin:0 0 24px}
+.trust-ledger-head>span{font-size:11px;font-weight:800;letter-spacing:.13em;color:#d2cec3;line-height:1.5}
+.trust-ledger-head h3{font-weight:850;letter-spacing:-.055em;line-height:1.15;
+ font-size:clamp(20px,2.4vw,33px);margin:0;max-width:520px;text-align:right;color:var(--cream)}
+.trust-ledger-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #62615b}
+.trust-ledger-item{padding:24px clamp(12px,2vw,30px) 18px;min-width:0;
+ border-right:1px solid #62615b}
+.trust-ledger-item:first-child{padding-left:0}
+.trust-ledger-item:last-child{border-right:0;padding-right:0}
+.trust-ledger-item>span{display:block;color:var(--yellow);font-size:11px;font-weight:850;
+ letter-spacing:.11em;line-height:1.5;margin-bottom:17px}
+.trust-ledger-item strong{display:block;color:var(--white);font-size:clamp(20px,2.1vw,30px);
+ letter-spacing:-.055em;line-height:1.12;font-weight:850;margin-bottom:11px}
+.trust-ledger-item p{max-width:360px;margin:0;font-size:14px;line-height:1.6;color:#dedbd1}
+@media(max-width:700px){
+ .trust-ledger{margin-top:8px;padding-top:20px}
+ .trust-ledger-head{display:block;margin-bottom:18px}
+ .trust-ledger-head h3{text-align:left;margin-top:12px;font-size:clamp(23px,6vw,30px)}
+ .trust-ledger-grid{grid-template-columns:1fr}
+ .trust-ledger-item,.trust-ledger-item:first-child,.trust-ledger-item:last-child{
+  border:0;border-bottom:1px solid #62615b;padding:18px 0 19px}
+ .trust-ledger-item:last-child{border-bottom:0}
+ .trust-ledger-item>span{margin-bottom:8px}
+ .trust-ledger-item strong{font-size:clamp(22px,6vw,29px);margin-bottom:7px}
+ .trust-ledger-item p{font-size:14px}
+}
