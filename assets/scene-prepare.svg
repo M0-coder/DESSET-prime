@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220" viewBox="0 0 320 220" fill="none" role="img" aria-label="Ilustración conceptual de un comercio organizando un paquete">
+<path d="M20 171C74 149 121 164 170 129C220 93 254 151 303 105" stroke="#1551D8" stroke-width="12" stroke-linecap="square"/>
+<rect x="43" y="64" width="233" height="126" fill="#FAF3DF" stroke="#111111" stroke-width="7"/><rect x="54" y="102" width="211" height="75" fill="#1551D8"/>
+<path d="M35 69L65 22H257L287 69" fill="#FFC62F" stroke="#111111" stroke-width="7" stroke-linejoin="round"/><path d="M65 22L82 69H128L120 22H164L171 69H219L228 22" fill="#FF3328" stroke="#111111" stroke-width="5" stroke-linejoin="round"/><path d="M82 69C82 83 107 83 107 69M128 69C128 83 151 83 151 69M171 69C171 83 197 83 197 69M219 69C219 83 245 83 245 69" stroke="#111111" stroke-width="5"/>
+<path d="M111 125L165 107L217 125L165 147L111 125Z" fill="#FFC62F" stroke="#111111" stroke-width="6" stroke-linejoin="round"/><path d="M111 125V171L165 193V147M217 125V171L165 193" fill="#FF3328" stroke="#111111" stroke-width="6" stroke-linejoin="round"/><path d="M165 147L217 125V171L165 193Z" fill="#FFC62F" stroke="#111111" stroke-width="6" stroke-linejoin="round"/><path d="M163 108V147" stroke="#111111" stroke-width="5"/><rect x="198" y="133" width="15" height="21" fill="#FAF3DF"/><path d="M202 139H209M202 145H209" stroke="#111111" stroke-width="2"/>
+<circle cx="272" cy="179" r="19" fill="#FFC62F" stroke="#111111" stroke-width="6"/>
+</svg>
