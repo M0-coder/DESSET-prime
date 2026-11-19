@@ -91,9 +91,9 @@ async function viewport(width,height,reduce=false){
   return {text:el.textContent.trim(),visible:style.display!=="none"&&style.visibility!=="hidden",inside:r.left>=railBox.left-2&&r.right<=railBox.right+2,width:Math.round(r.width)};
  });
  const typeSizes={
-  heroKicker:parseFloat(getComputedStyle(document.querySelector(".hero-kicker")).fontSize),
-  sectionLabel:parseFloat(getComputedStyle(document.querySelector(".section-label")).fontSize),
-  flowNumber:parseFloat(getComputedStyle(document.querySelector(".motion-story-index")).fontSize)
+  heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
+  sectionTitle:parseFloat(getComputedStyle(document.querySelector(".section-head h2")).fontSize),
+  storyTitle:parseFloat(getComputedStyle(document.querySelector(".motion-story-unit h3")).fontSize)
  };
  return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
@@ -105,7 +105,7 @@ async function viewport(width,height,reduce=false){
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
  if(width<=700){
   if(diag.railWords.length!==4||diag.railWords.some(w=>!w.visible||!w.inside||w.width<45))fails.push("mobile editorial keyword rail clips or hides a word: "+JSON.stringify(diag.railWords));
-  if(diag.typeSizes.heroKicker<11||diag.typeSizes.sectionLabel<11||diag.typeSizes.flowNumber<11)fails.push("mobile editorial labels smaller than 11px: "+JSON.stringify(diag.typeSizes));
+  if(diag.typeSizes.heroLead<14||diag.typeSizes.sectionTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
  report.viewports.push({width,height,reduce,...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
@@ -127,6 +127,9 @@ try{
  const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src"),flow:!!document.querySelector(".v4-flow-board"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
  if(!heroQuality.headline?.includes("EL COMERCIO")||!heroQuality.headline?.includes("SE MUEVE")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
  report.tests.push({name:"V4 motion/design contract",heroQuality});
+ const smallUI=await js('(()=>{const selector=".header-descriptor,.v4-hero-caption,.hero-kicker,.v4-canvas-top,.v4-canvas-bottom,.hero-meta,.section-label,.kicker,.service-top,.ecosystem-board-top,.motion-story-index,.motion-story-status,.audience-no,.audience-tag,.business-pitch-top,.closing-kicker-signal";return {decorativeLabelCount:document.querySelectorAll(selector).length,numberedTokens:document.body.textContent.match(/\\b0[1-9]\\s*\\/\\s*/g)||[],statusVisible:document.querySelector(".trust-ledger-item strong")?.textContent?.trim()}})()');
+ if(smallUI.decorativeLabelCount!==0||smallUI.numberedTokens.length!==0||!smallUI.statusVisible)report.failures.push("Editorial numeric labels survived cleanup: "+JSON.stringify(smallUI));
+ report.tests.push({name:"Zero editorial numeric labels and redundant tiny captions",smallUI});
  await capture("desktop-entry.png");
  await sleep(1100);
  await capture("desktop-transition.png");
@@ -158,15 +161,15 @@ try{
  if(rc.primaryHref!=="#contacto"||!rc.futureCollapsed||rc.futureCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||!rc.candidateStatus.includes("no procesa pedidos ni pagos")||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
  report.tests.push({name:"V4.3 commercial focus & primary contact",rc});
  await js('document.querySelector(".future-services summary").click()');
- const expandedFuture=await js('(()=>{const d=document.querySelector(".future-services");return {open:d.open,cards:[...d.querySelectorAll(".service")].map(e=>({height:Math.round(e.getBoundingClientRect().height),status:e.querySelector(".status")?.textContent?.trim()}))}})()');
- if(!expandedFuture.open||expandedFuture.cards.length!==2||expandedFuture.cards.some(x=>x.height<170||x.status!=="HORIZONTE"))report.failures.push("Future services toggle contract failed: "+JSON.stringify(expandedFuture));
+ const expandedFuture=await js('(()=>{const d=document.querySelector(".future-services");return {open:d.open,cards:[...d.querySelectorAll(".service")].map(e=>({height:Math.round(e.getBoundingClientRect().height),description:e.querySelector(".service-body p")?.textContent?.trim()}))}})()');
+ if(!expandedFuture.open||expandedFuture.cards.length!==2||expandedFuture.cards.some(x=>x.height<170||!x.description?.startsWith("Horizonte futuro:")))report.failures.push("Future services toggle contract failed: "+JSON.stringify(expandedFuture));
  report.tests.push({name:"Deferred expansion accordion",expandedFuture});
  await js('document.querySelector(".future-services").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(120);
  await capture("desktop-expansion-optional.png");
  await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(180);
- const trustDesktop=await js('(()=>{const el=document.querySelector(".trust-ledger"),cards=[...el.querySelectorAll(".trust-ledger-item")],grid=el.querySelector(".trust-ledger-grid"),v=document.documentElement.clientWidth;return {cards:cards.map(x=>({label:x.querySelector("span")?.textContent?.trim(),right:Math.round(x.getBoundingClientRect().right),width:Math.round(x.getBoundingClientRect().width),font:parseFloat(getComputedStyle(x.querySelector("p")).fontSize)})),gridCols:getComputedStyle(grid).gridTemplateColumns.split(" ").length,viewport:v,heading:el.querySelector("h3")?.textContent?.trim()}})()');
+ const trustDesktop=await js('(()=>{const el=document.querySelector(".trust-ledger"),cards=[...el.querySelectorAll(".trust-ledger-item")],grid=el.querySelector(".trust-ledger-grid"),v=document.documentElement.clientWidth;return {cards:cards.map(x=>({title:x.querySelector("strong")?.textContent?.trim(),right:Math.round(x.getBoundingClientRect().right),width:Math.round(x.getBoundingClientRect().width),font:parseFloat(getComputedStyle(x.querySelector("p")).fontSize)})),gridCols:getComputedStyle(grid).gridTemplateColumns.split(" ").length,viewport:v,heading:el.querySelector("h3")?.textContent?.trim()}})()');
  if(trustDesktop.cards.length!==3||trustDesktop.gridCols!==3||trustDesktop.cards.some(x=>x.right>trustDesktop.viewport+2||x.font<14)||!trustDesktop.heading.includes("CLARIDAD"))report.failures.push("Trust content broken on desktop: "+JSON.stringify(trustDesktop));
  report.tests.push({name:"Credibility status ledger desktop",trustDesktop});
  await capture("desktop-trust-status.png");
