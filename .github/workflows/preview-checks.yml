@@ -1,4 +1,4 @@
-name: DESSET Prime V4.3 RC — QA sin despliegue
+name: DESSET Prime V4.5 — QA cinética sin despliegue
 on:
   push:
     branches: [design/**]
@@ -29,7 +29,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: desset-prime-v4-evidence
+          name: desset-prime-v45-evidence
           path: reports/browser/
           if-no-files-found: warn
           retention-days: 14
