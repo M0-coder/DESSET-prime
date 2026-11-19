@@ -154,6 +154,16 @@ try{
  if(!pitch.visible||pitch.href!=="#contacto"||!pitch.heading.includes("NEGOCIO")||!pitch.label.includes("Conversemos"))report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
  report.tests.push({name:"Commercial pitch CTA",pitch});
  await capture("desktop-business-pitch.png");
+ const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const future=document.querySelector(".future-services");const prim=document.querySelector(".contact-primary");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),futureCollapsed:!future.open,futureCards:future.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.textContent.trim(),contactTarget:prim.getAttribute("target"),candidateStatus:document.querySelector(".contact-status")?.textContent,headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');
+ if(rc.primaryHref!=="#contacto"||!rc.futureCollapsed||rc.futureCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||!rc.candidateStatus.includes("no procesa pedidos ni pagos")||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
+ report.tests.push({name:"V4.3 commercial focus & primary contact",rc});
+ await js('document.querySelector(".future-services summary").click()');
+ const expandedFuture=await js('(()=>{const d=document.querySelector(".future-services");return {open:d.open,cards:[...d.querySelectorAll(".service")].map(e=>({height:Math.round(e.getBoundingClientRect().height),status:e.querySelector(".status")?.textContent?.trim()}))}})()');
+ if(!expandedFuture.open||expandedFuture.cards.length!==2||expandedFuture.cards.some(x=>x.height<170||x.status!=="HORIZONTE"))report.failures.push("Future services toggle contract failed: "+JSON.stringify(expandedFuture));
+ report.tests.push({name:"Deferred expansion accordion",expandedFuture});
+ await js('document.querySelector(".future-services").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(120);
+ await capture("desktop-expansion-optional.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
@@ -164,6 +174,12 @@ try{
    await js('document.querySelector(".business-pitch").scrollIntoView({block:"start",behavior:"instant"})');
    await sleep(240);
    await capture("mobile-business-pitch.png");
+   await js('document.querySelector(".contact-primary").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(100);
+   const mobileContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {label:a.textContent.trim(),left:r.left,right:r.right,height:r.height,viewport:v}})()');
+   if(mobileContact.left < -2||mobileContact.right>mobileContact.viewport+2||mobileContact.height<48)report.failures.push("Primary mobile contact clipped or too small: "+JSON.stringify(mobileContact));
+   report.tests.push({name:"Mobile primary contact tap target",mobileContact});
+   await capture("mobile-contact-final.png");
    await js("document.querySelector('.menu-button').click()");
    const menu=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),display:getComputedStyle(document.querySelector('.main-nav')).display})");
    if(menu.expanded!=="true"||menu.display==="none")report.failures.push("Mobile navigation did not open");
@@ -183,6 +199,8 @@ try{
    report.tests.push({name:"mobile technical detail expandable",detailOpen});
   }
   if(w===320){
+   const narrowContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {left:r.left,right:r.right,height:r.height,viewport:v}})()');
+   if(narrowContact.left < -2||narrowContact.right>narrowContact.viewport+2||narrowContact.height<48)report.failures.push("320px contact button fail: "+JSON.stringify(narrowContact));
    await sleep(3200);
    await capture("mobile-320-final.png");
    await capture("mobile-320-full.png",true);
