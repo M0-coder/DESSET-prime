@@ -12,11 +12,11 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const child=spawn(process.env.CHROME_BIN||"google-chrome",[
  "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
  "--no-first-run","--no-default-browser-check","--disable-background-networking",
- "--remote-allow-origins=*","--remote-debugging-port=9222","--user-data-dir="+profile,"about:blank"
-],{stdio:["ignore","ignore","pipe"]});
+ "--remote-debugging-pipe","--user-data-dir="+profile,"about:blank"
+],{stdio:["ignore","ignore","pipe","pipe","pipe"]});
 let chromeError="";
 child.stderr.on("data",b=>{chromeError+=String(b).slice(-900)});
-let socket,requestId=0;
+let requestId=0,sessionId=null,pipeBuffer="";
 const pending=new Map();
 const report={timestamp:new Date().toISOString(),viewports:[],screenshots:[],tests:[],failures:[]};
 async function until(fn,label){
@@ -27,12 +27,28 @@ async function until(fn,label){
  }
  throw new Error("Timeout waiting for "+label+"; Chrome stderr: "+chromeError.slice(-1200));
 }
-function call(method,params={}){
+child.stdio[4].on("data",chunk=>{
+ pipeBuffer+=chunk.toString();
+ let pos;
+ while((pos=pipeBuffer.indexOf("\0"))!==-1){
+  const frame=pipeBuffer.slice(0,pos);pipeBuffer=pipeBuffer.slice(pos+1);
+  if(!frame)continue;
+  let msg;try{msg=JSON.parse(frame)}catch(e){chromeError+=" CDP parse error: "+String(e);continue}
+  if(!msg.id)continue;
+  const pendingCall=pending.get(msg.id);if(!pendingCall)continue;
+  clearTimeout(pendingCall.timeout);pending.delete(msg.id);
+  if(msg.error)pendingCall.reject(new Error(msg.error.message));
+  else pendingCall.accept(msg);
+ }
+});
+function call(method,params={},page=true){
  const id=++requestId;
  return new Promise((accept,reject)=>{
-  const timeout=setTimeout(()=>{pending.delete(id);reject(new Error("CDP timeout "+method))},12000);
+  const timeout=setTimeout(()=>{pending.delete(id);reject(new Error("CDP timeout "+method+"; Chrome stderr: "+chromeError.slice(-400)))},12000);
   pending.set(id,{accept,reject,timeout});
-  socket.send(JSON.stringify({id,method,params}));
+  const msg={id,method,params};
+  if(page&&sessionId)msg.sessionId=sessionId;
+  child.stdio[3].write(JSON.stringify(msg)+"\0");
  });
 }
 async function js(expression){
@@ -78,24 +94,10 @@ async function viewport(width,height,reduce=false){
  return diag;
 }
 try{
- const port=9222; // CI job runs one Chrome instance in a disposable runner
- const pages=await until(async()=>{
-  const r=await fetch("http://127.0.0.1:"+port+"/json/list");
-  if(!r.ok)return null;
-  const list=await r.json();
-  return list.find(x=>x.type==="page"&&x.webSocketDebuggerUrl);
- },"CDP page target");
- socket=new WebSocket(pages.webSocketDebuggerUrl);
- await new Promise((ok,bad)=>{socket.addEventListener("open",ok,{once:true});socket.addEventListener("error",bad,{once:true})});
- socket.addEventListener("message",ev=>{
-  const msg=JSON.parse(String(ev.data));
-  if(!msg.id)return;
-  const p=pending.get(msg.id);
-  if(!p)return;
-  clearTimeout(p.timeout);pending.delete(msg.id);
-  if(msg.error)p.reject(new Error(msg.error.message));
-  else p.accept(msg);
- });
+ const target=await call("Target.createTarget",{url:"about:blank"},false);
+ const attached=await call("Target.attachToTarget",{targetId:target.result.targetId,flatten:true},false);
+ sessionId=attached.result.sessionId;
+ if(!sessionId)throw new Error("CDP attach returned no session");
  await call("Page.enable");
  await call("Runtime.enable");
  const d=await viewport(1440,900);
@@ -128,7 +130,7 @@ try{
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
  await writeFile(join(output,"audit.json"),JSON.stringify(report,null,2));
- if(socket)socket.close();
+ if(child.stdio[3])child.stdio[3].end();
  child.kill("SIGTERM");
  await sleep(80);
  await rm(profile,{recursive:true,force:true}).catch(()=>{});
