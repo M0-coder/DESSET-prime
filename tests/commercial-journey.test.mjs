@@ -24,7 +24,7 @@ test("commercial contact CTA resolves locally and avoids fictitious contact deta
  assert.ok(pitch);
  assert.match(pitch[1],/href="#contacto"/);
  assert.match(html,/id="contacto"/);
- assert.match(html,/Abrir Instagram/);
+ assert.match(html,/Ver perfil en Instagram/);
  assert.match(html,/href="https:\/\/www\.instagram\.com\/deliver_assets\/"/);
  assert.doesNotMatch(html,/<a\b[^>]+href="(?:mailto:|tel:|https:\/\/wa\.me\/)/i,"Cannot invent or publish personal/uncorroborated contact details");
 });
@@ -48,7 +48,7 @@ test("three locally illustrated business scenes use original semantics, not gene
 });
 
 test("no fake availability, brand replacement, remote imagery or public checkout",()=>{
- assert.match(html,/DESSET desarrolla una propuesta para conectar pedidos, comercios y entregas de última milla/);
+ assert.match(html,/En DESSET estamos construyendo un sistema para conectar pedidos, comercios y entregas/);
  assert.match(html,/DESSET está en desarrollo/);
  assert.match(html,/assets\/deliver-assets-mark\.png/);
  assert.doesNotMatch(html,/<form\b|<input\b|<button[^>]*comprar|https?:\/\/images\./i);
