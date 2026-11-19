@@ -1,9 +1,11 @@
 /* DESSET Prime | Progressive motion system.
- * V4.5 Kinetic Experience: entry, three-step concept, final contact.\n * Decorative, one-shot transitions only. No scroll trapping, timers, remote
+ * V4.5 Kinetic Experience: entry, three-step concept, final contact.
+ * Decorative, one-shot transitions only. No scroll trapping, timers, remote
  * dependencies, layout hiding, or auto-play video. */
 "use strict";
 (()=>{
- const root=document.documentElement;\n root.dataset.kineticVersion="v45";
+ const root=document.documentElement;
+ root.dataset.kineticVersion="v45";
  const cues=document.querySelectorAll(
   ".statement h2, .solutions .section-head, .ecosystem .section-head, "+
   ".motion-story, .motion-story-unit, .audiences .section-head, "+
