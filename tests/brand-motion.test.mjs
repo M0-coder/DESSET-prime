@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 const source=readFileSync(new URL("../index.html",import.meta.url),"utf8");
-const css=readFileSync(new URL("../styles-motion-v2.css",import.meta.url),"utf8");
+const css=readFileSync(new URL("../styles.css",import.meta.url),"utf8");
 const hero=source.split('<section class="hero hero--motion"')[1]?.split('<section class="statement"')[0]||"";
 test("El hero original contiene solo copias del símbolo versionado, sin nuevos logos",()=>{
  assert.ok(hero.length>600);
@@ -24,4 +24,19 @@ test("Se conserva CSP, noindex y la hoja de movimiento está enlazada",()=>{
  assert.match(source,/href="\.\/styles-motion-v2\.css"/);
  assert.match(source,/name="robots" content="noindex,nofollow"/);
  assert.match(source,/Content-Security-Policy/);
+});
+
+const headers=readFileSync(new URL("../_headers",import.meta.url),"utf8");
+test("Cabeceras y seguridad configuradas sin directivas CSP inválidas en meta",()=>{
+ assert.match(headers,/frame-ancestors 'none'/);
+ assert.match(headers,/X-Frame-Options: DENY/);
+ assert.doesNotMatch(source,/<meta[^>]*frame-ancestors/i);
+});
+test("Sin segunda portada ni animaciones V1 superpuestas",()=>{
+ assert.doesNotMatch(css,/@keyframes arrive|\.art-center\{|\.hero-art\{/);
+ assert.doesNotMatch(source,/styles-motion-v2\.css/);
+});
+test("PNG original no se reescala por encima de 96 píxeles",()=>{
+ assert.match(css,/\.hero--motion \.hero-symbol\{[^}]*width:96px/);
+ assert.match(css,/\.hero--motion \.hero-symbol\{width:96px;max-width:none\}/);
 });
