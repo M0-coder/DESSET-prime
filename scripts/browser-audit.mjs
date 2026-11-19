@@ -93,7 +93,7 @@ async function viewport(width,height,reduce=false){
  const typeSizes={
   heroKicker:parseFloat(getComputedStyle(document.querySelector(".hero-kicker")).fontSize),
   sectionLabel:parseFloat(getComputedStyle(document.querySelector(".section-label")).fontSize),
-  flowNumber:parseFloat(getComputedStyle(document.querySelector(".v4-flow-number")).fontSize)
+  flowNumber:parseFloat(getComputedStyle(document.querySelector(".motion-story-index")).fontSize)
  };
  return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
@@ -121,6 +121,9 @@ try{
  await call("Page.enable");
  await call("Runtime.enable");
  const d=await viewport(1440,900);
+ const motionMode=await js("document.documentElement.dataset.motionSystem");
+ if(motionMode!=="ready")report.failures.push("Intersection motion system unavailable: "+String(motionMode));
+ report.tests.push({name:"Progressive motion system active",mode:motionMode});
  const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src"),flow:!!document.querySelector(".v4-flow-board"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
  if(!heroQuality.headline?.includes("EL COMERCIO")||!heroQuality.headline?.includes("SE MUEVE")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
  report.tests.push({name:"V4 motion/design contract",heroQuality});
@@ -130,6 +133,18 @@ try{
  await sleep(2050);
  await capture("desktop-final.png");
  await capture("desktop-full.png",true);
+ await js('document.querySelector(".motion-story").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(450);
+ const storyState=await js('({sequence:document.querySelector(".motion-story").classList.contains("motion-active"),cards:[...document.querySelectorAll(".motion-story-unit")].map(x=>({text:x.querySelector("h3")?.textContent,active:x.classList.contains("motion-active")}))})');
+ if(!storyState.sequence||storyState.cards.length!==3||storyState.cards.some(x=>!x.active))report.failures.push("Narrative motion sequence not activated: "+JSON.stringify(storyState));
+ report.tests.push({name:"Scroll-bound narrative sequence",storyState});
+ await capture("desktop-story-motion.png");
+ await js('document.querySelector("#contacto").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(450);
+ const closing=await js('[...document.querySelectorAll(".closing-line")].map(x=>({word:x.textContent.trim(),active:x.classList.contains("motion-active")}))');
+ if(closing.length!==3||closing.some(x=>!x.active))report.failures.push("Closing editorial sequence not activated: "+JSON.stringify(closing));
+ report.tests.push({name:"Brand closing motion",closing});
+ await capture("desktop-closing-motion.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
@@ -162,6 +177,8 @@ try{
   }
  }
  const reduced=await viewport(390,844,true);
+ const reducedMode=await js("document.documentElement.dataset.motionSystem");
+ if(reducedMode!=="reduced")report.failures.push("Motion fallback failed for reduced preference: "+String(reducedMode));
  await capture("mobile-reduced-motion.png");
  report.tests.push({name:"reduced motion",animation:reduced.animation});
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
