@@ -1,4 +1,4 @@
-name: DESSET Prime — Preview Checks (NO DEPLOY)
+name: DESSET Prime V3 — QA sin despliegue
 on:
   push:
     branches: [design/**]
@@ -16,21 +16,23 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: '22.16.0'
-      - name: Syntax check
-        run: node --check scripts/app.js
-      - name: Static contracts and original logo integrity
+      - name: JavaScript syntax
+        run: |
+          node --check scripts/app.js
+          node --check scripts/browser-audit.mjs
+      - name: Unit and source contracts
         run: node --test tests/*.test.mjs
-      - name: Instrumented Chrome audit (responsive, interaction, motion, screenshots)
+      - name: Browser QA and snapshots
         run: node scripts/browser-audit.mjs
-      - name: Upload browser evidence
+      - name: Preserve browser evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: desset-prime-hero-v2-screenshots
+          name: desset-prime-v3-evidence
           path: reports/browser/
           if-no-files-found: warn
           retention-days: 14
-      - name: Ensure no publishing instructions are added
+      - name: No deployment mechanisms
         run: |
           test ! -f wrangler.toml
           test ! -f _worker.js

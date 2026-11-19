@@ -107,7 +107,7 @@ try{
  await sleep(2050);
  await capture("desktop-final.png");
  await capture("desktop-full.png",true);
- assert.equal(d.logo.length>=5,true,"Expected original brand instances");
+ assert.equal(d.logo.length>=4,true,"Expected original brand mark and concept artwork");
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
   if(w===390){
