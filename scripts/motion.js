@@ -7,7 +7,7 @@
  const cues=document.querySelectorAll(
   ".statement h2, .solutions .section-head, .ecosystem .section-head, "+
   ".motion-story, .motion-story-unit, .audiences .section-head, "+
-  ".responsibility h2, .closing-line"
+  ".closing-line"
  );
  if(!cues.length){root.dataset.motionSystem="empty";return}
  const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
