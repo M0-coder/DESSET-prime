@@ -13,7 +13,7 @@ const child=spawn(process.env.CHROME_BIN||"google-chrome",[
  "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
  "--no-first-run","--no-default-browser-check","--disable-background-networking",
  "--remote-debugging-pipe","--user-data-dir="+profile,"about:blank"
-],{stdio:["ignore","ignore","pipe","pipe","pipe"]});
+],{stdio:["ignore","ignore","pipe","pipe","pipe"],env:{...process.env,DBUS_SESSION_BUS_ADDRESS:"",DBUS_SYSTEM_BUS_ADDRESS:""}});
 let chromeError="";
 child.stderr.on("data",b=>{chromeError+=String(b).slice(-900)});
 let requestId=0,sessionId=null,pipeBuffer="";
@@ -44,7 +44,7 @@ child.stdio[4].on("data",chunk=>{
 function call(method,params={},page=true){
  const id=++requestId;
  return new Promise((accept,reject)=>{
-  const timeout=setTimeout(()=>{pending.delete(id);reject(new Error("CDP timeout "+method+"; Chrome stderr: "+chromeError.slice(-400)))},12000);
+  const timeout=setTimeout(()=>{pending.delete(id);reject(new Error("CDP timeout "+method+"; Chrome stderr: "+chromeError.slice(-400)))},25000);
   pending.set(id,{accept,reject,timeout});
   const msg={id,method,params};
   if(page&&sessionId)msg.sessionId=sessionId;
@@ -94,6 +94,8 @@ async function viewport(width,height,reduce=false){
  return diag;
 }
 try{
+ // Chromium can initialize asynchronously on cold GitHub runners.
+ await sleep(1400);
  const target=await call("Target.createTarget",{url:"about:blank"},false);
  const attached=await call("Target.attachToTarget",{targetId:target.result.targetId,flatten:true},false);
  sessionId=attached.result.sessionId;
