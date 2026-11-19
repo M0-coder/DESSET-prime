@@ -37,7 +37,7 @@ test("V4.3: hero CTA reaches the unique primary contact path and is accessible",
  assert.match(hero,/<a class="hero-cta" href="#contacto">Hablemos de tu negocio/);
  assert.match(hero,/<a class="hero-secondary" href="#ecosistema">Ver cómo funcionaría/);
  assert.match(html,/class="contact-primary" href="https:\/\/www\.instagram\.com\/deliver_assets\/"/);
- assert.match(html,/Abrir Instagram para conversar/);
+ assert.match(html,/Ver perfil en Instagram/);
  assert.match(css,/\.contact-primary:focus-visible/);
  assert.match(css,/\.contact-primary\{[^}]*min-height:56px/s);
  assert.equal((html.match(/class="contact-primary"/g)||[]).length,1);
