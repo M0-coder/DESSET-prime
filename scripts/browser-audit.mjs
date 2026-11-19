@@ -155,6 +155,11 @@ try{
    await capture("mobile-architecture-expanded.png");
    report.tests.push({name:"mobile technical detail expandable",detailOpen});
   }
+  if(w===320){
+   await sleep(3200);
+   await capture("mobile-320-final.png");
+   await capture("mobile-320-full.png",true);
+  }
  }
  const reduced=await viewport(390,844,true);
  await capture("mobile-reduced-motion.png");
