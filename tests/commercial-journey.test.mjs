@@ -9,7 +9,7 @@ const scenes=["choose","prepare","move"];
 test("business proposition appears before generic stakeholder cards and keeps an honest launch status",()=>{
  const audience=html.indexOf('id="negocios"');
  const pitch=html.indexOf('class="business-pitch"');
- const cards=html.indexOf('class="audience-grid"');
+ const cards=html.indexOf('class="audience-grid audience-grid--compact"');
  assert.ok(audience>0 && pitch>audience && cards>pitch,"Commercial value proposition must precede stakeholder cards");
  assert.match(html,/¿TU NEGOCIO/);
  assert.match(html,/Conversemos sobre tu comercio/);
@@ -20,7 +20,7 @@ test("business proposition appears before generic stakeholder cards and keeps an
 });
 
 test("commercial contact CTA resolves locally and avoids fictitious contact details",()=>{
- const pitch=html.match(/<div class="business-pitch">([\s\S]*?)<div class="audience-grid">/);
+ const pitch=html.match(/<div class="business-pitch">([\s\S]*?)<div class="audience-grid audience-grid--compact">/);
  assert.ok(pitch);
  assert.match(pitch[1],/href="#contacto"/);
  assert.match(html,/id="contacto"/);
@@ -49,7 +49,7 @@ test("three locally illustrated business scenes use original semantics, not gene
 
 test("no fake availability, brand replacement, remote imagery or public checkout",()=>{
  assert.match(html,/DESSET desarrolla una plataforma para que los comercios puedan organizar pedidos/);
- assert.match(html,/plataforma todavía está en desarrollo/);
+ assert.match(html,/DESSET está en desarrollo/);
  assert.match(html,/assets\/deliver-assets-mark\.png/);
  assert.doesNotMatch(html,/<form\b|<input\b|<button[^>]*comprar|https?:\/\/images\./i);
 });
