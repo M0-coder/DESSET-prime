@@ -19,7 +19,8 @@ test("no numbered editorial label survives in any visible section, card, diagram
  assert.doesNotMatch(html,/\b0[1-9]\s*\/\s*[^<]+/,"Editorial section numbers must be absent");
  assert.doesNotMatch(html,/CONEXIÓN\s*\/\s*001|IDENTIDAD EN MOVIMIENTO\s*[—-]\s*01/i);
  for(const label of obsoleteLabels){
-  assert.doesNotMatch(html,new RegExp('\\bclass="[^"]*\\b'+label+'\\b[^"]*"'),"Obsolete caption remains: "+label);
+  const activeClasses=[...html.matchAll(/class="([^"]+)"/g)].flatMap(m=>m[1].split(/\s+/));
+  assert.ok(!activeClasses.includes(label),"Obsolete caption remains: "+label);
   assert.doesNotMatch(css,new RegExp('\\.'+label+'(?![\\w-])'),"Unused caption selector remains: "+label);
  }
  assert.doesNotMatch(html,/<div class="role" role="listitem"><span>/,"Technical architecture roles need no numeric index");
