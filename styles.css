@@ -22,7 +22,7 @@
 .main-nav .nav-contact{padding:16px}
 .section-label{flex-direction:column}
 .statement{padding-top:65px;min-height:620px}
-.statement h2{font-size:clamp(56px,14vw,98px);margin:60px 0}
+.statement h2{font-size:clamp(31px,8.8vw,72px);line-height:1;letter-spacing:-.065em;margin:60px 0;overflow-wrap:normal}
 .statement-bottom{align-items:end}
 .statement-bottom p{font-size:16px}
 .statement-symbol{font-size:70px}

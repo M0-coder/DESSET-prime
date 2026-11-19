@@ -73,7 +73,7 @@ async function viewport(width,height,reduce=false){
  const diag=await js(`(()=>{
  const viewport=document.documentElement.clientWidth;
  const logo=[...document.images].map(x=>({src:x.getAttribute('src'),complete:x.complete,naturalWidth:x.naturalWidth,naturalHeight:x.naturalHeight}));
- const text=[...document.querySelectorAll('.motion-line')].map(el=>{
+ const text=[...document.querySelectorAll('.motion-line, .statement h2, .contact h2')].map(el=>{
   const r=document.createRange();r.selectNodeContents(el);
   return {text:el.innerText,contentWidth:Math.round(r.getBoundingClientRect().width),visibleWidth:Math.round(el.getBoundingClientRect().width),clientWidth:el.clientWidth,scrollWidth:el.scrollWidth};
  });
@@ -87,7 +87,7 @@ async function viewport(width,height,reduce=false){
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.logo.some(x=>!x.complete||x.naturalWidth===0))fails.push("broken image");
- if(diag.offscreen.some(x=>!x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
+ if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
  report.viewports.push({width,height,reduce,...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
