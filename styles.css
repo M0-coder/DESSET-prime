@@ -251,7 +251,7 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
  .v4-hero-caption{font-size:9px;line-height:1.5;padding-bottom:16px;letter-spacing:.07em}
  .v4-edition{display:none}
  .v4-hero-composition{padding:42px 0 7px;gap:26px}
- .hero[data-variant="v4"] .hero-kicker{font-size:9px;margin-bottom:23px}
+ .hero[data-variant="v4"] .hero-kicker{font-size:11px;margin-bottom:23px;line-height:1.5}
  .hero[data-variant="v4"] .motion-headline{font-size:clamp(36px,9.7vw,70px);line-height:.95;letter-spacing:-.083em}
  .hero[data-variant="v4"] .motion-line{padding-bottom:.13em}
  .v4-hero-declaration{font-size:10px;margin-top:12px;padding-top:12px}
