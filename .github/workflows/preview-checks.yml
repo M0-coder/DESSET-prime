@@ -1,0 +1,27 @@
+name: DESSET Prime — Preview Checks (NO DEPLOY)
+on:
+  push:
+    branches: [design/**]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  source-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22.16.0'
+      - name: Syntax check
+        run: node --check scripts/app.js
+      - name: Static contracts and original logo integrity
+        run: node --test tests/*.test.mjs
+      - name: Ensure no publishing instructions are added
+        run: |
+          test ! -f wrangler.toml
+          test ! -f _worker.js
+          test ! -d functions
