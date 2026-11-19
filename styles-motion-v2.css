@@ -17,7 +17,7 @@
 .hero--motion .hero-stage:after{content:"";position:absolute;width:32%;height:8px;left:5%;bottom:17%;background:#ffc62f}
 .hero--motion .hero-stage__line{position:absolute;left:8%;top:10%;height:55%;width:1px;background:rgba(250,243,223,.4)}
 .hero--motion .hero-stage__corner{position:absolute;right:5%;top:11%;width:23px;height:23px;border:4px solid #ffc62f}
-.hero--motion .hero-symbol{position:relative;width:min(61%,340px);z-index:2;transform-origin:center center}
+.hero--motion .hero-symbol{position:relative;width:clamp(96px,10vw,144px);z-index:2;transform-origin:center center}
 .hero--motion .hero-symbol img{display:block;width:100%;height:auto;max-height:320px;object-fit:contain;filter:drop-shadow(0 18px 24px rgba(0,0,0,.22))}
 .hero--motion .hero-symbol-echoes{position:absolute;inset:0;z-index:1;pointer-events:none}
 .hero--motion .hero-symbol-echoes img{position:absolute;width:clamp(44px,5vw,90px);height:auto;opacity:.34}
@@ -67,7 +67,7 @@
  .hero--motion .hero-explanation p{font-size:16px}
  .hero--motion .hero-cta{margin-top:21px}
  .hero--motion .hero-stage{min-height:315px}
- .hero--motion .hero-symbol{width:54%;max-width:240px}
+ .hero--motion .hero-symbol{width:112px;max-width:none}
  .hero--motion .hero-meta{font-size:9px;padding-top:17px;line-height:1.5}
  .hero--motion .hero-stage__note{font-size:9px}
  .hero--motion .hero-stage:after{bottom:22%}
