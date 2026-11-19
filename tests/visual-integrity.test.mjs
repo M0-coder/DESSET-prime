@@ -24,12 +24,12 @@ test("small editorial red captions meet WCAG AA normal text on actual light back
  for(const bg of [token("paper"),token("cream"),"#FFFFFF"]){
   assert.ok(ratio(red,bg)>=4.5,red+" on "+bg+" falls below 4.5:1");
  }
- assert.match(css,/\.section-head \.kicker\{color:var\(--red-ink\)\}/);
+ assert.doesNotMatch(css,/\.section-head \.kicker/);
 });
 test("bright red stays an approved brand accent, while small text on red is dark",()=>{
  assert.equal(token("red").toUpperCase(),"#FF3328");
  assert.ok(ratio(token("ink"),token("red"))>=4.5);
- assert.match(css,/\.audiences \.audience:nth-child\(2\) \.audience-no\{background:var\(--red\);color:var\(--ink\)\}/);
+ assert.doesNotMatch(css,/\.audiences \.audience:nth-child\(2\) \.audience-no/);
 });
 test("mobile brand vocabulary is not cut by nowrap overflow",()=>{
  assert.match(css,/@media\(max-width:700px\)/);
