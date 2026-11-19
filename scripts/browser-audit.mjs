@@ -103,13 +103,16 @@ try{
  await call("Page.enable");
  await call("Runtime.enable");
  const d=await viewport(1440,900);
+ const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src"),flow:!!document.querySelector(".v4-flow-board"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
+ if(!heroQuality.headline?.includes("EL COMERCIO")||!heroQuality.headline?.includes("SE MUEVE")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
+ report.tests.push({name:"V4 motion/design contract",heroQuality});
  await capture("desktop-entry.png");
  await sleep(1100);
  await capture("desktop-transition.png");
  await sleep(2050);
  await capture("desktop-final.png");
  await capture("desktop-full.png",true);
- assert.equal(d.logo.length>=4,true,"Expected original brand mark and concept artwork");
+ assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
   if(w===390){
