@@ -84,7 +84,18 @@ async function viewport(width,height,reduce=false){
   const s=getComputedStyle(el),r=el.getBoundingClientRect();
   return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.left < -2 || (s.display!=='none'&&s.visibility!=='hidden'&&r.right>viewport+2&&r.width>0);
  }).slice(0,12).map(el=>({tag:el.tagName,className:typeof el.className==='string'?el.className.slice(0,70):'',right:Math.round(el.getBoundingClientRect().right),left:Math.round(el.getBoundingClientRect().left)}));
- return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ const rail=document.querySelector(".v4-hero-rail");
+ const railBox=rail.getBoundingClientRect();
+ const railWords=[...rail.querySelectorAll("span")].map(el=>{
+  const r=el.getBoundingClientRect(),style=getComputedStyle(el);
+  return {text:el.textContent.trim(),visible:style.display!=="none"&&style.visibility!=="hidden",inside:r.left>=railBox.left-2&&r.right<=railBox.right+2,width:Math.round(r.width)};
+ });
+ const typeSizes={
+  heroKicker:parseFloat(getComputedStyle(document.querySelector(".hero-kicker")).fontSize),
+  sectionLabel:parseFloat(getComputedStyle(document.querySelector(".section-label")).fontSize),
+  flowNumber:parseFloat(getComputedStyle(document.querySelector(".v4-flow-number")).fontSize)
+ };
+ return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
@@ -92,6 +103,10 @@ async function viewport(width,height,reduce=false){
  if(diag.logo.some(x=>!x.complete||x.naturalWidth===0))fails.push("broken image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
+ if(width<=700){
+  if(diag.railWords.length!==4||diag.railWords.some(w=>!w.visible||!w.inside||w.width<45))fails.push("mobile editorial keyword rail clips or hides a word: "+JSON.stringify(diag.railWords));
+  if(diag.typeSizes.heroKicker<11||diag.typeSizes.sectionLabel<11||diag.typeSizes.flowNumber<11)fails.push("mobile editorial labels smaller than 11px: "+JSON.stringify(diag.typeSizes));
+ }
  report.viewports.push({width,height,reduce,...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
  return diag;
@@ -130,6 +145,15 @@ try{
    const after=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),focused:document.activeElement===document.querySelector('.menu-button')})");
    if(after.expanded!=="false"||!after.focused)report.failures.push("Escape did not close and focus mobile menu");
    report.tests.push({name:"mobile navigation + Escape",menu,after});
+   const details=await js('document.querySelector(".v4-architecture-details")?.open');
+   if(details)report.failures.push("Technical roles should be collapsed by default");
+   await js('document.querySelector(".v4-architecture-details summary").click()');
+   const detailOpen=await js('(()=>{const d=document.querySelector(".v4-architecture-details");const cards=[...d.querySelectorAll(".role")];return {open:d.open,visible:cards.every(c=>c.getBoundingClientRect().height>40),roles:cards.length}})()');
+   if(!detailOpen.open||!detailOpen.visible||detailOpen.roles!==4)report.failures.push("Technical roles accordion failed: "+JSON.stringify(detailOpen));
+   await js('document.querySelector(".v4-architecture-details").scrollIntoView({block:"start",behavior:"instant"})');
+   await sleep(100);
+   await capture("mobile-architecture-expanded.png");
+   report.tests.push({name:"mobile technical detail expandable",detailOpen});
   }
  }
  const reduced=await viewport(390,844,true);
