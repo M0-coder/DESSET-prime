@@ -10,6 +10,8 @@ test("trust starts with a definite business direction but contains no active-ser
  assert.match(html,/En DESSET estamos construyendo un sistema/);
  assert.match(html,/Comenzamos por la última milla/);
  assert.doesNotMatch(html,/somos líderes|miles de clientes|servicios disponibles hoy|empresa registrada|RUC:\s*\d+|seguimiento en tiempo real/i);
+ assert.match(html,/Nuestra tarea es concreta: desarrollar herramientas/);
+ assert.doesNotMatch(html,/trabajo verificable|confianza garantizada|100% confiable/i);
  assert.match(html,/DESSET \/ EN DESARROLLO/);
  assert.match(html,/Este sitio no procesa pedidos ni pagos/);
 });
@@ -23,6 +25,7 @@ test("transparent status is explicit, short, and not a decorative trust seal",()
  for(const phase of ["01 / ENFOQUE","02 / ETAPA ACTUAL","03 / DISPONIBILIDAD"])
   assert.ok(panel.includes(phase),"No declaration for "+phase);
  assert.match(panel,/En construcción/);
+ assert.match(panel,/Siguiente paso: validar necesidades con comercios/);
  assert.match(panel,/Aún sin operación comercial/);
  assert.match(panel,/No se reciben pedidos, pagos ni contrataciones desde esta web/);
  assert.doesNotMatch(panel,/100% seguro|certificado|verificado por|avalado por|garantizado/i);
