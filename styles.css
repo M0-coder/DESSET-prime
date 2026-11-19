@@ -249,3 +249,17 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
  .v4-shape-yellow{transform:rotate(-18deg)}
  .v4-shape-red{transform:rotate(27deg)}
 }
+
+/* Endurecimiento de accesibilidad: no reducir el lenguaje comercial a microtexto móvil. */
+@media(max-width:700px){
+ .v4-hero-caption{font-size:11px;letter-spacing:.02em;line-height:1.55}
+ .v4-hero-declaration{font-size:12px;letter-spacing:.035em}
+ .hero[data-variant="v4"] .hero-cta,
+ .hero[data-variant="v4"] .hero-secondary{font-size:13px;min-height:44px;align-items:center}
+ .hero[data-variant="v4"] .hero-meta{font-size:11px;line-height:1.45}
+ .hero[data-variant="v4"] .hero-meta a{display:inline-flex;align-items:center;min-height:44px}
+}
+@media(max-width:360px){
+ .v4-hero-caption{font-size:10px}
+ .hero[data-variant="v4"] .hero-meta{gap:12px}
+}
