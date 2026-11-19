@@ -15,7 +15,7 @@ test("business proposition appears before generic stakeholder cards and keeps an
  assert.match(html,/Conversemos sobre tu comercio/);
  assert.match(html,/DESARROLLO INICIAL/);
  assert.match(html,/NO REPRESENTA UNA OPERACIÓN ACTIVA/);
- assert.match(html,/No procesa pedidos ni pagos/);
+ assert.match(html,/no procesa pedidos ni pagos/i);
  assert.doesNotMatch(html,/más de [0-9]+ (?:comercios|clientes|repartidores)|entregas en tiempo real|compra ahora/i);
 });
 
