@@ -138,6 +138,9 @@ try{
  const storyState=await js('({sequence:document.querySelector(".motion-story").classList.contains("motion-active"),cards:[...document.querySelectorAll(".motion-story-unit")].map(x=>({text:x.querySelector("h3")?.textContent,active:x.classList.contains("motion-active")}))})');
  if(!storyState.sequence||storyState.cards.length!==3||storyState.cards.some(x=>!x.active))report.failures.push("Narrative motion sequence not activated: "+JSON.stringify(storyState));
  report.tests.push({name:"Scroll-bound narrative sequence",storyState});
+ const scenes=await js('(()=>[...document.querySelectorAll(".motion-story-art img")].map(el=>({src:el.getAttribute("src"),complete:el.complete,width:el.naturalWidth,height:el.naturalHeight,rendered:el.getBoundingClientRect().width})))()');
+ if(scenes.length!==3||scenes.some(x=>!x.complete||x.width<100||x.height<100||x.rendered<45))report.failures.push("Commercial narrative illustrations missing or too small: "+JSON.stringify(scenes));
+ report.tests.push({name:"Original semantic illustration assets render",scenes});
  await capture("desktop-story-motion.png");
  await js('document.querySelector("#contacto").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(450);
@@ -145,6 +148,12 @@ try{
  if(closing.length!==3||closing.some(x=>!x.active))report.failures.push("Closing editorial sequence not activated: "+JSON.stringify(closing));
  report.tests.push({name:"Brand closing motion",closing});
  await capture("desktop-closing-motion.png");
+ await js('document.querySelector(".business-pitch").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(350);
+ const pitch=await js('(()=>{const section=document.querySelector(".business-pitch");const anchor=section.querySelector("a.business-pitch-cta");return {heading:section.querySelector("h3")?.textContent?.replace(/\\s+/g," ").trim(),href:anchor?.getAttribute("href"),label:anchor?.textContent?.trim(),visible:section.getBoundingClientRect().height>180}})()');
+ if(!pitch.visible||pitch.href!=="#contacto"||!pitch.heading.includes("NEGOCIO")||!pitch.label.includes("Conversemos"))report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
+ report.tests.push({name:"Commercial pitch CTA",pitch});
+ await capture("desktop-business-pitch.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
@@ -152,6 +161,9 @@ try{
    await sleep(3200);
    await capture("mobile-final.png");
    await capture("mobile-full.png",true);
+   await js('document.querySelector(".business-pitch").scrollIntoView({block:"start",behavior:"instant"})');
+   await sleep(240);
+   await capture("mobile-business-pitch.png");
    await js("document.querySelector('.menu-button').click()");
    const menu=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),display:getComputedStyle(document.querySelector('.main-nav')).display})");
    if(menu.expanded!=="true"||menu.display==="none")report.failures.push("Mobile navigation did not open");
