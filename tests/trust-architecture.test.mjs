@@ -12,7 +12,7 @@ test("trust starts with a definite business direction but contains no active-ser
  assert.doesNotMatch(html,/somos líderes|miles de clientes|servicios disponibles hoy|empresa registrada|RUC:\s*\d+|seguimiento en tiempo real/i);
  assert.match(html,/Nuestra tarea es concreta: desarrollar herramientas/);
  assert.doesNotMatch(html,/trabajo verificable|confianza garantizada|100% confiable/i);
- assert.match(html,/DESSET \/ EN DESARROLLO/);
+ assert.match(html,/DESSET está en desarrollo/);
  assert.match(html,/Este sitio no procesa pedidos ni pagos/);
 });
 
@@ -20,10 +20,11 @@ test("transparent status is explicit, short, and not a decorative trust seal",()
  const panel=html.match(/<div class="trust-ledger" aria-labelledby="trust-ledger-title">([\s\S]*?)<\/div>\s*<\/section>/)?.[1]||"";
  assert.ok(panel.length>500);
  assert.match(panel,/id="trust-ledger-title"/);
- assert.match(panel,/ESTADO DEL PROYECTO/);
+ assert.match(panel,/CLARIDAD DESDE EL PRINCIPIO/);
  assert.equal((panel.match(/class="trust-ledger-item"/g)||[]).length,3);
- for(const phase of ["01 / ENFOQUE","02 / ETAPA ACTUAL","03 / DISPONIBILIDAD"])
-  assert.ok(panel.includes(phase),"No declaration for "+phase);
+ for(const phase of ["Pedidos y última milla.","En construcción.","Aún sin operación comercial."])
+  assert.ok(panel.includes(phase),"Missing credible state "+phase);
+ assert.doesNotMatch(panel,/class="trust-ledger-item"><span>/);
  assert.match(panel,/En construcción/);
  assert.match(panel,/Siguiente paso: validar necesidades con comercios/);
  assert.match(panel,/Aún sin operación comercial/);
