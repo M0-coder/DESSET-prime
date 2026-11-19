@@ -164,6 +164,12 @@ try{
  await js('document.querySelector(".future-services").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(120);
  await capture("desktop-expansion-optional.png");
+ await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(180);
+ const trustDesktop=await js('(()=>{const el=document.querySelector(".trust-ledger"),cards=[...el.querySelectorAll(".trust-ledger-item")],grid=el.querySelector(".trust-ledger-grid"),v=document.documentElement.clientWidth;return {cards:cards.map(x=>({label:x.querySelector("span")?.textContent?.trim(),right:Math.round(x.getBoundingClientRect().right),width:Math.round(x.getBoundingClientRect().width),font:parseFloat(getComputedStyle(x.querySelector("p")).fontSize)})),gridCols:getComputedStyle(grid).gridTemplateColumns.split(" ").length,viewport:v,heading:el.querySelector("h3")?.textContent?.trim()}})()');
+ if(trustDesktop.cards.length!==3||trustDesktop.gridCols!==3||trustDesktop.cards.some(x=>x.right>trustDesktop.viewport+2||x.font<14)||!trustDesktop.heading.includes("CLARIDAD"))report.failures.push("Trust content broken on desktop: "+JSON.stringify(trustDesktop));
+ report.tests.push({name:"Credibility status ledger desktop",trustDesktop});
+ await capture("desktop-trust-status.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
@@ -180,6 +186,12 @@ try{
    if(mobileContact.left < -2||mobileContact.right>mobileContact.viewport+2||mobileContact.height<48)report.failures.push("Primary mobile contact clipped or too small: "+JSON.stringify(mobileContact));
    report.tests.push({name:"Mobile primary contact tap target",mobileContact});
    await capture("mobile-contact-final.png");
+   await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(160);
+   const trustMobile=await js('(()=>{const el=document.querySelector(".trust-ledger"),cards=[...el.querySelectorAll(".trust-ledger-item")],v=document.documentElement.clientWidth;return {viewport:v,cols:getComputedStyle(el.querySelector(".trust-ledger-grid")).gridTemplateColumns.split(" ").length,cards:cards.map(c=>({right:Math.round(c.getBoundingClientRect().right),left:Math.round(c.getBoundingClientRect().left),height:Math.round(c.getBoundingClientRect().height),font:parseFloat(getComputedStyle(c.querySelector("p")).fontSize)}))}})()');
+   if(trustMobile.cards.length!==3||trustMobile.cols!==1||trustMobile.cards.some(c=>c.left < -2||c.right>trustMobile.viewport+2||c.height<70||c.font<14))report.failures.push("Trust content clipped or unreadable on mobile: "+JSON.stringify(trustMobile));
+   report.tests.push({name:"Credibility status ledger mobile",trustMobile});
+   await capture("mobile-trust-status.png");
    await js("document.querySelector('.menu-button').click()");
    const menu=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),display:getComputedStyle(document.querySelector('.main-nav')).display})");
    if(menu.expanded!=="true"||menu.display==="none")report.failures.push("Mobile navigation did not open");
