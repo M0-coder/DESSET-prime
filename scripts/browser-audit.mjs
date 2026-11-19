@@ -12,7 +12,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const child=spawn(process.env.CHROME_BIN||"google-chrome",[
  "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
  "--no-first-run","--no-default-browser-check","--disable-background-networking",
- "--remote-allow-origins=*","--remote-debugging-port=0","--user-data-dir="+profile,"about:blank"
+ "--remote-allow-origins=*","--remote-debugging-port=9222","--user-data-dir="+profile,"about:blank"
 ],{stdio:["ignore","ignore","pipe"]});
 let chromeError="";
 child.stderr.on("data",b=>{chromeError+=String(b).slice(-900)});
@@ -25,7 +25,7 @@ async function until(fn,label){
   try{const v=await fn();if(v)return v}catch{}
   await sleep(100);
  }
- throw new Error("Timeout waiting for "+label);
+ throw new Error("Timeout waiting for "+label+"; Chrome stderr: "+chromeError.slice(-1200));
 }
 function call(method,params={}){
  const id=++requestId;
@@ -78,10 +78,7 @@ async function viewport(width,height,reduce=false){
  return diag;
 }
 try{
- const port=await until(async()=>{
-  const raw=await readFile(join(profile,"DevToolsActivePort"),"utf8");
-  return Number(raw.split("\n")[0])||0;
- },"DevToolsActivePort");
+ const port=9222; // CI job runs one Chrome instance in a disposable runner
  const pages=await until(async()=>{
   const r=await fetch("http://127.0.0.1:"+port+"/json/list");
   if(!r.ok)return null;
