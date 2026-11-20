@@ -41,7 +41,7 @@ test("V4.5 chooses IntersectionObserver once, never drives scroll positions, and
 test("V4.5 enlarges typography while keeping narrow-phone and semantic link fallbacks",()=>{
  assert.match(css,/@media\(min-width:1181px\)\{[\s\S]*?font-size:clamp\(65px,8\.05vw,143px\)/);
  assert.match(css,/@media\(max-width:360px\)\{[\s\S]*?font-size:38px/);
- assert.match(html,/<a class="hero-cta" href="#contacto">/);
+ assert.match(html,/<a class="hero-cta" href="#soluciones">/);
  assert.match(html,/Ver perfil en Instagram/);
  assert.match(html,/data-channel-review="pending"/);
  assert.doesNotMatch(html,/clientes activos|entregas en tiempo real|garantizamos la entrega/i);

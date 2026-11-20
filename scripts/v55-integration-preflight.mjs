@@ -20,7 +20,7 @@ for(const [path,want] of Object.entries(a)){
 }
 const availability=text("scripts/service-state.js");
 require("Prime remains presentation only",
- /todavía no realiza pedidos ni entregas comerciales/i.test(html)&&
+ /Escena conceptual que ilustra la relación entre comercio, reparto y destino; no es una entrega real/i.test(html)&&
  /no procesa pedidos ni pagos/i.test(html)&&
  /data-service-status[^>]*>Acceso público no habilitado/.test(html)&&
  /applicationDistribution:"not_published"/.test(availability)&&

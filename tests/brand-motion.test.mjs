@@ -10,7 +10,8 @@ test("V4: portada comercial editorial con mensaje legible, CTA reales y sin oper
  assert.match(head,/EL COMERCIO/);
  assert.match(head,/SE MUEVE/);
  for(const keyword of ["COMERCIO","LOGÍSTICA","CONEXIÓN","PERSONAS","NEGOCIOS","ENTREGAS"])assert.match(head,new RegExp(keyword));
- assert.match(head,/href="#contacto"/);
+ assert.match(head,/href="#soluciones"/);
+ assert.doesNotMatch(head,/href="#contacto">Hablemos de tu negocio/);
  assert.match(head,/href="#ecosistema"/);
  assert.match(head,/v4-motion-canvas/);
  assert.doesNotMatch(head,/roles-geometry-v2\.svg|system-illustration|Cuatro funciones conectadas/);
