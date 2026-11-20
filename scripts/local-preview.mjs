@@ -5,7 +5,10 @@ import {stat} from "node:fs/promises";
 import {resolve,sep} from "node:path";
 import {fileURLToPath} from "node:url";
 
-const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
+const projectRoot=resolve(fileURLToPath(new URL("../",import.meta.url)));
+const root=process.env.DESSET_PRIME_WEB_ROOT==="dist"
+ ? resolve(projectRoot,"dist")
+ : projectRoot;
 const host="127.0.0.1";
 const port=4173;
 const mime={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",
