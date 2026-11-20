@@ -89,6 +89,8 @@ try{
  check("Desktop WebGL2 real draw calls",desktop.webgl&&desktop.triangles>100&&desktop.drawCalls>0,{desktop});
  check("Real Three.js revision",desktop.threeRevision==="187",{revision:desktop.threeRevision});
  check("Exactly one GPU canvas",desktop.domCanvas===1,{count:desktop.domCanvas});
+ const detailedDesktop=await waitUntil("three real glTF binary models loaded in desktop",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3?p:null})()'),17000);
+ check("V6.2 desktop three independently loaded GLB models",detailedDesktop.glbLoaded===3&&detailedDesktop.glbModels.every(x=>x.meshes>=5&&x.triangles>=250),{models:detailedDesktop.glbModels,status:detailedDesktop.glbStatus});
  check("V6.1 real GPU shadows and painted sign textures",desktop.shadows===true&&desktop.textureCount>=2&&desktop.cinematic==="v6.1",{shadows:desktop.shadows,textures:desktop.textureCount,cinematic:desktop.cinematic});
  check("V6.1 desktop geometry and draw call budgets",desktop.geometryCount>35&&desktop.geometryCount<180&&desktop.drawCalls<160,{geometryCount:desktop.geometryCount,drawCalls:desktop.drawCalls});
  await screenshot("desktop-three-webgl.png");
@@ -106,6 +108,8 @@ try{
  await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
  const mobile=await waitUntil("mobile real GPU after consent",async()=>evalJS('(()=>{const e=document.querySelector(".v5-city-stage"),p=window.__dessetV6Probe?.();return e.dataset.v6State==="active"&&p?.triangles>0&&p?.frames>2?p:null})()'),15000);
  check("Mobile WebGL2 after explicit opt-in",mobile.webgl&&mobile.triangles>100,{mobile});
+ const detailedMobile=await waitUntil("three GLB models after mobile user consent",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3?p:null})()'),17000);
+ check("V6.2 mobile loads all 3 detailed GLB originals after explicit consent",detailedMobile.glbLoaded===3&&detailedMobile.glbModels.length===3,{models:detailedMobile.glbModels});
  check("Mobile suppresses expensive shadow maps but keeps 3D materials",mobile.shadows===false&&mobile.textureCount>=2,{shadows:mobile.shadows,textures:mobile.textureCount});
  const groups=Object.entries(mobile.objectBounds||{});
  const fullyFramed=groups.length===3&&groups.every(([name,b])=>b.minX>=-1.02&&b.maxX<=1.02&&b.minY>=-1.02&&b.maxY<=1.02);
