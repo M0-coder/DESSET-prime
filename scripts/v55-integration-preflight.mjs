@@ -12,7 +12,7 @@ const snap=JSON.parse(text("config/v55-production-snapshot.json"));
 const html=text("index.html"),headers=text("_headers");
 const test=[],fails=[];
 const require=(name,pass,data={})=>{test.push({name,pass:Boolean(pass),...data});if(!pass)fails.push(name)};
-const blobSHA=bytes=>createHash("sha1").update("blob "+bytes.length+"\\0").update(bytes).digest("hex");
+const blobSHA=bytes=>createHash("sha1").update("blob "+bytes.length+String.fromCharCode(0)).update(bytes).digest("hex");
 const a=snap.official.visual_approval.known_asset_blob_sha1;
 for(const [path,want] of Object.entries(a)){
  const got=blobSHA(file(path));
@@ -24,7 +24,7 @@ require("Prime continues to prohibit remote scripts",/script-src 'self'/.test(ht
 require("Production branch and workflow metadata are explicit",snap.official.observed_cloudflare.production_branch==="release-approved"&&snap.official.production_requirements.manual_workflow===".github/workflows/cloudflare-pages-production.yml");
 require("Owner approval cannot be implied",snap.prime.approval==="pending"&&snap.official.production_requirements.owner_design_approval_required===true);
 require("Channels still flagged pending",((html.match(/data-channel-review="pending"/g)||[]).length)>=3);
-require("Release deployment remains absent from Prime workflow",!/(?:wrangler\\s+pages\\s+deploy|\\bvercel\\s+deploy\\b|\\bpages:\\s*write\\b)/.test(text(".github/workflows/preview-checks.yml")));
+require("Release deployment remains absent from Prime workflow",!/(?:wrangler\s+pages\s+deploy|\bvercel\s+deploy\b|\bpages:\s*write\b)/.test(text(".github/workflows/preview-checks.yml")));
 require("Current Prime is larger than historical packaging baseline",Object.keys(a).length===2&&statSync(resolve(root,"assets/v5-cinematic-desktop.webp")).size>0&&statSync(resolve(root,"assets/v5-cinematic-mobile.webp")).size>0);
 const report={schema:"desset-prime-v55-integration-parity-v1",snapshot_at_local:snap.captured_at_local,
 checks:test,failures:fails,source_scope:"Prime working branch, OFFLINE; official production data is a historic snapshot",
