@@ -44,15 +44,36 @@
     const script=document.createElement("script");
     script.src="./assets/v6-three.bundle.js";
     script.async=true;
-    script.onload=()=>{webglRequested=false};
+    script.onload=()=>{
+      webglRequested=false;
+      if(stage.dataset.v64Requested==="tour" && stage.dataset.v6State==="active"){
+        stage.dataset.v64Requested="";
+        stage.querySelector(".v63-tour")?.click();
+      }
+    };
     script.onerror=()=>{
       webglRequested=false;
       stage.dataset.v6State="fallback";
+      stage.dataset.v64Requested="";
       if(threeStart)threeStart.hidden=false;
     };
     document.head.appendChild(script);
   };
   threeStart?.addEventListener("click",loadThree);
+
+  // Primary-site integration: one intentional hero click opens the ecosystem
+  // section and requests the actual GLB tour. Same explicit click is mobile
+  // consent to load WebGL; reduced-motion visitors keep the static poster.
+  document.querySelector("[data-v64-tour-launch]")?.addEventListener("click",()=>{
+    if(stage.dataset.v6State==="active"){
+      const tour=stage.querySelector(".v63-tour");
+      if(tour?.getAttribute("aria-pressed")!=="true")tour?.click();
+      return;
+    }
+    stage.dataset.v64Requested="tour";
+    loadThree();
+  });
+
   if(!mobile){
     const trigger3D=new window.IntersectionObserver((entries,instance)=>{
       if(!entries.some(e=>e.isIntersecting))return;
