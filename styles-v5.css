@@ -69,7 +69,14 @@
 }
 .v5-stage-caption strong {color:#FFC62F;font-weight:850;}
 .v5-stage-caption span {max-width:790px;}
-.v5-city-stage .v5-stage-render { transform:translate3d(0,0,0) scale(1);transform-origin:center center; }
+/* Higher specificity than legacy .ecosystem-board img (max-width:900/max-height:420).
+   Prevent letterboxing: render must occupy the intended responsive frame. */
+.v5-city-stage .v5-stage-render {
+ margin:0;max-width:none;max-height:none;width:100%;height:100%;
+ position:absolute;inset:0;display:block;
+ object-fit:contain;object-position:center;
+ transform:translate3d(0,0,0) scale(1);transform-origin:center center;
+}
 .contact {position:relative;isolation:isolate;}
 .v5-contact-light {
  position:absolute;z-index:0;left:18%;top:4%;width:62%;height:70%;
