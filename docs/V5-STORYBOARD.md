@@ -25,7 +25,7 @@ La web no debe parecer una plantilla de delivery ni prometer servicio disponible
 
 - HTML/CSS/SVG/JS nativos, sin framework de animación, servidor remoto, webfont remota ni dependencias npm.
 - `styles.css` V4.5 no se toca: V5 aislado en `styles-v5.css`; `scripts/motion.js` V4.5 no se toca: V5 en `scripts/v5-cinematic.js`.
-- Imagen SVG local lazy, `decoding=async` y dimensiones explícitas.
+- Imagen SVG local de 10 KB, `decoding=async` y dimensiones explícitas; cargada de forma directa para garantizar la auditoría visual de todos los estados.
 - Animar solamente `opacity`, `transform` y `stroke-dashoffset`; limitar `will-change` temporalmente o no usarlo.
 - Respetar `prefers-reduced-motion`; sin control del scroll, sin movimiento si el usuario no lo desea; la información esencial está presente sin JS.
 - No añadir reclamos de disponibilidad, pedidos, pagos, usuarios, resultados ni cobertura.
