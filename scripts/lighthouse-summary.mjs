@@ -28,6 +28,12 @@ for(const kind of ["mobile","desktop"]){
  if(metrics.cls>0.1)out.warnings.push(kind+" laboratory CLS > 0.1");
  if(categories.performance!==null&&categories.performance<85)out.warnings.push(kind+" laboratory performance <85");
  if(categories.accessibility!==null&&categories.accessibility<90)out.warnings.push(kind+" accessibility score <90");
+ // Hard CI sentinel budgets for synthetic lab regressions only. These are not field CWV gates.
+ if(categories.performance!==null&&categories.performance<85)out.failures.push(kind+" performance score <85");
+ if(categories.accessibility!==null&&categories.accessibility<90)out.failures.push(kind+" accessibility score <90");
+ if(categories["best-practices"]!==null&&categories["best-practices"]<90)out.failures.push(kind+" best-practices score <90");
+ if(metrics.cls!==null&&metrics.cls>0.1)out.failures.push(kind+" lab CLS >0.1");
+ if(metrics.lcp_ms!==null&&metrics.lcp_ms>4000)out.failures.push(kind+" lab LCP >4000ms");
  out.audits[kind]={
   categories,metrics,
   lighthouseVersion:raw.lighthouseVersion,
