@@ -58,3 +58,15 @@
 @media(prefers-reduced-motion:reduce){
  #soluciones .solutions-grid .service--main,#negocios .business-pitch{transition:none!important}
 }
+
+/* VISUAL-03: cinematic storyboard; approved photo reused in three distinct crops.
+No changes to brand, motorcycle, logos, 3D or text. */
+#ecosistema .motion-story-art{overflow:hidden}
+#ecosistema .v03-photo-story{display:block;position:relative;width:100%;height:100%;min-height:175px;overflow:hidden;border-radius:16px;isolation:isolate;background:#142239}
+#ecosistema .v03-photo-story img{position:absolute;top:0;width:200%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:center;filter:none}
+#ecosistema .motion-story-art--choose .v03-photo-story img{left:0}
+#ecosistema .motion-story-art--organize .v03-photo-story img{left:-40%}
+#ecosistema .motion-story-art--move .v03-photo-story img{left:-100%}
+@media(max-width:860px){#ecosistema .v03-photo-story{min-height:150px;border-radius:12px}}
+@media(max-width:700px){#ecosistema .v03-photo-story{min-height:155px}}
+@media(prefers-reduced-motion:reduce){#ecosistema .v03-photo-story img{animation:none!important;transform:none!important;opacity:1!important}}
