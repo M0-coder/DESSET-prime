@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync,statSync} from "node:fs";
+import {createHash} from "node:crypto";
 
 const root=new URL("../",import.meta.url);
 const read=path=>readFileSync(new URL(path,root),"utf8");
@@ -10,6 +11,9 @@ const motion=read("scripts/v5-cinematic.js");
 const svg=read("assets/v5-logistics-scene.svg");
 const mobileSvg=read("assets/v5-logistics-mobile.svg");
 const workflow=read(".github/workflows/preview-checks.yml");
+const desktopWebP=readFileSync(new URL("assets/v5-cinematic-desktop.webp",root));
+const mobileWebP=readFileSync(new URL("assets/v5-cinematic-mobile.webp",root));
+const sha256=b=>createHash("sha256").update(b).digest("hex");
 
 test("V5 is an additive local layer with a reversible surface",()=>{
   assert.match(html,/href="\.\/styles\.css"/);
@@ -18,6 +22,9 @@ test("V5 is an additive local layer with a reversible surface",()=>{
   assert.match(html,/src="\.\/scripts\/v5-cinematic\.js"/);
   assert.match(html,/src="\.\/assets\/v5-logistics-scene\.svg"/);
   assert.match(html,/srcset="\.\/assets\/v5-logistics-mobile\.svg"/);
+  assert.match(html,/srcset="\.\/assets\/v5-cinematic-desktop\.webp"/);
+  assert.match(html,/srcset="\.\/assets\/v5-cinematic-mobile\.webp"/);
+  assert.match(html,/type="image\/webp"/);
   assert.match(html,/media="\(max-width: 430px\)"/);
   assert.ok(statSync(new URL("styles-v5.css",root)).size<16000);
   assert.ok(statSync(new URL("assets/v5-logistics-scene.svg",root)).size<18000);
@@ -33,11 +40,27 @@ test("V5 renders three conceptual scenes without fabricating commerce",()=>{
   assert.match(html,/v5-contact-light/);
   assert.match(html,/Visualización conceptual del sistema previsto/);
   assert.match(html,/todavía no realiza pedidos ni entregas comerciales/);
-  assert.match(html,/alt="Ilustración isométrica conceptual:/);
-  assert.match(html,/v5-route-overlay[^>]+aria-hidden="true"/);
+  assert.match(html,/alt="Escena conceptual tridimensional:/);
+  assert.doesNotMatch(html,/class="v5-route-overlay"/);
   assert.match(html,/deliver-assets-mark\.png/);
   assert.match(html,/ELEGIR/);assert.match(html,/ORGANIZAR/);assert.match(html,/MOVER/);
   assert.doesNotMatch(html,/tenemos [0-9]+ repartidores|entregas realizadas|cliente[s]? satisfechos/i);
+});
+
+test("V5.2 high-fidelity render assets are authentic, optimized, immutable and fall back to original vector",()=>{
+  assert.equal(desktopWebP.subarray(0,4).toString(),"RIFF");
+  assert.equal(desktopWebP.subarray(8,12).toString(),"WEBP");
+  assert.equal(mobileWebP.subarray(0,4).toString(),"RIFF");
+  assert.equal(mobileWebP.subarray(8,12).toString(),"WEBP");
+  assert.ok(desktopWebP.length<=220000,"Desktop asset exceeds 220 KB budget");
+  assert.ok(mobileWebP.length<=270000,"Mobile asset exceeds 270 KB budget");
+  assert.equal(sha256(desktopWebP),"474f755562617e230f864306d91ed641f96d3bcf58c7757618209c5dd584ec39");
+  assert.equal(sha256(mobileWebP),"4acb78bf2e97f6ee3647cc8b54368d80d6cf5ee730ad1e976c8be77da7fcb5cc");
+  assert.match(html,/<source media="\\(max-width: 430px\\)" type="image\\/webp" srcset="\\.\\/assets\\/v5-cinematic-mobile\\.webp"/);
+  assert.match(html,/<source media="\\(max-width: 430px\\)" type="image\\/svg\\+xml" srcset="\\.\\/assets\\/v5-logistics-mobile\\.svg"/);
+  assert.match(html,/<source media="\\(min-width: 431px\\)" type="image\\/webp" srcset="\\.\\/assets\\/v5-cinematic-desktop\\.webp"/);
+  assert.match(html,/loading="lazy"/);
+  assert.match(html,/no una operación real/i);
 });
 
 test("V5 graphic is authored locally, without scripts or external imagery",()=>{
@@ -55,16 +78,16 @@ test("V5 graphic is authored locally, without scripts or external imagery",()=>{
   assert.match(mobileSvg,/recorrido amarillo luminoso/);
   assert.doesNotMatch(mobileSvg,/<script\b|<foreignObject\b|<image\b|xlink:href|href="https?:\/\//i);
   assert.ok(statSync(new URL("assets/v5-logistics-mobile.svg",root)).size<18000);
-  assert.match(css,/@media\(max-width:430px\)\{[\s\S]*?\.v5-route-overlay \{display:none;\}/);
-  assert.match(css,/\.v5-stage-world \{aspect-ratio:390 \/ 560;min-height:0;\}/);
+  assert.match(css,/\.v5-stage-world \{aspect-ratio:2 \/ 3;min-height:0;\}/);
+  assert.doesNotMatch(css,/\.v5-route-overlay|\.v5-route-line|\.v5-route-node/);
 });
 
 test("V5 animations are finite and accessible; no scroll listener, tracking or blocking",()=>{
-  for(const frame of ["v5-hero-light","v5-route-draw","v5-camera-arrive","v5-contact-arrive"]){
+  for(const frame of ["v5-hero-light","v5-camera-arrive","v52-edge-light","v5-contact-arrive"]){
     assert.match(css,new RegExp("@keyframes "+frame+"\\s*\\{"));
   }
   assert.match(css,/@media\s*\(prefers-reduced-motion:reduce\)/);
-  assert.match(css,/\.v5-route-line\s*\{stroke-dasharray:11 12;stroke-dashoffset:0!important/);
+  assert.match(css,/\.v5-stage-render \{filter:none!important;transform:none!important;\}/);
   assert.match(motion,/const reduced=media\?\.matches===true/);
   assert.match(motion,/instance\.unobserve\(entry\.target\)/);
   assert.match(motion,/root\.dataset\.v5Mode="ready"/);
