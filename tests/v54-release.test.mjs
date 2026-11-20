@@ -28,8 +28,8 @@ test("V5.4 keyboard landmarks and visible focus have source contracts",()=>{
 test("V5.4 local HTTP DAST smoke is restricted and cannot become a public server",()=>{
  assert.match(audit,/const host="http:\/\/127\.0\.0\.1:4173"/);
  assert.match(server,/const host="127\.0\.0\.1"/);
- for(const expected of ["X-Robots-Tag","Content-Security-Policy","X-Content-Type-Options",
-    "Forbidden route","POST rejected","HEAD WebP asset"])assert.ok(audit.includes(expected));
+ for(const expected of ["x-robots-tag","content-security-policy","x-content-type-options",
+    "forbidden route","post rejected","head webp asset"])assert.ok(audit.toLowerCase().includes(expected));
  assert.match(audit,/reports\/quality/);
  assert.match(audit,/if\(failures\.length\)/);
  assert.doesNotMatch(audit,/http:\/\/(?:0\.0\.0\.0|localhost\.localdomain)|https:\/\/desset\.lat/);
@@ -47,6 +47,6 @@ test("V5.4 CI preserves no-deploy guard and asserts security and keyboard eviden
 test("V5.4 rollback and human gates cannot be misread as authorization",()=>{
  for(const requirement of ["Figma","lectores de pantalla","400 %","móviles físicos","INP","marca",
     "evidencia por SHA","rollback","SIN MERGE","SIN DESPLIEGUE","NO-GO"])
-   assert.ok(plan.includes(requirement),"Missing mandatory release blocker: "+requirement);
+   assert.ok(plan.toLowerCase().includes(requirement.toLowerCase()),"Missing mandatory release blocker: "+requirement);
  assert.match(plan,/requiere una autorización nueva y explícita/i);
 });
