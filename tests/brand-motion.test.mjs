@@ -31,8 +31,8 @@ test("V4: identidad visual original y movimiento finito + accesible",()=>{
 test("V4: la secuencia cotidiana es visible y el diagrama técnico no domina la página",()=>{
  assert.match(html,/v4-flow-board/);
  assert.match(html,/ELEGIR/);
- assert.match(html,/ORGANIZAR/);
- assert.match(html,/MOVER/);
+ assert.match(html,/<h3>PREPARAR<\/h3>/);
+ assert.match(html,/<h3>ENTREGAR<\/h3>/);
  assert.match(html,/<details class="v4-architecture-details">/);
  assert.equal((html.match(/roles-geometry-v2\.svg/g)||[]).length,1);
  assert.match(app,/event\.key==="Escape"/);
