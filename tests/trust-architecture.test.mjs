@@ -22,7 +22,7 @@ test("transparent status is explicit, short, and not a decorative trust seal",()
  assert.match(panel,/id="trust-ledger-title"/);
  assert.match(panel,/CLARIDAD DESDE EL PRINCIPIO/);
  assert.equal((panel.match(/class="trust-ledger-item"/g)||[]).length,3);
- for(const phase of ["Pedidos y última milla.","En construcción.","Aún sin operación comercial."])
+ for(const phase of ["Pedidos y última milla","En construcción","Aún sin operación comercial"])
   assert.ok(panel.includes(phase),"Missing credible state "+phase);
  assert.doesNotMatch(panel,/class="trust-ledger-item"><span>/);
  assert.match(panel,/En construcción/);
