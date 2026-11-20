@@ -34,7 +34,8 @@ test("navegación, accesibilidad y seguridad de vista previa",()=>{
  assert.doesNotMatch(html,/href="#"/);
 });
 test("sin dependencia de hojas duplicadas, marca ficticia ni imágenes de stock",()=>{
- assert.equal((html.match(/rel="stylesheet"/g)||[]).length,1);
+ const stylesheets=[...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map(match=>match[1]);
+ assert.deepEqual(stylesheets,["./styles.css","./styles-v5.css"],"Only the V4 base and isolated V5 stylesheet are permitted");
  assert.doesNotMatch(css,/\.art-center\{|\.hero-art\{|@keyframes arrive/);
  assert.doesNotMatch(html,/https?:\/\/images\./);
 });
