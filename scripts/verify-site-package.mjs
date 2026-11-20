@@ -40,6 +40,7 @@ for(const name of ["commerce","courier","destination"]){
 }
 check(expected.has("assets/v6-three.bundle.js"),"Three.js bundle is missing");
 check(expected.has("styles-system.css")&&html.includes('href="./styles-system.css"'),"60/30/10 design CSS not packaged");
+check(expected.has("assets/roles-geometry-es.svg")&&!expected.has("assets/roles-geometry-v2.svg"),"Only localized diagram may be distributed; sealed original remains source-only");
 check(![...expected].some(x=>x.endsWith(".md")||x.includes("workflow")||x.includes("package")||x.includes("node_modules")), "development files in static site");
 async function inventory(path=""){
  const entries=await readdir(resolve(dist,path),{withFileTypes:true});
@@ -55,4 +56,4 @@ async function inventory(path=""){
 const actual=await inventory();
 check(actual.length===expected.size+1,"unexpected file/s in packed site");
 check(actual.every(x=>x==="site-manifest.json"||expected.has(x)),"unknown web package content");
-console.log("DESSET Prime built website PASS: "+expected.size+" signed files, "+total+" bytes; Three.js and three GLB ready, hero-to-ecosystem tour connected");
+console.log("DESSET Prime built website PASS: "+expected.size+" SHA-256-verified files (not cryptographically signed), "+total+" bytes; Three.js and three GLB ready, hero-to-ecosystem tour connected");
