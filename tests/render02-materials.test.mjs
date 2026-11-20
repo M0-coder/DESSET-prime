@@ -18,6 +18,9 @@ test("RENDER-02 owns one local, linear-data roughness texture",()=>{
  assert.match(src,/canvas\.width=128;canvas\.height=128/);
  assert.match(src,/const roughnessMap=makeLocalRoughnessMap\(ownedTextures\)/);
  assert.match(src,/tuned\.roughnessMap=roughnessMap/);
+ assert.equal((src.match(/glass:"glass"/g)||[]).length,2);
+ assert.match(src,/if\(pattern==="glass"\)/);
+ assert.match(src,/ctx\.createLinearGradient\(0,0,256,256\)/);
  assert.match(src,/registry\.push\(map\)/);
  assert.match(src,/map\.anisotropy=1/);
  assert.doesNotMatch(src,/roughnessMap\.colorSpace=THREE\.SRGBColorSpace/);

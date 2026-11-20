@@ -11,9 +11,9 @@ const sources=Object.freeze({
  destination:"./assets/v62-destination.glb"
 });
 const patternByScene={
- commerce:{royal:"metal",gold:"woven",cream:"woven",royalDark:"ribbed"},
+ commerce:{royal:"metal",gold:"woven",cream:"woven",royalDark:"ribbed",glass:"glass"},
  courier:{royal:"woven",gold:"woven",rubber:"rubber"},
- destination:{red:"stucco",cream:"tile",royalDark:"ribbed"}
+ destination:{red:"stucco",cream:"tile",royalDark:"ribbed",glass:"glass"}
 };
 // RENDER-02: named glTF surfaces, physically bounded finishes.
 const finishProfiles=Object.freeze({
@@ -60,7 +60,20 @@ function makeLocalTexture(pattern,registry){
  const ctx=canvas.getContext("2d");
  if(!ctx)throw new Error("No Canvas2D to make authored textures");
  ctx.fillStyle="#eeeeee";ctx.fillRect(0,0,256,256);
- if(pattern==="stucco"){
+ if(pattern==="glass"){
+  // RENDER-02: controlled graphic reflection, no environment map or external HDR.
+  const reflection=ctx.createLinearGradient(0,0,256,256);
+  reflection.addColorStop(0,"#e4f4ff");
+  reflection.addColorStop(.19,"#fafdff");
+  reflection.addColorStop(.27,"#85b6e0");
+  reflection.addColorStop(.42,"#ffffff");
+  reflection.addColorStop(.57,"#d4e9f8");
+  reflection.addColorStop(1,"#d0e8f8");
+  ctx.fillStyle=reflection;ctx.fillRect(0,0,256,256);
+  ctx.fillStyle="rgba(255,255,255,.36)";
+  ctx.beginPath();ctx.moveTo(47,0);ctx.lineTo(112,0);
+  ctx.lineTo(236,256);ctx.lineTo(179,256);ctx.closePath();ctx.fill();
+ }else if(pattern==="stucco"){
   ctx.fillStyle="#faf5f0";ctx.fillRect(0,0,256,256);
   ctx.strokeStyle="rgba(41,34,35,.14)";ctx.lineWidth=3;
   for(let row=0;row<8;row++){
