@@ -60,6 +60,31 @@ if(!stage||!mount||!controls||reduced){
    new THREE.MeshBasicMaterial({map:texture,transparent:true,depthWrite:false,side:THREE.DoubleSide}));
   surface.position.set(x,y,z);parent.add(surface);return surface;
  };
+ // Additive GPU sprites create a restrained cinematic glow without a post-processing pass.
+ let glowTexture;
+ const glow=(parent,x,y,z,color,scale,opacity=.34)=>{
+  if(!glowTexture){
+   const canvas=document.createElement("canvas");canvas.width=128;canvas.height=128;
+   const ctx=canvas.getContext("2d");
+   if(!ctx)return;
+   const gradient=ctx.createRadialGradient(64,64,2,64,64,63);
+   gradient.addColorStop(0,"rgba(255,255,255,.93)");
+   gradient.addColorStop(.19,"rgba(255,255,255,.55)");
+   gradient.addColorStop(.50,"rgba(255,255,255,.13)");
+   gradient.addColorStop(1,"rgba(255,255,255,0)");
+   ctx.fillStyle=gradient;ctx.fillRect(0,0,128,128);
+   glowTexture=new THREE.CanvasTexture(canvas);
+   glowTexture.colorSpace=THREE.SRGBColorSpace;
+   ownedTextures.push(glowTexture);
+  }
+  const material=new THREE.SpriteMaterial({
+   map:glowTexture,color,transparent:true,opacity,
+   blending:THREE.AdditiveBlending,depthWrite:false
+  });
+  const sprite=new THREE.Sprite(material);
+  sprite.position.set(x,y,z);sprite.scale.set(scale,scale,1);
+  parent.add(sprite);return sprite;
+ };
  const plinth=(parent,w,d)=>{
   const shade=new THREE.Mesh(new THREE.CircleGeometry(1,24),
    new THREE.MeshBasicMaterial({color:0x03060e,transparent:true,opacity:.30,depthWrite:false}));
@@ -165,6 +190,10 @@ if(!stage||!mount||!controls||reduced){
   box(parcel,.10,.66,.73,0,.005,0,mats.cream);
   box(parcel,.85,.07,.12,0,.34,0,mats.cream);
   parcel.position.set(coarse?-1.2:-2.25,1.35,coarse?-2.35:-.58);scene.add(parcel);
+  glow(scene,coarse?-.7:-5,2.8,coarse?-4.7:0,0x4a8cff,2.8,.28);
+  glow(scene,coarse?.7:5.03,2.6,coarse?4.7:-.35,0xff6852,2.4,.23);
+  glow(scene,coarse?0:.98,2.1,coarse?0:1.18,0xffc62f,1.7,.25);
+  glow(particle,0,0,0,0xffc62f,1.5,.55);
   // Soft pools of light offer depth without a costly post-processing pass.
   const pools=coarse?[[-.7,-4.7,2.25],[0,0,2.05],[.7,4.7,2.0]]:[[-5,0,2.25],[.98,1.18,2.05],[5.03,-.35,2.0]];
   for(const [x,z,r] of pools){
