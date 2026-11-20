@@ -9,7 +9,7 @@
  const cues=document.querySelectorAll(
   ".statement h2, .solutions .section-head, .ecosystem .section-head, "+
   ".motion-story, .motion-story-unit, .audiences .section-head, "+
-  ".trust-ledger, .solutions-grid .service--main, .business-pitch, "+
+  ".solutions-grid .service--main, .business-pitch, "+
   ".audience-grid--compact .audience, .contact-bottom--rc, "+
   ".contact, .closing-line"
  );

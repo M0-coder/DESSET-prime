@@ -155,7 +155,7 @@ try{
  report.tests.push({name:"V4.5 hero scale and original mark motion",kineticIntro});
  const anim01=await js('(()=>({glint:getComputedStyle(document.querySelector(".v5-glint")).display,scan:getComputedStyle(document.querySelector(".v5-stage-scan")).display,red:getComputedStyle(document.querySelector(".v4-shape-red")).animationName,blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,direction:document.documentElement.dataset.motionDirection,lensTransform:getComputedStyle(document.querySelector(".v5-hero-refraction")).transform}))()');
  if(anim01.glint!=="none"||anim01.scan!=="none"||
-   anim01.red!=="anim01-graphic-settle"||anim01.blue!=="v45-blue-strike"||
+   anim01.red!=="v4-red-pop"||anim01.blue!=="v45-blue-strike"||
    anim01.direction!=="editorial-cinematic-v1"||anim01.lensTransform!=="none")
   report.failures.push("ANIM-01 editorial cinematic composition regressed: "+JSON.stringify(anim01));
  report.tests.push({name:"ANIM-01 no scanner, glint, cursor-game lens or bouncing hero",anim01});

@@ -25,3 +25,7 @@ No cambios de HTML, 3D GLB/Three.js, fotos WebP, CSS system, cabezales CSP, empa
 Compilación + empaquetado reproducible, pruebas unitarias, static gate, HTTP 17/17, preflight de publicación en NO-GO, cobertura instrumental con alcance correcto, mutation smoke dirigido, navegador con 6 estados/25 capturas, GPU WebGL2 intacta, Lighthouse en sitio `dist/`. Comparar capturas con versión preferida, no solo CI.
 
 **Gobierno:** DRAFT / NO MERGE / NO AUTO-MERGE / NO DEPLOY / NO RELEASE / NO DNS / NO CLOUDFLARE. Requiere revisión visual antes de considerar integración por SHA separado.
+
+### Ajuste de contratos legado
+
+El presupuesto contractual de `styles.css` (<45KB) y el veto a animación en `trust-ledger` se preservaron; no se relajó ningún test. Para ello, las entradas editoriales se reusaron desde `prime-scene-rise` con solo 12px de desplazamiento, y los keyframes existentes `v4-red-pop`, `v4-canvas-reveal`, `v45-blue-strike`, `v45-mark-lock`, `v45-scene-illustration` y `v45-route-point` se suavizaron *en su origen*, sin duplicar miles de bytes de CSS. El cierre (estilo 60/30/10) ahora llega verticalmente sin inclinación. Se deshabilitó el listener de puntero que ya no tiene sentido. La tarjeta de confianza queda siempre estática y legible.

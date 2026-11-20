@@ -205,9 +205,9 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
  
 }
 @keyframes v4-type-rise{from{transform:translate3d(0,112%,0);opacity:.6}to{transform:translate3d(0,0,0);opacity:1}}
-@keyframes v4-canvas-reveal{from{opacity:0;transform:translateY(50px) rotate(7deg) scale(.92)}to{opacity:1;transform:translateY(0) rotate(-2deg) scale(1)}}
+@keyframes v4-canvas-reveal{from{opacity:.85;transform:translateY(12px) rotate(-2deg) scale(.99)}to{opacity:1;transform:translateY(0) rotate(-2deg) scale(1)}}
 @keyframes v4-yellow-swipe{from{transform:translate(100%,22%) rotate(-18deg)}to{transform:translate(0,0) rotate(-18deg)}}
-@keyframes v4-red-pop{from{transform:translate(90%,60%) rotate(0deg) scale(.3)}to{transform:translate(0,0) rotate(27deg) scale(1)}}
+@keyframes v4-red-pop{from{transform:translate(7%,6%) rotate(27deg) scale(.97)}to{transform:translate(0,0) rotate(27deg) scale(1)}}
 @keyframes v4-intro-fade{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes v4-rail-enter{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 @media(max-width:1180px){
@@ -336,7 +336,7 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
  .contact .closing-line--final.motion-active{animation-delay:.24s}
 }
 @keyframes prime-thread-paint{from{transform:rotate(-23deg) scaleX(0);opacity:0}to{transform:rotate(-23deg) scaleX(.94);opacity:.88}}
-@keyframes prime-scene-rise{from{opacity:.85;transform:translate3d(0,16px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes prime-scene-rise{from{opacity:.95;transform:translate3d(0,12px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
 @keyframes prime-bridge-draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @keyframes prime-shape-in{from{opacity:.4;scale:.75}to{opacity:1;scale:1}}
 @keyframes prime-type-line{from{opacity:.5;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
@@ -624,11 +624,11 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
  .contact.motion-active::after{animation:v45-contact-slash .9s cubic-bezier(.12,.78,.17,1) .15s both}
 }
 @keyframes v45-blue-strike{
- from{opacity:.45;transform:translate3d(-65%,-40%,0) rotate(-24deg)}
+ from{opacity:.78;transform:translate3d(-9%,-6%,0) rotate(-24deg)}
  to{opacity:1;transform:translate3d(0,0,0) rotate(-24deg)}
 }
 @keyframes v45-mark-lock{
- from{opacity:0;transform:translate3d(23px,-22px,0) scale(1.13)}
+ from{opacity:.78;transform:translate3d(0,12px,0) scale(.98)}
  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
 }
 @keyframes v45-declaration-in{
@@ -636,11 +636,11 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
  to{opacity:1;transform:translate3d(0,0,0)}
 }
 @keyframes v45-scene-illustration{
- from{opacity:.22;transform:translate3d(0,38px,0) rotate(-5deg) scale(.89)}
+ from{opacity:.84;transform:translate3d(0,13px,0) rotate(0deg) scale(.99)}
  to{opacity:1;transform:translate3d(0,0,0) rotate(0deg) scale(1)}
 }
 @keyframes v45-route-point{
- from{opacity:.3;transform:scale(.4)}to{opacity:1;transform:scale(1)}
+ from{opacity:.75;transform:scale(.96)}to{opacity:1;transform:scale(1)}
 }
 @keyframes v45-editorial-rise{
  from{opacity:.45;transform:translate3d(0,35px,0)}
@@ -664,65 +664,6 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
  .contact::after{animation:none!important;transition:none!important}
 }
 
-/* ANIM-01 — cinematic editorial direction, not game UI.
- * One-shot typography / frame entrances; no layout hiding, scroll trapping,
- * looping shaders, pointer parallax, remote assets or extra 3D.
- * Default visible markup remains fully readable without JS. */
-.v5-hero-refraction .v5-glint,
-.v5-city-stage .v5-stage-scan {display:none;}
-/* The decorative lens remains a static editorial motif, never cursor-following. */
-.v5-hero-refraction{transform:none!important;transition:none!important;}
-
-@media(prefers-reduced-motion:no-preference){
- /* Opening: brand and planes settle rather than bouncing or flying across. */
- .v4-shape-red{animation:anim01-graphic-settle .84s cubic-bezier(.19,.8,.24,1) .68s both;}
- .v4-canvas-stamp{animation-duration:.8s;animation-delay:.78s;}
- .v4-shape-blue{animation-duration:.86s;animation-delay:.35s;}
- .hero[data-variant="v4"] .hero-lead,
- .hero[data-variant="v4"] .hero-actions{animation-duration:.76s;animation-delay:.62s;}
- /* Editorial rhythm across the actual site, not a second autoplay scene. */
- .trust-ledger.motion-active,
- .solutions-grid .service--main.motion-active,
- .business-pitch.motion-active,
- .audience-grid--compact .audience.motion-active,
- .contact-bottom--rc.motion-active{
-  animation:anim01-editorial-entrance .84s cubic-bezier(.19,.78,.24,1) both;
- }
- .audience-grid--compact .audience:nth-child(2).motion-active{animation-delay:.1s;}
- .motion-story-unit.motion-active .motion-story-art img{animation-duration:.82s;}
- .contact .closing-line.motion-active{animation:anim01-closing-line .85s cubic-bezier(.18,.75,.24,1) both;}
- .contact .closing-line--middle.motion-active{animation-delay:.1s;}
- .contact .closing-line--final.motion-active{animation-delay:.2s;}
-}
-@keyframes v45-blue-strike{
- from{opacity:.75;transform:translate3d(-7%,-4%,0) rotate(-24deg)}
- to{opacity:1;transform:translate3d(0,0,0) rotate(-24deg)}
-}
-@keyframes v45-mark-lock{
- from{opacity:.75;transform:translate3d(0,12px,0) scale(.98)}
- to{opacity:1;transform:translate3d(0,0,0) scale(1)}
-}
-@keyframes v45-scene-illustration{
- from{opacity:.8;transform:translate3d(0,13px,0) scale(.985)}
- to{opacity:1;transform:translate3d(0,0,0) scale(1)}
-}
-@keyframes v45-route-point{
- from{opacity:.7;transform:scale(.95)}to{opacity:1;transform:scale(1)}
-}
-@keyframes anim01-graphic-settle{
- from{opacity:.83;transform:translate3d(7%,6%,0) rotate(27deg) scale(.97)}
- to{opacity:1;transform:translate3d(0,0,0) rotate(27deg) scale(1)}
-}
-@keyframes anim01-editorial-entrance{
- from{opacity:.94;transform:translate3d(0,16px,0)}
- to{opacity:1;transform:translate3d(0,0,0)}
-}
-@keyframes anim01-closing-line{
- from{opacity:1;transform:translate3d(0,18px,0)}
- to{opacity:1;transform:translate3d(0,0,0)}
-}
-@media(prefers-reduced-motion:reduce){
- .v5-hero-refraction{transform:none!important;}
- .trust-ledger,.solutions-grid .service--main,.business-pitch,
- .audience-grid--compact .audience,.contact-bottom--rc{animation:none!important;opacity:1!important;transform:none!important;}
-}
+/* ANIM-01: game-like scan/glint suppressed; documentary/editorial composition retained. */
+.v5-hero-refraction .v5-glint,.v5-city-stage .v5-stage-scan{display:none}
+.v5-hero-refraction{transform:none!important;transition:none!important}
