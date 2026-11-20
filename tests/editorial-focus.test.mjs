@@ -28,7 +28,7 @@ test("no numbered editorial label survives in any visible section, card, diagram
 });
 
 test("primary business narrative remains intelligible without decorative microcopy",()=>{
- for(const heading of ["EL COMERCIO","SE MUEVE","NO ES SOLO","Pedidos, comercios","Elegir. Preparar.","Para negocios","LAS BUENAS"]){
+ for(const heading of ["EL COMERCIO","SE MUEVE","NO ES SOLO","Pedidos, comercios","Elegir, preparar","Para negocios","LAS BUENAS"]){
   assert.ok(html.includes(heading),"Missing principal heading: "+heading);
  }
  assert.equal((html.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,3);
