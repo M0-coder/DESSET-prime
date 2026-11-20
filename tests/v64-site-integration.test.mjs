@@ -11,7 +11,7 @@ test("V6.4 packages the actual Prime website, not only an isolated GPU demo",()=
  assert.equal(manifest.schema,"desset-prime-static-web-package-v1");
  assert.equal(manifest.domain,"none");
  assert.equal(manifest.noindex,true);
- for(const file of ["index.html","styles.css","styles-v5.css","_headers",
+ for(const file of ["index.html","styles.css","styles-v5.css","styles-system.css","_headers",
   "scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js",
   "assets/v6-three.bundle.js","assets/v62-commerce.glb",
   "assets/v62-courier.glb","assets/v62-destination.glb"]){
