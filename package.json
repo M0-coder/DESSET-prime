@@ -6,7 +6,10 @@
   "description": "DESSET Prime experimental Three.js WebGL diorama: no production deployment",
   "scripts": {
     "build:3d": "node scripts/build-three.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "build:site": "npm run build:3d && node scripts/build-site.mjs",
+    "pack:site": "node scripts/build-site.mjs",
+    "verify:site": "node scripts/verify-site-package.mjs"
   },
   "dependencies": {
     "three": "0.187.0"
