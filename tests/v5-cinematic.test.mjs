@@ -56,9 +56,9 @@ test("V5.2 high-fidelity render assets are authentic, optimized, immutable and f
   assert.ok(mobileWebP.length<=270000,"Mobile asset exceeds 270 KB budget");
   assert.equal(sha256(desktopWebP),"474f755562617e230f864306d91ed641f96d3bcf58c7757618209c5dd584ec39");
   assert.equal(sha256(mobileWebP),"4acb78bf2e97f6ee3647cc8b54368d80d6cf5ee730ad1e976c8be77da7fcb5cc");
-  assert.match(html,/<source media="\\(max-width: 430px\\)" type="image\\/webp" srcset="\\.\\/assets\\/v5-cinematic-mobile\\.webp"/);
-  assert.match(html,/<source media="\\(max-width: 430px\\)" type="image\\/svg\\+xml" srcset="\\.\\/assets\\/v5-logistics-mobile\\.svg"/);
-  assert.match(html,/<source media="\\(min-width: 431px\\)" type="image\\/webp" srcset="\\.\\/assets\\/v5-cinematic-desktop\\.webp"/);
+  assert.ok(html.includes('media="(max-width: 430px)" type="image/webp" srcset="./assets/v5-cinematic-mobile.webp"'));
+  assert.ok(html.includes('media="(max-width: 430px)" type="image/svg+xml" srcset="./assets/v5-logistics-mobile.svg"'));
+  assert.ok(html.includes('media="(min-width: 431px)" type="image/webp" srcset="./assets/v5-cinematic-desktop.webp"'));
   assert.match(html,/loading="lazy"/);
   assert.match(html,/no una operación real/i);
 });
