@@ -14,6 +14,7 @@ if(!stage||!mount||!controls||reduced){
  let renderer,scene,camera,model,ro,observer,raf=0,alive=false,onscreen=true,paused=false;
  let cameraPreset="overview",frame=0,particle,parcel;
  let pointer={x:0,y:0},last=0,lastRender=0;
+ let onMove,onLeave,onResize,onVisibility;
  const PAL={blue:0x1551d8,gold:0xffc62f,red:0xff3328,night:0x0b1024};
  const makeMat=(color,metalness=0.2,roughness=0.48,emissive=0x000000,intensity=0)=>
    new THREE.MeshStandardMaterial({color,metalness,roughness,emissive,emissiveIntensity:intensity});
@@ -155,7 +156,7 @@ if(!stage||!mount||!controls||reduced){
  const tmp=new THREE.Vector3();
  function resize(w,h){
   if(!renderer||!camera)return;
-  const ratio=w/Math.max(1,h),size=coarse?10.4:8.0;
+  const ratio=w/Math.max(1,h),size=coarse?9.8:5.8;
   camera.left=-size*ratio;camera.right=size*ratio;
   camera.top=size;camera.bottom=-size;
   camera.updateProjectionMatrix();renderer.setSize(w,h,false);
@@ -167,8 +168,21 @@ if(!stage||!mount||!controls||reduced){
  function fail(reason){
   stop();stage.dataset.v6State=reason;
   controls.hidden=true;stage.dataset.v6View="poster";
-  mount.replaceChildren();
+  ro?.disconnect();observer?.disconnect();
+  if(onMove)mount.removeEventListener("pointermove",onMove);
+  if(onLeave)mount.removeEventListener("pointerleave",onLeave);
+  if(onResize)window.removeEventListener("resize",onResize);
+  if(onVisibility)document.removeEventListener("visibilitychange",onVisibility);
+  const materials=new Set(Object.values(mats));
+  scene?.traverse(obj=>{
+    obj.geometry?.dispose();
+    if(Array.isArray(obj.material))for(const m of obj.material)materials.add(m);
+    else if(obj.material)materials.add(obj.material);
+  });
+  for(const material of materials)material.dispose();
   renderer?.dispose();renderer=undefined;
+  mount.replaceChildren();
+  window.__dessetV6Probe=undefined;
   const trigger=stage.querySelector(".v6-enable-webgl");
   if(trigger)trigger.hidden=false;
  }
@@ -225,19 +239,23 @@ if(!stage||!mount||!controls||reduced){
       if(paused)stop();else wake();
     }else if(button.classList.contains("v6-poster")){fail("poster")}
    });
-   mount.addEventListener("pointermove",e=>{
+   onMove=e=>{
     if(coarse)return;
     const r=mount.getBoundingClientRect();
     pointer.x=((e.clientX-r.left)/Math.max(1,r.width)-.5)*2;
     pointer.y=((e.clientY-r.top)/Math.max(1,r.height)-.5)*2;
-   },{passive:true});
-   mount.addEventListener("pointerleave",()=>{pointer.x=0;pointer.y=0},{passive:true});
-   window.addEventListener("resize",()=>{if(renderer)resize(Math.max(mount.clientWidth,1),Math.max(mount.clientHeight,1))},{passive:true});
+   };
+   onLeave=()=>{pointer.x=0;pointer.y=0};
+   onResize=()=>{if(renderer)resize(Math.max(mount.clientWidth,1),Math.max(mount.clientHeight,1))};
+   mount.addEventListener("pointermove",onMove,{passive:true});
+   mount.addEventListener("pointerleave",onLeave,{passive:true});
+   window.addEventListener("resize",onResize,{passive:true});
    ro=new ResizeObserver(entries=>{for(const e of entries)resize(Math.max(1,e.contentRect.width),Math.max(1,e.contentRect.height))});
    ro.observe(mount);
    observer=new IntersectionObserver(entries=>{onscreen=entries[0]?.isIntersecting===true;if(onscreen)wake()}, {threshold:0.02});
    observer.observe(stage);
-   document.addEventListener("visibilitychange",()=>{if(document.hidden)stop();else wake()});
+   onVisibility=()=>{if(document.hidden)stop();else wake()};
+   document.addEventListener("visibilitychange",onVisibility);
    camera.position.set(...presets.overview.pos);cameraTarget.set(...presets.overview.look);camera.lookAt(cameraTarget);
    applyView("overview");
    renderer.render(scene,camera);
