@@ -10,10 +10,12 @@ test("VISUAL-03 uses only approved branded photo and original SVG backups",()=>{
  assert.match(html,/deliver-assets-mark\.png/);assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
 test("VISUAL-03 static art has separate crops, reduced-motion safety and bounded CSS",()=>{
- assert.match(css,/\.motion-story-art--choose \.v03-photo-story img\{left:0\}/);
- assert.match(css,/\.motion-story-art--organize \.v03-photo-story img\{left:-40%\}/);
- assert.match(css,/\.motion-story-art--move \.v03-photo-story img\{left:-100%\}/);
- assert.match(css,/\.v03-photo-story img\{position:absolute;top:0;width:200%/);
+ assert.match(css,/\.motion-story-art--choose\{--v03-focus:0%\}/);
+ assert.match(css,/\.motion-story-art--organize\{--v03-focus:45%\}/);
+ assert.match(css,/\.motion-story-art--move\{--v03-focus:100%\}/);
+ assert.match(css,/\.v03-photo-story img\{display:block;width:100%;height:100%/);
+ assert.match(css,/\.v03-photo-story::after\{content:"";position:absolute;inset:0/);
+ assert.match(css,/background-image:url\("\.\/assets\/desset-hero-entrega-dos-espejos\.webp"\)/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{#ecosistema \.v03-photo-story img/);
  assert.ok(statSync(new URL("styles-visual02.css",root)).size<=5200);
  assert.doesNotMatch(css,/https?:\/\/|@import|@font-face/);
