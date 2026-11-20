@@ -40,6 +40,10 @@ for(const name of ["commerce","courier","destination"]){
 }
 check(expected.has("assets/v6-three.bundle.js"),"Three.js bundle is missing");
 check(expected.has("styles-system.css")&&html.includes('href="./styles-system.css"'),"60/30/10 design CSS not packaged");
+check(expected.has("scripts/service-state.js")&&html.includes('src="./scripts/service-state.js"'),"Institutional availability module not packaged");
+const availability=await readFile(resolve(dist,"scripts/service-state.js"),"utf8");
+check(availability.includes('applicationDistribution:"not_published"')&&availability.includes('verified:false'),"Unapproved application publication status");
+check(html.includes('data-service-access')&&html.includes('data-service-status'),"Availability block missing from packaged site");
 check(expected.has("assets/roles-geometry-es.svg")&&!expected.has("assets/roles-geometry-v2.svg"),"Only localized diagram may be distributed; sealed original remains source-only");
 check(![...expected].some(x=>x.endsWith(".md")||x.includes("workflow")||x.includes("package")||x.includes("node_modules")), "development files in static site");
 async function inventory(path=""){
