@@ -1,4 +1,4 @@
-name: DESSET Prime V6.7 — sistema cromático 60-30-10 y narrativa editorial, sin despliegue
+name: DESSET Prime V6.8 — auditoría forense de integridad y accesibilidad, sin despliegue
 on:
   push:
     branches: [design/**]
@@ -44,6 +44,7 @@ jobs:
           node --check tests/v65-whole-site-audit.test.mjs
           node --check tests/v66-punctuation-radius.test.mjs
           node --check tests/v67-visual-system.test.mjs
+          node --check tests/v68-deep-audit.test.mjs
           node --check scripts/v6-gpu-browser-audit.mjs
           node --check assets/v6-three.bundle.js
           test -s assets/v62-commerce.glb
@@ -76,7 +77,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: desset-prime-v67-visual-system-qa
+          name: desset-prime-v68-full-repo-audit-qa
           path: |
             reports/browser/
             reports/quality/
@@ -132,7 +133,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: desset-prime-v67-lighthouse-built-site
+          name: desset-prime-v68-lighthouse-built-site
           path: reports/lighthouse/
           if-no-files-found: warn
           retention-days: 14
