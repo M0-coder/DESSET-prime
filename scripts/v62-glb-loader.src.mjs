@@ -91,7 +91,7 @@ export async function hydrateGLBModels({scene,coarse,stage,sign,ownedTextures,is
  const rows=Object.entries(sources);
  let loaded;
  try{
-  loaded=await Promise.all(rows.map(async([name,url])=>{
+  const tasks=rows.map(async([name,url])=>{
    const gltf=await loader.loadAsync(url);
    let meshes=0,triangles=0;
    gltf.scene.traverse(node=>{
@@ -100,10 +100,35 @@ export async function hydrateGLBModels({scene,coarse,stage,sign,ownedTextures,is
     const geo=node.geometry;
     triangles+=(geo.index?geo.index.count:geo.attributes.position.count)/3;
    });
-   if(meshes<5||meshes>40||triangles<250||triangles>45000)
+   if(meshes<5||meshes>40||triangles<250||triangles>45000){
+    disposeLoaded(gltf);
     throw new Error("GLB model outside budget: "+name+" "+meshes+" meshes "+triangles+" triangles");
+   }
    return {name,url,gltf,meshes,triangles};
-  }));
+  });
+  // Three independent assets must either succeed together or leave the
+  // working procedural 3D visible; never partially replace scene meshes.
+  const pending=Promise.allSettled(tasks);
+  const timeoutToken=Symbol("glb-timeout");
+  let deadline;
+  const outcomes=await Promise.race([
+   pending,
+   new Promise(resolve=>{deadline=setTimeout(()=>resolve(timeoutToken),10000)})
+  ]);
+  clearTimeout(deadline);
+  if(outcomes===timeoutToken){
+   // Late responses must be disposed, never inserted after fallback starts.
+   void pending.then(results=>{
+    for(const item of results)if(item.status==="fulfilled")disposeLoaded(item.value.gltf);
+   });
+   throw new Error("GLB loading timed out after 10s");
+  }
+  const failures=outcomes.filter(item=>item.status==="rejected");
+  if(failures.length){
+   for(const item of outcomes)if(item.status==="fulfilled")disposeLoaded(item.value.gltf);
+   throw new Error("GLB batch failed: "+failures.map(item=>String(item.reason).slice(0,100)).join("; "));
+  }
+  loaded=outcomes.map(item=>item.value);
  }catch(error){
   stage.dataset.v62ModelsStatus="fallback";
   stage.dataset.v62ModelsError="asset-loading";
@@ -115,10 +140,15 @@ export async function hydrateGLBModels({scene,coarse,stage,sign,ownedTextures,is
   for(const row of loaded)disposeLoaded(row.gltf);
   return {ready:false,models:[]};
  }
+ const sceneParents=new Map(loaded.map(row=>[row.name,scene.getObjectByName(row.name)]));
+ if([...sceneParents.values()].some(parent=>!parent)){
+  for(const row of loaded)disposeLoaded(row.gltf);
+  stage.dataset.v62ModelsStatus="fallback";
+  return {ready:false,models:[]};
+ }
  const details=[];
  for(const row of loaded){
-  const parent=scene.getObjectByName(row.name);
-  if(!parent){stage.dataset.v62ModelsStatus="fallback";return {ready:false,models:[]}}
+  const parent=sceneParents.get(row.name);
   const maps=new Map();
   const patternNames=patternByScene[row.name];
   row.gltf.scene.traverse(node=>{
