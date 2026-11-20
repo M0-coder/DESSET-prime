@@ -241,8 +241,8 @@ try{
    report.tests.push({name:"mobile technical detail expandable",detailOpen});
    await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
    await sleep(350);
-   const v5Mobile=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {visible:e.classList.contains("v5-visible"),left:r.left,right:r.right,viewport:v,overflow:document.documentElement.scrollWidth>v+2,caption:e.querySelector("figcaption")?.textContent?.trim(),imageLoaded:e.querySelector("img")?.naturalWidth>0}})()');
-   if(!v5Mobile.visible||v5Mobile.left< -2||v5Mobile.right>v5Mobile.viewport+2||v5Mobile.overflow||!v5Mobile.imageLoaded||!v5Mobile.caption?.includes("conceptual"))report.failures.push("V5 mobile 390 scene failed: "+JSON.stringify(v5Mobile));
+   const v5Mobile=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {visible:e.classList.contains("v5-visible"),left:r.left,right:r.right,viewport:v,overflow:document.documentElement.scrollWidth>v+2,caption:e.querySelector("figcaption")?.textContent?.trim(),imageLoaded:e.querySelector("img")?.naturalWidth>0,source:e.querySelector("img")?.currentSrc,overlay:getComputedStyle(e.querySelector(".v5-route-overlay")).display,ratio:Math.round(e.querySelector(".v5-stage-world").getBoundingClientRect().height/e.querySelector(".v5-stage-world").getBoundingClientRect().width*100)/100}})()');
+   if(!v5Mobile.visible||v5Mobile.left< -2||v5Mobile.right>v5Mobile.viewport+2||v5Mobile.overflow||!v5Mobile.imageLoaded||!v5Mobile.source?.includes("v5-logistics-mobile.svg")||v5Mobile.overlay!=="none"||v5Mobile.ratio<1.3||!v5Mobile.caption?.includes("conceptual"))report.failures.push("V5 mobile 390 scene failed: "+JSON.stringify(v5Mobile));
    report.tests.push({name:"V5 mobile 390 cinematic layout",v5Mobile});
    await capture("mobile-v5-scene.png");
   }
@@ -254,6 +254,9 @@ try{
    await capture("mobile-320-full.png",true);
    await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
    await sleep(250);
+   const v5Narrow=await js('(()=>{const e=document.querySelector(".v5-city-stage"),art=e.querySelector("img"),b=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {src:art.currentSrc,width:art.naturalWidth,height:art.naturalHeight,inside:b.left>=-2&&b.right<=v+2,overlay:getComputedStyle(e.querySelector(".v5-route-overlay")).display}})()');
+   if(!v5Narrow.src?.includes("v5-logistics-mobile.svg")||v5Narrow.width!==390||v5Narrow.height!==560||!v5Narrow.inside||v5Narrow.overlay!=="none")report.failures.push("V5 mobile 320 narrative composition failed: "+JSON.stringify(v5Narrow));
+   report.tests.push({name:"V5 mobile 320 full narrative",v5Narrow});
    await capture("mobile-320-v5-scene.png");
   }
  }
