@@ -214,4 +214,4 @@ const result={type:"experimental-WebGL2-real-GPU-smoke",checks,failures,captures
  serverLog:serverLogs.slice(-300),chromeLog:chromeError.slice(-600)};
 await writeFile(join(out,"gpu-audit.json"),JSON.stringify(result,null,2)+"\n");
 if(failures.length){console.error("V6 REAL WebGL AUDIT FAIL\n"+failures.join("\n"));process.exitCode=1}
-else console.log("V6 REAL WebGL AUDIT PASS "+checks.length+" checks / "+captures.length+" screenshots, triangles="+checks[0].desktop.triangles);
+else {const gpuCheck=checks.find(x=>x.name==="Desktop WebGL2 real draw calls");console.log("V6 REAL WebGL AUDIT PASS "+checks.length+" checks / "+captures.length+" screenshots, triangles="+(gpuCheck?.desktop?.triangles??"not recorded"));}
