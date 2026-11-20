@@ -44,6 +44,7 @@
     const script=document.createElement("script");
     script.src="./assets/v6-three.bundle.js";
     script.async=true;
+    script.onload=()=>{webglRequested=false};
     script.onerror=()=>{
       webglRequested=false;
       stage.dataset.v6State="fallback";
