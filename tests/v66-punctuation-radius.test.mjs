@@ -30,7 +30,7 @@ test("V6.6 punctuation stays in natural prose and legal availability disclosures
  assert.match(html,/DESSET está en desarrollo\. Esta página informa/);
  assert.match(html,/no procesa pedidos ni pagos\./);
  assert.match(html,/no representa una operación activa\. Las aplicaciones/);
- assert.match(html,/no reciben pedidos, pagos ni contrataciones desde esta web\./);
+ assert.match(html,/No se reciben pedidos, pagos ni contrataciones desde esta web\./);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
 
