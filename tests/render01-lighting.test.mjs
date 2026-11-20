@@ -11,8 +11,11 @@ test("RENDER-01 replaces hard-edged ground circles with a bounded local light fa
  assert.match(src,/new THREE\.CanvasTexture\(lampCanvas\)/);
  assert.match(src,/ownedTextures\.push\(render01FloorTexture\)/);
  assert.match(src,/new THREE\.PlaneGeometry\(r\*2,r\*2\)/);
- assert.match(src,/render01FloorTexture\?\.24:\.07/);
+ assert.match(src,/render01FloorTexture\?\.38:\.07/);
  assert.match(src,/halo\.name="render01-floor-pool"/);
+ assert.match(src,/mass\.name="render01-background-mass"/);
+ assert.match(src,/mass\.castShadow=false;mass\.receiveShadow=false/);
+ assert.match(src,/renderer\.toneMappingExposure=1\.07/);
  for(const color of ["0x447bff","PAL.gold","0xff6852"])assert.ok(src.includes(color));
  assert.doesNotMatch(src,/new THREE\.EffectComposer|UnrealBloomPass|WebGLMultipleRenderTargets/);
 });
