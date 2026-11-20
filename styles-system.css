@@ -1,0 +1,104 @@
+/* DESSET PRIME V6.7 — VISUAL SYSTEM / PRE-PUBLICATION EXPERIMENT
+ * 60/30/10 is a visual-area hierarchy, not a pixel-exact CSS calculation.
+ * 60% neutral canvas, ~30% ink / established DESSET royal blue, <=10% gold/red
+ * accents. Keep the existing brand's original pigment values.
+ *
+ * Loaded after styles.css and styles-v5.css; no external fonts or assets.
+ */
+:root {
+ --ds-60-paper:#F7F5EE;
+ --ds-60-surface:#FFFDF8;
+ --ds-30-ink:#111827;
+ --ds-30-blue:#1551D8;
+ --ds-10-gold:#FFC62F;
+ --ds-10-signal:#FF3328;
+ --ds-copy:#202937;
+ --ds-muted:#465060;
+ --ds-stroke:#D6D7D6;
+ --ds-radius-compact:12px;
+ --ds-radius-surface:18px;
+ --ds-radius-feature:26px;
+ --ds-shadow-soft:0 20px 54px rgba(10,23,47,.13);
+}
+body {background:var(--ds-60-paper);color:var(--ds-copy);}
+.site-header {background:var(--ds-60-surface);border-bottom-color:var(--ds-stroke);}
+.brand-name {color:var(--ds-30-ink);}
+.main-nav a:hover,.audience a {color:var(--ds-30-blue);}
+.main-nav .nav-contact {background:var(--ds-30-ink);color:#FFFDF8;border-radius:var(--ds-radius-compact);}
+.main-nav .nav-contact:hover {background:var(--ds-30-blue);color:#fff;}
+.solutions {background:var(--ds-60-paper);}
+.audiences {background:var(--ds-60-surface);}
+.ecosystem {background:#F1F1EB;}
+.solutions-grid .service--main,
+.business-pitch {background:var(--ds-30-blue);color:#fff;}
+.service {border-color:var(--ds-stroke);}
+.service:not(.service--main) {background:var(--ds-60-surface);}
+.section-head>p,.audience p,.service:not(.service--main) .service-body p {color:var(--ds-muted);}
+.business-pitch {
+ border-radius:var(--ds-radius-feature);
+ box-shadow:0 20px 50px rgba(17,24,39,.18),5px 7px 0 rgba(255,198,47,.85);
+}
+.hero[data-variant="v4"] .v4-motion-canvas {
+ border-radius:var(--ds-radius-feature);
+ box-shadow:0 22px 55px rgba(1,9,28,.27),7px 8px 0 rgba(255,198,47,.88);
+}
+.service,.ecosystem-board {border-radius:var(--ds-radius-feature);}
+.v5-city-stage {border-radius:22px;}
+.v4-architecture-inner {border-radius:var(--ds-radius-surface);}
+.hero[data-variant="v4"] .hero-cta,.contact-primary,
+.business-pitch-cta,.v6-enable-webgl,.v6-three-controls button,
+.v63-story,.v65-load-status {border-radius:var(--ds-radius-compact);}
+.v6-three-controls button:focus-visible,.v6-enable-webgl:focus-visible,
+a:focus-visible,button:focus-visible {outline-offset:3px;}
+/* A full-bleed yellow contact block consumed far more than an accent share.
+   Make the closing section neutral; reserve yellow for high-meaning controls. */
+.contact {
+ background:var(--ds-60-paper);
+ color:var(--ds-30-ink);
+}
+.contact::before {background:var(--ds-30-blue);opacity:.075;}
+.contact::after {opacity:.12;}
+.contact .closing-title {color:var(--ds-30-ink);}
+.contact h2 em {color:var(--ds-30-blue);}
+.contact .closing-line--middle::after {background:var(--ds-10-gold);}
+.contact-bottom {border-top-color:#C7CBD1;}
+.contact-bottom p {color:var(--ds-copy);}
+.contact-copy .contact-status {color:var(--ds-muted);font-size:13px;line-height:1.6;}
+.contact-primary {
+ color:#FFFDF8;background:var(--ds-30-blue);
+ border-color:var(--ds-30-blue);
+}
+.contact-primary:hover {background:var(--ds-30-ink);color:#FFFDF8;}
+.contact .social-links--secondary a {color:var(--ds-30-blue);border-color:var(--ds-30-blue);}
+.contact .social-links--secondary a:hover {color:var(--ds-30-ink);border-color:var(--ds-30-ink);}
+/* Type: consistent body metrics, readable data disclosures and three beats. */
+body {font-family:Inter,"Helvetica Neue",Arial,system-ui,sans-serif;}
+p {text-wrap:pretty;}
+h1,h2,h3,h4 {text-wrap:balance;}
+.section-head h2 {letter-spacing:-.055em;}
+.section-head>p {line-height:1.7;}
+.motion-story-unit h3 {letter-spacing:-.055em;}
+.motion-story-unit p {font-size:clamp(14px,1.15vw,16px);line-height:1.62;}
+.v4-architecture-details .role p {font-size:14px;line-height:1.6;}
+.audience-grid--compact .audience p {font-size:clamp(14px,1.1vw,16px);line-height:1.65;}
+.contact-copy p {line-height:1.7;}
+/* Large shapes and their brand colors retain identity; red is a signal,
+   not a new full-page surface. Yellow remains CTA/highlight only. */
+@media(max-width:700px){
+ .main-nav {background:var(--ds-60-surface);}
+ .hero[data-variant="v4"] .v4-motion-canvas,
+ .service,.business-pitch,.ecosystem-board {border-radius:var(--ds-radius-surface);}
+ .v5-city-stage {border-radius:16px;}
+ .business-pitch {
+  box-shadow:0 15px 32px rgba(17,24,39,.18),4px 5px 0 rgba(255,198,47,.85);
+ }
+ .hero[data-variant="v4"] .v4-motion-canvas {
+  box-shadow:0 17px 32px rgba(1,9,28,.25),5px 5px 0 rgba(255,198,47,.82);
+ }
+ .motion-story-unit p,.audience-grid--compact .audience p {font-size:15px;}
+ .section-head>p {font-size:16px;}
+ .contact-copy .contact-status {font-size:13px;}
+}
+@media(prefers-reduced-motion:reduce){
+ .business-pitch,.hero[data-variant="v4"] .v4-motion-canvas {transition:none!important;}
+}
