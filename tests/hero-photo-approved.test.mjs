@@ -20,6 +20,10 @@ test('HERO-PHOTO-01 exact locally packaged user-approved image with two mirrors'
  assert.equal(createHash('sha256').update(data).digest('hex'),'9f7940ed40dac21dcd286655930750ffd1008cf84830ed8b2e086a40c4cd00f1');
  assert.match(html,/src="\.\/assets\/desset-hero-entrega-dos-espejos\.webp"/);
  assert.match(html,/width="1671" height="941"/);
+ assert.match(html,/srcset="\.\/assets\/desset-hero-entrega-mobile\.webp"/);
+ const mobile=readFileSync(new URL("assets/desset-hero-entrega-mobile.webp",root));
+ assert.ok(mobile.length<=85000);
+ assert.equal(createHash("sha256").update(mobile).digest("hex"),"4a2043a8dfceb15d5f4cc008904feb49467a42f79f8f9c54db2bdcad0e33767e");
  assert.match(html,/loading="eager" fetchpriority="high"/);
 });
 test('HERO-PHOTO-01 two-column mockup, responsive, reduced motion and real 3D remain',()=>{

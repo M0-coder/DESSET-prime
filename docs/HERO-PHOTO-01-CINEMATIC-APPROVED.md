@@ -16,3 +16,6 @@
 Se agrega y certifica localmente el fichero WebP en la lista de build y verificador SHA-256; fuente CSS acotada a 9500 bytes, imagen acotada a 210000 bytes. Browser QA comprueba imagen cargada, marca oficial y texto eliminado. CI de compilación, tests unitarios, cobertura de alcance declarado, estática, seguridad HTTP, mutation testing dirigido, navegadores, GPU WebGL2, Lighthouse sintético y capturas. Aprobación artística requiere ver escritorio/móvil; no equiparar tests con percepción.
 
 **Gobierno:** PR DRAFT / NO MERGE / NO AUTO-MERGE / NO DEPLOY / NO RELEASE / NO DNS / NO CLOUDFLARE. Ningún cambio al repo de producción `M0-coder/DESSET`. Integración posterior únicamente con autorización de SHA exacto.
+
+## Optimización móvil
+Se incorporó una representación equivalente de la imagen aprobada a **960×541 px, 59 602 bytes**; el navegador la selecciona automáticamente a anchuras de 700 px o menos. SHA-256 `4a2043a8dfceb15d5f4cc008904feb49467a42f79f8f9c54db2bdcad0e33767e`. Se mantiene el render de 157 296 bytes para tablet/escritorio. Ambas imágenes tienen la misma escena con dos espejos; se limita exclusivamente resolución y compresión para reducir el LCP.

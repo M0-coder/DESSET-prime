@@ -42,6 +42,7 @@ check(expected.has("assets/v6-three.bundle.js"),"Three.js bundle is missing");
 check(expected.has("styles-system.css")&&html.includes('href="./styles-system.css"'),"60/30/10 design CSS not packaged");
 check(expected.has("styles-hero-photo.css")&&html.includes('href="./styles-hero-photo.css"'),"Photographic stylesheet missing");
 check(expected.has("assets/desset-hero-entrega-dos-espejos.webp")&&html.includes('src="./assets/desset-hero-entrega-dos-espejos.webp"'),"Approved photographic render is not packaged");
+check(expected.has("assets/desset-hero-entrega-mobile.webp")&&html.includes('srcset="./assets/desset-hero-entrega-mobile.webp"'),"Mobile photographic LCP asset missing");
 check(!html.includes("IDEAS</span>")&&!html.includes("ACCIÓN</span>"),"Unrelated old slogan was left");
 check(expected.has("scripts/service-state.js")&&html.includes('src="./scripts/service-state.js"'),"Institutional availability module not packaged");
 const availability=await readFile(resolve(dist,"scripts/service-state.js"),"utf8");
