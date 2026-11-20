@@ -149,9 +149,9 @@ if(!stage||!mount||!controls||reduced){
    new THREE.Vector3(3.05,.22,1.45),new THREE.Vector3(3.7,.20,.65)
   ];
   const curve=new THREE.CatmullRomCurve3(path);
-  const glow=new THREE.Mesh(new THREE.TubeGeometry(curve,76,.15,7,false),
+  routeHalo=new THREE.Mesh(new THREE.TubeGeometry(curve,76,.15,7,false),
     new THREE.MeshBasicMaterial({color:0xffb725,transparent:true,opacity:.13,depthWrite:false}));
-  scene.add(glow);
+  scene.add(routeHalo);
   const lightLine=new THREE.Mesh(new THREE.TubeGeometry(curve,76,.045,7,false),mats.route);
   scene.add(lightLine);
   particle=sphere(scene,.18,0,0,0,mats.gold);
@@ -161,22 +161,39 @@ if(!stage||!mount||!controls||reduced){
   box(parcel,.10,.66,.73,0,.005,0,mats.cream);
   box(parcel,.85,.07,.12,0,.34,0,mats.cream);
   parcel.position.set(-2.25,1.35,-.58);scene.add(parcel);
+  // Soft pools of light offer depth without a costly post-processing pass.
+  for(const [x,z,r] of [[-5,0,2.25],[.98,1.18,2.05],[5.03,-.35,2.0]]){
+    const halo=new THREE.Mesh(new THREE.CircleGeometry(r,32),
+      new THREE.MeshBasicMaterial({color:0x2e68c7,transparent:true,opacity:.07,depthWrite:false}));
+    halo.rotation.x=-Math.PI/2;halo.position.set(x,-.283,z);scene.add(halo);
+  }
  }
  function setup(){
   scene=new THREE.Scene();
   scene.background=new THREE.Color(PAL.night);
   scene.fog=new THREE.FogExp2(PAL.night,.018);
-  scene.add(new THREE.HemisphereLight(0xbad6ff,0x09162c,2.0));
-  const sun=new THREE.DirectionalLight(0xffffff,3.4);sun.position.set(-3,11,7);scene.add(sun);
-  const fill=new THREE.PointLight(0xffc62f,24,15);fill.position.set(0,5,4);scene.add(fill);
+  scene.add(new THREE.HemisphereLight(0xbad6ff,0x071020,1.85));
+  const sun=new THREE.DirectionalLight(0xf5faff,3.25);
+  sun.position.set(-3,11,7);sun.castShadow=!coarse;
+  sun.shadow.mapSize.set(1024,1024);
+  Object.assign(sun.shadow.camera,{left:-13,right:13,top:11,bottom:-11,near:.5,far:40});
+  sun.shadow.bias=-.0007;sun.shadow.normalBias=.025;
+  sun.shadow.camera.updateProjectionMatrix();scene.add(sun);
+  const fill=new THREE.PointLight(0xffc62f,17,17);
+  fill.position.set(0,5.2,4.2);scene.add(fill);
+  const rim=new THREE.PointLight(0x4c80ff,8.5,15);
+  rim.position.set(5.5,4,-4);scene.add(rim);
+  const neon=new THREE.PointLight(0xff3328,4,9);
+  neon.position.set(5,3,1);scene.add(neon);
   storefront();courier();destination();decorate();
   const key=new THREE.OrthographicCamera(-9,9,5,-5,.1,150);
   camera=key;
   renderer=new THREE.WebGLRenderer({antialias:!coarse,alpha:false,powerPreference:"low-power",preserveDrawingBuffer:false});
   renderer.setClearColor(PAL.night,1);
+  renderer.shadowMap.enabled=!coarse;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.22;
+  renderer.toneMappingExposure=1.12;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,coarse?1:1.4));
   const canvas=renderer.domElement;
   canvas.setAttribute("aria-hidden","true");canvas.tabIndex=-1;
@@ -192,7 +209,7 @@ if(!stage||!mount||!controls||reduced){
   destination:{pos:[7.6,8.7,12],look:[4.1,1,.1]}
  };
  const cameraTarget=new THREE.Vector3();
- const tmp=new THREE.Vector3();
+ const tmp=new THREE.Vector3(),desiredLook=new THREE.Vector3();
  function resize(w,h){
   if(!renderer||!camera)return;
   const ratio=w/Math.max(1,h),size=coarse?11.15:5.8;
@@ -212,6 +229,7 @@ if(!stage||!mount||!controls||reduced){
   if(onLeave)mount.removeEventListener("pointerleave",onLeave);
   if(onResize)window.removeEventListener("resize",onResize);
   if(onVisibility)document.removeEventListener("visibilitychange",onVisibility);
+  if(onControls)controls.removeEventListener("click",onControls);
   const materials=new Set(Object.values(mats));
   scene?.traverse(obj=>{
     obj.geometry?.dispose();
@@ -219,6 +237,7 @@ if(!stage||!mount||!controls||reduced){
     else if(obj.material)materials.add(obj.material);
   });
   for(const material of materials)material.dispose();
+  for(const texture of ownedTextures)texture.dispose();
   renderer?.dispose();renderer=undefined;
   mount.replaceChildren();
   window.__dessetV6Probe=undefined;
@@ -244,11 +263,17 @@ if(!stage||!mount||!controls||reduced){
   frame+=delta;
   const preset=presets[cameraPreset];
   const dx=!coarse?pointer.x*.32:0,dy=!coarse?pointer.y*.21:0;
-  tmp.set(preset.pos[0]+dx,preset.pos[1]+dy,preset.pos[2]);
+  const orbit=!coarse&&cameraPreset==="overview"?Math.sin(frame*.19)*.15:0;
+  tmp.set(preset.pos[0]+dx+orbit,preset.pos[1]+dy,preset.pos[2]);
   camera.position.lerp(tmp,Math.min(1,delta*3.2));
-  cameraTarget.lerp(new THREE.Vector3(...preset.look),Math.min(1,delta*4.1));
+  desiredLook.set(...preset.look);
+  cameraTarget.lerp(desiredLook,Math.min(1,delta*4.1));
   camera.lookAt(cameraTarget);
-  if(parcel)parcel.position.y=1.35+Math.sin(frame*1.65)*.13;
+  if(parcel){
+   parcel.position.y=1.35+Math.sin(frame*1.65)*.13;
+   parcel.rotation.y=Math.sin(frame*.48)*.09;
+  }
+  if(routeHalo)routeHalo.material.opacity=.12+Math.sin(frame*1.4)*.025;
   if(particle){
    const p=particle.userData.curve.getPointAt((frame*.082)%1);
    particle.position.copy(p);
@@ -270,14 +295,15 @@ if(!stage||!mount||!controls||reduced){
    controls.hidden=false;
    const trigger=stage.querySelector(".v6-enable-webgl");
    if(trigger)trigger.hidden=true;
-   controls.addEventListener("click",e=>{
+   onControls=e=>{
     const button=e.target.closest("button");if(!button)return;
     if(button.dataset.v6Camera){applyView(button.dataset.v6Camera);return}
     if(button.classList.contains("v6-pause")){
       paused=!paused;button.textContent=paused?"Reanudar movimiento":"Pausar movimiento";
       if(paused)stop();else wake();
     }else if(button.classList.contains("v6-poster")){fail("poster")}
-   });
+   };
+   controls.addEventListener("click",onControls);
    onMove=e=>{
     if(coarse)return;
     const r=mount.getBoundingClientRect();
@@ -291,7 +317,10 @@ if(!stage||!mount||!controls||reduced){
    window.addEventListener("resize",onResize,{passive:true});
    ro=new ResizeObserver(entries=>{for(const e of entries)resize(Math.max(1,e.contentRect.width),Math.max(1,e.contentRect.height))});
    ro.observe(mount);
-   observer=new IntersectionObserver(entries=>{onscreen=entries[0]?.isIntersecting===true;if(onscreen)wake()}, {threshold:0.02});
+   observer=new IntersectionObserver(entries=>{
+     onscreen=entries[0]?.isIntersecting===true;
+     if(onscreen)wake();else stop();
+   }, {threshold:0.02});
    observer.observe(stage);
    onVisibility=()=>{if(document.hidden)stop();else wake()};
    document.addEventListener("visibilitychange",onVisibility);
@@ -300,7 +329,11 @@ if(!stage||!mount||!controls||reduced){
    renderer.render(scene,camera);
    window.__dessetV6Probe=()=>({threeRevision:THREE.REVISION,webgl:true,frames:Number(stage.dataset.v6Frames||0),
       triangles:renderer?.info.render.triangles||0,drawCalls:renderer?.info.render.calls||0,
-      currentView:cameraPreset,domCanvas:mount.querySelectorAll("canvas").length});
+      currentView:cameraPreset,domCanvas:mount.querySelectorAll("canvas").length,
+      shadows:renderer?.shadowMap.enabled===true,
+      geometryCount:renderer?.info.memory.geometries||0,
+      textureCount:renderer?.info.memory.textures||0,
+      material:"PBR",colorSpace:"srgb",cinematic:"v6.1"});
   }
  }catch(e){console.warn("DESSET experimental Three.js fallback:",String(e));fail("unsupported")}
 }
