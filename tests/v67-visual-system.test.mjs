@@ -88,7 +88,7 @@ test("V6.7 stylesheet actually loads in the signed site and strict local preview
  assert.ok(html.includes('<link rel="stylesheet" href="./styles-system.css">'));
  assert.ok(html.indexOf('href="./styles-system.css"')>html.indexOf('href="./styles-v5.css"'));
  assert.ok(build.includes('"styles-system.css"'));
- assert.ok(build.includes('styles(?:-v5|-system)?'));
+ assert.ok(build.includes('styles(?:-v5|-system|-hero-photo)?'));
  assert.ok(preview.includes('rel==="styles-system.css"'));
  const manifest=JSON.parse(read("dist/site-manifest.json"));
  const record=manifest.files.find(f=>f.path==="styles-system.css");
