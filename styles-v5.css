@@ -238,3 +238,34 @@
  .v63-story-detail{font-size:10px;line-height:1.35;}
  .v63-story-progress{height:6px;margin-top:2px;}
 }
+
+/* V6.5 — reveal poster first, never show an empty WebGL loading frame. */
+.v5-city-stage[data-v6-state="loading"] .v6-three-mount,
+.v5-city-stage[data-v6-state="preparing"] .v6-three-mount {
+ opacity:0;pointer-events:none;
+}
+.v65-load-status[hidden]{display:none!important;}
+.v65-load-status{
+ display:block;padding:10px 12px;margin-bottom:10px;
+ color:#ffe8a6;background:#19243c;
+ border-left:3px solid #ffc62f;
+ font:700 12px/1.45 system-ui,sans-serif;
+}
+.v5-city-stage[data-v6-state="active"] .v6-three-mount{
+ opacity:1;transition:opacity .25s ease-out;
+}
+@media(max-width:800px){
+ /* Four compact but 44px-tall camera controls; primary tour gets its own row. */
+ .v6-three-controls{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+ .v6-three-controls button{
+  min-height:44px;font-size:clamp(10px,2.7vw,12px);
+  line-height:1.2;padding:7px 4px;white-space:normal;
+ }
+ .v6-three-controls button:first-child{grid-column:auto;}
+ .v6-three-controls .v63-tour{grid-column:1 / -1;order:-1;}
+ .v6-three-controls .v6-pause,
+ .v6-three-controls .v6-poster{grid-column:span 2;}
+}
+@media(prefers-reduced-motion:reduce){
+ .v5-city-stage[data-v6-state="active"] .v6-three-mount{transition:none;}
+}
