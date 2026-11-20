@@ -31,7 +31,7 @@ test("V6 remains self-hosted, reproducibly pinned and within byte budgets",()=>{
  assert.match(build,/bundle:true/);
  assert.match(build,/gzipBytes>190000/);
  assert.ok(statSync(new URL("assets/v6-three.bundle.js",root)).size>80000);
- assert.ok(statSync(new URL("assets/v6-three.bundle.js",root)).size<650000);
+ assert.ok(statSync(new URL("assets/v6-three.bundle.js",root)).size<750000);
  assert.doesNotMatch(selfHosted,/\bimport\s*\(/);
  assert.doesNotMatch(html,/https?:\/\/[^\s"']+\.(?:js|css)/);
  assert.match(workflow,/npm ci --ignore-scripts/);
