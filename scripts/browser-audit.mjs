@@ -272,9 +272,13 @@ try{
    if(!detailOpen.open||!detailOpen.visible||detailOpen.roles!==4)report.failures.push("Technical roles accordion failed: "+JSON.stringify(detailOpen));
    await js('document.querySelector(".v4-architecture-details").scrollIntoView({block:"start",behavior:"instant"})');
    await sleep(100);
-   const mobileDiagram=await js('(()=>{const im=document.querySelector(".v4-architecture-details picture img"),source=document.querySelector(".v4-architecture-details picture source");return {src:im.currentSrc,width:im.naturalWidth,height:im.naturalHeight,source:source?.getAttribute("srcset")}})()');
-   if(!mobileDiagram.src.endsWith("roles-geometry-mobile-es.svg")||mobileDiagram.width!==360||mobileDiagram.height!==392)
-    report.failures.push("V6.8 mobile diagram is unreadably using desktop SVG: "+JSON.stringify(mobileDiagram));
+   const mobileDiagram=await js('(()=>{const im=document.querySelector(".v4-architecture-details picture img"),source=document.querySelector(".v4-architecture-details picture source"),r=im.getBoundingClientRect();return {src:im.currentSrc,naturalWidth:im.naturalWidth,naturalHeight:im.naturalHeight,renderWidth:r.width,renderHeight:r.height,source:source?.getAttribute("srcset")}})()');
+   // Chromium may report SVG naturalWidth after responsive-density scaling.
+   // The actual selected source, decoded aspect ratio and rendered CSS size
+   // establish readability more reliably than fixed natural pixel dimensions.
+   const aspect=mobileDiagram.naturalWidth/Math.max(1,mobileDiagram.naturalHeight);
+   if(!mobileDiagram.src.endsWith("roles-geometry-mobile-es.svg")||mobileDiagram.renderWidth<220||mobileDiagram.renderHeight<220||Math.abs(aspect-360/392)>.035)
+    report.failures.push("V6.8 mobile diagram must use legible art-directed SVG: "+JSON.stringify(mobileDiagram));
    report.tests.push({name:"V6.8 art-directed legible mobile SVG diagram",mobileDiagram});
    await capture("mobile-architecture-expanded.png");
    report.tests.push({name:"mobile technical detail expandable",detailOpen});
