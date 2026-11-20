@@ -1,4 +1,4 @@
-name: DESSET Prime V4.5 — QA cinética sin despliegue
+name: DESSET Prime V5 — cinematic QA sin despliegue
 on:
   push:
     branches: [design/**]
@@ -20,6 +20,7 @@ jobs:
         run: |
           node --check scripts/app.js
           node --check scripts/motion.js
+          node --check scripts/v5-cinematic.js
           node --check scripts/browser-audit.mjs
       - name: Unit and source contracts
         run: node --test tests/*.test.mjs
@@ -29,7 +30,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: desset-prime-v45-evidence
+          name: desset-prime-v5-evidence
           path: reports/browser/
           if-no-files-found: warn
           retention-days: 14
