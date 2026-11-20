@@ -9,7 +9,7 @@
  const cues=document.querySelectorAll(
   ".statement h2, .solutions .section-head, .ecosystem .section-head, "+
   ".motion-story, .motion-story-unit, .audiences .section-head, "+
-  ".solutions-grid .service--main, .business-pitch, "+
+  ".statement-side, .solutions-grid .service--main, .business-pitch, "+
   ".audience-grid--compact .audience, .contact-bottom--rc, "+
   ".contact, .closing-line"
  );
@@ -21,6 +21,7 @@
  }
  root.dataset.motionSystem="ready";
  root.dataset.motionDirection="editorial-cinematic-v1";
+ root.dataset.anim02="cinematic-chapters";
  const observer=new window.IntersectionObserver((entries,instance)=>{
   for(const entry of entries){
    if(!entry.isIntersecting)continue;
