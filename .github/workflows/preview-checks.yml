@@ -1,4 +1,4 @@
-name: DESSET Prime V6.5 — auditoría integral y render premium opt-in, sin despliegue
+name: DESSET Prime V6.6 — tipografía editorial y bordes curvos, sin despliegue
 on:
   push:
     branches: [design/**]
@@ -42,6 +42,7 @@ jobs:
           node --check scripts/build-site.mjs
           node --check scripts/verify-site-package.mjs
           node --check tests/v65-whole-site-audit.test.mjs
+          node --check tests/v66-punctuation-radius.test.mjs
           node --check scripts/v6-gpu-browser-audit.mjs
           node --check assets/v6-three.bundle.js
           test -s assets/v62-commerce.glb
@@ -74,7 +75,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: desset-prime-v65-full-web-audit-evidence
+          name: desset-prime-v66-rounded-editorial-qa
           path: |
             reports/browser/
             reports/quality/
@@ -130,7 +131,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: desset-prime-v65-lighthouse-built-site-lab
+          name: desset-prime-v66-lighthouse-built-site
           path: reports/lighthouse/
           if-no-files-found: warn
           retention-days: 14
