@@ -35,7 +35,7 @@ test("V4.3: delivery first and optional expansion do not compete in initial view
 test("V4.3: hero CTA reaches the unique primary contact path and is accessible",()=>{
  const hero=html.match(/<div class="hero-actions">([\s\S]*?)<\/div>/)?.[1]||"";
  assert.match(hero,/<a class="hero-cta" href="#contacto">Hablemos de tu negocio/);
- assert.match(hero,/<a class="hero-secondary" href="#ecosistema">Ver cómo funcionaría/);
+ assert.match(hero,/<a class="hero-secondary" href="#ecosistema" data-v64-tour-launch aria-label="Explorar el recorrido 3D de DESSET">Explorar recorrido 3D/);
  assert.match(html,/class="contact-primary" href="https:\/\/www\.instagram\.com\/deliver_assets\/"/);
  assert.match(html,/Ver perfil en Instagram/);
  assert.match(css,/\.contact-primary:focus-visible/);
