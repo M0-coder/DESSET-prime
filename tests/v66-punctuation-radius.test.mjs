@@ -18,7 +18,7 @@ test("V6.6 all presentation headings and standalone labels omit terminal ornamen
  assert.match(html,/<h2 id="ecosystem-title">Elegir, preparar<br>y entregar<\/h2>/);
  assert.match(html,/>PERSONAS \/ NEGOCIOS \/ ENTREGAS</);
  assert.match(html,/>UNA CONEXIÓN \/ TRES MOMENTOS</);
- for(const action of ["ELEGIR","ORGANIZAR","MOVER"])
+ for(const action of ["ELEGIR","PREPARAR","ENTREGAR"])
   assert.ok(html.includes("<h3>"+action+"</h3>"),"Missing clean action "+action);
  assert.doesNotMatch(html,/<h3>[^<]+<span>\.<\/span><\/h3>/);
  assert.doesNotMatch(html,/v4-fullstop/);
