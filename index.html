@@ -11,6 +11,7 @@
   <link rel="icon" type="image/png" href="./assets/deliver-assets-mark.png">
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./styles-v5.css">
+  <link rel="stylesheet" href="./styles-system.css">
   <script defer src="./scripts/app.js"></script>
   <script defer src="./scripts/motion.js"></script>
   <script defer src="./scripts/v5-cinematic.js"></script>
@@ -142,7 +143,7 @@
           </div>
           <figcaption class="v5-stage-caption"><strong>EL COMERCIO CONECTADO</strong><span>Visualización conceptual del sistema previsto. DESSET todavía no realiza pedidos ni entregas comerciales.</span></figcaption>
         </figure>
-        <div class="v4-flow motion-story" aria-label="Tres momentos conceptuales de un pedido: elegir, organizar y mover">
+        <div class="v4-flow motion-story" aria-label="Tres momentos conceptuales de un pedido: elegir, preparar y entregar">
           <div class="motion-story-bridge" aria-hidden="true">
             <span class="motion-story-bridge-start"></span>
             <span class="motion-story-bridge-line"></span>
@@ -156,20 +157,20 @@
             </div>
             <div class="motion-story-unit motion-story-unit--organize">
               <div class="motion-story-art motion-story-art--organize" aria-hidden="true"><img src="./assets/scene-prepare.svg" width="320" height="220" alt="" decoding="async"></div>
-              <h3>ORGANIZAR</h3>
-              <p>Organizar las solicitudes y la preparación de cada pedido.</p>
+              <h3>PREPARAR</h3>
+              <p>Los comercios podrán recibir solicitudes y preparar pedidos cuando se habilite el servicio.</p>
             </div>
             <div class="motion-story-unit motion-story-unit--move">
               <div class="motion-story-art motion-story-art--move" aria-hidden="true"><img src="./assets/scene-move.svg" width="320" height="220" alt="" decoding="async"></div>
-              <h3>MOVER</h3>
-              <p>Coordinar las futuras entregas entre comercios y clientes.</p>
+              <h3>ENTREGAR</h3>
+              <p>Coordinar el recorrido desde el comercio hasta el destino cuando el servicio esté disponible.</p>
             </div>
           </div>
         </div>
         <details class="v4-architecture-details">
-          <summary>Explorar la arquitectura de Customer, Business, Rider y Control <span aria-hidden="true">↗</span></summary>
+          <summary>Explorar las funciones de clientes, comercios, repartidores y control <span aria-hidden="true">↗</span></summary>
           <div class="v4-architecture-inner">
-            <img src="./assets/roles-geometry-v2.svg" width="720" height="380" alt="Diagrama conceptual de Customer, Business, Rider y Control. No representa una operación en vivo.">
+            <img src="./assets/roles-geometry-v2.svg" width="720" height="380" alt="Diagrama conceptual de las cuatro funciones del sistema: clientes, comercios, repartidores y control. No representa una operación en vivo.">
             <div class="roles" role="list">
         <div class="role" role="listitem"><strong>Para personas</strong><p>Explorar opciones y gestionar solicitudes cuando el servicio esté habilitado.</p></div>
         <div class="role" role="listitem"><strong>Para comercios</strong><p>Preparar pedidos y organizar la relación con sus clientes.</p></div>
