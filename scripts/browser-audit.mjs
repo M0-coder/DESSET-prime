@@ -148,6 +148,11 @@ try{
     JSON.stringify(designSystem.steps)!==JSON.stringify(expectedSteps))
    report.failures.push("V6.7 computed 60-30-10 palette or three-step narrative mismatch: "+JSON.stringify(designSystem));
  report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
+ const visual02=await js('(()=>{const q=s=>document.querySelector(s);const cs=s=>getComputedStyle(q(s));return {cssLoaded:[...document.styleSheets].some(x=>x.href?.endsWith("/styles-visual02.css")),heroPhoto:q("#inicio .prime-photo-image")?.getAttribute("src"),heroLogo:q(".site-header .brand-mark")?.getAttribute("src"),heroCTA:q("#inicio .hero-cta")?.getAttribute("href"),businessShadow:cs("#negocios .business-pitch").boxShadow,storyBorder:cs("#ecosistema .ecosystem-board").borderTopColor,serviceTop:cs("#soluciones .service--main").borderTopWidth,trustBg:cs("#vision").backgroundColor,mobileSafe:document.documentElement.scrollWidth<=document.documentElement.clientWidth+2}})()');
+ if(!visual02.cssLoaded||!visual02.heroPhoto?.endsWith("desset-hero-entrega-dos-espejos.webp")||!visual02.heroLogo?.endsWith("deliver-assets-mark.png")||visual02.heroCTA!=="#contacto"||
+   visual02.serviceTop!=="5px"||visual02.trustBg!=="rgb(20, 34, 57)"||!visual02.mobileSafe)
+  report.failures.push("VISUAL-02 institutional editorial consistency regression: "+JSON.stringify(visual02));
+ report.tests.push({name:"VISUAL-02 corporate style, approved hero and responsive safety",visual02});
 
  const appAccess=await js('(()=>{const p=document.querySelector("[data-service-access]");const status=p?.querySelector("[data-service-status]");const links=p?.querySelector("[data-app-links]");return {found:!!p,availability:p?.dataset.applicationAvailability,status:status?.textContent.trim(),liveLinks:links?.querySelectorAll("a").length,linksHidden:links?.hidden,role:status?.getAttribute("role")}})()');
  if(!appAccess.found||appAccess.availability!=="not-published"||
