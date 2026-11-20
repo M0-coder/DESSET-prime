@@ -101,6 +101,29 @@ try{
  const destination=await waitUntil("desktop destination camera",async()=>evalJS('window.__dessetV6Probe?.().currentView==="destination"'));
  check("Camera destination works",Boolean(destination));
 
+ // V6.3: validate the real browser interaction, not only the storyboard source.
+ await evalJS('document.querySelector(".v63-tour").click()');
+ const storyStarted=await waitUntil("desktop cinematic story begins",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.tourActive&&p.tourProgress>=0?p:null})()'),6000);
+ check("V6.3 desktop tour starts with accessible progress",storyStarted.tourActive&&
+   (await evalJS('document.querySelector(".v63-story").hidden'))===false&&
+   (await evalJS('document.querySelector(".v63-tour").getAttribute("aria-pressed")'))==="true");
+ const commerceBeat=await waitUntil("tour reaches commerce",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.tourBeat==="commerce"&&p.currentView==="commerce"?p:null})()'),7000);
+ check("V6.3 tour actually moves the camera into commerce",commerceBeat.tourProgress>0&&commerceBeat.tourActive,{beat:commerceBeat.tourBeat,progress:commerceBeat.tourProgress});
+ await screenshot("desktop-v63-guided-tour.png");
+ await evalJS('document.querySelector(".v6-pause").click()');
+ const frozen=await evalJS('window.__dessetV6Probe?.().tourSeconds');
+ await sleep(350);
+ const frozenAfter=await evalJS('window.__dessetV6Probe?.().tourSeconds');
+ check("V6.3 pause freezes cinematic time",Math.abs(frozenAfter-frozen)<0.015,{before:frozen,after:frozenAfter});
+ await evalJS('document.querySelector(".v6-pause").click()');
+ const resumed=await waitUntil("tour resumes",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.tourSeconds>'+String(frozen+.07)+'?p:null})()'),5000);
+ check("V6.3 tour resumes without restarting from zero",resumed.tourSeconds>frozen,{resumed:resumed.tourSeconds});
+ await evalJS('document.querySelector("[data-v6-camera=courier]").click()');
+ const manualCourier=await evalJS('(()=>({p:window.__dessetV6Probe?.(),hidden:document.querySelector(".v63-story").hidden,pressed:document.querySelector(".v63-tour").getAttribute("aria-pressed")}))()');
+ check("V6.3 manual rider camera cancels autoplay and hides story",
+   manualCourier.p.currentView==="courier"&&!manualCourier.p.tourActive&&manualCourier.hidden&&manualCourier.pressed==="false",
+   {camera:manualCourier.p.currentView,active:manualCourier.p.tourActive});
+ 
  await viewport(390,844);
  const initialMobile=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),button:document.querySelector(".v6-enable-webgl")?.hidden,state:document.querySelector(".v5-city-stage").dataset.v6State}))()');
  check("Mobile 3D is opt-in and not preloaded",!initialMobile.script&&initialMobile.button===false,{initialMobile});
@@ -115,6 +138,14 @@ try{
  const fullyFramed=groups.length===3&&groups.every(([name,b])=>b.minX>=-1.02&&b.maxX<=1.02&&b.minY>=-1.02&&b.maxY<=1.02);
  check("Mobile 3D stations remain within camera frame",fullyFramed,{objectBounds:detailedMobile.objectBounds});
  await screenshot("mobile-three-webgl-optin.png");
+
+ await evalJS('document.querySelector(".v63-tour").click()');
+ const tourMobile=await waitUntil("mobile guided tour begins",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.tourActive&&p.tourProgress>0?p:null})()'),6000);
+ check("V6.3 mobile starts story on demand",tourMobile.tourActive&&tourMobile.tourProgress>0,{beat:tourMobile.tourBeat,progress:tourMobile.tourProgress});
+ await screenshot("mobile-v63-guided-tour.png");
+ await evalJS('document.querySelector(".v63-tour").click()');
+ const canceledMobile=await evalJS('window.__dessetV6Probe?.().tourActive');
+ check("V6.3 mobile user may stop the tour immediately",canceledMobile===false);
 
  await evalJS('document.querySelector(".v6-pause").click()');
  const pausedBefore=await evalJS('window.__dessetV6Probe?.().frames');
