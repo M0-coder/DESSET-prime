@@ -113,7 +113,7 @@
  .v5-stage-legend {font-size:10px;max-width:calc(100% - 24px);padding:9px 10px;left:12px;}
  .v5-stage-caption {display:block;padding:12px;font-size:12px;}
  .v5-stage-caption strong {display:block;margin-bottom:3px;}
- .v5-contact-light {left:5%;width:90%;}
+ .v5-contact-light {left:14%;width:72%;}
 }
 @media(prefers-reduced-motion:reduce) {
  .v5-hero-refraction,.v5-hero-refraction *,.v5-stage-render,
