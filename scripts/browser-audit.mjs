@@ -164,6 +164,12 @@ try{
    anim01.direction!=="editorial-cinematic-v1"||anim01.lensTransform!=="none")
   report.failures.push("ANIM-01 editorial cinematic composition regressed: "+JSON.stringify(anim01));
  report.tests.push({name:"ANIM-01 no scanner, glint, cursor-game lens or bouncing hero",anim01});
+ const anim02=await js('(()=>({photo:getComputedStyle(document.querySelector("#inicio .prime-photo-surface")).animationName,focus:getComputedStyle(document.querySelector("#inicio .prime-photo-image")).animationName,title:getComputedStyle(document.querySelector("#inicio .v4-headline-a .motion-line__inner")).animationName,cta:getComputedStyle(document.querySelector("#inicio .hero-actions")).animationName,chapters:document.documentElement.dataset.anim02,approvedSrc:document.querySelector("#inicio .prime-photo-image")?.getAttribute("src"),logo:document.querySelector(".brand-mark")?.getAttribute("src")}))()');
+ if(anim02.photo!=="anim02-frame"||anim02.focus!=="anim02-focus"||anim02.title!=="anim02-type"||anim02.cta!=="anim02-enter"||anim02.chapters!=="cinematic-chapters"||
+   !anim02.approvedSrc?.endsWith("desset-hero-entrega-dos-espejos.webp")||!anim02.logo?.endsWith("deliver-assets-mark.png"))
+  report.failures.push("ANIM-02 original DESSET hero/finite cinematography contract failed: "+JSON.stringify(anim02));
+ report.tests.push({name:"ANIM-02 real photographic opening, official mark, editorial chronology",anim02});
+
 
  const smallUI=await js('(()=>{const selector=".header-descriptor,.v4-hero-caption,.hero-kicker,.v4-canvas-top,.v4-canvas-bottom,.hero-meta,.section-label,.kicker,.service-top,.ecosystem-board-top,.motion-story-index,.motion-story-status,.audience-no,.audience-tag,.business-pitch-top,.closing-kicker-signal";return {decorativeLabelCount:document.querySelectorAll(selector).length,numberedTokens:document.body.textContent.match(/\\b0[1-9]\\s*\\/\\s*/g)||[],statusVisible:document.querySelector(".trust-ledger-item strong")?.textContent?.trim()}})()');
  if(smallUI.decorativeLabelCount!==0||smallUI.numberedTokens.length!==0||!smallUI.statusVisible)report.failures.push("Editorial numeric labels survived cleanup: "+JSON.stringify(smallUI));
@@ -336,6 +342,11 @@ try{
  const reducedAnimations=await js('(()=>({blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,stamp:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,headline:document.querySelector(".motion-headline").textContent.trim(),cta:document.querySelector(".hero-cta").getAttribute("href"),closing:document.querySelector("#contact-title").textContent.trim()}))()');
  if(reducedAnimations.blue!=="none"||reducedAnimations.stamp!=="none"||!reducedAnimations.headline.includes("EL COMERCIO")||reducedAnimations.cta!=="#contacto"||!reducedAnimations.closing.includes("CONEXIONES"))report.failures.push("V4.5 reduced motion/essential information failed: "+JSON.stringify(reducedAnimations));
  report.tests.push({name:"V4.5 full-fidelity reduced motion fallback",reducedAnimations});
+ const anim02Reduced=await js('(()=>({photo:getComputedStyle(document.querySelector("#inicio .prime-photo-surface")).animationName,focus:getComputedStyle(document.querySelector("#inicio .prime-photo-image")).animationName,title:getComputedStyle(document.querySelector("#inicio .v4-headline-a .motion-line__inner")).animationName,cta:document.querySelector("#inicio .hero-cta")?.getAttribute("href"),caption:document.querySelector("#inicio .prime-photo-caption")?.textContent.trim()}))()');
+ if(anim02Reduced.photo!=="none"||anim02Reduced.focus!=="none"||anim02Reduced.title!=="none"||anim02Reduced.cta!=="#contacto"||!anim02Reduced.caption?.includes("conceptual"))
+  report.failures.push("ANIM-02 reduced-motion accessibility contract failed: "+JSON.stringify(anim02Reduced));
+ report.tests.push({name:"ANIM-02 reduced motion leaves approved image and copy static",anim02Reduced});
+
  const v5Reduced=await js('(()=>({mode:document.documentElement.dataset.v5Mode,render:getComputedStyle(document.querySelector(".v5-stage-render")).animationName,scan:getComputedStyle(document.querySelector(".v5-stage-scan")).animationName,light:getComputedStyle(document.querySelector(".v5-contact-light")).animationName,source:document.querySelector(' + "'"+ '.v5-responsive-art source[type="image/webp"]' + "'"+ ')?.getAttribute("srcset"),caption:document.querySelector(".v5-stage-caption")?.textContent?.trim()}))()');
  if(v5Reduced.mode!=="reduced"||v5Reduced.render!=="none"||v5Reduced.scan!=="none"||v5Reduced.light!=="none"||!v5Reduced.source?.includes("v5-cinematic-mobile.webp")||!v5Reduced.caption?.includes("conceptual"))report.failures.push("V5.2 reduced-motion content/visibility failed: "+JSON.stringify(v5Reduced));
  report.tests.push({name:"V5 full reduced-motion fallback",v5Reduced});

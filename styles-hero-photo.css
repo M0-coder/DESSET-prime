@@ -39,3 +39,42 @@
 
 /* One visually identical, smaller resource is selected on phones to protect LCP. */
 #inicio .prime-photo-picture{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* ANIM-02: a finite photographic opening and three editorial chapters.
+   Source image, position, crop, logo, captions and CTA stay untouched. */
+@media(prefers-reduced-motion:no-preference){
+ #inicio .v4-hero-declaration{animation:anim02-enter .72s cubic-bezier(.18,.78,.24,1) .08s both}
+ #inicio .v4-headline-a .motion-line__inner{animation:anim02-type .95s cubic-bezier(.16,.8,.22,1) .17s both}
+ #inicio .v4-headline-b .motion-line__inner{animation:anim02-type 1.04s cubic-bezier(.16,.8,.22,1) .32s both}
+ #inicio .hero-lead{animation:anim02-enter .8s cubic-bezier(.2,.78,.22,1) .54s both}
+ #inicio .hero-actions{animation:anim02-enter .8s cubic-bezier(.2,.78,.22,1) .70s both}
+ #inicio .prime-photo-surface{animation:anim02-frame 1.35s cubic-bezier(.17,.8,.21,1) .10s both}
+ #inicio .prime-photo-image{animation:anim02-focus 2.05s cubic-bezier(.19,.7,.23,1) .10s both}
+ .statement h2.motion-active,.solutions .section-head.motion-active,
+ .ecosystem .section-head.motion-active,.audiences .section-head.motion-active{
+  animation:anim02-chapter .95s cubic-bezier(.16,.74,.21,1) both
+ }
+ .statement-side.motion-active,.solutions-grid .service--main.motion-active,
+ .business-pitch.motion-active,.audience-grid--compact .audience.motion-active,
+ .contact-bottom--rc.motion-active,.motion-story-unit.motion-active{
+  animation:anim02-panel .86s cubic-bezier(.17,.76,.25,1) both
+ }
+ .motion-story-unit--organize.motion-active{animation-delay:.11s}
+ .motion-story-unit--move.motion-active{animation-delay:.22s}
+}
+@keyframes anim02-enter{from{opacity:.55;transform:translate3d(0,18px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes anim02-type{from{opacity:.35;transform:translate3d(0,32px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes anim02-frame{from{opacity:.75;transform:translate3d(0,14px,0) scale(.99);clip-path:inset(0 0 12% 0)}to{opacity:1;transform:none;clip-path:inset(0)}}
+@keyframes anim02-focus{from{filter:brightness(.86) saturate(.94);transform:scale(1.025)}to{filter:none;transform:scale(1)}}
+@keyframes anim02-chapter{from{opacity:.8;transform:translate3d(0,34px,0)}to{opacity:1;transform:none}}
+@keyframes anim02-panel{from{opacity:.89;transform:translate3d(0,19px,0)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+ #inicio .v4-hero-declaration,#inicio .motion-line__inner,#inicio .hero-lead,
+ #inicio .hero-actions,#inicio .prime-photo-surface,#inicio .prime-photo-image,
+ .statement h2,.solutions .section-head,.ecosystem .section-head,.audiences .section-head,
+ .statement-side,.solutions-grid .service--main,.business-pitch,
+ .audience-grid--compact .audience,.contact-bottom--rc,.motion-story-unit{
+  animation:none!important;transform:none!important;clip-path:none!important;
+  filter:none!important;opacity:1!important
+ }
+}
