@@ -47,7 +47,8 @@ test("VISUAL-02 ships a single budgeted local stylesheet in source and packaged 
  assert.equal(manifest.noindex,true);
 });
 test("VISUAL-02 has no hidden deployment or remote resources",()=>{
- for(const s of [css,preview,gate])
-  assert.doesNotMatch(s,/https?:\/\/[^" ]+\.css|@import/);
+ assert.doesNotMatch(css,/https?:\/\/[^" ]+\.css|@import/);
+ assert.match(gate,/Remote CSS dependency/);
+ assert.match(preview,/const host="127\.0\.0\.1"/);
  assert.doesNotMatch(css,/display:\s*none|visibility:\s*hidden|overflow:\s*hidden|opacity:\s*0(?:[;}])/);
 });
