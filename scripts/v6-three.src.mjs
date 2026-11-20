@@ -16,7 +16,7 @@ if(!stage||!mount||!controls||reduced){
  if(stage)stage.dataset.v6State=reduced?"reduced":"missing";
 }else{
  let renderer,scene,camera,ro,observer,raf=0,alive=false,onscreen=true,paused=false;
- let cameraPreset="overview",frame=0,particle,parcel,routeHalo;
+ let cameraPreset="overview",frame=0,particle,parcel,routeHalo,render01FloorTexture;
  let modelStats={ready:false,models:[]};
  let storyActive=false,storyElapsed=0,storyBeat=-1;
  const storyPanel=stage.querySelector(".v63-story");
@@ -206,18 +206,42 @@ if(!stage||!mount||!controls||reduced){
   glow(scene,vertical?.7:5.03,2.6,vertical?4.7:-.35,0xff6852,2.4,.23);
   glow(scene,vertical?0:.98,2.1,vertical?0:1.18,0xffc62f,1.7,.25);
   glow(particle,0,0,0,0xffc62f,1.5,.55);
-  // Soft pools of light offer depth without a costly post-processing pass.
-  const pools=vertical?[[-.7,-4.7,2.25],[0,0,2.05],[.7,4.7,2.0]]:[[-5,0,2.25],[.98,1.18,2.05],[5.03,-.35,2.0]];
-  for(const [x,z,r] of pools){
-    const halo=new THREE.Mesh(new THREE.CircleGeometry(r,32),
-      new THREE.MeshBasicMaterial({color:0x2e68c7,transparent:true,opacity:.07,depthWrite:false}));
-    halo.rotation.x=-Math.PI/2;halo.position.set(x,-.283,z);scene.add(halo);
+  // RENDER-01: one local 128px alpha mask makes grounded light pools, not flat colored discs.
+  // Three existing floor accents keep their draw-call budget; no bloom, network or runtime GPU passes.
+  const lampCanvas=document.createElement("canvas");
+  lampCanvas.width=128;lampCanvas.height=128;
+  const lampContext=lampCanvas.getContext("2d");
+  if(lampContext){
+   const falloff=lampContext.createRadialGradient(64,64,2,64,64,63);
+   falloff.addColorStop(0,"rgba(255,255,255,.94)");
+   falloff.addColorStop(.25,"rgba(255,255,255,.60)");
+   falloff.addColorStop(.62,"rgba(255,255,255,.18)");
+   falloff.addColorStop(1,"rgba(255,255,255,0)");
+   lampContext.fillStyle=falloff;lampContext.fillRect(0,0,128,128);
+   render01FloorTexture=new THREE.CanvasTexture(lampCanvas);
+   render01FloorTexture.colorSpace=THREE.SRGBColorSpace;
+   ownedTextures.push(render01FloorTexture);
+  }
+  const pools=vertical?
+   [[-.7,-4.7,2.25,0x447bff],[0,0,2.05,PAL.gold],[.7,4.7,2.0,0xff6852]]:
+   [[-5,0,2.25,0x447bff],[.98,1.18,2.05,PAL.gold],[5.03,-.35,2.0,0xff6852]];
+  for(const [x,z,r,color] of pools){
+   const geometry=render01FloorTexture?new THREE.PlaneGeometry(r*2,r*2):new THREE.CircleGeometry(r,32);
+   const material=new THREE.MeshBasicMaterial({
+    ...(render01FloorTexture?{map:render01FloorTexture}:{}),
+    color,transparent:true,opacity:render01FloorTexture?.38:.07,
+    depthWrite:false,toneMapped:false
+   });
+   const halo=new THREE.Mesh(geometry,material);
+   halo.name="render01-floor-pool";
+   halo.rotation.x=-Math.PI/2;halo.position.set(x,-.283,z);
+   scene.add(halo);
   }
  }
  function setup(){
   scene=new THREE.Scene();
   scene.background=new THREE.Color(PAL.night);
-  scene.fog=new THREE.FogExp2(PAL.night,.018);
+  scene.fog=new THREE.FogExp2(PAL.night,.020);
   scene.add(new THREE.HemisphereLight(0xbad6ff,0x071020,1.85));
   const sun=new THREE.DirectionalLight(0xf5faff,3.25);
   sun.position.set(-3,11,7);sun.castShadow=!coarse;
@@ -225,11 +249,11 @@ if(!stage||!mount||!controls||reduced){
   Object.assign(sun.shadow.camera,{left:-13,right:13,top:11,bottom:-11,near:.5,far:40});
   sun.shadow.bias=-.0007;sun.shadow.normalBias=.025;
   sun.shadow.camera.updateProjectionMatrix();scene.add(sun);
-  const fill=new THREE.PointLight(0xffc62f,17,17);
+  const fill=new THREE.PointLight(0xffc62f,15.5,17);
   fill.position.set(0,5.2,4.2);scene.add(fill);
-  const rim=new THREE.PointLight(0x4c80ff,8.5,15);
+  const rim=new THREE.PointLight(0x4c80ff,9.2,15);
   rim.position.set(5.5,4,-4);scene.add(rim);
-  const neon=new THREE.PointLight(0xff3328,4,9);
+  const neon=new THREE.PointLight(0xff3328,3.4,9);
   neon.position.set(5,3,1);scene.add(neon);
   storefront();courier();destination();decorate();
   const key=new THREE.OrthographicCamera(-9,9,5,-5,.1,150);
@@ -239,7 +263,7 @@ if(!stage||!mount||!controls||reduced){
   renderer.shadowMap.enabled=!coarse;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.12;
+  renderer.toneMappingExposure=1.07;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,coarse?1:1.4));
   const canvas=renderer.domElement;
   canvas.setAttribute("aria-hidden","true");canvas.tabIndex=-1;
@@ -474,6 +498,8 @@ if(!stage||!mount||!controls||reduced){
       geometryCount:renderer?.info.memory.geometries||0,
       textureCount:renderer?.info.memory.textures||0,
       material:"PBR",colorSpace:"srgb",cinematic:"v6.2",
+      render01Pools:scene.children.filter(object=>object.name==="render01-floor-pool").length,
+      render01Texture:render01FloorTexture?.isCanvasTexture===true,
       glbLoaded:modelStats.ready?modelStats.models.length:0,
       glbModels:modelStats.models,glbStatus:stage.dataset.v62ModelsStatus||"not-started",
       tourActive:storyActive,tourSeconds:Number(storyElapsed.toFixed(3)),
