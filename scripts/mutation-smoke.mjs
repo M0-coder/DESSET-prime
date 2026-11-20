@@ -14,7 +14,7 @@ const files=[
 const mutants=[
  {name:"noindex removed",file:"index.html",before:'<meta name="robots" content="noindex,nofollow">',after:'<meta name="robots" content="index,follow">'},
  {name:"mobile render source removed",file:"index.html",before:'srcset="./assets/v5-cinematic-mobile.webp"',after:'srcset="./assets/v5-absent-mobile.webp"'},
- {name:"reduced motion disabled",file:"styles-v5.css",before:'@media(prefers-reduced-motion:reduce)',after:'@media(prefers-reduced-motion:none)'},
+ {name:"reduced motion disabled",file:"styles-v5.css",before:'@media(prefers-reduced-motion:reduce) {\\n .v5-hero-refraction',after:'@media(prefers-reduced-motion:none) {\\n .v5-hero-refraction'},
  {name:"remote script injected",file:"index.html",before:'</head>',after:'<script src="https://untrusted.example/remote.js"></script></head>'}
 ];
 const temp=mkdtempSync(join(tmpdir(),"desset-v53-mutation-"));
