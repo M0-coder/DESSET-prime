@@ -13,7 +13,8 @@ const mime={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",
  ".png":"image/png",".webp":"image/webp"};
 const permitted=rel=>rel==="index.html"||rel==="styles.css"||rel==="styles-v5.css"
  || /^scripts\/(?:app|motion|v5-cinematic)\.js$/.test(rel)
- || /^assets\/[a-z0-9-]+\.(?:png|svg|webp)$/.test(rel);
+ || /^assets\/[a-z0-9-]+\.(?:png|svg|webp)$/.test(rel)
+ || rel==="assets/v6-three.bundle.js";
 const server=createServer(async(req,res)=>{
  const headers={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff",
   "X-Robots-Tag":"noindex, nofollow","Referrer-Policy":"no-referrer",
