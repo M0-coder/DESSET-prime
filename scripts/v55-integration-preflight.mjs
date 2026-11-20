@@ -18,7 +18,14 @@ for(const [path,want] of Object.entries(a)){
  const got=blobSHA(file(path));
  require("Production-approved original asset unchanged: "+path,got===want,{gitBlobSha1:got,expected:want});
 }
-require("Prime remains presentation only",/en desarrollo/i.test(html)&&/todavía no realiza pedidos ni entregas comerciales/i.test(html)&&/no procesa pedidos ni pagos/i.test(html));
+const availability=text("scripts/service-state.js");
+require("Prime remains presentation only",
+ /todavía no realiza pedidos ni entregas comerciales/i.test(html)&&
+ /no procesa pedidos ni pagos/i.test(html)&&
+ /data-service-status[^>]*>Acceso público no habilitado/.test(html)&&
+ /applicationDistribution:"not_published"/.test(availability)&&
+ /verified:false/.test(availability)&&
+ !/<form\\b|<iframe\\b/i.test(html));
 require("Prime stays noindex",html.includes('name="robots" content="noindex,nofollow"'));
 require("Prime continues to prohibit remote scripts",/script-src 'self'/.test(html)&&/script-src 'self'/.test(headers));
 require("Production branch and workflow metadata are explicit",snap.official.observed_cloudflare.production_branch==="release-approved"&&snap.official.production_requirements.manual_workflow===".github/workflows/cloudflare-pages-production.yml");
