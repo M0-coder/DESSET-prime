@@ -8,6 +8,7 @@ const html=read("index.html");
 const css=read("styles-v5.css");
 const motion=read("scripts/v5-cinematic.js");
 const svg=read("assets/v5-logistics-scene.svg");
+const mobileSvg=read("assets/v5-logistics-mobile.svg");
 const workflow=read(".github/workflows/preview-checks.yml");
 
 test("V5 is an additive local layer with a reversible surface",()=>{
@@ -16,6 +17,8 @@ test("V5 is an additive local layer with a reversible surface",()=>{
   assert.match(html,/src="\.\/scripts\/motion\.js"/);
   assert.match(html,/src="\.\/scripts\/v5-cinematic\.js"/);
   assert.match(html,/src="\.\/assets\/v5-logistics-scene\.svg"/);
+  assert.match(html,/srcset="\.\/assets\/v5-logistics-mobile\.svg"/);
+  assert.match(html,/media="\(max-width: 430px\)"/);
   assert.ok(statSync(new URL("styles-v5.css",root)).size<16000);
   assert.ok(statSync(new URL("assets/v5-logistics-scene.svg",root)).size<18000);
   assert.ok(statSync(new URL("index.html",root)).size<35000);
@@ -47,6 +50,13 @@ test("V5 graphic is authored locally, without scripts or external imagery",()=>{
   assert.match(svg,/id="yellow"/);
   assert.match(svg,/id="red"/);
   assert.doesNotMatch(svg,/<script\b|<foreignObject\b|<image\b|xlink:href|href="https?:\/\//i);
+  assert.match(mobileSvg,/viewBox="0 0 390 560"/);
+  assert.match(mobileSvg,/comercio con toldo amarillo/);
+  assert.match(mobileSvg,/recorrido amarillo luminoso/);
+  assert.doesNotMatch(mobileSvg,/<script\b|<foreignObject\b|<image\b|xlink:href|href="https?:\/\//i);
+  assert.ok(statSync(new URL("assets/v5-logistics-mobile.svg",root)).size<18000);
+  assert.match(css,/@media\(max-width:430px\)\{[\s\S]*?\.v5-route-overlay \{display:none;\}/);
+  assert.match(css,/\.v5-stage-world \{aspect-ratio:390 \/ 560;min-height:0;\}/);
 });
 
 test("V5 animations are finite and accessible; no scroll listener, tracking or blocking",()=>{
