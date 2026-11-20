@@ -162,6 +162,18 @@ try{
  const reopened=await waitUntil("WebGL reopened after poster",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.triangles>100&&p?.domCanvas===1?p:null})()'),15000);
  check("WebGL scene reopens cleanly without duplicate canvas",reopened.domCanvas===1&&reopened.triangles>100,{reopened});
 
+ // One-click real website integration: hero CTA is the mobile opt-in
+ // and must launch the actual guided GLB tour, not just scroll to artwork.
+ await viewport(390,844);
+ const beforeHero=await evalJS('(()=>({loading:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),cta:!!document.querySelector("[data-v64-tour-launch]")}))()');
+ check("Prime mobile hero exposes 3D journey without preloading WebGL",beforeHero.cta&&!beforeHero.loading,{beforeHero});
+ await evalJS('document.querySelector("[data-v64-tour-launch]").click()');
+ await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+ const heroTour=await waitUntil("hero launches GLB cinematic experience",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3&&p?.tourActive?p:null})()'),18000);
+ check("One-click hero activates all GLBs and guided 3D tour",heroTour.glbLoaded===3&&heroTour.tourActive,
+  {models:heroTour.glbLoaded,beat:heroTour.tourBeat});
+ await screenshot("mobile-v64-hero-3d-site-integration.png");
+
  await viewport(390,844,true);
  const reduced=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),button:document.querySelector(".v6-enable-webgl")?.hidden,poster:!!document.querySelector(".v5-stage-render")}))()');
  check("Reduced-motion remains static and never loads WebGL",!reduced.script&&reduced.button===true&&reduced.poster,{reduced});
