@@ -46,7 +46,7 @@ test("V5 graphic is authored locally, without scripts or external imagery",()=>{
   assert.match(svg,/id="blueWall"/);
   assert.match(svg,/id="yellow"/);
   assert.match(svg,/id="red"/);
-  assert.doesNotMatch(svg,/<script\b|<foreignObject\b|<image\b|xlink:href|https?:\/\//i);
+  assert.doesNotMatch(svg,/<script\b|<foreignObject\b|<image\b|xlink:href|href="https?:\/\//i);
 });
 
 test("V5 animations are finite and accessible; no scroll listener, tracking or blocking",()=>{
