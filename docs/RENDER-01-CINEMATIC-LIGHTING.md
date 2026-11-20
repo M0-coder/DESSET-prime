@@ -12,7 +12,6 @@ Mejora del render WebGL2 3D ya existente. **No** reestructura la portada ni crea
 - **Repartidor / tránsito:** luz ambiental amarilla contenida.
 - **Destino / entrega:** contrapunto rojo discreto.
 - **Suelo:** se sustituyen tres manchas sólidas por tres máscaras de luz radial más legibles con bordes suaves, usando **una sola textura procedimental local de 128 × 128 px**.
-- **Profundidad ambiental:** cinco masas urbanas discretas detrás de los protagonistas, sin sombras, para dar escala sin competir con la acción.
 - **Exposición:** 1,07 bajo el mismo ACES Filmic, para controlar brillos.
 - **Iluminación global:** ajuste fino de relleno cálido, rim frío, acento rojo y niebla para aumentar profundidad sin quemar los materiales.
 - **Cámara, puesta en escena, modelos GLB y coreografía:** idénticos a la referencia. Un ciclo completo sigue durando 9,3 segundos.
@@ -32,7 +31,7 @@ Mejora del render WebGL2 3D ya existente. **No** reestructura la portada ni crea
 
 ## Límites y reversibilidad
 
-Los tres planos sustituyen tres círculos y se añaden cinco volúmenes ambientales oscuros de fondo, sin proyectar ni recibir sombras: aproximadamente cinco draw calls adicionales, dentro del límite existente de 160. La textura se libera mediante `ownedTextures`; si el canvas 2D no está disponible, se conserva un círculo plano. La renderización no requiere red, rastreo, efectos posprocesados ni otra dependencia. En móviles el sombreado caro permanece desactivado. Si WebGL falla o el usuario prefiere menos movimiento, permanece la imagen WebP accesible.
+Tres planos sustituyen tres círculos, sin nuevos volúmenes ni draw calls adicionales. Se descartaron cinco volúmenes de fondo tras la revisión visual por degradar la claridad de la escena y producir un aspecto de diorama. La textura se libera mediante `ownedTextures`; si el canvas 2D no está disponible, se conserva un círculo plano. La renderización no requiere red, rastreo, efectos posprocesados ni otra dependencia. En móviles el sombreado caro permanece desactivado. Si WebGL falla o el usuario prefiere menos movimiento, permanece la imagen WebP accesible.
 
 ## Evidencia requerida
 

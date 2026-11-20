@@ -170,20 +170,6 @@ if(!stage||!mount||!controls||reduced){
   ground.rotation.x=-Math.PI/2;ground.position.y=-.32;scene.add(ground);
   const grid=new THREE.GridHelper(20,20,0x314977,0x1b2d4b);
   grid.position.y=-.297;grid.material.transparent=true;grid.material.opacity=.35;scene.add(grid);
-  // RENDER-01: five deliberately subdued background masses create urban depth,
-  // outside the three principal subjects and with no shadow/dynamic-light cost.
-  const backdropMaterial=makeMat(0x1b2e50,.06,.86);
-  const backdrop=vertical?
-   [[-2.8,-8.4,1.15,.72,.80],[-1.3,-8.1,1.30,1.0,.70],
-    [0,-8.7,1.7,.66,.82],[1.65,-8.3,1.30,.84,.65],[2.95,-8.5,.90,.63,.75]]:
-   [[-8.4,-5.5,1.45,.88,.80],[-5.7,-6.1,1.85,.71,.82],
-    [-2.4,-6.4,1.10,1.08,.78],[2.45,-6.6,1.75,.60,.93],[6.4,-5.8,1.42,.86,.86]];
-  for(const [x,z,w,h,d] of backdrop){
-   const mass=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),backdropMaterial);
-   mass.name="render01-background-mass";
-   mass.position.set(x,h/2-.30,z);mass.castShadow=false;mass.receiveShadow=false;
-   scene.add(mass);
-  }
   for(const [x,z,color] of [[-5,-2,0x1551d8],[0,-2.7,0xffc62f],[5,-2,0xff3328]]){
    const disc=new THREE.Mesh(new THREE.CircleGeometry(2.2,34),
     new THREE.MeshBasicMaterial({color,transparent:true,opacity:.15,depthWrite:false}));
@@ -513,7 +499,6 @@ if(!stage||!mount||!controls||reduced){
       textureCount:renderer?.info.memory.textures||0,
       material:"PBR",colorSpace:"srgb",cinematic:"v6.2",
       render01Pools:scene.children.filter(object=>object.name==="render01-floor-pool").length,
-      render01Backdrops:scene.children.filter(object=>object.name==="render01-background-mass").length,
       render01Texture:render01FloorTexture?.isCanvasTexture===true,
       glbLoaded:modelStats.ready?modelStats.models.length:0,
       glbModels:modelStats.models,glbStatus:stage.dataset.v62ModelsStatus||"not-started",
