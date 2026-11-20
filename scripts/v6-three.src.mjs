@@ -2,6 +2,7 @@
  * All geometry is procedural, no external textures, fetch, tracking or WebGPU.
  * The V5 WebP image remains the functional fallback and accessible context. */
 import * as THREE from "three";
+import {hydrateGLBModels} from "./v62-glb-loader.src.mjs";
 
 const stage=document.querySelector(".v5-city-stage");
 const mount=stage?.querySelector(".v6-three-mount");
@@ -13,6 +14,7 @@ if(!stage||!mount||!controls||reduced){
 }else{
  let renderer,scene,camera,ro,observer,raf=0,alive=false,onscreen=true,paused=false;
  let cameraPreset="overview",frame=0,particle,parcel,routeHalo;
+ let modelStats={ready:false,models:[]};
  let pointer={x:0,y:0},last=0,lastRender=0;
  let onMove,onLeave,onResize,onVisibility,onControls;
  const ownedTextures=[];
@@ -388,8 +390,21 @@ if(!stage||!mount||!controls||reduced){
       shadows:renderer?.shadowMap.enabled===true,
       geometryCount:renderer?.info.memory.geometries||0,
       textureCount:renderer?.info.memory.textures||0,
-      material:"PBR",colorSpace:"srgb",cinematic:"v6.1",
+      material:"PBR",colorSpace:"srgb",cinematic:"v6.2",
+      glbLoaded:modelStats.ready?modelStats.models.length:0,
+      glbModels:modelStats.models,glbStatus:stage.dataset.v62ModelsStatus||"not-started",
       objectBounds:objectBounds()});
+   // Render the working procedural scene immediately, and promote the three
+   // self-hosted GLB models only after all assets pass GLTFLoader validation.
+   void hydrateGLBModels({
+    scene,coarse,stage,sign,ownedTextures,isLive:()=>Boolean(renderer)
+   }).then(value=>{
+    modelStats=value;
+    if(value.ready&&renderer&&!document.hidden)renderer.render(scene,camera);
+   }).catch(error=>{
+    stage.dataset.v62ModelsStatus="fallback";
+    console.warn("DESSET detailed GLB fallback:",String(error).slice(0,200));
+   });
   }
  }catch(e){console.warn("DESSET experimental Three.js fallback:",String(e));fail("unsupported")}
 }
