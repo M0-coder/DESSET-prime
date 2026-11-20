@@ -1,0 +1,57 @@
+/** Verify the packaged DESSET Prime website, not only source files.
+ * Strict offline integrity and negative-control checks before any preview.
+ */
+import {readFile,readdir,stat} from "node:fs/promises";
+import {createHash} from "node:crypto";
+import {resolve,relative,sep} from "node:path";
+import {fileURLToPath} from "node:url";
+
+const base=resolve(fileURLToPath(new URL("../",import.meta.url)));
+const dist=resolve(base,"dist");
+const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+message)};
+const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
+check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
+check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
+check(manifest.files.length>=18&&manifest.files.length<40,"unexpected file count");
+const expected=new Set(manifest.files.map(x=>x.path));
+check(expected.size===manifest.files.length,"duplicate entries");
+let total=0;
+for(const entry of manifest.files){
+ check(!entry.path.includes("..")&&!entry.path.startsWith("/"),"unsafe path "+entry.path);
+ const abs=resolve(dist,entry.path);
+ check(abs.startsWith(dist+sep),"path escapes dist: "+entry.path);
+ const bytes=await readFile(abs);
+ const digest=createHash("sha256").update(bytes).digest("hex");
+ check(digest===entry.sha256&&entry.bytes===bytes.length,"sha256 mismatch "+entry.path);
+ total+=bytes.length;
+}
+check(total===manifest.totalBytes,"package size mismatch");
+const html=await readFile(resolve(dist,"index.html"),"utf8");
+const loader=await readFile(resolve(dist,"scripts/v5-cinematic.js"),"utf8");
+check(html.includes('href="#ecosistema" data-v64-tour-launch'),"hero journey is not linked to real site");
+check(html.includes('class="v63-tour"')&&html.includes('class="v6-three-mount"'),"3D tour not mounted in ecosystem");
+check(html.includes('name="robots" content="noindex,nofollow"'),"noindex absent");
+check(loader.includes('stage.dataset.v64Requested="tour"')&&loader.includes('stage.querySelector(".v63-tour")?.click()'),"hero link cannot activate Three.js journey");
+for(const name of ["commerce","courier","destination"]){
+ const path="assets/v62-"+name+".glb";
+ check(expected.has(path),"GLB missing "+name);
+ const bytes=await readFile(resolve(dist,path));
+ check(bytes.toString("ascii",0,4)==="glTF"&&bytes.readUInt32LE(4)===2,"invalid GLB "+name);
+}
+check(expected.has("assets/v6-three.bundle.js"),"Three.js bundle is missing");
+check(![...expected].some(x=>x.endsWith(".md")||x.includes("workflow")||x.includes("package")||x.includes("node_modules")), "development files in static site");
+async function inventory(path=""){
+ const entries=await readdir(resolve(dist,path),{withFileTypes:true});
+ const found=[];
+ for(const entry of entries){
+  const rel=path?path+"/"+entry.name:entry.name;
+  if(entry.isDirectory())found.push(...await inventory(rel));
+  else if(entry.isFile())found.push(rel);
+  else throw Error("Unexpected symlink or nonfile in web package: "+rel);
+ }
+ return found;
+}
+const actual=await inventory();
+check(actual.length===expected.size+1,"unexpected file/s in packed site");
+check(actual.every(x=>x==="site-manifest.json"||expected.has(x)),"unknown web package content");
+console.log("DESSET Prime built website PASS: "+expected.size+" signed files, "+total+" bytes; Three.js and three GLB ready, hero-to-ecosystem tour connected");
