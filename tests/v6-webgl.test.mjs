@@ -48,7 +48,8 @@ test("V6 has real input controls, opt-in mobile loading and permanent poster fal
  assert.match(loader,/document\.createElement\("script"\)/);
  assert.match(loader,/\.\/assets\/v6-three\.bundle\.js/);
  assert.match(loader,/threeStart\?\.addEventListener\("click",loadThree\)/);
- assert.match(loader,/if\(!mobile\)\{/);
+ assert.match(loader,/if\(threeStart\)threeStart.hidden=false/);
+ assert.doesNotMatch(loader,/trigger3D|trigger3D\.observe/);
  assert.match(gpu,/getContext\("webgl2"\)/);
  assert.match(gpu,/stage\.dataset\.v6State="active"/);
  assert.match(gpu,/stage\.dataset\.v6State=reason/);
