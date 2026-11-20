@@ -12,7 +12,7 @@ test("activos históricos originales sin alteración",()=>{
  assert.equal(gitBlob(mark),"fa6cb4ea5c5331c4cf47dfd157214e972f809356");
  assert.equal(gitBlob(roles),"71401c4d0f93eeefcde393f18e82e165e50d8f90");
  assert.match(html,/assets\/deliver-assets-mark\.png/);
- assert.match(html,/assets\/roles-geometry-v2\.svg/);
+ assert.match(html,/assets\/roles-geometry-es\.svg/);
 });
 test("estructura pública informativa y alcance responsable",()=>{
  for(const id of ["inicio","vision","soluciones","ecosistema","negocios","contacto"])
