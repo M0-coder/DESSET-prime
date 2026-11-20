@@ -69,7 +69,7 @@ if(!stage||!mount||!controls||reduced){
   box(parent,w*.86,.04,d*.85,0,.025,0,mats.road);
  };
  function storefront(){
-  const g=new THREE.Group();g.position.set(-5,0,0);scene.add(g);
+  const g=new THREE.Group();g.position.set(coarse?-.7:-5,0,coarse?-4.7:0);scene.add(g);
   plinth(g,4.1,3.1);
   box(g,2.7,2.3,1.95,0,1.22,-.2,mats.blue);
   box(g,3.1,.27,2.25,0,2.47,-.22,mats.cyan);
@@ -87,7 +87,7 @@ if(!stage||!mount||!controls||reduced){
   sphere(g,.064,.20,1.0,.852,mats.headlight);
  }
  function destination(){
-  const g=new THREE.Group();g.position.set(5.03,0,-.35);scene.add(g);
+  const g=new THREE.Group();g.position.set(coarse?.7:5.03,0,coarse?4.7:-.35);scene.add(g);
   plinth(g,3.65,3.15);
   box(g,2.65,2.12,2.18,0,1.12,0,mats.red);
   const roof=new THREE.Mesh(new THREE.ConeGeometry(2.14,1.28,4,1),mats.cream);
@@ -103,7 +103,7 @@ if(!stage||!mount||!controls||reduced){
   box(g,.05,.67,.09,-.81,1.32,1.166,mats.chrome);
  }
  function courier(){
-  const g=new THREE.Group();g.position.set(.98,.13,1.18);scene.add(g);
+  const g=new THREE.Group();g.position.set(coarse?0:.98,.13,coarse?0:1.18);scene.add(g);
   plinth(g,3.9,2.65);
   for(const x of [-.92,.91]){
    const tyre=new THREE.Mesh(new THREE.TorusGeometry(.39,.115,8,18),mats.dark);
@@ -143,7 +143,11 @@ if(!stage||!mount||!controls||reduced){
    cylinder(scene,.055,1.55,x,.70,z,mats.side);
    sphere(scene,.13,x,1.52,z,mats.gold);
   }
-  const path=[
+  const path=coarse?[
+   new THREE.Vector3(-.5,.18,-2.9),new THREE.Vector3(-1.15,.21,-1.6),
+   new THREE.Vector3(-.8,.22,-.7),new THREE.Vector3(.45,.23,.8),
+   new THREE.Vector3(1.15,.20,2.05),new THREE.Vector3(.6,.20,3.20)
+  ]:[
    new THREE.Vector3(-3.15,.18,1.22),new THREE.Vector3(-1.65,.20,2.35),
    new THREE.Vector3(.10,.21,2.30),new THREE.Vector3(1.90,.23,2.26),
    new THREE.Vector3(3.05,.22,1.45),new THREE.Vector3(3.7,.20,.65)
@@ -160,9 +164,10 @@ if(!stage||!mount||!controls||reduced){
   box(parcel,.82,.64,.71,0,0,0,mats.gold);
   box(parcel,.10,.66,.73,0,.005,0,mats.cream);
   box(parcel,.85,.07,.12,0,.34,0,mats.cream);
-  parcel.position.set(-2.25,1.35,-.58);scene.add(parcel);
+  parcel.position.set(coarse?-1.2:-2.25,1.35,coarse?-2.35:-.58);scene.add(parcel);
   // Soft pools of light offer depth without a costly post-processing pass.
-  for(const [x,z,r] of [[-5,0,2.25],[.98,1.18,2.05],[5.03,-.35,2.0]]){
+  const pools=coarse?[[-.7,-4.7,2.25],[0,0,2.05],[.7,4.7,2.0]]:[[-5,0,2.25],[.98,1.18,2.05],[5.03,-.35,2.0]];
+  for(const [x,z,r] of pools){
     const halo=new THREE.Mesh(new THREE.CircleGeometry(r,32),
       new THREE.MeshBasicMaterial({color:0x2e68c7,transparent:true,opacity:.07,depthWrite:false}));
     halo.rotation.x=-Math.PI/2;halo.position.set(x,-.283,z);scene.add(halo);
@@ -203,7 +208,11 @@ if(!stage||!mount||!controls||reduced){
   resize(width,height);
   return renderer.info;
  }
- const presets={
+ const presets=coarse?{
+  overview:{pos:[9.6,12.5,9.7],look:[0,1,0]},
+  commerce:{pos:[8.6,9.8,3.4],look:[-.7,1.1,-4.7]},
+  destination:{pos:[9.2,9.8,11.8],look:[.7,1.1,4.7]}
+ }:{
   overview:{pos:[12,11,18],look:[0,1,0]},
   commerce:{pos:[-.3,8.2,12],look:[-4.2,1.0,0]},
   destination:{pos:[7.6,8.7,12],look:[4.1,1,.1]}
@@ -212,7 +221,7 @@ if(!stage||!mount||!controls||reduced){
  const tmp=new THREE.Vector3(),desiredLook=new THREE.Vector3();
  function resize(w,h){
   if(!renderer||!camera)return;
-  const ratio=w/Math.max(1,h),size=coarse?11.15:5.8;
+  const ratio=w/Math.max(1,h),size=coarse?6.6:5.8;
   camera.left=-size*ratio;camera.right=size*ratio;
   camera.top=size;camera.bottom=-size;
   camera.updateProjectionMatrix();renderer.setSize(w,h,false);
