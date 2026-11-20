@@ -85,6 +85,13 @@ try{
  await send("Page.enable");await send("Runtime.enable");
  await viewport(1440,900);
  await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+ const desktopInitial=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),poster:document.querySelector(".v5-stage-render")?.complete,trigger:document.querySelector(".v6-enable-webgl")?.hidden}))()');
+ check("Desktop keeps cinematic render until explicit Three.js opt-in",!desktopInitial.script&&desktopInitial.trigger===false&&desktopInitial.poster,{desktopInitial});
+ await evalJS('document.querySelector(".v6-enable-webgl").click()');
+ const desktopEarly=await evalJS('(()=>{const e=document.querySelector(".v5-city-stage"),p=window.__dessetV6Probe?.();return {state:e.dataset.v6State,glbLoaded:p?.glbLoaded||0,posterOpacity:getComputedStyle(e.querySelector(".v5-responsive-art")).opacity}})()');
+ check("No premature WebGL reveal before all three GLBs load",
+   desktopEarly.state!=="active"?(desktopEarly.posterOpacity!=="0"):desktopEarly.glbLoaded===3,
+   {desktopEarly});
  const desktop=await waitUntil("desktop real GPU",async()=>evalJS('(()=>{const e=document.querySelector(".v5-city-stage"),p=window.__dessetV6Probe?.();return e.dataset.v6State==="active"&&p?.triangles>0&&p?.frames>2?p:null})()'),15000);
  check("Desktop WebGL2 real draw calls",desktop.webgl&&desktop.triangles>100&&desktop.drawCalls>0,{desktop});
  check("Real Three.js revision",desktop.threeRevision==="187",{revision:desktop.threeRevision});
