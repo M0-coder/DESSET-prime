@@ -143,6 +143,13 @@ try{
     JSON.stringify(designSystem.steps)!==JSON.stringify(expectedSteps))
    report.failures.push("V6.7 computed 60-30-10 palette or three-step narrative mismatch: "+JSON.stringify(designSystem));
  report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
+
+ const appAccess=await js('(()=>{const p=document.querySelector("[data-service-access]");const status=p?.querySelector("[data-service-status]");const links=p?.querySelector("[data-app-links]");return {found:!!p,availability:p?.dataset.applicationAvailability,status:status?.textContent.trim(),liveLinks:links?.querySelectorAll("a").length,linksHidden:links?.hidden,role:status?.getAttribute("role")}})()');
+ if(!appAccess.found||appAccess.availability!=="not-published"||
+   appAccess.status!=="Acceso público no habilitado"||
+   !appAccess.linksHidden||appAccess.liveLinks!==0||appAccess.role!=="status")
+   report.failures.push("V6.9 web wrongly claims live app availability: "+JSON.stringify(appAccess));
+ report.tests.push({name:"V6.9 enterprise services remain permanent, app availability remains truthful",appAccess});
  const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,mark:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src")}))()');
  if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<110||kineticIntro.blue!=="v45-blue-strike"||kineticIntro.mark!=="v45-mark-lock"||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png"))report.failures.push("V4.5 hero kinetic introduction failed: "+JSON.stringify(kineticIntro));
  report.tests.push({name:"V4.5 hero scale and original mark motion",kineticIntro});
