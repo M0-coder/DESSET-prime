@@ -296,6 +296,7 @@ if(!stage||!mount||!controls||reduced){
   window.__dessetV6Probe=undefined;
   const trigger=stage.querySelector(".v6-enable-webgl");
   if(trigger)trigger.hidden=false;
+  stage.dispatchEvent(new Event("desset:v6-unavailable"));
  }
  const cancelTour=(reason="manual")=>{
   if(!storyActive&&stage.dataset.v63Tour!=="complete")return;
@@ -379,17 +380,27 @@ if(!stage||!mount||!controls||reduced){
   stage.dataset.v6Frames=String(Number(stage.dataset.v6Frames||0)+1);
  }
  function wake(){
-  if(!renderer||alive||paused)return;
+  if(!renderer||alive||paused||stage.dataset.v6State!=="active")return;
   alive=true;last=0;lastRender=0;raf=requestAnimationFrame(render);
  }
+ // Render one complete frame while the original poster still covers the canvas.
+ // Reveal the WebGL layer only when the detailed GLBs or fallback are ready.
+ const revealReady=()=>{
+  if(!renderer||stage.dataset.v6State!=="preparing")return;
+  renderer.render(scene,camera);
+  controls.hidden=false;
+  stage.dataset.v6State="active";
+  stage.dispatchEvent(new Event("desset:v6-ready"));
+  wake();
+ };
  // Core 3D scene starts on demand via the existing V5 progressively enhanced controller.
  try{
   const probe=document.createElement("canvas");
   if(!probe.getContext("webgl2")){fail("unsupported");}
   else{
    setup();
-   stage.dataset.v6State="active";
-   controls.hidden=false;
+   stage.dataset.v6State="preparing";
+   controls.hidden=true;
    const trigger=stage.querySelector(".v6-enable-webgl");
    if(trigger)trigger.hidden=true;
    onControls=e=>{
@@ -459,16 +470,20 @@ if(!stage||!mount||!controls||reduced){
       tourBeat:STORY_BEATS[storyBeat]?.id||null,tourDuration:STORY_DURATION,
       tourProgress:storyProgress?.value||0,
       objectBounds:objectBounds()});
-   // Render the working procedural scene immediately, and promote the three
-   // self-hosted GLB models only after all assets pass GLTFLoader validation.
+   // Keep the cinematic WebP poster on screen until all GLB models load and
+   // one true GPU frame has been rendered. Prevents empty canvas and model pop.
    void hydrateGLBModels({
-    scene,coarse,stage,sign,ownedTextures,isLive:()=>Boolean(renderer)
+    scene,coarse,stage,sign,ownedTextures,
+    isLive:()=>Boolean(renderer)&&stage.dataset.v6State==="preparing"
    }).then(value=>{
+    if(!renderer)return;
     modelStats=value;
-    if(value.ready&&renderer&&!document.hidden)renderer.render(scene,camera);
+    revealReady();
    }).catch(error=>{
+    if(!renderer)return;
     stage.dataset.v62ModelsStatus="fallback";
     console.warn("DESSET detailed GLB fallback:",String(error).slice(0,200));
+    revealReady();
    });
   }
  }catch(e){console.warn("DESSET experimental Three.js fallback:",String(e));fail("unsupported")}
