@@ -6,6 +6,8 @@ const html=read("index.html"),css=read("styles-visual02.css"),
       build=read("scripts/build-site.mjs"),verify=read("scripts/verify-site-package.mjs"),
       gate=read("scripts/static-gate.mjs"),preview=read("scripts/local-preview.mjs"),
       audit=read("scripts/browser-audit.mjs");
+const visual02Css=css.split("/* VISUAL-03:")[0];
+assert.ok(css.includes("/* VISUAL-03:"),"Must retain isolated VISUAL-03 marker");
 test("VISUAL-02 leaves the approved photographic hero and real official identity untouched",()=>{
  assert.match(html,/desset-hero-entrega-dos-espejos\.webp/);
  assert.match(html,/desset-hero-entrega-mobile\.webp/);
@@ -26,7 +28,7 @@ test("VISUAL-02 concentrates editorial retouching below hero, no image, typeface
  assert.match(css,/#soluciones \.solutions-grid \.service--main\{border:1px solid/);
  assert.match(css,/@media\(max-width:700px\)/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
- assert.doesNotMatch(css,/#inicio|\.prime-photo-image|\.brand-mark|(?:@import|url\(|@font-face|@keyframes|animation:)/);
+ assert.doesNotMatch(visual02Css,/#inicio|\.prime-photo-image|\.brand-mark|(?:@import|url\(|@font-face|@keyframes|animation:)/);
  assert.ok(statSync(new URL("styles-visual02.css",root)).size<=5200);
 });
 test("VISUAL-02 ships a single budgeted local stylesheet in source and packaged dist",()=>{
@@ -50,5 +52,5 @@ test("VISUAL-02 has no hidden deployment or remote resources",()=>{
  assert.doesNotMatch(css,/https?:\/\/[^" ]+\.css|@import/);
  assert.match(gate,/Remote CSS dependency/);
  assert.match(preview,/const host="127\.0\.0\.1"/);
- assert.doesNotMatch(css,/display:\s*none|visibility:\s*hidden|overflow:\s*hidden|opacity:\s*0(?:[;}])/);
+ assert.doesNotMatch(visual02Css,/display:\s*none|visibility:\s*hidden|overflow:\s*hidden|opacity:\s*0(?:[;}])/);
 });

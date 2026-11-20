@@ -58,3 +58,12 @@
 @media(prefers-reduced-motion:reduce){
  #soluciones .solutions-grid .service--main,#negocios .business-pitch{transition:none!important}
 }
+
+/* VISUAL-03: three independent user-approved photographs, no hero duplication. */
+#ecosistema .motion-story-art{overflow:hidden}
+#ecosistema .v03-photo-story{display:block;position:relative;width:100%;height:100%;overflow:hidden;border-radius:14px}
+#ecosistema .v03-photo-story img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;filter:none}
+#ecosistema .motion-story-art--choose img{object-position:48% 50%}
+#ecosistema .motion-story-art--organize img{object-position:50% 48%}
+#ecosistema .motion-story-art--move img{object-position:51% 47%}
+@media(prefers-reduced-motion:reduce){#ecosistema .v03-photo-story img{animation:none!important;transform:none!important;opacity:1!important}}

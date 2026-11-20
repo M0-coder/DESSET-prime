@@ -205,7 +205,13 @@ try{
  report.tests.push({name:"Scroll-bound narrative sequence",storyState});
  const scenes=await js('(()=>[...document.querySelectorAll(".motion-story-art img")].map(el=>({src:el.getAttribute("src"),complete:el.complete,width:el.naturalWidth,height:el.naturalHeight,rendered:el.getBoundingClientRect().width})))()');
  if(scenes.length!==3||scenes.some(x=>!x.complete||x.width<100||x.height<100||x.rendered<45))report.failures.push("Commercial narrative illustrations missing or too small: "+JSON.stringify(scenes));
- report.tests.push({name:"Original semantic illustration assets render",scenes});
+ report.tests.push({name:"Narrative photographs load and SVG fallback attributes remain",scenes});
+ const v03=await js('(()=>[...document.querySelectorAll(".motion-story-art img")].map(x=>({src:x.getAttribute("src"),current:x.currentSrc,photo:!!x.closest("picture.v03-photo-story"),fit:getComputedStyle(x).objectFit,loaded:x.complete&&x.naturalWidth===960&&x.naturalHeight===640})))()');
+ const v03Photos=["scene-choose.webp","scene-prepare.webp","scene-move.webp"];
+ if(v03.length!==3||new Set(v03.map(x=>x.current)).size!==3||v03.some((x,i)=>!x.photo||!x.current.endsWith(v03Photos[i])||x.fit!=="cover"||!x.loaded||!x.src.endsWith(["scene-choose.svg","scene-prepare.svg","scene-move.svg"][i])))
+  report.failures.push("VISUAL-03 distinct user-approved WebP photographs or SVG fallback failed: "+JSON.stringify(v03));
+ report.tests.push({name:"VISUAL-03 three different approved photos, exact sizes, original SVG fallbacks",v03});
+
  await capture("desktop-story-motion.png");
  const kineticJourney=await js('(()=>{const cards=[...document.querySelectorAll(".motion-story-unit")].map(c=>({active:c.classList.contains("motion-active"),animation:getComputedStyle(c.querySelector("img")).animationName}));const route=getComputedStyle(document.querySelector(".motion-story-bridge-line")).animationName;return {cards,route}})()');
  if(kineticJourney.cards.length!==3||kineticJourney.cards.some(x=>!x.active||x.animation!=="v45-scene-illustration")||kineticJourney.route!=="prime-bridge-draw")report.failures.push("Three-beat narrative sequence failed: "+JSON.stringify(kineticJourney));
