@@ -138,7 +138,7 @@ try{
  await capture("desktop-transition.png");
  await sleep(2050);
  await capture("desktop-final.png");
- await capture("desktop-full.png",true);
+ 
  const v5Cover=await js('(()=>({mode:document.documentElement.dataset.v5Mode,overlay:!!document.querySelector(".v5-hero-refraction"),stage:!!document.querySelector(".v5-city-stage"),asset:document.querySelector(".v5-stage-render")?.getAttribute("src"),contactLight:!!document.querySelector(".v5-contact-light")}))()');
  if(v5Cover.mode!=="ready"||!v5Cover.overlay||!v5Cover.stage||!v5Cover.asset?.endsWith("v5-logistics-scene.svg")||!v5Cover.contactLight)report.failures.push("V5 cinematic entry incomplete: "+JSON.stringify(v5Cover));
  report.tests.push({name:"V5 cinematic identity and local asset",v5Cover});
@@ -150,6 +150,8 @@ try{
  await capture("desktop-v5-scene-motion.png");
  await sleep(1750);
  await capture("desktop-v5-scene-final.png");
+   // Capture entire page only after below-fold poster has been decoded.
+   await capture("desktop-full.png",true);
  await js('document.querySelector(".motion-story").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(450);
  const storyState=await js('({sequence:document.querySelector(".motion-story").classList.contains("motion-active"),cards:[...document.querySelectorAll(".motion-story-unit")].map(x=>({text:x.querySelector("h3")?.textContent,active:x.classList.contains("motion-active")}))})');
@@ -206,7 +208,7 @@ try{
   if(w===390){
    await sleep(3200);
    await capture("mobile-final.png");
-   await capture("mobile-full.png",true);
+   
    await js('document.querySelector(".business-pitch").scrollIntoView({block:"start",behavior:"instant"})');
    await sleep(240);
    await capture("mobile-business-pitch.png");
@@ -245,19 +247,23 @@ try{
    if(!v5Mobile.visible||v5Mobile.left< -2||v5Mobile.right>v5Mobile.viewport+2||v5Mobile.overflow||!v5Mobile.imageLoaded||!v5Mobile.source?.includes("v5-cinematic-mobile.webp")||v5Mobile.width!==1024||v5Mobile.height!==1536||v5Mobile.fillX<.98||v5Mobile.fillY<.98||v5Mobile.obsoleteOverlay||v5Mobile.ratio<1.4||!v5Mobile.caption?.includes("conceptual"))report.failures.push("V5 mobile 390 scene failed: "+JSON.stringify(v5Mobile));
    report.tests.push({name:"V5 mobile 390 cinematic layout",v5Mobile});
    await capture("mobile-v5-scene.png");
+   // Capture entire page only after below-fold poster has been decoded.
+   await capture("mobile-full.png",true);
   }
   if(w===320){
    const narrowContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {left:r.left,right:r.right,height:r.height,viewport:v}})()');
    if(narrowContact.left < -2||narrowContact.right>narrowContact.viewport+2||narrowContact.height<48)report.failures.push("320px contact button fail: "+JSON.stringify(narrowContact));
    await sleep(3200);
    await capture("mobile-320-final.png");
-   await capture("mobile-320-full.png",true);
+   
    await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
    await sleep(250);
    const v5Narrow=await js('(()=>{const e=document.querySelector(".v5-city-stage"),art=e.querySelector("img"),b=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {src:art.currentSrc,width:art.naturalWidth,height:art.naturalHeight,inside:b.left>=-2&&b.right<=v+2,fillX:+(art.getBoundingClientRect().width/e.querySelector(".v5-stage-world").getBoundingClientRect().width).toFixed(2),fillY:+(art.getBoundingClientRect().height/e.querySelector(".v5-stage-world").getBoundingClientRect().height).toFixed(2),obsoleteOverlay:!!e.querySelector(".v5-route-overlay")}})()');
    if(!v5Narrow.src?.includes("v5-cinematic-mobile.webp")||v5Narrow.width!==1024||v5Narrow.height!==1536||!v5Narrow.inside||v5Narrow.fillX<.98||v5Narrow.fillY<.98||v5Narrow.obsoleteOverlay)report.failures.push("V5 mobile 320 narrative composition failed: "+JSON.stringify(v5Narrow));
    report.tests.push({name:"V5 mobile 320 full narrative",v5Narrow});
    await capture("mobile-320-v5-scene.png");
+   // Capture entire page only after below-fold poster has been decoded.
+   await capture("mobile-320-full.png",true);
   }
  }
  const reduced=await viewport(390,844,true);
