@@ -8,6 +8,7 @@ const nav=read("scripts/app.js");
 const system=read("styles-system.css");
 const base=read("styles.css");
 const diagram=read("assets/roles-geometry-es.svg");
+const mobileDiagram=read("assets/roles-geometry-mobile-es.svg");
 const original=read("assets/roles-geometry-v2.svg");
 const pack=JSON.parse(read("dist/site-manifest.json"));
 
@@ -17,7 +18,13 @@ test("V6.8 diagrams are Spanish in both pixels and accessibility descriptions",(
  }
  assert.doesNotMatch(diagram,/\bCUSTOMER\b|\bBUSINESS\b|\bRIDER\b/i);
  assert.match(diagram,/<desc id="d">Los clientes solicitan, los comercios preparan, los repartidores entregan y el control supervisa/);
- assert.match(html,/funciones del sistema: clientes, comercios, repartidores y control/);
+ assert.match(html,/Diagrama conceptual de cuatro funciones: clientes eligen, comercios preparan, reparto entrega y control supervisa/);
+ assert.match(html,/<source media="\(max-width:700px\)" srcset="\.\/assets\/roles-geometry-mobile-es\.svg"/);
+ assert.match(mobileDiagram,/viewBox="0 0 360 392"/);
+ for(const label of ["CLIENTES","COMERCIOS","REPARTO","CONTROL","ELEGIR","PREPARAR","ENTREGAR","SUPERVISAR"])
+  assert.ok(mobileDiagram.includes(">"+label+"</text>"),"Mobile label not legible/translated: "+label);
+ assert.doesNotMatch(mobileDiagram,/CUSTOMER|BUSINESS|RIDER/);
+ assert.equal(read("dist/assets/roles-geometry-mobile-es.svg"),mobileDiagram);
  assert.equal(read("dist/assets/roles-geometry-es.svg"),diagram);
  assert.match(original,/>CUSTOMER<\/text>/);
  assert.match(html,/src="\.\/assets\/roles-geometry-es\.svg"/);
@@ -40,7 +47,7 @@ test("V6.8 navigation works progressively when scripts fail or are disabled",()=
 });
 
 test("V6.8 signed inventory records every updated static asset",()=>{
- for(const path of ["assets/roles-geometry-es.svg","styles-system.css","scripts/app.js"]){
+ for(const path of ["assets/roles-geometry-es.svg","assets/roles-geometry-mobile-es.svg","styles-system.css","scripts/app.js"]){
   const found=pack.files.find(x=>x.path===path);
   assert.ok(found&&found.bytes>0,"Package omits "+path);
  }
