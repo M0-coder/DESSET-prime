@@ -17,6 +17,7 @@ test("PERF-01 preloads only the matching responsive approved hero ahead of CSS",
  assert.match(html,/<source type="image\/webp" media="\(max-width: 700px\)" srcset="\.\/assets\/desset-hero-entrega-mobile\.webp">/);
  assert.match(html,/src="\.\/assets\/desset-hero-entrega-dos-espejos\.webp" width="1671" height="941"/);
  assert.match(html,/loading="eager" fetchpriority="high"/);
+ assert.match(html,/class="v5-stage-render"[^>]*decoding="async" loading="lazy" fetchpriority="low"/);
 });
 test("PERF-01 three original photos remain lazy and are explicitly low-priority",()=>{
  for(const n of ["choose","prepare","move"]){
@@ -34,5 +35,6 @@ test("PERF-01 checks browser-selected responsive preload and real effective prio
  assert.match(audit,/matchMedia\(x\.media\)\.matches/);
  assert.match(audit,/perf01\.activeCount!==1/);
  assert.match(audit,/perf01\.heroPriority!=="high"/);
+ assert.match(audit,/perf01\.offscreen3D\.loading!=="lazy"/);
  assert.match(audit,/perf01\.stories\.some\(x=>x\.loading!=="lazy"\|\|x\.priority!=="low"\)/);
 });

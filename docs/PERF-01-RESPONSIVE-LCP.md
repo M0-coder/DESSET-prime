@@ -8,12 +8,14 @@ La portada tenía `loading=eager` / `fetchpriority=high` y su WebP móvil respon
 ## Cambio
 - Dos hints `rel=preload as=image` dentro del head, **excluyentes por media query**, apuntando exactamente a los dos WebP originales de portada. Móvil <=700px precarga su WebP 960px; desktop >=701px precarga el WebP de 1671px. Mantener sus MIME y URL sin query strings; no añadir imágenes nuevas ni duplicar descargas por usar URLs diferentes.
 - Las tres tarjetas WebP conservan su `picture` + SVG de respaldo + `loading=lazy`, y añaden `fetchpriority=low` a sus `img` de fallback efectivos.
-- Nada cambia en composición, resolución, calidad o tamaño del archivo; no se altera la carga voluntaria del motor 3D ni el contenido institucional.
+- El póster conceptual WebP bajo el hero pasa de `loading=eager` a `loading=lazy`, conservando `fetchpriority=low`. Su imagen y alt no cambian, y el motor 3D sigue estrictamente opt-in. La carga del póster cuando aparece en viewport se verifica en Chrome mediante sus dimensiones naturales.
+- Nada cambia en composición, resolución, calidad o tamaño de archivos, código 3D ni contenido institucional.
 
 ## Pruebas y criterios
 - Unit tests: exactamente 2 pistas excluyentes delante de hojas CSS, rango idéntico al `picture`, 3 SVG/WebP intactos y prioridades correctamente declaradas.
 - Chrome instrumentado desktop, tablet, móvil y modo reducido: exactamente **una pista activa por viewport**, `currentSrc` correspondiente, hero alta prioridad y 3 tarjetas lazy/low.
 - Build `dist/` determinista con SHA-256, static gate, seguridad HTTP, 3 GLB y WebGL2, CI completa, Lighthouse móvil/escritorio comparado con **baseline PR11** (móvil laboratorio 98, LCP 2328,89 ms, CLS0; escritorio 100, LCP 725,67 ms). No reclamar aceleración real sin medición comparable.
+- Primera iteración (solo preload + tarjetas low) fue técnicamente PASS pero **no mejoró** el laboratorio: móvil 97 / LCP 2407,87 ms, escritorio 100 / LCP 726,76 ms. Por ello se añade la carga diferida del póster 3D e instrumentación real de su recuperación al hacer scroll. Un segundo PASS sin mejora demostrable no autoriza integración.
 - Si hay duplicación de solicitudes, peor puntuación o regresión visual, corregir o descartar antes de integrar.
 - Mutation smoke dirigido, cobertura instrumentada de alcance declarado, reproducibilidad y deuda técnica documentados. Lighthouse local no implica rendimiento real en teléfonos físicos.
 
