@@ -7,12 +7,12 @@ const css=readFileSync(new URL("../styles.css",import.meta.url),"utf8");
 
 test("trust starts with a definite business direction but contains no active-service or corporate-registration claim",()=>{
  assert.match(html,/EL COMERCIO/);
- assert.match(html,/En DESSET estamos construyendo un sistema/);
- assert.match(html,/Comenzamos por la última milla/);
+ assert.match(html,/DESSET reúne comercio, tecnología y logística en un ecosistema de servicios/);
+ assert.match(html,/orientado a la última milla/);
  assert.doesNotMatch(html,/somos líderes|miles de clientes|servicios disponibles hoy|empresa registrada|RUC:\s*\d+|seguimiento en tiempo real/i);
- assert.match(html,/Nuestra tarea es concreta: desarrollar herramientas/);
+ assert.match(html,/Comercio, tecnología y distribución se integran en una misma arquitectura/);
  assert.doesNotMatch(html,/trabajo verificable|confianza garantizada|100% confiable/i);
- assert.match(html,/DESSET está en desarrollo/);
+ assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET/);
  assert.match(html,/Este sitio no procesa pedidos ni pagos/);
 });
 
@@ -20,15 +20,15 @@ test("transparent status is explicit, short, and not a decorative trust seal",()
  const panel=html.match(/<div class="trust-ledger" aria-labelledby="trust-ledger-title">([\s\S]*?)<\/div>\s*<\/section>/)?.[1]||"";
  assert.ok(panel.length>500);
  assert.match(panel,/id="trust-ledger-title"/);
- assert.match(panel,/CLARIDAD DESDE EL PRINCIPIO/);
+ assert.match(panel,/UN ECOSISTEMA, TRES PILARES/);
  assert.equal((panel.match(/class="trust-ledger-item"/g)||[]).length,3);
- for(const phase of ["Pedidos y última milla.","En construcción.","Aún sin operación comercial."])
+ for(const phase of ["Comercio conectado","Logística de última milla","Tecnología DESSET"])
   assert.ok(panel.includes(phase),"Missing credible state "+phase);
  assert.doesNotMatch(panel,/class="trust-ledger-item"><span>/);
- assert.match(panel,/En construcción/);
- assert.match(panel,/Siguiente paso: validar necesidades con comercios/);
- assert.match(panel,/Aún sin operación comercial/);
- assert.match(panel,/No se reciben pedidos, pagos ni contrataciones desde esta web/);
+ assert.match(panel,/Interacción entre clientes y negocios desde aplicaciones dedicadas/);
+ assert.match(panel,/organizar el recorrido desde el comercio hasta el destino/);
+ assert.match(panel,/Aplicaciones y herramientas para los distintos participantes/);
+ assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
  assert.doesNotMatch(panel,/100% seguro|certificado|verificado por|avalado por|garantizado/i);
 });
 

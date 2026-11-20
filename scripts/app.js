@@ -14,4 +14,6 @@ if(menu&&nav){
    setOpen(false);menu.focus();
   }
  });
+ // The no-JavaScript fallback remains visible until menu listeners exist.
+ document.documentElement.classList.add("js-enabled");
 }

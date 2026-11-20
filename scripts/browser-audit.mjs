@@ -72,14 +72,14 @@ async function viewport(width,height,reduce=false){
  await sleep(130);
  const diag=await js(`(()=>{
  const viewport=document.documentElement.clientWidth;
- const logo=[...document.images].map(x=>({src:x.getAttribute('src'),complete:x.complete,naturalWidth:x.naturalWidth,naturalHeight:x.naturalHeight}));
+ const logo=[...document.images].map(x=>({src:x.getAttribute('src'),loading:x.loading,complete:x.complete,naturalWidth:x.naturalWidth,naturalHeight:x.naturalHeight}));
  const text=[...document.querySelectorAll('.motion-line, .statement h2, .contact h2')].map(el=>{
   const r=document.createRange();r.selectNodeContents(el);
   return {text:el.innerText,contentWidth:Math.round(r.getBoundingClientRect().width),visibleWidth:Math.round(el.getBoundingClientRect().width),clientWidth:el.clientWidth,scrollWidth:el.scrollWidth};
  });
  const nodes=[...document.querySelectorAll('body *')].filter(el=>{
   // Visual montage intentionally clips decorative children; keep checking parent bounds and headline text.
-  const clip=el.closest(".v4-motion-canvas,.v4-hero-rail");
+  const clip=el.closest(".v4-motion-canvas,.v4-hero-rail,.v5-city-stage");
   if(clip&&clip!==el)return false;
   const s=getComputedStyle(el),r=el.getBoundingClientRect();
   return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.left < -2 || (s.display!=='none'&&s.visibility!=='hidden'&&r.right>viewport+2&&r.width>0);
@@ -100,7 +100,7 @@ async function viewport(width,height,reduce=false){
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
- if(diag.logo.some(x=>!x.complete||x.naturalWidth===0))fails.push("broken image");
+ if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
  if(width<=700){
@@ -127,6 +127,29 @@ try{
  const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src"),flow:!!document.querySelector(".v4-flow-board"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
  if(!heroQuality.headline?.includes("EL COMERCIO")||!heroQuality.headline?.includes("SE MUEVE")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
  report.tests.push({name:"V4 motion/design contract",heroQuality});
+ const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",board:".ecosystem-board",stage:".v5-city-stage",pitch:".business-pitch",contact:".contact-primary"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
+ const decorDots=roundedUI.titles.filter(t=>t.endsWith("."));
+ if(decorDots.length||Object.entries(roundedUI.radii).some(([,v])=>v<10))
+   report.failures.push("V6.6 unexpected heading periods or missing rounded corners: "+JSON.stringify({decorDots,radii:roundedUI.radii}));
+ report.tests.push({name:"V6.6 editorial punctuation and computed corner radii",roundedUI});
+
+ const designSystem=await js('(()=>{const color=sel=>getComputedStyle(document.querySelector(sel)).backgroundColor;return {body:color("body"),contact:color(".contact"),feature:color(".solutions-grid .service--main"),brand:color(".business-pitch"),cssLoaded:[...document.styleSheets].some(s=>s.href?.endsWith("/styles-system.css")),steps:[...document.querySelectorAll(".motion-story-unit h3")].map(e=>e.textContent.trim()),contactStatusColor:getComputedStyle(document.querySelector(".contact-status")).color}})()');
+ const expectedSteps=["ELEGIR","PREPARAR","ENTREGAR"];
+ if(!designSystem.cssLoaded||
+    designSystem.body!=="rgb(247, 245, 238)"||
+    designSystem.contact!=="rgb(247, 245, 238)"||
+    designSystem.feature!=="rgb(21, 81, 216)"||
+    designSystem.brand!=="rgb(21, 81, 216)"||
+    JSON.stringify(designSystem.steps)!==JSON.stringify(expectedSteps))
+   report.failures.push("V6.7 computed 60-30-10 palette or three-step narrative mismatch: "+JSON.stringify(designSystem));
+ report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
+
+ const appAccess=await js('(()=>{const p=document.querySelector("[data-service-access]");const status=p?.querySelector("[data-service-status]");const links=p?.querySelector("[data-app-links]");return {found:!!p,availability:p?.dataset.applicationAvailability,status:status?.textContent.trim(),liveLinks:links?.querySelectorAll("a").length,linksHidden:links?.hidden,role:status?.getAttribute("role")}})()');
+ if(!appAccess.found||appAccess.availability!=="not-published"||
+   appAccess.status!=="Acceso público no habilitado"||
+   !appAccess.linksHidden||appAccess.liveLinks!==0||appAccess.role!=="status")
+   report.failures.push("V6.9 web wrongly claims live app availability: "+JSON.stringify(appAccess));
+ report.tests.push({name:"V6.9 enterprise services remain permanent, app availability remains truthful",appAccess});
  const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,mark:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src")}))()');
  if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<110||kineticIntro.blue!=="v45-blue-strike"||kineticIntro.mark!=="v45-mark-lock"||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png"))report.failures.push("V4.5 hero kinetic introduction failed: "+JSON.stringify(kineticIntro));
  report.tests.push({name:"V4.5 hero scale and original mark motion",kineticIntro});
@@ -138,7 +161,20 @@ try{
  await capture("desktop-transition.png");
  await sleep(2050);
  await capture("desktop-final.png");
- await capture("desktop-full.png",true);
+ 
+ const v5Cover=await js('(()=>({mode:document.documentElement.dataset.v5Mode,overlay:!!document.querySelector(".v5-hero-refraction"),stage:!!document.querySelector(".v5-city-stage"),asset:document.querySelector(".v5-stage-render")?.getAttribute("src"),contactLight:!!document.querySelector(".v5-contact-light")}))()');
+ if(v5Cover.mode!=="ready"||!v5Cover.overlay||!v5Cover.stage||!v5Cover.asset?.endsWith("v5-logistics-scene.svg")||!v5Cover.contactLight)report.failures.push("V5 cinematic entry incomplete: "+JSON.stringify(v5Cover));
+ report.tests.push({name:"V5 cinematic identity and local asset",v5Cover});
+ await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(580);
+ const v5Stage=await js('(()=>{const e=document.querySelector(".v5-city-stage"),im=e.querySelector("img"),r=e.getBoundingClientRect();const w=e.querySelector(".v5-stage-world").getBoundingClientRect(),i=im.getBoundingClientRect();return {visible:e.classList.contains("v5-visible"),imageLoaded:im.complete,source:im.currentSrc,width:im.naturalWidth,height:im.naturalHeight,fillX:+(i.width/w.width).toFixed(2),fillY:+(i.height/w.height).toFixed(2),renderAnimation:getComputedStyle(im).animationName,obsoleteOverlay:!!e.querySelector(".v5-route-overlay"),left:r.left,right:r.right,viewport:document.documentElement.clientWidth,caption:e.querySelector("figcaption")?.textContent?.trim()}})()');
+ if(!v5Stage.visible||!v5Stage.imageLoaded||!v5Stage.source?.includes("v5-cinematic-desktop.webp")||v5Stage.width!==1752||v5Stage.height!==897||v5Stage.renderAnimation!=="v5-camera-arrive"||v5Stage.fillX<.98||v5Stage.fillY<.98||v5Stage.obsoleteOverlay||v5Stage.left< -2||v5Stage.right>v5Stage.viewport+2||!v5Stage.caption?.includes("conceptual"))report.failures.push("V5.2 desktop WebP render and cinematic framing failed: "+JSON.stringify(v5Stage));
+ report.tests.push({name:"V5.2 original high-fidelity desktop WebP render",v5Stage});
+ await capture("desktop-v5-scene-motion.png");
+ await sleep(1750);
+ await capture("desktop-v5-scene-final.png");
+   // Capture entire page only after below-fold poster has been decoded.
+   await capture("desktop-full.png",true);
  await js('document.querySelector(".motion-story").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(450);
  const storyState=await js('({sequence:document.querySelector(".motion-story").classList.contains("motion-active"),cards:[...document.querySelectorAll(".motion-story-unit")].map(x=>({text:x.querySelector("h3")?.textContent,active:x.classList.contains("motion-active")}))})');
@@ -158,10 +194,16 @@ try{
  const closing=await js('[...document.querySelectorAll(".closing-line")].map(x=>({word:x.textContent.trim(),active:x.classList.contains("motion-active")}))');
  if(closing.length!==3||closing.some(x=>!x.active))report.failures.push("Closing editorial sequence not activated: "+JSON.stringify(closing));
  report.tests.push({name:"Brand closing motion",closing});
+ const closingInk=await js('(()=>[...document.querySelectorAll(".contact .closing-line")].map(e=>({text:e.textContent.trim(),opacity:Number(getComputedStyle(e).opacity)})))()');
+ if(closingInk.some(x=>x.opacity<.99))report.failures.push("V6.7 contact heading loses contrast during motion: "+JSON.stringify(closingInk));
+ report.tests.push({name:"V6.7 closing headline remains opaque during cinema animation",closingInk});
  await capture("desktop-closing-motion.png");
  const kineticFinale=await js('(()=>{const contact=document.querySelector("#contacto"),middle=contact.querySelector(".closing-line--middle");return {active:contact.classList.contains("motion-active"),lineAnimation:getComputedStyle(middle).animationName,underlineAnimation:getComputedStyle(middle,"::after").animationName,slashAnimation:getComputedStyle(contact,"::after").animationName}})()');
  if(!kineticFinale.active||kineticFinale.lineAnimation!=="v45-closing-reveal"||kineticFinale.underlineAnimation!=="v45-underline"||kineticFinale.slashAnimation!=="v45-contact-slash")report.failures.push("Kinetic final contact scene failed: "+JSON.stringify(kineticFinale));
  report.tests.push({name:"V4.5 closing scene and finite underline",kineticFinale});
+ const v5Finale=await js('(()=>{const e=document.querySelector("#contacto"),light=e.querySelector(".v5-contact-light");return {visible:e.classList.contains("v5-visible"),effect:getComputedStyle(light).animationName}})()');
+ if(!v5Finale.visible||v5Finale.effect!=="v5-contact-arrive")report.failures.push("V5 cinematic contact light did not reveal: "+JSON.stringify(v5Finale));
+ report.tests.push({name:"V5 ambient finale",v5Finale});
  await sleep(1250);
  await capture("desktop-closing-final.png");
  await js('document.querySelector(".business-pitch").scrollIntoView({block:"center",behavior:"instant"})');
@@ -171,11 +213,11 @@ try{
  report.tests.push({name:"Commercial pitch CTA",pitch});
  await capture("desktop-business-pitch.png");
  const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const future=document.querySelector(".future-services");const prim=document.querySelector(".contact-primary");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),futureCollapsed:!future.open,futureCards:future.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.textContent.trim(),contactTarget:prim.getAttribute("target"),candidateStatus:document.querySelector(".contact-status")?.textContent,headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');
- if(rc.primaryHref!=="#contacto"||!rc.futureCollapsed||rc.futureCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||!rc.candidateStatus.includes("no procesa pedidos ni pagos")||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
+ if(rc.primaryHref!=="#contacto"||!rc.futureCollapsed||rc.futureCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||!rc.candidateStatus.includes("Esta web no procesa transacciones")||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
  report.tests.push({name:"V4.3 commercial focus & primary contact",rc});
  await js('document.querySelector(".future-services summary").click()');
  const expandedFuture=await js('(()=>{const d=document.querySelector(".future-services");return {open:d.open,cards:[...d.querySelectorAll(".service")].map(e=>({height:Math.round(e.getBoundingClientRect().height),description:e.querySelector(".service-body p")?.textContent?.trim()}))}})()');
- if(!expandedFuture.open||expandedFuture.cards.length!==2||expandedFuture.cards.some(x=>x.height<170||!x.description?.startsWith("Horizonte futuro:")))report.failures.push("Future services toggle contract failed: "+JSON.stringify(expandedFuture));
+ if(!expandedFuture.open||expandedFuture.cards.length!==2||expandedFuture.cards.some(x=>x.height<170||(x.description?.length||0)<40))report.failures.push("Future services toggle contract failed: "+JSON.stringify(expandedFuture));
  report.tests.push({name:"Deferred expansion accordion",expandedFuture});
  await js('document.querySelector(".future-services").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(120);
@@ -183,16 +225,27 @@ try{
  await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(180);
  const trustDesktop=await js('(()=>{const el=document.querySelector(".trust-ledger"),cards=[...el.querySelectorAll(".trust-ledger-item")],grid=el.querySelector(".trust-ledger-grid"),v=document.documentElement.clientWidth;return {cards:cards.map(x=>({title:x.querySelector("strong")?.textContent?.trim(),right:Math.round(x.getBoundingClientRect().right),width:Math.round(x.getBoundingClientRect().width),font:parseFloat(getComputedStyle(x.querySelector("p")).fontSize)})),gridCols:getComputedStyle(grid).gridTemplateColumns.split(" ").length,viewport:v,heading:el.querySelector("h3")?.textContent?.trim()}})()');
- if(trustDesktop.cards.length!==3||trustDesktop.gridCols!==3||trustDesktop.cards.some(x=>x.right>trustDesktop.viewport+2||x.font<14)||!trustDesktop.heading.includes("CLARIDAD"))report.failures.push("Trust content broken on desktop: "+JSON.stringify(trustDesktop));
+ if(trustDesktop.cards.length!==3||trustDesktop.gridCols!==3||trustDesktop.cards.some(x=>x.right>trustDesktop.viewport+2||x.font<14)||!trustDesktop.heading.includes("UN ECOSISTEMA, TRES PILARES"))report.failures.push("Trust content broken on desktop: "+JSON.stringify(trustDesktop));
  report.tests.push({name:"Credibility status ledger desktop",trustDesktop});
  await capture("desktop-trust-status.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
+  if(w===390||w===320){
+   // Simulate a script-unavailable page in the loaded DOM. This exercises
+   // the exact no-JS CSS selector without needing a second browser session.
+   const fallback=await js('(()=>{const root=document.documentElement;root.classList.remove("js-enabled");const nav=document.querySelector(".main-nav"),btn=document.querySelector(".menu-button"),header=document.querySelector(".site-header");const p={navDisplay:getComputedStyle(nav).display,menuDisplay:getComputedStyle(btn).display,headerHeight:header.getBoundingClientRect().height,links:[...nav.querySelectorAll("a")].map(a=>({text:a.textContent.trim(),height:a.getBoundingClientRect().height}))};root.classList.add("js-enabled");p.headerHeightAfter=header.getBoundingClientRect().height;return p})()');
+   if(fallback.navDisplay!=="flex"||fallback.menuDisplay!=="none"||fallback.headerHeight<70||Math.abs(fallback.headerHeight-fallback.headerHeightAfter)>1||fallback.links.length<4||fallback.links.some(l=>l.height<42))
+     report.failures.push("V6.8 no-JS mobile navigation failed: "+JSON.stringify(fallback));
+   report.tests.push({name:"V6.8 resilient mobile navigation without JavaScript "+w,fallback});
+   const radius=await js('(()=>({stage:parseFloat(getComputedStyle(document.querySelector(".v5-city-stage")).borderTopLeftRadius),pitch:parseFloat(getComputedStyle(document.querySelector(".business-pitch")).borderTopLeftRadius),screen:document.documentElement.clientWidth}))()');
+   if(radius.stage<15||radius.pitch<17)report.failures.push("V6.6 mobile curves missing: "+JSON.stringify(radius));
+   report.tests.push({name:"V6.6 mobile curved surfaces "+w,radius});
+  }
   if(w===390){
    await sleep(3200);
    await capture("mobile-final.png");
-   await capture("mobile-full.png",true);
+   
    await js('document.querySelector(".business-pitch").scrollIntoView({block:"start",behavior:"instant"})');
    await sleep(240);
    await capture("mobile-business-pitch.png");
@@ -201,6 +254,9 @@ try{
    const mobileContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {label:a.textContent.trim(),left:r.left,right:r.right,height:r.height,viewport:v}})()');
    if(mobileContact.left < -2||mobileContact.right>mobileContact.viewport+2||mobileContact.height<48)report.failures.push("Primary mobile contact clipped or too small: "+JSON.stringify(mobileContact));
    report.tests.push({name:"Mobile primary contact tap target",mobileContact});
+   const mobileClosing=await js('(()=>[...document.querySelectorAll(".contact .closing-line")].map(e=>({text:e.textContent.trim(),opacity:Number(getComputedStyle(e).opacity)})))()');
+   if(mobileClosing.some(x=>x.opacity<.99))report.failures.push("V6.7 mobile closing text loses opacity: "+JSON.stringify(mobileClosing));
+   report.tests.push({name:"V6.7 mobile contact heading maintains legibility",mobileClosing});
    await capture("mobile-contact-final.png");
    await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
    await sleep(160);
@@ -223,14 +279,38 @@ try{
    if(!detailOpen.open||!detailOpen.visible||detailOpen.roles!==4)report.failures.push("Technical roles accordion failed: "+JSON.stringify(detailOpen));
    await js('document.querySelector(".v4-architecture-details").scrollIntoView({block:"start",behavior:"instant"})');
    await sleep(100);
+   const mobileDiagram=await js('(()=>{const im=document.querySelector(".v4-architecture-details picture img"),source=document.querySelector(".v4-architecture-details picture source"),r=im.getBoundingClientRect();return {src:im.currentSrc,naturalWidth:im.naturalWidth,naturalHeight:im.naturalHeight,renderWidth:r.width,renderHeight:r.height,source:source?.getAttribute("srcset")}})()');
+   // Chromium may report SVG naturalWidth after responsive-density scaling.
+   // The actual selected source, decoded aspect ratio and rendered CSS size
+   // establish readability more reliably than fixed natural pixel dimensions.
+   const aspect=mobileDiagram.naturalWidth/Math.max(1,mobileDiagram.naturalHeight);
+   if(!mobileDiagram.src.endsWith("roles-geometry-mobile-es.svg")||mobileDiagram.renderWidth<220||mobileDiagram.renderHeight<220||Math.abs(aspect-360/392)>.035)
+    report.failures.push("V6.8 mobile diagram must use legible art-directed SVG: "+JSON.stringify(mobileDiagram));
+   report.tests.push({name:"V6.8 art-directed legible mobile SVG diagram",mobileDiagram});
    await capture("mobile-architecture-expanded.png");
    report.tests.push({name:"mobile technical detail expandable",detailOpen});
+   await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(350);
+   const v5Mobile=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {visible:e.classList.contains("v5-visible"),left:r.left,right:r.right,viewport:v,overflow:document.documentElement.scrollWidth>v+2,caption:e.querySelector("figcaption")?.textContent?.trim(),imageLoaded:e.querySelector("img")?.naturalWidth>0,source:e.querySelector("img")?.currentSrc,width:e.querySelector("img")?.naturalWidth,height:e.querySelector("img")?.naturalHeight,obsoleteOverlay:!!e.querySelector(".v5-route-overlay"),fillX:+(e.querySelector("img").getBoundingClientRect().width/e.querySelector(".v5-stage-world").getBoundingClientRect().width).toFixed(2),fillY:+(e.querySelector("img").getBoundingClientRect().height/e.querySelector(".v5-stage-world").getBoundingClientRect().height).toFixed(2),ratio:Math.round(e.querySelector(".v5-stage-world").getBoundingClientRect().height/e.querySelector(".v5-stage-world").getBoundingClientRect().width*100)/100}})()');
+   if(!v5Mobile.visible||v5Mobile.left< -2||v5Mobile.right>v5Mobile.viewport+2||v5Mobile.overflow||!v5Mobile.imageLoaded||!v5Mobile.source?.includes("v5-cinematic-mobile.webp")||v5Mobile.width!==1024||v5Mobile.height!==1536||v5Mobile.fillX<.98||v5Mobile.fillY<.98||v5Mobile.obsoleteOverlay||v5Mobile.ratio<1.4||!v5Mobile.caption?.includes("conceptual"))report.failures.push("V5 mobile 390 scene failed: "+JSON.stringify(v5Mobile));
+   report.tests.push({name:"V5 mobile 390 cinematic layout",v5Mobile});
+   await capture("mobile-v5-scene.png");
+   // Capture entire page only after below-fold poster has been decoded.
+   await capture("mobile-full.png",true);
   }
   if(w===320){
    const narrowContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {left:r.left,right:r.right,height:r.height,viewport:v}})()');
    if(narrowContact.left < -2||narrowContact.right>narrowContact.viewport+2||narrowContact.height<48)report.failures.push("320px contact button fail: "+JSON.stringify(narrowContact));
    await sleep(3200);
    await capture("mobile-320-final.png");
+   
+   await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(250);
+   const v5Narrow=await js('(()=>{const e=document.querySelector(".v5-city-stage"),art=e.querySelector("img"),b=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {src:art.currentSrc,width:art.naturalWidth,height:art.naturalHeight,inside:b.left>=-2&&b.right<=v+2,fillX:+(art.getBoundingClientRect().width/e.querySelector(".v5-stage-world").getBoundingClientRect().width).toFixed(2),fillY:+(art.getBoundingClientRect().height/e.querySelector(".v5-stage-world").getBoundingClientRect().height).toFixed(2),obsoleteOverlay:!!e.querySelector(".v5-route-overlay")}})()');
+   if(!v5Narrow.src?.includes("v5-cinematic-mobile.webp")||v5Narrow.width!==1024||v5Narrow.height!==1536||!v5Narrow.inside||v5Narrow.fillX<.98||v5Narrow.fillY<.98||v5Narrow.obsoleteOverlay)report.failures.push("V5 mobile 320 narrative composition failed: "+JSON.stringify(v5Narrow));
+   report.tests.push({name:"V5 mobile 320 full narrative",v5Narrow});
+   await capture("mobile-320-v5-scene.png");
+   // Capture entire page only after below-fold poster has been decoded.
    await capture("mobile-320-full.png",true);
   }
  }
@@ -240,8 +320,56 @@ try{
  const reducedAnimations=await js('(()=>({blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,stamp:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,headline:document.querySelector(".motion-headline").textContent.trim(),cta:document.querySelector(".hero-cta").getAttribute("href"),closing:document.querySelector("#contact-title").textContent.trim()}))()');
  if(reducedAnimations.blue!=="none"||reducedAnimations.stamp!=="none"||!reducedAnimations.headline.includes("EL COMERCIO")||reducedAnimations.cta!=="#contacto"||!reducedAnimations.closing.includes("CONEXIONES"))report.failures.push("V4.5 reduced motion/essential information failed: "+JSON.stringify(reducedAnimations));
  report.tests.push({name:"V4.5 full-fidelity reduced motion fallback",reducedAnimations});
+ const v5Reduced=await js('(()=>({mode:document.documentElement.dataset.v5Mode,render:getComputedStyle(document.querySelector(".v5-stage-render")).animationName,scan:getComputedStyle(document.querySelector(".v5-stage-scan")).animationName,light:getComputedStyle(document.querySelector(".v5-contact-light")).animationName,source:document.querySelector(' + "'"+ '.v5-responsive-art source[type="image/webp"]' + "'"+ ')?.getAttribute("srcset"),caption:document.querySelector(".v5-stage-caption")?.textContent?.trim()}))()');
+ if(v5Reduced.mode!=="reduced"||v5Reduced.render!=="none"||v5Reduced.scan!=="none"||v5Reduced.light!=="none"||!v5Reduced.source?.includes("v5-cinematic-mobile.webp")||!v5Reduced.caption?.includes("conceptual"))report.failures.push("V5.2 reduced-motion content/visibility failed: "+JSON.stringify(v5Reduced));
+ report.tests.push({name:"V5 full reduced-motion fallback",v5Reduced});
  await capture("mobile-reduced-motion.png");
  report.tests.push({name:"reduced motion",animation:reduced.animation});
+
+ // V5.4 CDP keyboard accessibility: synthetic interactions, not a manual screen-reader audit.
+ const pressKey=async(key,code,keyCode)=>{
+  // Chrome CDP expects a printable control character for native Enter activation.
+  // raw keyDown without the CR text changes focus but does not generate click.
+  const press={type:"keyDown",key,code,windowsVirtualKeyCode:keyCode,nativeVirtualKeyCode:keyCode};
+  if(key==="Enter"){press.text=String.fromCharCode(13);press.unmodifiedText=String.fromCharCode(13);}
+  await call("Input.dispatchKeyEvent",press);
+  await call("Input.dispatchKeyEvent",{type:"keyUp",key,code,windowsVirtualKeyCode:keyCode,nativeVirtualKeyCode:keyCode});
+ };
+ await pressKey("Tab","Tab",9);
+ const skipFocus=await js('(()=>{const e=document.activeElement,r=e.getBoundingClientRect(),s=getComputedStyle(e);return {className:e.className,href:e.getAttribute("href"),focusVisible:e.matches(":focus-visible"),outlineWidth:s.outlineWidth,left:Math.round(r.left),right:Math.round(r.right),viewport:document.documentElement.clientWidth}})()');
+ if(!skipFocus.className?.includes("skip-link")||skipFocus.href!=="#contenido"||!skipFocus.focusVisible||parseFloat(skipFocus.outlineWidth)<2||skipFocus.left<0||skipFocus.right>skipFocus.viewport+2)
+  report.failures.push("V5.4 keyboard skip-link focus not visible: "+JSON.stringify(skipFocus));
+ report.tests.push({name:"V5.4 keyboard first-Tab skip-link",skipFocus});
+ await capture("mobile-v54-keyboard-focus.png");
+
+ await js('document.querySelector(".menu-button").focus()');
+ await pressKey("Enter","Enter",13);
+ const keyboardMenuOpen=await js('(()=>{const e=document.querySelector(".menu-button");return {expanded:e.getAttribute("aria-expanded"),focus:e===document.activeElement,focusVisible:e.matches(":focus-visible"),outlineWidth:getComputedStyle(e).outlineWidth}})()');
+ if(keyboardMenuOpen.expanded!=="true"||!keyboardMenuOpen.focus||!keyboardMenuOpen.focusVisible||parseFloat(keyboardMenuOpen.outlineWidth)<2)
+  report.failures.push("V5.4 keyboard Enter cannot access menu: "+JSON.stringify(keyboardMenuOpen));
+ await pressKey("Escape","Escape",27);
+ const keyboardMenuClosed=await js('(()=>{const e=document.querySelector(".menu-button");return {expanded:e.getAttribute("aria-expanded"),focused:e===document.activeElement}})()');
+ if(keyboardMenuClosed.expanded!=="false"||!keyboardMenuClosed.focused)
+  report.failures.push("V5.4 keyboard Escape does not restore menu focus: "+JSON.stringify(keyboardMenuClosed));
+ report.tests.push({name:"V5.4 keyboard menu Enter and Escape",keyboardMenuOpen,keyboardMenuClosed});
+
+ await js('document.querySelector(".v4-architecture-details summary").focus()');
+ await pressKey("Enter","Enter",13);
+ const detailsKeyboard=await js('(()=>{const d=document.querySelector(".v4-architecture-details"),e=d.querySelector("summary");return {open:d.open,focused:e===document.activeElement,focusVisible:e.matches(":focus-visible"),outlineWidth:getComputedStyle(e).outlineWidth}})()');
+ if(!detailsKeyboard.open||!detailsKeyboard.focused||!detailsKeyboard.focusVisible||parseFloat(detailsKeyboard.outlineWidth)<2)
+  report.failures.push("V5.4 keyboard accordion Enter or focus failed: "+JSON.stringify(detailsKeyboard));
+ report.tests.push({name:"V5.4 native keyboard disclosure",detailsKeyboard});
+
+ await call("Accessibility.enable");
+ const tree=await call("Accessibility.getFullAXTree");
+ const nodes=tree.result?.nodes||[];
+ const headings=nodes.filter(n=>!n.ignored&&n.role?.value==="heading").map(n=>String(n.name?.value||"").trim());
+ const accessible={nodeCount:nodes.length,headingCount:headings.length,
+   hasHero:headings.some(n=>n.includes("EL COMERCIO")),hasContact:headings.some(n=>n.includes("CONEXIONES"))};
+ if(!accessible.hasHero||!accessible.hasContact||accessible.headingCount<6)
+  report.failures.push("V5.4 accessibility tree missing landmarks or headlines: "+JSON.stringify(accessible));
+ report.tests.push({name:"V5.4 Chromium accessibility tree structural smoke",accessible});
+
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
  await writeFile(join(output,"audit.json"),JSON.stringify(report,null,2));

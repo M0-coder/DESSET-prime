@@ -43,7 +43,7 @@ test("mobile brand vocabulary is not cut by nowrap overflow",()=>{
 test("technical diagrams and four roles are one opt-in view, not repeated clutter",()=>{
  const detail=html.match(/<details class="v4-architecture-details">([\s\S]*?)<\/details>/);
  assert.ok(detail,"Technical accordion must exist");
- assert.match(detail[1],/roles-geometry-v2.svg/);
+ assert.match(detail[1],/roles-geometry-es.svg/);
  assert.match(detail[1],/class="roles" role="list"/);
  assert.equal((detail[1].match(/class="role" role="listitem"/g)||[]).length,4);
  assert.equal((html.match(/class="roles" role="list"/g)||[]).length,1);

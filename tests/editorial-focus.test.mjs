@@ -28,16 +28,16 @@ test("no numbered editorial label survives in any visible section, card, diagram
 });
 
 test("primary business narrative remains intelligible without decorative microcopy",()=>{
- for(const heading of ["EL COMERCIO","SE MUEVE","NO ES SOLO","Pedidos, comercios","Elegir. Preparar.","Para negocios","LAS BUENAS"]){
+ for(const heading of ["EL COMERCIO","SE MUEVE","NO ES SOLO","Pedidos, comercios","Elegir, preparar","Para negocios","LAS BUENAS"]){
   assert.ok(html.includes(heading),"Missing principal heading: "+heading);
  }
  assert.equal((html.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,3);
  assert.equal((html.match(/class="trust-ledger-item"/g)||[]).length,3);
  assert.equal((html.match(/class="role" role="listitem"/g)||[]).length,4);
- assert.match(html,/En desarrollo: una plataforma/);
- assert.match(html,/Horizonte futuro/);
+ assert.match(html,/Un modelo integrado para solicitudes de clientes/);
+ assert.match(html,/Área complementaria del modelo logístico/);
  assert.match(html,/no representa una operación activa/i);
- assert.match(html,/No se reciben pedidos, pagos ni contrataciones/);
+ assert.match(html,/Acceso público no habilitado/);
  assert.match(html,/Este sitio no procesa pedidos ni pagos/);
 });
 

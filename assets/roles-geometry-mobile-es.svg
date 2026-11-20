@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 392" role="img" aria-labelledby="title desc">
+<title id="title">Funciones de DESSET, versión móvil</title>
+<desc id="desc">Cuatro funciones: clientes eligen, comercios preparan, repartidores entregan y control supervisa. Es un esquema de un sistema futuro, no una operación activa.</desc>
+<rect width="360" height="392" rx="20" fill="#F3F1E9"/>
+<path d="M180 177V213M168 195H192" stroke="#1551D8" stroke-width="3" stroke-linecap="round"/>
+<rect x="18" y="20" width="150" height="151" rx="16" fill="#1551D8"/>
+<rect x="192" y="20" width="150" height="151" rx="16" fill="#FFFDF8" stroke="#D4D8E0" stroke-width="1.5"/>
+<rect x="18" y="221" width="150" height="151" rx="16" fill="#111827"/>
+<rect x="192" y="221" width="150" height="151" rx="16" fill="#FFFDF8" stroke="#D4D8E0" stroke-width="1.5"/>
+<g font-family="Arial,Helvetica,sans-serif" font-weight="800" font-size="19" text-anchor="middle">
+ <text x="93" y="96" fill="#FFFFFF">CLIENTES</text>
+ <text x="267" y="96" fill="#111827">COMERCIOS</text>
+ <text x="93" y="297" fill="#FFFFFF">REPARTO</text>
+ <text x="267" y="297" fill="#111827">CONTROL</text>
+</g>
+<g font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="13" text-anchor="middle" letter-spacing="1">
+ <text x="93" y="128" fill="#FFFFFF">ELEGIR</text>
+ <text x="267" y="128" fill="#1551D8">PREPARAR</text>
+ <text x="93" y="329" fill="#FFC62F">ENTREGAR</text>
+ <text x="267" y="329" fill="#1551D8">SUPERVISAR</text>
+</g>
+<path d="M180 183l11 12-11 12-11-12z" fill="#FFC62F" stroke="#111827" stroke-width="2"/>
+<circle cx="156" cy="34" r="4" fill="#FFC62F"/>
+<circle cx="330" cy="234" r="4" fill="#FF3328"/>
+</svg>
