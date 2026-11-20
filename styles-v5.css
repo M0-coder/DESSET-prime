@@ -269,3 +269,26 @@
 @media(prefers-reduced-motion:reduce){
  .v5-city-stage[data-v6-state="active"] .v6-three-mount{transition:none;}
 }
+
+/* V6.6 — curva editorial: suaviza superficies, conserva trazos y geometría DESSET. */
+:root{
+ --prime-radius-sm:12px;--prime-radius-md:18px;--prime-radius-lg:26px;
+}
+.hero[data-variant="v4"] .v4-motion-canvas{border-radius:var(--prime-radius-lg);}
+.v4-motion-canvas::after{border-radius:18px;}
+.v4-canvas-stamp{border-radius:var(--prime-radius-sm);}
+.hero[data-variant="v4"] .hero-cta,.main-nav .nav-contact,
+.business-pitch-cta,.contact-primary,.contact .social-links a:first-child,
+.skip-link{border-radius:var(--prime-radius-sm);}
+.service,.business-pitch,.ecosystem-board{border-radius:var(--prime-radius-lg);}
+.v5-city-stage{border-radius:22px;}
+.v5-stage-legend{border-radius:999px;}
+.v4-architecture-inner{border-radius:var(--prime-radius-md);}
+.v6-three-controls button,.v6-enable-webgl{border-radius:var(--prime-radius-sm);}
+.v63-story,.v65-load-status{border-radius:var(--prime-radius-sm);}
+@media(max-width:700px){
+ .hero[data-variant="v4"] .v4-motion-canvas,
+ .business-pitch,.ecosystem-board{border-radius:var(--prime-radius-md);}
+ .service,.v5-city-stage{border-radius:16px;}
+ .v4-canvas-stamp{border-radius:10px;}
+}
