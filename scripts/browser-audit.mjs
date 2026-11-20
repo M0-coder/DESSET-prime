@@ -79,7 +79,7 @@ async function viewport(width,height,reduce=false){
  });
  const nodes=[...document.querySelectorAll('body *')].filter(el=>{
   // Visual montage intentionally clips decorative children; keep checking parent bounds and headline text.
-  const clip=el.closest(".v4-motion-canvas,.v4-hero-rail");
+  const clip=el.closest(".v4-motion-canvas,.v4-hero-rail,.v5-city-stage");
   if(clip&&clip!==el)return false;
   const s=getComputedStyle(el),r=el.getBoundingClientRect();
   return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.left < -2 || (s.display!=='none'&&s.visibility!=='hidden'&&r.right>viewport+2&&r.width>0);
@@ -139,6 +139,17 @@ try{
  await sleep(2050);
  await capture("desktop-final.png");
  await capture("desktop-full.png",true);
+ const v5Cover=await js('(()=>({mode:document.documentElement.dataset.v5Mode,overlay:!!document.querySelector(".v5-hero-refraction"),stage:!!document.querySelector(".v5-city-stage"),asset:document.querySelector(".v5-stage-render")?.getAttribute("src"),contactLight:!!document.querySelector(".v5-contact-light")}))()');
+ if(v5Cover.mode!=="ready"||!v5Cover.overlay||!v5Cover.stage||!v5Cover.asset?.endsWith("v5-logistics-scene.svg")||!v5Cover.contactLight)report.failures.push("V5 cinematic entry incomplete: "+JSON.stringify(v5Cover));
+ report.tests.push({name:"V5 cinematic identity and local asset",v5Cover});
+ await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(580);
+ const v5Stage=await js('(()=>{const e=document.querySelector(".v5-city-stage"),im=e.querySelector("img"),r=e.getBoundingClientRect(),route=e.querySelector(".v5-route-line");return {visible:e.classList.contains("v5-visible"),imageLoaded:im.complete,width:im.naturalWidth,height:im.naturalHeight,routeAnimation:getComputedStyle(route).animationName,left:r.left,right:r.right,viewport:document.documentElement.clientWidth,caption:e.querySelector("figcaption")?.textContent?.trim()}})()');
+ if(!v5Stage.visible||!v5Stage.imageLoaded||v5Stage.width!==1200||v5Stage.height!==560||v5Stage.routeAnimation!=="v5-route-draw"||v5Stage.left< -2||v5Stage.right>v5Stage.viewport+2||!v5Stage.caption?.includes("conceptual")) report.failures.push("V5 rendered route or truthfulness failed: "+JSON.stringify(v5Stage));
+ report.tests.push({name:"V5 original rendered 2.5D sequence",v5Stage});
+ await capture("desktop-v5-scene-motion.png");
+ await sleep(1750);
+ await capture("desktop-v5-scene-final.png");
  await js('document.querySelector(".motion-story").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(450);
  const storyState=await js('({sequence:document.querySelector(".motion-story").classList.contains("motion-active"),cards:[...document.querySelectorAll(".motion-story-unit")].map(x=>({text:x.querySelector("h3")?.textContent,active:x.classList.contains("motion-active")}))})');
@@ -162,6 +173,9 @@ try{
  const kineticFinale=await js('(()=>{const contact=document.querySelector("#contacto"),middle=contact.querySelector(".closing-line--middle");return {active:contact.classList.contains("motion-active"),lineAnimation:getComputedStyle(middle).animationName,underlineAnimation:getComputedStyle(middle,"::after").animationName,slashAnimation:getComputedStyle(contact,"::after").animationName}})()');
  if(!kineticFinale.active||kineticFinale.lineAnimation!=="v45-closing-reveal"||kineticFinale.underlineAnimation!=="v45-underline"||kineticFinale.slashAnimation!=="v45-contact-slash")report.failures.push("Kinetic final contact scene failed: "+JSON.stringify(kineticFinale));
  report.tests.push({name:"V4.5 closing scene and finite underline",kineticFinale});
+ const v5Finale=await js('(()=>{const e=document.querySelector("#contacto"),light=e.querySelector(".v5-contact-light");return {visible:e.classList.contains("v5-visible"),effect:getComputedStyle(light).animationName}})()');
+ if(!v5Finale.visible||v5Finale.effect!=="v5-contact-arrive")report.failures.push("V5 cinematic contact light did not reveal: "+JSON.stringify(v5Finale));
+ report.tests.push({name:"V5 ambient finale",v5Finale});
  await sleep(1250);
  await capture("desktop-closing-final.png");
  await js('document.querySelector(".business-pitch").scrollIntoView({block:"center",behavior:"instant"})');
@@ -225,6 +239,12 @@ try{
    await sleep(100);
    await capture("mobile-architecture-expanded.png");
    report.tests.push({name:"mobile technical detail expandable",detailOpen});
+   await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(350);
+   const v5Mobile=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {visible:e.classList.contains("v5-visible"),left:r.left,right:r.right,viewport:v,overflow:document.documentElement.scrollWidth>v+2,caption:e.querySelector("figcaption")?.textContent?.trim(),imageLoaded:e.querySelector("img")?.naturalWidth>0}})()');
+   if(!v5Mobile.visible||v5Mobile.left< -2||v5Mobile.right>v5Mobile.viewport+2||v5Mobile.overflow||!v5Mobile.imageLoaded||!v5Mobile.caption?.includes("conceptual"))report.failures.push("V5 mobile 390 scene failed: "+JSON.stringify(v5Mobile));
+   report.tests.push({name:"V5 mobile 390 cinematic layout",v5Mobile});
+   await capture("mobile-v5-scene.png");
   }
   if(w===320){
    const narrowContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {left:r.left,right:r.right,height:r.height,viewport:v}})()');
@@ -232,6 +252,9 @@ try{
    await sleep(3200);
    await capture("mobile-320-final.png");
    await capture("mobile-320-full.png",true);
+   await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(250);
+   await capture("mobile-320-v5-scene.png");
   }
  }
  const reduced=await viewport(390,844,true);
@@ -240,6 +263,9 @@ try{
  const reducedAnimations=await js('(()=>({blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,stamp:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,headline:document.querySelector(".motion-headline").textContent.trim(),cta:document.querySelector(".hero-cta").getAttribute("href"),closing:document.querySelector("#contact-title").textContent.trim()}))()');
  if(reducedAnimations.blue!=="none"||reducedAnimations.stamp!=="none"||!reducedAnimations.headline.includes("EL COMERCIO")||reducedAnimations.cta!=="#contacto"||!reducedAnimations.closing.includes("CONEXIONES"))report.failures.push("V4.5 reduced motion/essential information failed: "+JSON.stringify(reducedAnimations));
  report.tests.push({name:"V4.5 full-fidelity reduced motion fallback",reducedAnimations});
+ const v5Reduced=await js('(()=>({mode:document.documentElement.dataset.v5Mode,route:getComputedStyle(document.querySelector(".v5-route-line")).animationName,light:getComputedStyle(document.querySelector(".v5-contact-light")).animationName,asset:document.querySelector(".v5-stage-render")?.getAttribute("src"),caption:document.querySelector(".v5-stage-caption")?.textContent?.trim()}))()');
+ if(v5Reduced.mode!=="reduced"||v5Reduced.route!=="none"||v5Reduced.light!=="none"||!v5Reduced.asset?.includes("v5-logistics-scene.svg")||!v5Reduced.caption?.includes("conceptual"))report.failures.push("V5 reduced-motion content/visibility failed: "+JSON.stringify(v5Reduced));
+ report.tests.push({name:"V5 full reduced-motion fallback",v5Reduced});
  await capture("mobile-reduced-motion.png");
  report.tests.push({name:"reduced motion",animation:reduced.animation});
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
