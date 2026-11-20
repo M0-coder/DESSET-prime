@@ -71,6 +71,14 @@ a:focus-visible,button:focus-visible {outline-offset:3px;}
 .contact-primary:hover {background:var(--ds-30-ink);color:#FFFDF8;}
 .contact .social-links--secondary a {color:var(--ds-30-blue);border-color:var(--ds-30-blue);}
 .contact .social-links--secondary a:hover {color:var(--ds-30-ink);border-color:var(--ds-30-ink);}
+/* Keep closing headlines fully legible on the new neutral background
+   throughout entry motion: transform moves, but opacity never fades to 35%. */
+@keyframes v45-closing-reveal {
+ from {opacity:1;transform:translate3d(-18px,12px,0) skewX(-3deg);}
+ to {opacity:1;transform:translate3d(0,0,0) skewX(0deg);}
+}
+.contact .closing-line--middle {color:var(--ds-30-blue);}
+.contact .closing-line--final em {color:var(--ds-30-blue);}
 /* Type: consistent body metrics, readable data disclosures and three beats. */
 body {font-family:Inter,"Helvetica Neue",Arial,system-ui,sans-serif;}
 p {text-wrap:pretty;}
