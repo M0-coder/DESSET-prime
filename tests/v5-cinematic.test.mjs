@@ -43,7 +43,7 @@ test("V5 renders three conceptual scenes without fabricating commerce",()=>{
   assert.match(html,/alt="Escena conceptual tridimensional:/);
   assert.doesNotMatch(html,/class="v5-route-overlay"/);
   assert.match(html,/deliver-assets-mark\.png/);
-  assert.match(html,/ELEGIR/);assert.match(html,/ORGANIZAR/);assert.match(html,/MOVER/);
+  assert.match(html,/<h3>ELEGIR<\/h3>/);assert.match(html,/<h3>PREPARAR<\/h3>/);assert.match(html,/<h3>ENTREGAR<\/h3>/);
   assert.doesNotMatch(html,/tenemos [0-9]+ repartidores|entregas realizadas|cliente[s]? satisfechos/i);
 });
 
