@@ -38,8 +38,8 @@ test("V5 renders three conceptual scenes without fabricating commerce",()=>{
   assert.match(html,/v5-hero-refraction/);
   assert.match(html,/class="v5-city-stage"/);
   assert.match(html,/v5-contact-light/);
-  assert.match(html,/Visualización conceptual del sistema previsto/);
-  assert.match(html,/todavía no realiza pedidos ni entregas comerciales/);
+  assert.match(html,/Escena conceptual que ilustra la relación entre comercio, reparto y destino/);
+  assert.match(html,/no es una entrega real/);
   assert.match(html,/alt="Escena conceptual tridimensional:/);
   assert.doesNotMatch(html,/class="v5-route-overlay"/);
   assert.match(html,/deliver-assets-mark\.png/);

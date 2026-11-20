@@ -51,6 +51,18 @@ test("V6.9 keeps website informational, operations gated to apps, no invented la
  assert.match(control,/verified:false/);
  assert.doesNotMatch(control,/fetch\s*\(|localStorage|XMLHttpRequest|sendBeacon/);
 });
+test("V6.9-P1 permanent institutional copy keeps CTA promises verifiable",()=>{
+ const hero=html.match(/<div class="hero-actions">([\s\S]*?)<\/div>/)?.[1]||"";
+ assert.match(hero,/<a class="hero-cta" href="#soluciones">Conocer servicios DESSET/);
+ assert.match(html,/<a class="business-pitch-cta" href="#contacto">Ver canales DESSET/);
+ assert.match(html,/<a href="#contacto">Ver perfiles de la marca/);
+ assert.doesNotMatch(html,/Hablemos de tu negocio|Conversemos sobre tu comercio|Plantear una colaboración|todavía no realiza pedidos ni entregas comerciales/i);
+ assert.match(html,/Escena conceptual que ilustra la relación entre comercio, reparto y destino; no es una entrega real/);
+ assert.match(html,/No representa una operación activa/);
+ assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
+ assert.match(html,/Esta web no procesa transacciones/);
+ assert.match(html,/name="robots" content="noindex,nofollow"/);
+});
 test("V6.9 default availability controller never falsely displays applications as launched",()=>{
  const result=simulate();
  assert.equal(result.panel.dataset.applicationAvailability,"not-published");

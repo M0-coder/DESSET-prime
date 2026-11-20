@@ -12,7 +12,7 @@ test("business proposition appears before generic stakeholder cards and keeps an
  const cards=html.indexOf('class="audience-grid audience-grid--compact"');
  assert.ok(audience>0 && pitch>audience && cards>pitch,"Commercial value proposition must precede stakeholder cards");
  assert.match(html,/¿TU NEGOCIO/);
- assert.match(html,/Conversemos sobre tu comercio/);
+ assert.match(html,/<a class="business-pitch-cta" href="#contacto">Ver canales DESSET/);
  assert.match(html,/Un modelo integrado para solicitudes de clientes/);
  assert.match(html,/no representa una operación activa/i);
  assert.match(html,/no procesa pedidos ni pagos/i);

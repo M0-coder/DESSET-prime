@@ -209,12 +209,12 @@ try{
  await js('document.querySelector(".business-pitch").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(350);
  const pitch=await js('(()=>{const section=document.querySelector(".business-pitch");const anchor=section.querySelector("a.business-pitch-cta");return {heading:section.querySelector("h3")?.textContent?.replace(/\\s+/g," ").trim(),href:anchor?.getAttribute("href"),label:anchor?.textContent?.trim(),visible:section.getBoundingClientRect().height>180}})()');
- if(!pitch.visible||pitch.href!=="#contacto"||!pitch.heading.includes("NEGOCIO")||!pitch.label.includes("Conversemos"))report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
+ if(!pitch.visible||pitch.href!=="#contacto"||!pitch.heading.includes("NEGOCIO")||!pitch.label.includes("Ver canales DESSET"))report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
  report.tests.push({name:"Commercial pitch CTA",pitch});
  await capture("desktop-business-pitch.png");
  const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const future=document.querySelector(".future-services");const prim=document.querySelector(".contact-primary");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),futureCollapsed:!future.open,futureCards:future.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.textContent.trim(),contactTarget:prim.getAttribute("target"),candidateStatus:document.querySelector(".contact-status")?.textContent,headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');
- if(rc.primaryHref!=="#contacto"||!rc.futureCollapsed||rc.futureCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||!rc.candidateStatus.includes("Esta web no procesa transacciones")||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
- report.tests.push({name:"V4.3 commercial focus & primary contact",rc});
+ if(rc.primaryHref!=="#soluciones"||!rc.futureCollapsed||rc.futureCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||!rc.candidateStatus.includes("Esta web no procesa transacciones")||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
+ report.tests.push({name:"V4.3/P1 commercial focus & honest services CTA",rc});
  await js('document.querySelector(".future-services summary").click()');
  const expandedFuture=await js('(()=>{const d=document.querySelector(".future-services");return {open:d.open,cards:[...d.querySelectorAll(".service")].map(e=>({height:Math.round(e.getBoundingClientRect().height),description:e.querySelector(".service-body p")?.textContent?.trim()}))}})()');
  if(!expandedFuture.open||expandedFuture.cards.length!==2||expandedFuture.cards.some(x=>x.height<170||(x.description?.length||0)<40))report.failures.push("Future services toggle contract failed: "+JSON.stringify(expandedFuture));
