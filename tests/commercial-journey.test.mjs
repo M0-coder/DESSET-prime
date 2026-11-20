@@ -13,7 +13,7 @@ test("business proposition appears before generic stakeholder cards and keeps an
  assert.ok(audience>0 && pitch>audience && cards>pitch,"Commercial value proposition must precede stakeholder cards");
  assert.match(html,/¿TU NEGOCIO/);
  assert.match(html,/Conversemos sobre tu comercio/);
- assert.match(html,/En desarrollo: una plataforma/);
+ assert.match(html,/Un modelo integrado para solicitudes de clientes/);
  assert.match(html,/no representa una operación activa/i);
  assert.match(html,/no procesa pedidos ni pagos/i);
  assert.doesNotMatch(html,/más de [0-9]+ (?:comercios|clientes|repartidores)|entregas en tiempo real|compra ahora/i);
@@ -48,8 +48,8 @@ test("three locally illustrated business scenes use original semantics, not gene
 });
 
 test("no fake availability, brand replacement, remote imagery or public checkout",()=>{
- assert.match(html,/En DESSET estamos construyendo un sistema para conectar pedidos, comercios y entregas/);
- assert.match(html,/DESSET está en desarrollo/);
+ assert.match(html,/DESSET reúne comercio, tecnología y logística en un ecosistema de servicios/);
+ assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
  assert.match(html,/assets\/deliver-assets-mark\.png/);
  assert.doesNotMatch(html,/<form\b|<input\b|<button[^>]*comprar|https?:\/\/images\./i);
 });
