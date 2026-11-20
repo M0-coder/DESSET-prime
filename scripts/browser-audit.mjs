@@ -153,6 +153,13 @@ try{
  const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,mark:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src")}))()');
  if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<110||kineticIntro.blue!=="v45-blue-strike"||kineticIntro.mark!=="v45-mark-lock"||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png"))report.failures.push("V4.5 hero kinetic introduction failed: "+JSON.stringify(kineticIntro));
  report.tests.push({name:"V4.5 hero scale and original mark motion",kineticIntro});
+ const anim01=await js('(()=>({glint:getComputedStyle(document.querySelector(".v5-glint")).display,scan:getComputedStyle(document.querySelector(".v5-stage-scan")).display,red:getComputedStyle(document.querySelector(".v4-shape-red")).animationName,blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,direction:document.documentElement.dataset.motionDirection,lensTransform:getComputedStyle(document.querySelector(".v5-hero-refraction")).transform}))()');
+ if(anim01.glint!=="none"||anim01.scan!=="none"||
+   anim01.red!=="v4-red-pop"||anim01.blue!=="v45-blue-strike"||
+   anim01.direction!=="editorial-cinematic-v1"||anim01.lensTransform!=="none")
+  report.failures.push("ANIM-01 editorial cinematic composition regressed: "+JSON.stringify(anim01));
+ report.tests.push({name:"ANIM-01 no scanner, glint, cursor-game lens or bouncing hero",anim01});
+
  const smallUI=await js('(()=>{const selector=".header-descriptor,.v4-hero-caption,.hero-kicker,.v4-canvas-top,.v4-canvas-bottom,.hero-meta,.section-label,.kicker,.service-top,.ecosystem-board-top,.motion-story-index,.motion-story-status,.audience-no,.audience-tag,.business-pitch-top,.closing-kicker-signal";return {decorativeLabelCount:document.querySelectorAll(selector).length,numberedTokens:document.body.textContent.match(/\\b0[1-9]\\s*\\/\\s*/g)||[],statusVisible:document.querySelector(".trust-ledger-item strong")?.textContent?.trim()}})()');
  if(smallUI.decorativeLabelCount!==0||smallUI.numberedTokens.length!==0||!smallUI.statusVisible)report.failures.push("Editorial numeric labels survived cleanup: "+JSON.stringify(smallUI));
  report.tests.push({name:"Zero editorial numeric labels and redundant tiny captions",smallUI});

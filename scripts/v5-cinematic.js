@@ -105,28 +105,5 @@
     loadThree();
   });
 
-  const hero=document.querySelector(".v4-motion-canvas");
-  const lens=hero?.querySelector(".v5-hero-refraction");
-  if(!hero || !lens || window.matchMedia?.("(pointer: fine)").matches!==true) return;
-
-  // Modest pointer response affects decoration only, not navigation or scroll.
-  let frame=0;
-  let dx=0;
-  let dy=0;
-  const paint=()=>{
-    lens.style.setProperty("--v5-x",dx.toFixed(1)+"px");
-    lens.style.setProperty("--v5-y",dy.toFixed(1)+"px");
-    frame=0;
-  };
-  const update=(event)=>{
-    const box=hero.getBoundingClientRect();
-    dx=((event.clientX-box.left)/Math.max(box.width,1)-.5)*9;
-    dy=((event.clientY-box.top)/Math.max(box.height,1)-.5)*7;
-    if(!frame) frame=window.requestAnimationFrame(paint);
-  };
-  hero.addEventListener("pointermove",update,{passive:true});
-  hero.addEventListener("pointerleave",()=>{
-    if(frame) window.cancelAnimationFrame(frame);
-    frame=0; dx=0; dy=0; paint();
-  },{passive:true});
+  // ANIM-01: decorative lens stays still. No cursor-following game interaction.
 })();

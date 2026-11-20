@@ -74,8 +74,8 @@ a:focus-visible,button:focus-visible {outline-offset:3px;}
 /* Keep closing headlines fully legible on the new neutral background
    throughout entry motion: transform moves, but opacity never fades to 35%. */
 @keyframes v45-closing-reveal {
- from {opacity:1;transform:translate3d(-18px,12px,0) skewX(-3deg);}
- to {opacity:1;transform:translate3d(0,0,0) skewX(0deg);}
+ from {opacity:1;transform:translate3d(0,15px,0);}
+ to {opacity:1;transform:translate3d(0,0,0);}
 }
 .contact .closing-line--middle {color:var(--ds-30-blue);}
 .contact .closing-line--final em {color:var(--ds-30-blue);}

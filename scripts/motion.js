@@ -9,6 +9,8 @@
  const cues=document.querySelectorAll(
   ".statement h2, .solutions .section-head, .ecosystem .section-head, "+
   ".motion-story, .motion-story-unit, .audiences .section-head, "+
+  ".solutions-grid .service--main, .business-pitch, "+
+  ".audience-grid--compact .audience, .contact-bottom--rc, "+
   ".contact, .closing-line"
  );
  if(!cues.length){root.dataset.motionSystem="empty";return}
@@ -18,6 +20,7 @@
   return;
  }
  root.dataset.motionSystem="ready";
+ root.dataset.motionDirection="editorial-cinematic-v1";
  const observer=new window.IntersectionObserver((entries,instance)=>{
   for(const entry of entries){
    if(!entry.isIntersecting)continue;
