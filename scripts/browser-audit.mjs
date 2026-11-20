@@ -132,6 +132,17 @@ try{
  if(decorDots.length||Object.entries(roundedUI.radii).some(([,v])=>v<10))
    report.failures.push("V6.6 unexpected heading periods or missing rounded corners: "+JSON.stringify({decorDots,radii:roundedUI.radii}));
  report.tests.push({name:"V6.6 editorial punctuation and computed corner radii",roundedUI});
+
+ const designSystem=await js('(()=>{const color=sel=>getComputedStyle(document.querySelector(sel)).backgroundColor;return {body:color("body"),contact:color(".contact"),feature:color(".solutions-grid .service--main"),brand:color(".business-pitch"),cssLoaded:[...document.styleSheets].some(s=>s.href?.endsWith("/styles-system.css")),steps:[...document.querySelectorAll(".motion-story-unit h3")].map(e=>e.textContent.trim()),contactStatusColor:getComputedStyle(document.querySelector(".contact-status")).color}})()');
+ const expectedSteps=["ELEGIR","PREPARAR","ENTREGAR"];
+ if(!designSystem.cssLoaded||
+    designSystem.body!=="rgb(247, 245, 238)"||
+    designSystem.contact!=="rgb(247, 245, 238)"||
+    designSystem.feature!=="rgb(21, 81, 216)"||
+    designSystem.brand!=="rgb(21, 81, 216)"||
+    JSON.stringify(designSystem.steps)!==JSON.stringify(expectedSteps))
+   report.failures.push("V6.7 computed 60-30-10 palette or three-step narrative mismatch: "+JSON.stringify(designSystem));
+ report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
  const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,mark:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src")}))()');
  if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<110||kineticIntro.blue!=="v45-blue-strike"||kineticIntro.mark!=="v45-mark-lock"||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png"))report.failures.push("V4.5 hero kinetic introduction failed: "+JSON.stringify(kineticIntro));
  report.tests.push({name:"V4.5 hero scale and original mark motion",kineticIntro});
