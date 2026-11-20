@@ -12,7 +12,7 @@ test("V6.4 packages the actual Prime website, not only an isolated GPU demo",()=
  assert.equal(manifest.domain,"none");
  assert.equal(manifest.noindex,true);
  for(const file of ["index.html","styles.css","styles-v5.css","styles-system.css","_headers",
-  "scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js",
+  "scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js",
   "assets/v6-three.bundle.js","assets/v62-commerce.glb",
   "assets/v62-courier.glb","assets/v62-destination.glb"]){
   assert.ok(manifest.files.some(x=>x.path===file),"Not packed: "+file);
