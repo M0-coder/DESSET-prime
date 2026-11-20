@@ -18,12 +18,8 @@ jobs:
           node-version: '22.16.0'
       - name: Install pinned Three.js + esbuild and compile self-hosted bundle
         run: |
-          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
           npm ci --ignore-scripts --no-audit --no-fund
           npm run build:3d
-          echo DESSET_LOCKFILE_BEGIN
-          cat package-lock.json
-          echo DESSET_LOCKFILE_END
       - name: JavaScript syntax
         run: |
           node --check scripts/app.js
@@ -89,7 +85,6 @@ jobs:
           node-version: '22.16.0'
       - name: Build Three.js WebGL2 in isolated Lighthouse preview
         run: |
-          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
           npm ci --ignore-scripts --no-audit --no-fund
           npm run build:3d
       - name: Start loopback-only preview
