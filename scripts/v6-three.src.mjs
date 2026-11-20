@@ -11,25 +11,31 @@ const coarse=window.matchMedia?.("(max-width: 800px)")?.matches===true;
 if(!stage||!mount||!controls||reduced){
  if(stage)stage.dataset.v6State=reduced?"reduced":"missing";
 }else{
- let renderer,scene,camera,model,ro,observer,raf=0,alive=false,onscreen=true,paused=false;
- let cameraPreset="overview",frame=0,particle,parcel;
+ let renderer,scene,camera,ro,observer,raf=0,alive=false,onscreen=true,paused=false;
+ let cameraPreset="overview",frame=0,particle,parcel,routeHalo;
  let pointer={x:0,y:0},last=0,lastRender=0;
- let onMove,onLeave,onResize,onVisibility;
+ let onMove,onLeave,onResize,onVisibility,onControls;
+ const ownedTextures=[];
  const PAL={blue:0x1551d8,gold:0xffc62f,red:0xff3328,night:0x0b1024};
  const makeMat=(color,metalness=0.2,roughness=0.48,emissive=0x000000,intensity=0)=>
    new THREE.MeshStandardMaterial({color,metalness,roughness,emissive,emissiveIntensity:intensity});
  const mats={
-  blue:makeMat(PAL.blue,.23,.35),cyan:makeMat(0x5f94ff,.28,.36),
-  gold:makeMat(PAL.gold,.22,.33,0xe39505,.10),
-  red:makeMat(PAL.red,.25,.37),dark:makeMat(0x172443,.26,.61),
-  side:makeMat(0x263e73,.22,.54),cream:makeMat(0xf9f0d3,.1,.63),
-  glass:makeMat(0x73d7f7,.34,.14,0x1551d8,.27),
-  route:makeMat(PAL.gold,.12,.29,0xffb725,1.2),
-  road:makeMat(0x122142,.14,.75)
+  blue:makeMat(PAL.blue,.21,.29),cyan:makeMat(0x5f94ff,.26,.32),
+  gold:makeMat(PAL.gold,.22,.36,0xe39505,.13),
+  red:makeMat(PAL.red,.24,.38),dark:makeMat(0x172443,.28,.60),
+  side:makeMat(0x263e73,.20,.60),cream:makeMat(0xf9f0d3,.08,.61),
+  glass:makeMat(0x73d7f7,.40,.13,0x1c68bb,.47),
+  route:makeMat(PAL.gold,.12,.30,0xffb725,1.4),
+  road:makeMat(0x122142,.14,.78),
+  trim:makeMat(0x1a3e83,.55,.28),
+  chrome:makeMat(0xc5d6f6,.75,.22),
+  windowLight:makeMat(0x82d7f3,.10,.20,0x4b9de8,.70),
+  headlight:makeMat(0xfef4cb,.14,.25,0xffc62f,1.6)
  };
  const box=(parent,w,h,d,x,y,z,material)=>{
   const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
-  mesh.position.set(x,y,z);parent.add(mesh);return mesh;
+  mesh.position.set(x,y,z);mesh.castShadow=!coarse;mesh.receiveShadow=!coarse;
+  parent.add(mesh);return mesh;
  };
  const sphere=(parent,r,x,y,z,material,detail=12)=>{
   const mesh=new THREE.Mesh(new THREE.SphereGeometry(r,detail,8),material);
@@ -38,6 +44,21 @@ if(!stage||!mount||!controls||reduced){
  const cylinder=(parent,radius,height,x,y,z,material,segments=16)=>{
   const mesh=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,height,segments),material);
   mesh.position.set(x,y,z);parent.add(mesh);return mesh;
+ };
+ // Procedural typographic signage is painted directly on 3D materials, not HTML.
+ const sign=(parent,label,x,y,z,width=1.3,height=.33)=>{
+  const canvas=document.createElement("canvas");
+  canvas.width=512;canvas.height=128;
+  const ctx=canvas.getContext("2d");if(!ctx)return;
+  ctx.clearRect(0,0,512,128);ctx.fillStyle="#FFF8E4";
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.font="900 62px system-ui,Arial,sans-serif";ctx.fillText(label,256,67,490);
+  const texture=new THREE.CanvasTexture(canvas);
+  texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=2;
+  ownedTextures.push(texture);
+  const surface=new THREE.Mesh(new THREE.PlaneGeometry(width,height),
+   new THREE.MeshBasicMaterial({map:texture,transparent:true,depthWrite:false,side:THREE.DoubleSide}));
+  surface.position.set(x,y,z);parent.add(surface);return surface;
  };
  const plinth=(parent,w,d)=>{
   const shade=new THREE.Mesh(new THREE.CircleGeometry(1,24),
@@ -57,8 +78,13 @@ if(!stage||!mount||!controls||reduced){
   box(g,3.22,.2,1.15,0,1.96,1.12,mats.gold);
   for(let i=0;i<7;i++)box(g,.43,.10,.79,-1.35+i*.45,1.79,1.26,i%2?mats.cream:mats.red);
   box(g,1.24,.27,.05,0,2.08,.935,mats.dark);
-  box(g,.68,.22,.065,0,2.10,.972,mats.gold);
+  box(g,1.11,.27,.07,0,2.10,.974,mats.trim);
+  sign(g,"DESSET",0,2.10,1.017,.95,.18);
   for(const x of [-1.04,1.04])cylinder(g,.13,.7,x,.39,1.5,mats.gold);
+  for(const x of [-.91,.91])box(g,.055,1.1,.07,x,1.22,.831,mats.chrome);
+  box(g,2.76,.065,.18,0,.19,.88,mats.chrome);
+  box(g,.75,.08,.50,0,.17,1.01,mats.gold);
+  sphere(g,.064,.20,1.0,.852,mats.headlight);
  }
  function destination(){
   const g=new THREE.Group();g.position.set(5.03,0,-.35);scene.add(g);
@@ -69,8 +95,12 @@ if(!stage||!mount||!controls||reduced){
   roof.rotation.y=Math.PI/4;g.add(roof);
   box(g,.83,1.48,.058,.36,.76,1.122,mats.dark);
   box(g,.62,.6,.065,-.81,1.30,1.123,mats.glass);
-  box(g,.52,.62,.062,1.333,1.31,-.34,mats.glass);
+  box(g,.52,.62,.062,1.333,1.31,-.34,mats.windowLight);
   sphere(g,.075,.80,.72,1.17,mats.gold);
+  box(g,1.02,.09,.42,.36,.17,1.33,mats.cream);
+  box(g,2.84,.13,.20,0,2.15,1.03,mats.chrome);
+  sign(g,"DESTINO",0,2.17,1.145,1.35,.17);
+  box(g,.05,.67,.09,-.81,1.32,1.166,mats.chrome);
  }
  function courier(){
   const g=new THREE.Group();g.position.set(.98,.13,1.18);scene.add(g);
@@ -92,6 +122,11 @@ if(!stage||!mount||!controls||reduced){
   trunk.rotation.y=.06;
   box(g,.75,.08,.92,.82,2.04,-.15,mats.red);
   box(g,.45,.24,.06,.82,1.52,.33,mats.dark);
+  sphere(g,.11,-1.22,.92,.48,mats.headlight);
+  box(g,.18,.25,.65,-1.12,.59,.50,mats.chrome);
+  box(g,1.85,.045,.65,0,.47,.43,mats.dark);
+  box(g,.43,.11,.06,-.16,1.33,.38,mats.gold);
+  box(g,.45,.07,.07,.82,1.24,.365,mats.chrome);
   return g;
  }
  function decorate(){
