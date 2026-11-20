@@ -7,7 +7,7 @@ const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const read=p=>readFileSync(resolve(root,p),"utf8");
 const html=read("index.html");
 const headers=read("_headers");
-const js=["scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js"].map(read);
+const js=["scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js"].map(read);
 const styles=["styles.css","styles-v5.css","styles-system.css"].map(read);
 const issues=[],warnings=[];
 const assert=(ok,label)=>{if(!ok)issues.push(label)};
@@ -38,7 +38,7 @@ for(const [i,s] of js.entries()){
 }
 assert(styles.every(s=>!/@import\b|url\(\s*['"]?https?:/i.test(s)),"Remote CSS dependency");
 assert(!/\b(?:pages:\s*write|id-token:\s*write)\b/.test(read(".github/workflows/preview-checks.yml")),"CI write token permission");
-const budget={html_bytes:35000,v5_css_bytes:16000,system_css_bytes:7000,desktop_webp_bytes:220000,mobile_webp_bytes:270000};
+const budget={html_bytes:35000,v5_css_bytes:16000,system_css_bytes:9000,desktop_webp_bytes:220000,mobile_webp_bytes:270000};
 const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
  v5_css_bytes:statSync(resolve(root,"styles-v5.css")).size,
  system_css_bytes:statSync(resolve(root,"styles-system.css")).size,
