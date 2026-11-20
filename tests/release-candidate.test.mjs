@@ -15,8 +15,8 @@ test("V4.3: limited public story, no redundant responsibility section and two sh
  const cards=html.match(/<div class="audience-grid audience-grid--compact">([\s\S]*?)<\/div>/);
  assert.ok(cards);
  assert.equal((cards[1].match(/class="audience"/g)||[]).length,2);
- assert.match(cards[1],/Personas\./);
- assert.match(cards[1],/Aliados\./);
+ assert.match(cards[1],/<h3>Personas<\/h3>/);
+ assert.match(cards[1],/<h3>Aliados<\/h3>/);
  assert.doesNotMatch(cards[1],/<h3>Negocios\./);
 });
 
