@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./styles-v5.css">
   <link rel="stylesheet" href="./styles-system.css">
+  <link rel="stylesheet" href="./styles-hero-photo.css">
   <script defer src="./scripts/app.js"></script>
   <script defer src="./scripts/motion.js"></script>
   <script defer src="./scripts/v5-cinematic.js"></script>
@@ -38,25 +39,29 @@
     <section id="inicio" class="hero hero--motion" data-variant="v4" aria-labelledby="hero-title">
       <div class="v4-hero-composition">
         <div class="v4-hero-type">
+          <p class="v4-hero-declaration">COMERCIO · TECNOLOGÍA · LOGÍSTICA</p>
           <h1 id="hero-title" class="motion-headline">
             <span class="motion-line v4-headline-a"><span class="motion-line__inner">EL COMERCIO</span></span>
             <span class="motion-line v4-headline-b"><span class="motion-line__inner">SE MUEVE</span></span>
           </h1>
-          <p class="v4-hero-declaration">PERSONAS / NEGOCIOS / ENTREGAS<span aria-hidden="true"> ↗</span></p>
+          <div class="v4-hero-bottom">
+            <p class="hero-lead">DESSET reúne comercio, tecnología y logística en un ecosistema de servicios orientado a la última milla. Conoce sus soluciones, sus aplicaciones y la forma en que conecta clientes, negocios y entregas.</p>
+            <div class="hero-actions"><a class="hero-cta" href="#contacto">Hablemos de tu negocio <span aria-hidden="true">↗</span></a><a class="hero-secondary" href="#ecosistema" data-v64-tour-launch aria-label="Explorar el recorrido 3D de DESSET">Explorar recorrido 3D <span aria-hidden="true">↗</span></a></div>
+          </div>
         </div>
-        <div class="v4-motion-canvas" role="img" aria-label="Composición editorial abstracta en azul, amarillo y rojo sobre el concepto de comercio en movimiento.">
+        <div class="v4-motion-canvas prime-photo-surface" role="img" aria-label="Escena conceptual: una comerciante entrega un pedido preparado a un repartidor con uniforme azul, mochila negra y motocicleta de dos espejos. No representa operaciones comerciales activas de DESSET.">
+          <picture class="prime-photo-picture">
+            <source type="image/webp" media="(max-width: 700px)" srcset="./assets/desset-hero-entrega-mobile.webp">
+            <img class="prime-photo-image" src="./assets/desset-hero-entrega-dos-espejos.webp" width="1671" height="941" alt="" decoding="async" loading="eager" fetchpriority="high">
+          </picture>
+          <span class="prime-photo-caption">Representación conceptual · No corresponde a operaciones activas de DESSET</span>
           <div class="v4-shape v4-shape-blue" aria-hidden="true"></div>
           <div class="v4-shape v4-shape-yellow" aria-hidden="true"></div>
           <div class="v4-shape v4-shape-red" aria-hidden="true"></div>
           <span class="motion-brand-thread" aria-hidden="true"></span>
-          <div class="v4-canvas-type" aria-hidden="true"><span>IDEAS</span><span>EN</span><span>ACCIÓN</span></div>
           <div class="v4-canvas-stamp"><img src="./assets/deliver-assets-mark.png" width="96" height="73" alt=""></div>
           <div class="v5-hero-refraction" aria-hidden="true"><span class="v5-lens"></span><span class="v5-lens v5-lens--inner"></span><span class="v5-glint"></span><span class="v5-depth-line"></span></div>
         </div>
-      </div>
-      <div class="v4-hero-bottom">
-        <p class="hero-lead">DESSET reúne comercio, tecnología y logística en un ecosistema de servicios orientado a la última milla. Conoce sus soluciones, sus aplicaciones y la forma en que conecta clientes, negocios y entregas.</p>
-        <div class="hero-actions"><a class="hero-cta" href="#contacto">Hablemos de tu negocio <span aria-hidden="true">↗</span></a><a class="hero-secondary" href="#ecosistema" data-v64-tour-launch aria-label="Explorar el recorrido 3D de DESSET">Explorar recorrido 3D <span aria-hidden="true">↗</span></a></div>
       </div>
       <div class="v4-hero-rail" aria-hidden="true"><span>COMERCIO</span><b>×</b><span>CONEXIÓN</span><b>×</b><span>LOGÍSTICA</span><b>×</b><span>FUTURO</span></div>
     </section>

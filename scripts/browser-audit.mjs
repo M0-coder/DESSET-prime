@@ -127,6 +127,11 @@ try{
  const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src"),flow:!!document.querySelector(".v4-flow-board"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
  if(!heroQuality.headline?.includes("EL COMERCIO")||!heroQuality.headline?.includes("SE MUEVE")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
  report.tests.push({name:"V4 motion/design contract",heroQuality});
+ const heroPhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");const f=document.querySelector("#inicio .prime-photo-surface");return {loaded:!!x?.complete&&x.naturalWidth===1671&&x.naturalHeight===941,src:x?.getAttribute("src"),logo:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),oldText:document.querySelector("#inicio")?.textContent?.includes("IDEAS EN ACCIÓN"),ratio:f?.getBoundingClientRect().width/f?.getBoundingClientRect().height}})()');
+ if(!heroPhoto.loaded||!heroPhoto.src?.endsWith("desset-hero-entrega-dos-espejos.webp")||
+    !heroPhoto.logo?.endsWith("deliver-assets-mark.png")||heroPhoto.oldText||heroPhoto.ratio<1.2||heroPhoto.ratio>2)
+    report.failures.push("HERO-PHOTO-01 exact local render, original logo, conceptual disclosure failed: "+JSON.stringify(heroPhoto));
+ report.tests.push({name:"HERO-PHOTO-01 exact local render, original logo, conceptual disclosure",heroPhoto});
  const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",board:".ecosystem-board",stage:".v5-city-stage",pitch:".business-pitch",contact:".contact-primary"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
  const decorDots=roundedUI.titles.filter(t=>t.endsWith("."));
  if(decorDots.length||Object.entries(roundedUI.radii).some(([,v])=>v<10))
@@ -151,7 +156,7 @@ try{
    report.failures.push("V6.9 web wrongly claims live app availability: "+JSON.stringify(appAccess));
  report.tests.push({name:"V6.9 enterprise services remain permanent, app availability remains truthful",appAccess});
  const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,mark:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src")}))()');
- if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<110||kineticIntro.blue!=="v45-blue-strike"||kineticIntro.mark!=="v45-mark-lock"||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png"))report.failures.push("V4.5 hero kinetic introduction failed: "+JSON.stringify(kineticIntro));
+ if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<60||kineticIntro.blue!=="v45-blue-strike"||kineticIntro.mark!=="v45-mark-lock"||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png"))report.failures.push("V4.5 hero kinetic introduction failed: "+JSON.stringify(kineticIntro));
  report.tests.push({name:"V4.5 hero scale and original mark motion",kineticIntro});
  const anim01=await js('(()=>({glint:getComputedStyle(document.querySelector(".v5-glint")).display,scan:getComputedStyle(document.querySelector(".v5-stage-scan")).display,red:getComputedStyle(document.querySelector(".v4-shape-red")).animationName,blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,direction:document.documentElement.dataset.motionDirection,lensTransform:getComputedStyle(document.querySelector(".v5-hero-refraction")).transform}))()');
  if(anim01.glint!=="none"||anim01.scan!=="none"||
@@ -322,6 +327,10 @@ try{
   }
  }
  const reduced=await viewport(390,844,true);
+ const mobilePhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");return {src:x?.currentSrc,width:x?.naturalWidth,height:x?.naturalHeight,loaded:!!x?.complete}})()');
+ if(!mobilePhoto.loaded||!mobilePhoto.src?.includes("desset-hero-entrega-mobile.webp")||mobilePhoto.width!==960)
+  report.failures.push("HERO-PHOTO-01 mobile responsive photo not selected: "+JSON.stringify(mobilePhoto));
+ report.tests.push({name:"HERO-PHOTO-01 60KB mobile WebP actually loaded",mobilePhoto});
  const reducedMode=await js("document.documentElement.dataset.motionSystem");
  if(reducedMode!=="reduced")report.failures.push("Motion fallback failed for reduced preference: "+String(reducedMode));
  const reducedAnimations=await js('(()=>({blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,stamp:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,headline:document.querySelector(".motion-headline").textContent.trim(),cta:document.querySelector(".hero-cta").getAttribute("href"),closing:document.querySelector("#contact-title").textContent.trim()}))()');
