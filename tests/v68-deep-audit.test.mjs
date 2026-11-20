@@ -33,7 +33,8 @@ test("V6.8 diagrams are Spanish in both pixels and accessibility descriptions",(
 test("V6.8 navigation works progressively when scripts fail or are disabled",()=>{
  assert.match(base,/@media\(max-width:700px\)/);
  assert.match(base,/\.main-nav\{display:none;position:absolute/);
- assert.match(system,/html:not\(\.js-enabled\) \.main-nav\{\s*position:static;display:flex/);
+ assert.match(system,/html:not\(\.js-enabled\) \.main-nav\{\s*position:absolute;display:flex/);
+ assert.match(system,/height:70px;min-height:70px;flex-wrap:nowrap/);
  assert.match(system,/html:not\(\.js-enabled\) \.menu-button\{display:none;\}/);
  assert.match(system,/html:not\(\.js-enabled\) \.site-header\{/);
  assert.match(nav,/document\.documentElement\.classList\.add\("js-enabled"\)/);
