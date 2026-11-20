@@ -34,7 +34,7 @@ test("V4: la secuencia cotidiana es visible y el diagrama técnico no domina la 
  assert.match(html,/<h3>PREPARAR<\/h3>/);
  assert.match(html,/<h3>ENTREGAR<\/h3>/);
  assert.match(html,/<details class="v4-architecture-details">/);
- assert.equal((html.match(/roles-geometry-v2\.svg/g)||[]).length,1);
+ assert.equal((html.match(/roles-geometry-es\.svg/g)||[]).length,1);
  assert.match(app,/event\.key==="Escape"/);
 });
 test("CSP desde headers reales y prototipo sin indexación",()=>{
