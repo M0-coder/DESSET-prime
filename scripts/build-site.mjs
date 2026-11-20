@@ -15,7 +15,7 @@ const allowStatic=assets.filter(name=>name!=="roles-geometry-v2.svg"&&/^[a-z0-9-
 const compiled=["assets/v6-three.bundle.js",
  "assets/v62-commerce.glb","assets/v62-courier.glb","assets/v62-destination.glb"];
 const files=[
- "index.html","styles.css","styles-v5.css","styles-system.css","_headers",
+ "index.html","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","_headers",
  "scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js",
  ...allowStatic,...compiled
 ].sort();
@@ -31,7 +31,7 @@ if(!loader.includes('stage.dataset.v64Requested="tour"')||
  throw Error("Hero link is not connected to locally bundled WebGL.");
 if(files.length>40)throw Error("Too many release files for DESSET Prime experiment: "+files.length);
 for(const path of files){
- if(path.split("/").includes("..") || !(path==="assets/v6-three.bundle.js" || /^(?:index\.html|styles(?:-v5|-system)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb))$/.test(path)))
+ if(path.split("/").includes("..") || !(path==="assets/v6-three.bundle.js" || /^(?:index\.html|styles(?:-v5|-system|-hero-photo)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb))$/.test(path)))
    throw Error("Unexpected package path: "+path);
  const info=await stat(resolve(root,path));
  if(!info.isFile()||info.size===0)throw Error("Required website file missing/empty: "+path);
