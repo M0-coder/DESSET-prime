@@ -52,7 +52,7 @@ test("V6.3 users control storyboard without tracking, CDNs or background timers"
  assert.match(app,/courier:\{pos:/);
  assert.match(app,/const beginTour=\(\)=>\{/);
  assert.match(app,/const cancelTour=\(reason="manual"\)=>\{/);
- assert.match(app,/storyElapsed\+=wallDelta/);
+ assert.match(app,/storyElapsed=Math\.min\(STORY_DURATION,storyElapsed\+wallDelta\)/);
  assert.match(app,/routeProgress\(storyElapsed\)/);
  assert.match(app,/storyProgress\.value=step\.progress/);
  assert.match(app,/cancelTour\("complete"\)/);
