@@ -209,9 +209,9 @@ if(!stage||!mount||!controls||reduced){
   return renderer.info;
  }
  const presets=coarse?{
-  overview:{pos:[9.6,12.5,9.7],look:[0,1,0]},
-  commerce:{pos:[8.6,9.8,3.4],look:[-.7,1.1,-4.7]},
-  destination:{pos:[9.2,9.8,11.8],look:[.7,1.1,4.7]}
+  overview:{pos:[3.5,14.8,15.2],look:[0,1,0]},
+  commerce:{pos:[3.2,10.8,7.0],look:[-.7,1.1,-4.7]},
+  destination:{pos:[4.8,10.8,14.5],look:[.7,1.1,4.7]}
  }:{
   overview:{pos:[12,11,18],look:[0,1,0]},
   commerce:{pos:[-.3,8.2,12],look:[-4.2,1.0,0]},
