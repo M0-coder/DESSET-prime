@@ -3,10 +3,10 @@
  * All scenes are conceptual, never evidence of an operational delivery. */
 export const STORY_BEATS=Object.freeze([
  Object.freeze({id:"opening",view:"overview",start:0,end:0.85,title:"COMERCIO EN MOVIMIENTO",detail:"Una visualización conceptual de DESSET."}),
- Object.freeze({id:"commerce",view:"commerce",start:0.85,end:3.1,title:"01 / EL COMERCIO",detail:"Donde comienza un futuro pedido."}),
- Object.freeze({id:"courier",view:"courier",start:3.1,end:5.85,title:"02 / EL REPARTIDOR",detail:"El movimiento conecta cada punto."}),
- Object.freeze({id:"destination",view:"destination",start:5.85,end:8.45,title:"03 / EL DESTINO",detail:"Una ruta que termina en la entrega."}),
- Object.freeze({id:"closing",view:"overview",start:8.45,end:9.3,title:"DESSET / VISIÓN",detail:"Representación artística, no un servicio activo."})
+ Object.freeze({id:"commerce",view:"commerce",start:0.85,end:3.1,title:"EL COMERCIO",detail:"Aquí comenzaría la solicitud de un cliente."}),
+ Object.freeze({id:"courier",view:"courier",start:3.1,end:5.85,title:"EL REPARTIDOR",detail:"El reparto conectaría el comercio con su destino."}),
+ Object.freeze({id:"destination",view:"destination",start:5.85,end:8.45,title:"EL DESTINO",detail:"El destino representa una futura entrega."}),
+ Object.freeze({id:"closing",view:"overview",start:8.45,end:9.3,title:"DESSET / VISIÓN",detail:"Recorrido conceptual. El servicio todavía no está activo."})
 ]);
 export const STORY_DURATION=STORY_BEATS.at(-1).end;
 export function storyAtTime(seconds){
