@@ -112,7 +112,10 @@
       <div class="ecosystem-board v4-flow-board">
         <figure class="v5-city-stage" aria-label="Renderización gráfica conceptual de DESSET">
           <div class="v5-stage-world">
-            <img class="v5-stage-render" src="./assets/v5-logistics-scene.svg" width="1200" height="560" decoding="async" alt="Ilustración isométrica conceptual: un comercio, un paquete y una persona repartidora frente a un destino. No representa servicios activos.">
+            <picture class="v5-responsive-art">
+              <source media="(max-width: 430px)" type="image/svg+xml" srcset="./assets/v5-logistics-mobile.svg" width="390" height="560">
+              <img class="v5-stage-render" src="./assets/v5-logistics-scene.svg" width="1200" height="560" decoding="async" alt="Ilustración isométrica conceptual: comercio, paquete, repartidor y destino conectados por una ruta; sin operaciones activas.">
+            </picture>
             <span class="v5-stage-scan" aria-hidden="true"></span>
             <svg class="v5-route-overlay" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
               <path class="v5-route-line" d="M322 393 C404 352 469 358 537 370 S729 396 773 405 S858 430 892 410"/>
