@@ -127,6 +127,11 @@ try{
  const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src"),flow:!!document.querySelector(".v4-flow-board"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
  if(!heroQuality.headline?.includes("EL COMERCIO")||!heroQuality.headline?.includes("SE MUEVE")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
  report.tests.push({name:"V4 motion/design contract",heroQuality});
+ const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",board:".ecosystem-board",stage:".v5-city-stage",pitch:".business-pitch",contact:".contact-primary"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
+ const decorDots=roundedUI.titles.filter(t=>t.endsWith("."));
+ if(decorDots.length||Object.entries(roundedUI.radii).some(([,v])=>v<10))
+   report.failures.push("V6.6 unexpected heading periods or missing rounded corners: "+JSON.stringify({decorDots,radii:roundedUI.radii}));
+ report.tests.push({name:"V6.6 editorial punctuation and computed corner radii",roundedUI});
  const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,mark:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".v4-canvas-stamp img")?.getAttribute("src")}))()');
  if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<110||kineticIntro.blue!=="v45-blue-strike"||kineticIntro.mark!=="v45-mark-lock"||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png"))report.failures.push("V4.5 hero kinetic introduction failed: "+JSON.stringify(kineticIntro));
  report.tests.push({name:"V4.5 hero scale and original mark motion",kineticIntro});
@@ -205,6 +210,11 @@ try{
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
+  if(w===390||w===320){
+   const radius=await js('(()=>({stage:parseFloat(getComputedStyle(document.querySelector(".v5-city-stage")).borderTopLeftRadius),pitch:parseFloat(getComputedStyle(document.querySelector(".business-pitch")).borderTopLeftRadius),screen:document.documentElement.clientWidth}))()');
+   if(radius.stage<15||radius.pitch<17)report.failures.push("V6.6 mobile curves missing: "+JSON.stringify(radius));
+   report.tests.push({name:"V6.6 mobile curved surfaces "+w,radius});
+  }
   if(w===390){
    await sleep(3200);
    await capture("mobile-final.png");
