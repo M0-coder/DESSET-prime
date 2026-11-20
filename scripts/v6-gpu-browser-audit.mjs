@@ -181,6 +181,23 @@ try{
   {models:heroTour.glbLoaded,beat:heroTour.tourBeat});
  await screenshot("mobile-v64-hero-3d-site-integration.png");
 
+ // Tablet breakpoint audit: 431–800px uses a landscape WebGL layout,
+ // with cheaper shaders but the same three original GLBs in frame.
+ await viewport(768,1024);
+ await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+ const tabletPoster=await evalJS('(()=>({stage:document.querySelector(".v5-city-stage"),trigger:document.querySelector(".v6-enable-webgl").hidden,script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle"))}))()');
+ check("Tablet starts with the premium static poster",tabletPoster.trigger===false&&!tabletPoster.script);
+ await evalJS('document.querySelector(".v6-enable-webgl").click()');
+ const tablet=await waitUntil("three GLB models render in 768px layout",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3&&p.frames>2?p:null})()'),17000);
+ const tabletBounds=Object.values(tablet.objectBounds||{});
+ const tabletFramed=tabletBounds.length===3&&tabletBounds.every(b=>b.minX>=-1.04&&b.maxX<=1.04&&b.minY>=-1.04&&b.maxY<=1.04);
+ check("Tablet camera fits all three GLB models within the landscape frame",tabletFramed,{bounds:tablet.objectBounds});
+ await screenshot("tablet-768-three-webgl.png");
+ await send("Emulation.setDeviceMetricsOverride",{width:1024,height:800,deviceScaleFactor:1,mobile:false});
+ await waitUntil("responsive breakpoint restores poster",async()=>evalJS('document.querySelector(".v5-city-stage")?.dataset.v6State==="poster"'),4000);
+ const rotated=await evalJS('(()=>{const stage=document.querySelector(".v5-city-stage");return {canvas:stage.querySelectorAll(".v6-three-mount canvas").length,trigger:stage.querySelector(".v6-enable-webgl").hidden}})()');
+ check("Resize across quality breakpoint frees GPU and offers safe reopen",rotated.canvas===0&&rotated.trigger===false,{rotated});
+
  await viewport(390,844,true);
  const reduced=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),button:document.querySelector(".v6-enable-webgl")?.hidden,poster:!!document.querySelector(".v5-stage-render")}))()');
  check("Reduced-motion remains static and never loads WebGL",!reduced.script&&reduced.button===true&&reduced.poster,{reduced});
