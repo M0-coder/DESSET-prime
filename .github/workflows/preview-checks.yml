@@ -1,4 +1,4 @@
-name: DESSET Prime V5 — cinematic QA sin despliegue
+name: DESSET Prime V5.3 — QA y Lighthouse local sin despliegue
 on:
   push:
     branches: [design/**]
@@ -8,7 +8,7 @@ permissions:
 jobs:
   source-check:
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
@@ -22,16 +22,31 @@ jobs:
           node --check scripts/motion.js
           node --check scripts/v5-cinematic.js
           node --check scripts/browser-audit.mjs
+          node --check scripts/local-preview.mjs
+          node --check scripts/lighthouse-summary.mjs
+          node --check scripts/mutation-smoke.mjs
+          node --check scripts/static-gate.mjs
+      - name: Static source security and integrity gate
+        run: node scripts/static-gate.mjs
       - name: Unit and source contracts
         run: node --test tests/*.test.mjs
-      - name: Browser QA and snapshots
+      - name: Node execution coverage (scope limited, no certified global coverage)
+        run: |
+          mkdir -p reports/quality
+          node --experimental-test-coverage --test tests/*.test.mjs > reports/quality/node-coverage.txt
+          tail -n 23 reports/quality/node-coverage.txt
+      - name: Targeted mutation smoke
+        run: node scripts/mutation-smoke.mjs
+      - name: Browser QA and screenshots
         run: node scripts/browser-audit.mjs
-      - name: Preserve browser evidence
+      - name: Preserve QA evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: desset-prime-v5-evidence
-          path: reports/browser/
+          name: desset-prime-v53-qa-evidence
+          path: |
+            reports/browser/
+            reports/quality/
           if-no-files-found: warn
           retention-days: 14
       - name: No deployment mechanisms
@@ -39,3 +54,48 @@ jobs:
           test ! -f wrangler.toml
           test ! -f _worker.js
           test ! -d functions
+
+  lighthouse-local-lab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22.16.0'
+      - name: Start loopback-only preview
+        run: |
+          mkdir -p reports/lighthouse
+          node scripts/local-preview.mjs > reports/lighthouse/preview-server.log 2>&1 &
+          echo $! > reports/lighthouse/preview-server.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/ -o /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat reports/lighthouse/preview-server.log
+          exit 1
+      - name: Lighthouse mobile and desktop (laboratory, not field CWV)
+        env:
+          npm_config_ignore_scripts: 'true'
+        run: |
+          npm exec --yes --package=lighthouse@12.8.2 -- lighthouse http://127.0.0.1:4173/ --chrome-flags="--headless=new --no-sandbox --disable-dev-shm-usage" --output=json --output-path=reports/lighthouse/mobile.json --only-categories=performance,accessibility,best-practices --quiet
+          npm exec --yes --package=lighthouse@12.8.2 -- lighthouse http://127.0.0.1:4173/ --chrome-flags="--headless=new --no-sandbox --disable-dev-shm-usage" --preset=desktop --output=json --output-path=reports/lighthouse/desktop.json --only-categories=performance,accessibility,best-practices --quiet
+      - name: Summarize observed lab scores
+        if: always()
+        run: node scripts/lighthouse-summary.mjs
+      - name: Preserve Lighthouse evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: desset-prime-v53-lighthouse-lab
+          path: reports/lighthouse/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Stop local server
+        if: always()
+        run: |
+          if test -f reports/lighthouse/preview-server.pid; then
+            kill "$(cat reports/lighthouse/preview-server.pid)" || true
+          fi
