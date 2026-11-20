@@ -43,8 +43,9 @@
   // Real 3D is deliberately lazy: no 3D package request on mobile until explicit opt-in.
   // Desktop receives the script only when the scene intersects the viewport.
   const threeStart=stage.querySelector(".v6-enable-webgl");
-  const mobile=window.matchMedia?.("(max-width: 800px)")?.matches===true;
-  if(threeStart && mobile)threeStart.hidden=false;
+  // The original cinematic WebP remains the default visual on ALL devices.
+  // WebGL is only fetched after the user's explicit click (hero or stage).
+  if(threeStart)threeStart.hidden=false;
   const loadStatus=stage.querySelector(".v65-load-status");
   let webglRequested=false;
   const runRequestedTour=()=>{
@@ -103,14 +104,6 @@
     stage.dataset.v64Requested="tour";
     loadThree();
   });
-
-  if(!mobile){
-    const trigger3D=new window.IntersectionObserver((entries,instance)=>{
-      if(!entries.some(e=>e.isIntersecting))return;
-      instance.disconnect();loadThree();
-    },{threshold:.1,rootMargin:"0px 0px 22% 0px"});
-    trigger3D.observe(stage);
-  }
 
   const hero=document.querySelector(".v4-motion-canvas");
   const lens=hero?.querySelector(".v5-hero-refraction");
