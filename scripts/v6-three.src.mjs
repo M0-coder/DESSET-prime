@@ -40,6 +40,10 @@ if(!stage||!mount||!controls||reduced){
   mesh.position.set(x,y,z);parent.add(mesh);return mesh;
  };
  const plinth=(parent,w,d)=>{
+  const shade=new THREE.Mesh(new THREE.CircleGeometry(1,24),
+   new THREE.MeshBasicMaterial({color:0x03060e,transparent:true,opacity:.30,depthWrite:false}));
+  shade.rotation.x=-Math.PI/2;shade.position.y=-.279;shade.scale.set(w*.57,d*.58,1);
+  parent.add(shade);
   box(parent,w,.23,d,0,-.12,0,mats.side);
   box(parent,w*.86,.04,d*.85,0,.025,0,mats.road);
  };
@@ -156,7 +160,7 @@ if(!stage||!mount||!controls||reduced){
  const tmp=new THREE.Vector3();
  function resize(w,h){
   if(!renderer||!camera)return;
-  const ratio=w/Math.max(1,h),size=coarse?9.8:5.8;
+  const ratio=w/Math.max(1,h),size=coarse?11.15:5.8;
   camera.left=-size*ratio;camera.right=size*ratio;
   camera.top=size;camera.bottom=-size;
   camera.updateProjectionMatrix();renderer.setSize(w,h,false);
