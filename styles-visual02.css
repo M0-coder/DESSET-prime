@@ -59,12 +59,11 @@
  #soluciones .solutions-grid .service--main,#negocios .business-pitch{transition:none!important}
 }
 
-/* VISUAL-03: crop within cards, never overflow viewport. */
+/* VISUAL-03: three independent user-approved photographs, no hero duplication. */
 #ecosistema .motion-story-art{overflow:hidden}
 #ecosistema .v03-photo-story{display:block;position:relative;width:100%;height:100%;overflow:hidden;border-radius:14px}
-#ecosistema .v03-photo-story img{display:block;width:100%;height:100%;object-fit:cover;filter:none}
-#ecosistema .v03-photo-story::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:url("./assets/desset-hero-entrega-dos-espejos.webp");background-size:200% auto;background-position:var(--v03-focus) center}
-#ecosistema .motion-story-art--choose{--v03-focus:0%}
-#ecosistema .motion-story-art--organize{--v03-focus:45%}
-#ecosistema .motion-story-art--move{--v03-focus:100%}
+#ecosistema .v03-photo-story img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;filter:none}
+#ecosistema .motion-story-art--choose img{object-position:48% 50%}
+#ecosistema .motion-story-art--organize img{object-position:50% 48%}
+#ecosistema .motion-story-art--move img{object-position:51% 47%}
 @media(prefers-reduced-motion:reduce){#ecosistema .v03-photo-story img{animation:none!important;transform:none!important;opacity:1!important}}
