@@ -18,7 +18,7 @@ test("estructura pública informativa y alcance responsable",()=>{
  for(const id of ["inicio","vision","soluciones","ecosistema","negocios","contacto"])
   assert.match(html,new RegExp('id="'+id+'"'));
  assert.match(html,/No procesa pedidos ni pagos/i);
- assert.match(html,/Horizonte futuro/);
+ assert.match(html,/Conocer otras áreas del ecosistema/);
  assert.match(html,/conceptual/i);
  assert.doesNotMatch(html,/>\s*(Pedir ahora|Hacer un pedido|Iniciar sesión|Descarga la app)/i);
  assert.doesNotMatch(html,/[+]\s*[0-9]+\s*(clientes|repartidores|pedidos|negocios)/i);
