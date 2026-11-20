@@ -7,7 +7,8 @@ const html=read("index.html");
 const nav=read("scripts/app.js");
 const system=read("styles-system.css");
 const base=read("styles.css");
-const diagram=read("assets/roles-geometry-v2.svg");
+const diagram=read("assets/roles-geometry-es.svg");
+const original=read("assets/roles-geometry-v2.svg");
 const pack=JSON.parse(read("dist/site-manifest.json"));
 
 test("V6.8 diagrams are Spanish in both pixels and accessibility descriptions",()=>{
@@ -17,7 +18,9 @@ test("V6.8 diagrams are Spanish in both pixels and accessibility descriptions",(
  assert.doesNotMatch(diagram,/\bCUSTOMER\b|\bBUSINESS\b|\bRIDER\b/i);
  assert.match(diagram,/<desc id="d">Los clientes solicitan, los comercios preparan, los repartidores entregan y el control supervisa/);
  assert.match(html,/funciones del sistema: clientes, comercios, repartidores y control/);
- assert.equal(read("dist/assets/roles-geometry-v2.svg"),diagram);
+ assert.equal(read("dist/assets/roles-geometry-es.svg"),diagram);
+ assert.match(original,/>CUSTOMER<\/text>/);
+ assert.match(html,/src="\.\/assets\/roles-geometry-es\.svg"/);
 });
 
 test("V6.8 navigation works progressively when scripts fail or are disabled",()=>{
@@ -37,7 +40,7 @@ test("V6.8 navigation works progressively when scripts fail or are disabled",()=
 });
 
 test("V6.8 signed inventory records every updated static asset",()=>{
- for(const path of ["assets/roles-geometry-v2.svg","styles-system.css","scripts/app.js"]){
+ for(const path of ["assets/roles-geometry-v2.svg","assets/roles-geometry-es.svg","styles-system.css","scripts/app.js"]){
   const found=pack.files.find(x=>x.path===path);
   assert.ok(found&&found.bytes>0,"Package omits "+path);
  }
