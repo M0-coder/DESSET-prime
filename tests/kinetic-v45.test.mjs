@@ -11,7 +11,7 @@ test("V4.5 retains exactly three cinematic beats around truthful current content
  for(const id of ["inicio","ecosistema","contacto"])assert.match(html,new RegExp('id="'+id+'"'));
  for(const word of ["EL COMERCIO","SE MUEVE","ELEGIR","PREPARAR","ENTREGAR","LAS BUENAS","CONEXIONES"])assert.ok(html.includes(word));
  assert.match(html,/no representa una operación activa/i);
- assert.match(html,/No se reciben pedidos, pagos ni contrataciones/);
+ assert.match(html,/Acceso público no habilitado/);
  assert.match(html,/no procesa pedidos ni pagos/i);
  assert.doesNotMatch(html,/\b0[1-9]\s*\/\s*[^<]+/);
 });
