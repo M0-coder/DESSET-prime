@@ -27,7 +27,8 @@ test("V6.4 hero CTA launches the Three.js GLB journey in the ecosystem section",
  assert.ok(loader.includes('stage.dataset.v64Requested="tour"'));
  assert.ok(loader.includes('stage.querySelector(".v63-tour")?.click()'));
  assert.ok(loader.includes('threeStart?.addEventListener("click",loadThree)'));
- assert.ok(loader.includes('if(!mobile){'));
+ assert.ok(loader.includes('if(threeStart)threeStart.hidden=false'));
+ assert.ok(!loader.includes('trigger3D.observe'));
  assert.ok(html.includes('name="robots" content="noindex,nofollow"'));
 });
 test("V6.4 CI builds and tests the packaged website, without a deployment workflow",()=>{
