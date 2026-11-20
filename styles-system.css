@@ -115,14 +115,16 @@ h1,h2,h3,h4 {text-wrap:balance;}
    A static, keyboard-accessible nav must not depend on the hamburger handler. */
 @media(max-width:700px){
  html:not(.js-enabled) .site-header{
-  height:auto;min-height:70px;flex-wrap:wrap;align-content:start;
-  padding-bottom:10px;
+  height:70px;min-height:70px;flex-wrap:nowrap;align-content:normal;
+  padding-bottom:0;
  }
  html:not(.js-enabled) .menu-button{display:none;}
  html:not(.js-enabled) .main-nav{
-  position:static;display:flex;flex-direction:row;flex-wrap:wrap;
-  flex-basis:100%;gap:0 18px;align-items:center;
-  padding:10px 0 0;border:0;background:transparent;
+  position:absolute;display:flex;flex-direction:row;flex-wrap:wrap;
+  top:70px;left:0;right:0;z-index:60;
+  flex-basis:auto;gap:0 18px;align-items:center;
+  padding:10px var(--edge);border-bottom:1px solid var(--ds-stroke);
+  background:var(--ds-60-surface);box-shadow:var(--ds-shadow-soft);
  }
  html:not(.js-enabled) .main-nav a{
   display:inline-flex;align-items:center;min-height:44px;
