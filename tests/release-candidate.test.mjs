@@ -25,9 +25,9 @@ test("V4.3: delivery first and optional expansion do not compete in initial view
  const optional=html.match(/<details class="future-services">([\s\S]*?)<\/details>/);
  assert.ok(main&&optional);
  assert.equal((main[1].match(/class="service service--main"/g)||[]).length,1);
- assert.doesNotMatch(main[1],/Horizonte futuro/);
+ assert.doesNotMatch(main[1],/acceso público disponible|operación comercial activa/i);
  assert.equal((optional[1].match(/class="service"/g)||[]).length,2);
- assert.match(optional[1],/Horizonte futuro/);
+ assert.match(optional[1],/Área complementaria del modelo logístico/);
  assert.match(css,/\.future-services summary:focus-visible/);
  assert.doesNotMatch(html,/<details class="future-services"\s+open/);
 });
