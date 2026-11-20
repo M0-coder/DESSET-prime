@@ -10,6 +10,8 @@ const mount=stage?.querySelector(".v6-three-mount");
 const controls=stage?.querySelector(".v6-three-controls");
 const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches===true;
 const coarse=window.matchMedia?.("(max-width: 800px)")?.matches===true;
+// Geometry layout follows the CSS aspect-ratio breakpoint (430px), not the GPU quality breakpoint.
+const vertical=window.matchMedia?.("(max-width: 430px)")?.matches===true;
 if(!stage||!mount||!controls||reduced){
  if(stage)stage.dataset.v6State=reduced?"reduced":"missing";
 }else{
@@ -103,7 +105,7 @@ if(!stage||!mount||!controls||reduced){
   box(parent,w*.86,.04,d*.85,0,.025,0,mats.road);
  };
  function storefront(){
-  const g=new THREE.Group();g.name="commerce";g.position.set(coarse?-.7:-5,0,coarse?-4.7:0);scene.add(g);
+  const g=new THREE.Group();g.name="commerce";g.position.set(vertical?-.7:-5,0,vertical?-4.7:0);scene.add(g);
   plinth(g,4.1,3.1);
   box(g,2.7,2.3,1.95,0,1.22,-.2,mats.blue);
   box(g,3.1,.27,2.25,0,2.47,-.22,mats.cyan);
@@ -121,7 +123,7 @@ if(!stage||!mount||!controls||reduced){
   sphere(g,.064,.20,1.0,.852,mats.headlight);
  }
  function destination(){
-  const g=new THREE.Group();g.name="destination";g.position.set(coarse?.7:5.03,0,coarse?4.7:-.35);scene.add(g);
+  const g=new THREE.Group();g.name="destination";g.position.set(vertical?.7:5.03,0,vertical?4.7:-.35);scene.add(g);
   plinth(g,3.65,3.15);
   box(g,2.65,2.12,2.18,0,1.12,0,mats.red);
   const roof=new THREE.Mesh(new THREE.ConeGeometry(2.14,1.28,4,1),mats.cream);
@@ -137,7 +139,7 @@ if(!stage||!mount||!controls||reduced){
   box(g,.05,.67,.09,-.81,1.32,1.166,mats.chrome);
  }
  function courier(){
-  const g=new THREE.Group();g.name="courier";g.position.set(coarse?0:.98,.13,coarse?0:1.18);scene.add(g);
+  const g=new THREE.Group();g.name="courier";g.position.set(vertical?0:.98,.13,vertical?0:1.18);scene.add(g);
   plinth(g,3.9,2.65);
   for(const x of [-.92,.91]){
    const tyre=new THREE.Mesh(new THREE.TorusGeometry(.39,.115,8,18),mats.dark);
@@ -177,7 +179,7 @@ if(!stage||!mount||!controls||reduced){
    cylinder(scene,.055,1.55,x,.70,z,mats.side);
    sphere(scene,.13,x,1.52,z,mats.gold);
   }
-  const path=coarse?[
+  const path=vertical?[
    new THREE.Vector3(-.5,.18,-2.9),new THREE.Vector3(-1.15,.21,-1.6),
    new THREE.Vector3(-.8,.22,-.7),new THREE.Vector3(.45,.23,.8),
    new THREE.Vector3(1.15,.20,2.05),new THREE.Vector3(.6,.20,3.20)
@@ -199,13 +201,13 @@ if(!stage||!mount||!controls||reduced){
   box(parcel,.82,.64,.71,0,0,0,mats.gold);
   box(parcel,.10,.66,.73,0,.005,0,mats.cream);
   box(parcel,.85,.07,.12,0,.34,0,mats.cream);
-  parcel.position.set(coarse?-1.2:-2.25,1.35,coarse?-2.35:-.58);scene.add(parcel);
-  glow(scene,coarse?-.7:-5,2.8,coarse?-4.7:0,0x4a8cff,2.8,.28);
-  glow(scene,coarse?.7:5.03,2.6,coarse?4.7:-.35,0xff6852,2.4,.23);
-  glow(scene,coarse?0:.98,2.1,coarse?0:1.18,0xffc62f,1.7,.25);
+  parcel.position.set(vertical?-1.2:-2.25,1.35,vertical?-2.35:-.58);scene.add(parcel);
+  glow(scene,vertical?-.7:-5,2.8,vertical?-4.7:0,0x4a8cff,2.8,.28);
+  glow(scene,vertical?.7:5.03,2.6,vertical?4.7:-.35,0xff6852,2.4,.23);
+  glow(scene,vertical?0:.98,2.1,vertical?0:1.18,0xffc62f,1.7,.25);
   glow(particle,0,0,0,0xffc62f,1.5,.55);
   // Soft pools of light offer depth without a costly post-processing pass.
-  const pools=coarse?[[-.7,-4.7,2.25],[0,0,2.05],[.7,4.7,2.0]]:[[-5,0,2.25],[.98,1.18,2.05],[5.03,-.35,2.0]];
+  const pools=vertical?[[-.7,-4.7,2.25],[0,0,2.05],[.7,4.7,2.0]]:[[-5,0,2.25],[.98,1.18,2.05],[5.03,-.35,2.0]];
   for(const [x,z,r] of pools){
     const halo=new THREE.Mesh(new THREE.CircleGeometry(r,32),
       new THREE.MeshBasicMaterial({color:0x2e68c7,transparent:true,opacity:.07,depthWrite:false}));
@@ -247,7 +249,7 @@ if(!stage||!mount||!controls||reduced){
   resize(width,height);
   return renderer.info;
  }
- const presets=coarse?{
+ const presets=vertical?{
   overview:{pos:[3.5,14.8,15.2],look:[0,1,0]},
   commerce:{pos:[3.2,10.8,7.0],look:[-.7,1.1,-4.7]},
   courier:{pos:[3.4,9.3,9.7],look:[0,1.1,0]},
@@ -262,7 +264,7 @@ if(!stage||!mount||!controls||reduced){
  const tmp=new THREE.Vector3(),desiredLook=new THREE.Vector3();
  function resize(w,h){
   if(!renderer||!camera)return;
-  const ratio=w/Math.max(1,h),size=coarse?6.6:5.8;
+  const ratio=w/Math.max(1,h),size=vertical?6.6:5.8;
   camera.left=-size*ratio;camera.right=size*ratio;
   camera.top=size;camera.bottom=-size;
   camera.updateProjectionMatrix();renderer.setSize(w,h,false);
@@ -367,7 +369,7 @@ if(!stage||!mount||!controls||reduced){
     parcel.position.set(point.x,point.y+.75+Math.sin(frame*2.1)*.07,point.z);
     parcel.rotation.y=Math.sin(frame*1.2)*.12;
    }else{
-    parcel.position.set(coarse?-1.2:-2.25,1.35+Math.sin(frame*1.65)*.13,coarse?-2.35:-.58);
+    parcel.position.set(vertical?-1.2:-2.25,1.35+Math.sin(frame*1.65)*.13,vertical?-2.35:-.58);
     parcel.rotation.y=Math.sin(frame*.48)*.09;
    }
   }
@@ -380,7 +382,7 @@ if(!stage||!mount||!controls||reduced){
   stage.dataset.v6Frames=String(Number(stage.dataset.v6Frames||0)+1);
  }
  function wake(){
-  if(!renderer||alive||paused||stage.dataset.v6State!=="active")return;
+  if(!renderer||alive||paused||document.hidden||!onscreen||stage.dataset.v6State!=="active")return;
   alive=true;last=0;lastRender=0;raf=requestAnimationFrame(render);
  }
  // Render one complete frame while the original poster still covers the canvas.
@@ -424,7 +426,15 @@ if(!stage||!mount||!controls||reduced){
     pointer.y=((e.clientY-r.top)/Math.max(1,r.height)-.5)*2;
    };
    onLeave=()=>{pointer.x=0;pointer.y=0};
-   onResize=()=>{if(renderer)resize(Math.max(mount.clientWidth,1),Math.max(mount.clientHeight,1))};
+   onResize=()=>{
+    if(!renderer)return;
+    // Avoid stretched geometry and high-cost mobile shaders after rotation:
+    // re-enter through the poster if the page crosses a layout/quality breakpoint.
+    const isVertical=window.matchMedia("(max-width: 430px)").matches;
+    const isCoarse=window.matchMedia("(max-width: 800px)").matches;
+    if(isVertical!==vertical||isCoarse!==coarse){fail("poster");return}
+    resize(Math.max(mount.clientWidth,1),Math.max(mount.clientHeight,1));
+   };
    mount.addEventListener("pointermove",onMove,{passive:true});
    mount.addEventListener("pointerleave",onLeave,{passive:true});
    window.addEventListener("resize",onResize,{passive:true});
