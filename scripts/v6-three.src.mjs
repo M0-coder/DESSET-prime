@@ -297,8 +297,23 @@ if(!stage||!mount||!controls||reduced){
   const trigger=stage.querySelector(".v6-enable-webgl");
   if(trigger)trigger.hidden=false;
  }
- const applyView=(view)=>{
+ const cancelTour=(reason="manual")=>{
+  if(!storyActive&&stage.dataset.v63Tour!=="complete")return;
+  storyActive=false;
+  stage.dataset.v63Tour=reason==="complete"?"complete":"stopped";
+  if(storyButton){
+   storyButton.textContent=reason==="complete"?"Repetir recorrido":"Ver recorrido 3D";
+   storyButton.setAttribute("aria-pressed","false");
+  }
+  if(reason==="complete"&&storyPanel){
+   storyTitle.textContent="RECORRIDO FINALIZADO";
+   storyDetail.textContent="Visión conceptual de comercio, reparto y destino; no es una entrega real.";
+   storyProgress.value=100;
+  }else if(storyPanel){storyPanel.hidden=true;storyProgress.value=0}
+ };
+ const applyView=(view,{preserveStory=false}={})=>{
   if(!(view in presets))return;
+  if(!preserveStory)cancelTour("manual");
   cameraPreset=view;stage.dataset.v6View=view;
   for(const button of controls.querySelectorAll("[data-v6-camera]"))
    button.setAttribute("aria-pressed",String(button.dataset.v6Camera===view));
@@ -307,13 +322,36 @@ if(!stage||!mount||!controls||reduced){
   if(pause)pause.textContent="Pausar movimiento";
   wake();
  };
+ const beginTour=()=>{
+  if(!storyPanel||!storyButton||!renderer)return;
+  storyActive=true;storyElapsed=0;storyBeat=-1;
+  stage.dataset.v63Tour="playing";
+  storyPanel.hidden=false;storyProgress.value=0;
+  storyButton.textContent="Detener recorrido";
+  storyButton.setAttribute("aria-pressed","true");
+  applyView("overview",{preserveStory:true});
+ };
  function render(now){
   if(!alive)return;
   raf=requestAnimationFrame(render);
   if(document.hidden||!onscreen||paused)return;
   if(now-lastRender<(coarse?32:22))return;
-  const delta=Math.min(.055,(now-last||16)/1000);last=now;lastRender=now;
+  const wallDelta=Math.min(.20,(now-last||16)/1000);
+  const delta=Math.min(.055,wallDelta);last=now;lastRender=now;
   frame+=delta;
+  if(storyActive){
+   storyElapsed=Math.min(STORY_DURATION,storyElapsed+wallDelta);
+   const step=storyAtTime(storyElapsed);
+   if(step.index!==storyBeat){
+    storyBeat=step.index;
+    applyView(step.beat.view,{preserveStory:true});
+    storyTitle.textContent=step.beat.title;
+    storyDetail.textContent=step.beat.detail;
+    stage.dataset.v63Beat=step.beat.id;
+   }
+   storyProgress.value=step.progress;
+   if(step.done)cancelTour("complete");
+  }
   const preset=presets[cameraPreset];
   const dx=!coarse?pointer.x*.32:0,dy=!coarse?pointer.y*.21:0;
   const orbit=!coarse&&cameraPreset==="overview"?Math.sin(frame*.19)*.15:0;
@@ -323,8 +361,14 @@ if(!stage||!mount||!controls||reduced){
   cameraTarget.lerp(desiredLook,Math.min(1,delta*4.1));
   camera.lookAt(cameraTarget);
   if(parcel){
-   parcel.position.y=1.35+Math.sin(frame*1.65)*.13;
-   parcel.rotation.y=Math.sin(frame*.48)*.09;
+   if(storyActive&&parcel.userData.curve){
+    const point=parcel.userData.curve.getPointAt(routeProgress(storyElapsed));
+    parcel.position.set(point.x,point.y+.75+Math.sin(frame*2.1)*.07,point.z);
+    parcel.rotation.y=Math.sin(frame*1.2)*.12;
+   }else{
+    parcel.position.set(coarse?-1.2:-2.25,1.35+Math.sin(frame*1.65)*.13,coarse?-2.35:-.58);
+    parcel.rotation.y=Math.sin(frame*.48)*.09;
+   }
   }
   if(routeHalo)routeHalo.material.opacity=.12+Math.sin(frame*1.4)*.025;
   if(particle){
@@ -351,6 +395,11 @@ if(!stage||!mount||!controls||reduced){
    onControls=e=>{
     const button=e.target.closest("button");if(!button)return;
     if(button.dataset.v6Camera){applyView(button.dataset.v6Camera);return}
+    if(button.classList.contains("v63-tour")){
+     if(storyActive){cancelTour("manual");applyView("overview")}
+     else beginTour();
+     return;
+    }
     if(button.classList.contains("v6-pause")){
       paused=!paused;button.textContent=paused?"Reanudar movimiento":"Pausar movimiento";
       if(paused)stop();else wake();
@@ -406,6 +455,9 @@ if(!stage||!mount||!controls||reduced){
       material:"PBR",colorSpace:"srgb",cinematic:"v6.2",
       glbLoaded:modelStats.ready?modelStats.models.length:0,
       glbModels:modelStats.models,glbStatus:stage.dataset.v62ModelsStatus||"not-started",
+      tourActive:storyActive,tourSeconds:Number(storyElapsed.toFixed(3)),
+      tourBeat:STORY_BEATS[storyBeat]?.id||null,tourDuration:STORY_DURATION,
+      tourProgress:storyProgress?.value||0,
       objectBounds:objectBounds()});
    // Render the working procedural scene immediately, and promote the three
    // self-hosted GLB models only after all assets pass GLTFLoader validation.
