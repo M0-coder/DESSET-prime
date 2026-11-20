@@ -74,6 +74,8 @@ test("V6.7 responsive typography improves legibility without external fonts",()=
  assert.match(design,/\.motion-story-unit p \{font-size:clamp\(14px/);
  assert.match(design,/\.v4-architecture-details \.role p \{font-size:14px/);
  assert.match(design,/\.contact-copy \.contact-status \{color:var\(--ds-muted\);font-size:13px/);
+ assert.match(design,/@keyframes v45-closing-reveal \{\s*from \{opacity:1;/);
+ assert.match(design,/\.contact \.closing-line--middle \{color:var\(--ds-30-blue\)/);
  assert.match(design,/h1,h2,h3,h4 \{text-wrap:balance;\}/);
  assert.match(design,/p \{text-wrap:pretty;\}/);
  assert.match(design,/--ds-radius-compact:12px/);
