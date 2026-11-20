@@ -31,6 +31,35 @@
   root.classList.add("v5-motion-ready");
   root.dataset.v5Mode="ready";
 
+  // Real 3D is deliberately lazy: no 3D package request on mobile until explicit opt-in.
+  // Desktop receives the script only when the scene intersects the viewport.
+  const threeStart=stage.querySelector(".v6-enable-webgl");
+  const mobile=window.matchMedia?.("(max-width: 800px)")?.matches===true;
+  if(threeStart && mobile)threeStart.hidden=false;
+  let webglRequested=false;
+  const loadThree=()=>{
+    if(webglRequested || stage.dataset.v6State==="active")return;
+    webglRequested=true;
+    stage.dataset.v6State="loading";
+    const script=document.createElement("script");
+    script.src="./assets/v6-three.bundle.js";
+    script.async=true;
+    script.onerror=()=>{
+      webglRequested=false;
+      stage.dataset.v6State="fallback";
+      if(threeStart)threeStart.hidden=false;
+    };
+    document.head.appendChild(script);
+  };
+  threeStart?.addEventListener("click",loadThree);
+  if(!mobile){
+    const trigger3D=new window.IntersectionObserver((entries,instance)=>{
+      if(!entries.some(e=>e.isIntersecting))return;
+      instance.disconnect();loadThree();
+    },{threshold:.1,rootMargin:"0px 0px 22% 0px"});
+    trigger3D.observe(stage);
+  }
+
   const hero=document.querySelector(".v4-motion-canvas");
   const lens=hero?.querySelector(".v5-hero-refraction");
   if(!hero || !lens || window.matchMedia?.("(pointer: fine)").matches!==true) return;
