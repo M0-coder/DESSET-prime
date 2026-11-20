@@ -274,8 +274,12 @@ try{
 
  // V5.4 CDP keyboard accessibility: synthetic interactions, not a manual screen-reader audit.
  const pressKey=async(key,code,keyCode)=>{
-  await call("Input.dispatchKeyEvent",{type:"keyDown",key,code,windowsVirtualKeyCode:keyCode});
-  await call("Input.dispatchKeyEvent",{type:"keyUp",key,code,windowsVirtualKeyCode:keyCode});
+  // Chrome CDP expects a printable control character for native Enter activation.
+  // raw keyDown without the CR text changes focus but does not generate click.
+  const press={type:"keyDown",key,code,windowsVirtualKeyCode:keyCode,nativeVirtualKeyCode:keyCode};
+  if(key==="Enter"){press.text="\\r";press.unmodifiedText="\\r";}
+  await call("Input.dispatchKeyEvent",press);
+  await call("Input.dispatchKeyEvent",{type:"keyUp",key,code,windowsVirtualKeyCode:keyCode,nativeVirtualKeyCode:keyCode});
  };
  await pressKey("Tab","Tab",9);
  const skipFocus=await js('(()=>{const e=document.activeElement,r=e.getBoundingClientRect(),s=getComputedStyle(e);return {className:e.className,href:e.getAttribute("href"),focusVisible:e.matches(":focus-visible"),outlineWidth:s.outlineWidth,left:Math.round(r.left),right:Math.round(r.right),viewport:document.documentElement.clientWidth}})()');
