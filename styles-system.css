@@ -140,3 +140,43 @@ h1,h2,h3,h4 {text-wrap:balance;}
  .roles-diagram-responsive{margin:12px auto 0;}
  .roles-diagram-responsive img{padding:8px;}
 }
+
+/* V6.9 — evergreen institutional application access: one compact status,
+   not a full-page startup / 'coming soon' announcement. */
+.service-access{
+ display:flex;align-items:center;justify-content:space-between;gap:22px;
+ padding:clamp(18px,3vw,28px);margin:22px 0 8px;
+ background:var(--ds-60-surface);border:1px solid var(--ds-stroke);
+ border-radius:var(--ds-radius-surface);
+}
+.service-access__copy{max-width:62ch;}
+.service-access__eyebrow{
+ display:block;font-size:11px;line-height:1.5;font-weight:800;
+ letter-spacing:.10em;color:var(--ds-30-blue);
+}
+.service-access h3{
+ margin:6px 0 8px;color:var(--ds-30-ink);
+ font-size:clamp(19px,2.2vw,25px);line-height:1.2;letter-spacing:-.03em;
+}
+.service-access p{margin:0;font-size:14px;line-height:1.6;color:var(--ds-muted);}
+.service-access__actions{display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+.service-access__status{
+ display:inline-flex;align-items:center;min-height:42px;
+ padding:9px 13px;background:#EDF1F8;color:#1A3767;
+ border-radius:999px;font-size:12px;line-height:1.4;font-weight:700;
+ white-space:nowrap;
+}
+.service-access__links[hidden]{display:none!important;}
+.service-access__links{display:flex;flex-wrap:wrap;gap:8px;}
+.service-access__links a{
+ display:inline-flex;align-items:center;min-height:44px;padding:10px 14px;
+ background:var(--ds-30-blue);color:#fff;font-size:14px;font-weight:700;
+ border-radius:var(--ds-radius-compact);
+}
+.service-access__links a:hover{background:var(--ds-30-ink);}
+@media(max-width:700px){
+ .service-access{flex-direction:column;align-items:stretch;gap:14px;margin-top:18px;}
+ .service-access__actions{align-items:flex-start;}
+ .service-access__status{white-space:normal;}
+ .service-access__links a{min-height:44px;}
+}
