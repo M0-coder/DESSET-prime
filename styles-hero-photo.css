@@ -33,3 +33,6 @@
 @media(max-width:700px){#inicio.hero[data-variant="v4"]{padding-top:22px}#inicio .v4-hero-composition{gap:24px;padding:13px 0 25px}#inicio .v4-hero-declaration{margin-bottom:19px;font-size:10px;letter-spacing:.085em}#inicio .motion-headline{font-size:clamp(34px,9.2vw,63px);line-height:.96}#inicio .v4-hero-bottom{gap:20px}#inicio .hero-lead{font-size:15px;line-height:1.55}#inicio .hero-actions{align-items:flex-start;gap:8px 20px}#inicio .hero-cta{min-height:52px;padding:14px 17px}#inicio .prime-photo-surface{aspect-ratio:1.5;border-radius:16px}#inicio .prime-photo-caption{left:12px;right:11px;bottom:10px;font-size:10px}#inicio .v4-hero-rail{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:12px;padding:15px var(--edge)}}
 @media(max-width:360px){#inicio .motion-headline{font-size:clamp(32px,9.2vw,36px)}#inicio .hero-actions{display:flex;flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){#inicio .prime-photo-surface{animation:none!important;opacity:1!important;transform:none!important}}
+
+/* Mobile crop must keep both real-world mirrors visible; never crop the motorcycle's right edge. */
+@media(max-width:700px){#inicio .prime-photo-image{object-position:100% 50%}}

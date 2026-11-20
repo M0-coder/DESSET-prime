@@ -27,6 +27,7 @@ test('HERO-PHOTO-01 two-column mockup, responsive, reduced motion and real 3D re
  assert.match(css,/prime-photo-hero-enter/);
  assert.match(css,/@media\(max-width:860px\)/);assert.match(css,/@media\(max-width:700px\)/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+ assert.match(css,/@media\(max-width:700px\)\{#inicio \.prime-photo-image\{object-position:100% 50%\}\}/);
  assert.match(css,/\.prime-photo-surface \.v4-shape/);
  assert.doesNotMatch(css,/url\(\s*["']?https?:|@import|animation-iteration-count:\s*infinite/i);
  assert.ok(statSync(new URL('styles-hero-photo.css',root)).size<=9500);
