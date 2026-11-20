@@ -212,3 +212,29 @@
 @media(prefers-reduced-motion:reduce){
  .v63-story{transition:none!important;}
 }
+
+/* V6.3.1: cinema caption remains within view instead of below mobile controls.
+   Status and progress are semantic HTML; this is a visual positioning only. */
+.v5-city-stage[data-v63-tour="playing"] .v63-story,
+.v5-city-stage[data-v63-tour="complete"] .v63-story{
+ position:absolute;left:clamp(12px,2vw,22px);bottom:calc(100% + 14px);
+ width:min(520px,calc(100% - 32px));max-width:calc(100% - 32px);
+ padding:11px 15px;margin:0;
+ background:rgba(10,18,33,.91);
+ border:1px solid rgba(255,198,47,.48);
+ border-left:3px solid #ffc62f;
+ box-shadow:0 12px 35px rgba(0,0,0,.22);
+ z-index:8;pointer-events:none;
+ backdrop-filter:blur(6px);
+}
+@media(max-width:800px){
+ .v5-city-stage[data-v63-tour="playing"] .v63-story,
+ .v5-city-stage[data-v63-tour="complete"] .v63-story{
+  left:10px;right:10px;bottom:calc(100% + 10px);
+  width:auto;max-width:none;padding:9px 11px;gap:3px;
+  background:rgba(10,18,33,.94);backdrop-filter:none;
+ }
+ .v63-story-title{font-size:11px;letter-spacing:.05em;}
+ .v63-story-detail{font-size:10px;line-height:1.35;}
+ .v63-story-progress{height:6px;margin-top:2px;}
+}
