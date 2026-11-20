@@ -272,6 +272,10 @@ try{
    if(!detailOpen.open||!detailOpen.visible||detailOpen.roles!==4)report.failures.push("Technical roles accordion failed: "+JSON.stringify(detailOpen));
    await js('document.querySelector(".v4-architecture-details").scrollIntoView({block:"start",behavior:"instant"})');
    await sleep(100);
+   const mobileDiagram=await js('(()=>{const im=document.querySelector(".v4-architecture-details picture img"),source=document.querySelector(".v4-architecture-details picture source");return {src:im.currentSrc,width:im.naturalWidth,height:im.naturalHeight,source:source?.getAttribute("srcset")}})()');
+   if(!mobileDiagram.src.endsWith("roles-geometry-mobile-es.svg")||mobileDiagram.width!==360||mobileDiagram.height!==392)
+    report.failures.push("V6.8 mobile diagram is unreadably using desktop SVG: "+JSON.stringify(mobileDiagram));
+   report.tests.push({name:"V6.8 art-directed legible mobile SVG diagram",mobileDiagram});
    await capture("mobile-architecture-expanded.png");
    report.tests.push({name:"mobile technical detail expandable",detailOpen});
    await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
