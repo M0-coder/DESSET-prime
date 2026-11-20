@@ -88,6 +88,7 @@ test("V5 animations are finite and accessible; no scroll listener, tracking or b
     assert.match(css,new RegExp("@keyframes "+frame+"\\s*\\{"));
   }
   assert.match(css,/@media\s*\(prefers-reduced-motion:reduce\)/);
+  assert.match(css,/@media\(prefers-reduced-motion:reduce\) \{\s*\.v5-hero-refraction/);
   assert.match(css,/\.v5-stage-render \{filter:none!important;transform:none!important;\}/);
   assert.match(motion,/const reduced=media\?\.matches===true/);
   assert.match(motion,/instance\.unobserve\(entry\.target\)/);
