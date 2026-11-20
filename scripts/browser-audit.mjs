@@ -277,7 +277,7 @@ try{
   // Chrome CDP expects a printable control character for native Enter activation.
   // raw keyDown without the CR text changes focus but does not generate click.
   const press={type:"keyDown",key,code,windowsVirtualKeyCode:keyCode,nativeVirtualKeyCode:keyCode};
-  if(key==="Enter"){press.text="\\r";press.unmodifiedText="\\r";}
+  if(key==="Enter"){press.text=String.fromCharCode(13);press.unmodifiedText=String.fromCharCode(13);}
   await call("Input.dispatchKeyEvent",press);
   await call("Input.dispatchKeyEvent",{type:"keyUp",key,code,windowsVirtualKeyCode:keyCode,nativeVirtualKeyCode:keyCode});
  };
