@@ -187,6 +187,9 @@ try{
  const closing=await js('[...document.querySelectorAll(".closing-line")].map(x=>({word:x.textContent.trim(),active:x.classList.contains("motion-active")}))');
  if(closing.length!==3||closing.some(x=>!x.active))report.failures.push("Closing editorial sequence not activated: "+JSON.stringify(closing));
  report.tests.push({name:"Brand closing motion",closing});
+ const closingInk=await js('(()=>[...document.querySelectorAll(".contact .closing-line")].map(e=>({text:e.textContent.trim(),opacity:Number(getComputedStyle(e).opacity)})))()');
+ if(closingInk.some(x=>x.opacity<.99))report.failures.push("V6.7 contact heading loses contrast during motion: "+JSON.stringify(closingInk));
+ report.tests.push({name:"V6.7 closing headline remains opaque during cinema animation",closingInk});
  await capture("desktop-closing-motion.png");
  const kineticFinale=await js('(()=>{const contact=document.querySelector("#contacto"),middle=contact.querySelector(".closing-line--middle");return {active:contact.classList.contains("motion-active"),lineAnimation:getComputedStyle(middle).animationName,underlineAnimation:getComputedStyle(middle,"::after").animationName,slashAnimation:getComputedStyle(contact,"::after").animationName}})()');
  if(!kineticFinale.active||kineticFinale.lineAnimation!=="v45-closing-reveal"||kineticFinale.underlineAnimation!=="v45-underline"||kineticFinale.slashAnimation!=="v45-contact-slash")report.failures.push("Kinetic final contact scene failed: "+JSON.stringify(kineticFinale));
@@ -238,6 +241,9 @@ try{
    const mobileContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {label:a.textContent.trim(),left:r.left,right:r.right,height:r.height,viewport:v}})()');
    if(mobileContact.left < -2||mobileContact.right>mobileContact.viewport+2||mobileContact.height<48)report.failures.push("Primary mobile contact clipped or too small: "+JSON.stringify(mobileContact));
    report.tests.push({name:"Mobile primary contact tap target",mobileContact});
+   const mobileClosing=await js('(()=>[...document.querySelectorAll(".contact .closing-line")].map(e=>({text:e.textContent.trim(),opacity:Number(getComputedStyle(e).opacity)})))()');
+   if(mobileClosing.some(x=>x.opacity<.99))report.failures.push("V6.7 mobile closing text loses opacity: "+JSON.stringify(mobileClosing));
+   report.tests.push({name:"V6.7 mobile contact heading maintains legibility",mobileClosing});
    await capture("mobile-contact-final.png");
    await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
    await sleep(160);
