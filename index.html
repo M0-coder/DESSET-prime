@@ -113,16 +113,12 @@
         <figure class="v5-city-stage" aria-label="Renderización gráfica conceptual de DESSET">
           <div class="v5-stage-world">
             <picture class="v5-responsive-art">
+              <source media="(max-width: 430px)" type="image/webp" srcset="./assets/v5-cinematic-mobile.webp" width="1024" height="1536">
               <source media="(max-width: 430px)" type="image/svg+xml" srcset="./assets/v5-logistics-mobile.svg" width="390" height="560">
-              <img class="v5-stage-render" src="./assets/v5-logistics-scene.svg" width="1200" height="560" decoding="async" alt="Ilustración isométrica conceptual: comercio, paquete, repartidor y destino conectados por una ruta; sin operaciones activas.">
+              <source media="(min-width: 431px)" type="image/webp" srcset="./assets/v5-cinematic-desktop.webp" width="1752" height="897">
+              <img class="v5-stage-render" src="./assets/v5-logistics-scene.svg" width="1200" height="560" decoding="async" loading="lazy" alt="Escena conceptual tridimensional: un comercio, un paquete y un repartidor conectados con un destino mediante una ruta iluminada. Es una representación artística, no una operación real.">
             </picture>
             <span class="v5-stage-scan" aria-hidden="true"></span>
-            <svg class="v5-route-overlay" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
-              <path class="v5-route-line" d="M322 393 C404 352 469 358 537 370 S729 396 773 405 S858 430 892 410"/>
-              <circle class="v5-route-node v5-route-node--one" cx="322" cy="393" r="9"/>
-              <circle class="v5-route-node v5-route-node--two" cx="622" cy="384" r="9"/>
-              <circle class="v5-route-node v5-route-node--three" cx="892" cy="410" r="9"/>
-            </svg>
             <span class="v5-stage-legend">UNA CONEXIÓN. TRES MOMENTOS.</span>
           </div>
           <figcaption class="v5-stage-caption"><strong>EL COMERCIO CONECTADO.</strong><span>Visualización conceptual del sistema previsto. DESSET todavía no realiza pedidos ni entregas comerciales.</span></figcaption>
