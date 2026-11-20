@@ -15,6 +15,45 @@ const patternByScene={
  courier:{royal:"woven",gold:"woven",rubber:"rubber"},
  destination:{red:"stucco",cream:"tile",royalDark:"ribbed"}
 };
+// RENDER-02: named glTF surfaces, physically bounded finishes.
+const finishProfiles=Object.freeze({
+ commerce:Object.freeze({
+  royal:{roughness:.37,metalness:.15},gold:{roughness:.80,metalness:.02},
+  cream:{roughness:.69,metalness:0},royalDark:{roughness:.47,metalness:.20},
+  glass:{roughness:.16,metalness:.06},steel:{roughness:.28,metalness:.46}
+ }),
+ courier:Object.freeze({
+  royal:{roughness:.58,metalness:.07},gold:{roughness:.77,metalness:.02},
+  rubber:{roughness:.95,metalness:0},steel:{roughness:.29,metalness:.43},
+  cream:{roughness:.68,metalness:0}
+ }),
+ destination:Object.freeze({
+  red:{roughness:.87,metalness:0},cream:{roughness:.67,metalness:0},
+  royalDark:{roughness:.42,metalness:.16},
+  glass:{roughness:.17,metalness:.05},stone:{roughness:.83,metalness:0}
+ })
+});
+// One shared linear roughness map for all 3 GLBs; no CDN, HDR, normal maps.
+function makeLocalRoughnessMap(registry){
+ const canvas=document.createElement("canvas");
+ canvas.width=128;canvas.height=128;
+ const ctx=canvas.getContext("2d");
+ if(!ctx)throw new Error("No Canvas2D to author RENDER-02 finish map");
+ ctx.fillStyle="#f1f1f1";ctx.fillRect(0,0,128,128);
+ for(let y=0;y<128;y+=4){
+  ctx.fillStyle=(y%8===0)?"rgba(94,94,94,.11)":"rgba(255,255,255,.06)";
+  ctx.fillRect(0,y,128,1);
+ }
+ for(let x=0;x<128;x+=13){
+  ctx.fillStyle="rgba(72,72,72,.045)";ctx.fillRect(x,0,1,128);
+ }
+ const map=new THREE.CanvasTexture(canvas);
+ map.wrapS=THREE.RepeatWrapping;map.wrapT=THREE.RepeatWrapping;
+ map.anisotropy=1;
+ // Roughness is linear material data: DO NOT mark as sRGB.
+ registry.push(map);
+ return map;
+}
 function makeLocalTexture(pattern,registry){
  const canvas=document.createElement("canvas");
  canvas.width=256;canvas.height=256;
@@ -147,22 +186,43 @@ export async function hydrateGLBModels({scene,coarse,stage,sign,ownedTextures,is
   return {ready:false,models:[]};
  }
  const details=[];
+ const roughnessMap=makeLocalRoughnessMap(ownedTextures);
  for(const row of loaded){
   const parent=sceneParents.get(row.name);
   const maps=new Map();
+  const materialCache=new Map();
   const patternNames=patternByScene[row.name];
+  const profiles=finishProfiles[row.name];
+  let finishMaterials=0,roughnessMapped=0;
   row.gltf.scene.traverse(node=>{
    if(!node.isMesh)return;
    node.castShadow=!coarse;node.receiveShadow=!coarse;
-   const materialName=node.material?.name||"";
-   if(patternNames[materialName]){
-    const pattern=patternNames[materialName];
-    if(!maps.has(pattern))maps.set(pattern,makeLocalTexture(pattern,ownedTextures));
-    node.material=node.material.clone();
-    node.material.map=maps.get(pattern);
-    node.material.needsUpdate=true;
+   const original=node.material;
+   if(!original?.isMeshStandardMaterial)return;
+   if(!materialCache.has(original)){
+    const profile=profiles[original.name];
+    const pattern=patternNames[original.name];
+    if(profile||pattern){
+     const tuned=original.clone();
+     if(profile){
+      tuned.roughness=profile.roughness;
+      tuned.metalness=profile.metalness;
+      finishMaterials++;
+     }
+     if(pattern){
+      if(!maps.has(pattern))maps.set(pattern,makeLocalTexture(pattern,ownedTextures));
+      tuned.map=maps.get(pattern);
+      tuned.roughnessMap=roughnessMap;
+      roughnessMapped++;
+     }
+     tuned.needsUpdate=true;
+     materialCache.set(original,tuned);
+    }else materialCache.set(original,original);
    }
+   node.material=materialCache.get(original);
   });
+  // Dispose originals superseded by tuned materials; renderer owns the clones.
+  for(const [original,tuned] of materialCache)if(original!==tuned)original.dispose();
   // Keep all scene positions and camera framing unchanged while replacing basic
   // models with the authored, geometrically detailed glTF roots.
   parent.traverse(node=>{if(node.isMesh)node.geometry?.dispose()});
@@ -172,7 +232,7 @@ export async function hydrateGLBModels({scene,coarse,stage,sign,ownedTextures,is
   if(row.name==="destination")sign(parent,"DESTINO",0,2.21,1.251,1.02,.18);
   if(row.name==="courier")sign(parent,"DESSET",.84,1.61,.218,.48,.21);
   details.push({name:row.name,meshes:row.meshes,triangles:Math.round(row.triangles),
-   path:row.url,texturedMaterials:maps.size});
+   path:row.url,texturedMaterials:maps.size,finishMaterials,roughnessMapped});
  }
  stage.dataset.v62ModelsStatus="ready";
  return {ready:true,models:details};
