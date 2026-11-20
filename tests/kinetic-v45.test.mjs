@@ -9,7 +9,7 @@ const script=readFileSync(new URL("scripts/motion.js",root),"utf8");
 
 test("V4.5 retains exactly three cinematic beats around truthful current content",()=>{
  for(const id of ["inicio","ecosistema","contacto"])assert.match(html,new RegExp('id="'+id+'"'));
- for(const word of ["EL COMERCIO","SE MUEVE","ELEGIR","ORGANIZAR","MOVER","LAS BUENAS","CONEXIONES"])assert.ok(html.includes(word));
+ for(const word of ["EL COMERCIO","SE MUEVE","ELEGIR","PREPARAR","ENTREGAR","LAS BUENAS","CONEXIONES"])assert.ok(html.includes(word));
  assert.match(html,/no representa una operación activa/i);
  assert.match(html,/No se reciben pedidos, pagos ni contrataciones/);
  assert.match(html,/no procesa pedidos ni pagos/i);
