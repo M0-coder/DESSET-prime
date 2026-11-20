@@ -15,7 +15,7 @@ const mime={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",
  ".js":"text/javascript; charset=utf-8",".svg":"image/svg+xml",
  ".png":"image/png",".webp":"image/webp",".glb":"model/gltf-binary"};
 const permitted=rel=>rel==="index.html"||rel==="styles.css"||rel==="styles-v5.css"||rel==="styles-system.css"
- || /^scripts\/(?:app|motion|v5-cinematic)\.js$/.test(rel)
+ || /^scripts\/(?:app|motion|v5-cinematic|service-state)\.js$/.test(rel)
  || /^assets\/[a-z0-9-]+\.(?:png|svg|webp)$/.test(rel)
  || rel==="assets/v6-three.bundle.js"
  || /^assets\/v62-(?:commerce|courier|destination)\.glb$/.test(rel);
