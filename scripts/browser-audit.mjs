@@ -271,6 +271,47 @@ try{
  report.tests.push({name:"V5 full reduced-motion fallback",v5Reduced});
  await capture("mobile-reduced-motion.png");
  report.tests.push({name:"reduced motion",animation:reduced.animation});
+
+ // V5.4 CDP keyboard accessibility: synthetic interactions, not a manual screen-reader audit.
+ const pressKey=async(key,code,keyCode)=>{
+  await call("Input.dispatchKeyEvent",{type:"keyDown",key,code,windowsVirtualKeyCode:keyCode});
+  await call("Input.dispatchKeyEvent",{type:"keyUp",key,code,windowsVirtualKeyCode:keyCode});
+ };
+ await pressKey("Tab","Tab",9);
+ const skipFocus=await js('(()=>{const e=document.activeElement,r=e.getBoundingClientRect(),s=getComputedStyle(e);return {className:e.className,href:e.getAttribute("href"),focusVisible:e.matches(":focus-visible"),outlineWidth:s.outlineWidth,left:Math.round(r.left),right:Math.round(r.right),viewport:document.documentElement.clientWidth}})()');
+ if(!skipFocus.className?.includes("skip-link")||skipFocus.href!=="#contenido"||!skipFocus.focusVisible||parseFloat(skipFocus.outlineWidth)<2||skipFocus.left<0||skipFocus.right>skipFocus.viewport+2)
+  report.failures.push("V5.4 keyboard skip-link focus not visible: "+JSON.stringify(skipFocus));
+ report.tests.push({name:"V5.4 keyboard first-Tab skip-link",skipFocus});
+ await capture("mobile-v54-keyboard-focus.png");
+
+ await js('document.querySelector(".menu-button").focus()');
+ await pressKey("Enter","Enter",13);
+ const keyboardMenuOpen=await js('(()=>{const e=document.querySelector(".menu-button");return {expanded:e.getAttribute("aria-expanded"),focus:e===document.activeElement,focusVisible:e.matches(":focus-visible"),outlineWidth:getComputedStyle(e).outlineWidth}})()');
+ if(keyboardMenuOpen.expanded!=="true"||!keyboardMenuOpen.focus||!keyboardMenuOpen.focusVisible||parseFloat(keyboardMenuOpen.outlineWidth)<2)
+  report.failures.push("V5.4 keyboard Enter cannot access menu: "+JSON.stringify(keyboardMenuOpen));
+ await pressKey("Escape","Escape",27);
+ const keyboardMenuClosed=await js('(()=>{const e=document.querySelector(".menu-button");return {expanded:e.getAttribute("aria-expanded"),focused:e===document.activeElement}})()');
+ if(keyboardMenuClosed.expanded!=="false"||!keyboardMenuClosed.focused)
+  report.failures.push("V5.4 keyboard Escape does not restore menu focus: "+JSON.stringify(keyboardMenuClosed));
+ report.tests.push({name:"V5.4 keyboard menu Enter and Escape",keyboardMenuOpen,keyboardMenuClosed});
+
+ await js('document.querySelector(".v4-architecture-details summary").focus()');
+ await pressKey("Enter","Enter",13);
+ const detailsKeyboard=await js('(()=>{const d=document.querySelector(".v4-architecture-details"),e=d.querySelector("summary");return {open:d.open,focused:e===document.activeElement,focusVisible:e.matches(":focus-visible"),outlineWidth:getComputedStyle(e).outlineWidth}})()');
+ if(!detailsKeyboard.open||!detailsKeyboard.focused||!detailsKeyboard.focusVisible||parseFloat(detailsKeyboard.outlineWidth)<2)
+  report.failures.push("V5.4 keyboard accordion Enter or focus failed: "+JSON.stringify(detailsKeyboard));
+ report.tests.push({name:"V5.4 native keyboard disclosure",detailsKeyboard});
+
+ await call("Accessibility.enable");
+ const tree=await call("Accessibility.getFullAXTree");
+ const nodes=tree.result?.nodes||[];
+ const headings=nodes.filter(n=>!n.ignored&&n.role?.value==="heading").map(n=>String(n.name?.value||"").trim());
+ const accessible={nodeCount:nodes.length,headingCount:headings.length,
+   hasHero:headings.some(n=>n.includes("EL COMERCIO")),hasContact:headings.some(n=>n.includes("CONEXIONES"))};
+ if(!accessible.hasHero||!accessible.hasContact||accessible.headingCount<6)
+  report.failures.push("V5.4 accessibility tree missing landmarks or headlines: "+JSON.stringify(accessible));
+ report.tests.push({name:"V5.4 Chromium accessibility tree structural smoke",accessible});
+
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
  await writeFile(join(output,"audit.json"),JSON.stringify(report,null,2));
