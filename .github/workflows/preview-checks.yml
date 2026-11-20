@@ -1,4 +1,4 @@
-name: DESSET Prime V6.2 — GLB detallados y WebGL2, sin despliegue
+name: DESSET Prime V6.3 — recorrido cinematográfico interactivo WebGL2, sin despliegue
 on:
   push:
     branches: [design/**]
@@ -36,6 +36,7 @@ jobs:
           node --check scripts/build-three.mjs
           node --check scripts/build-glb-models.mjs
           node --check scripts/v62-glb-loader.src.mjs
+          node --check scripts/v63-storyboard.mjs
           node --check scripts/v6-gpu-browser-audit.mjs
           node --check assets/v6-three.bundle.js
           test -s assets/v62-commerce.glb
@@ -64,7 +65,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: desset-prime-v62-3d-glb-evidence
+          name: desset-prime-v63-cinematic-tour-evidence
           path: |
             reports/browser/
             reports/quality/
@@ -117,7 +118,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: desset-prime-v62-lighthouse-lab
+          name: desset-prime-v63-lighthouse-lab
           path: reports/lighthouse/
           if-no-files-found: warn
           retention-days: 14
