@@ -41,7 +41,8 @@ test("V6.2 build generates original, material-batched models with no external as
  assert.match(source,/models=\{commerce:commerce\(\),courier:courier\(\),destination:destination\(\)\}/);
  assert.match(builder,/import\("\.\/build-glb-models\.mjs"\)/);
  assert.match(loader,/new GLTFLoader\(\)/);
- assert.match(loader,/Promise\.all\(rows\.map/);
+ assert.match(loader,/Promise\.allSettled\(tasks\)/);
+ assert.match(loader,/GLB loading timed out after 10s/);
  assert.match(loader,/makeLocalTexture\(pattern,ownedTextures\)/);
  assert.match(loader,/stage\.dataset\.v62ModelsStatus="ready"/);
  assert.match(viewer,/hydrateGLBModels\(/);
