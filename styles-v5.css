@@ -136,3 +136,39 @@
  outline-offset:4px;
  box-shadow:0 0 0 6px #111111;
 }
+
+/* V6 REAL GPU STAGE — CSS is only shell/fallback, actual geometry is WebGL. */
+.v6-three-mount {
+ position:absolute;inset:0;z-index:3;opacity:0;pointer-events:none;
+ background:#0b1024;transition:opacity .35s ease;
+}
+.v6-three-mount .v6-three-canvas {display:block!important;width:100%!important;height:100%!important;}
+.v5-city-stage[data-v6-state="active"] .v6-three-mount {opacity:1;pointer-events:auto;}
+.v5-city-stage[data-v6-state="active"] .v5-responsive-art {opacity:0;pointer-events:none;}
+.v5-city-stage[data-v6-state="active"] .v5-stage-legend,
+.v5-city-stage[data-v6-state="active"] .v5-stage-scan {display:none;}
+.v6-three-toolbar {
+ position:relative;z-index:7;background:#0d1525;color:#f7f5ee;
+ border-top:1px solid rgba(247,245,238,.16);padding:10px clamp(12px,2vw,22px);
+}
+.v6-three-controls {display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.v6-three-controls[hidden],.v6-enable-webgl[hidden] {display:none!important;}
+.v6-three-controls button,.v6-enable-webgl {
+ background:transparent;color:#f7f5ee;
+ border:1px solid rgba(247,245,238,.35);min-height:44px;
+ border-radius:4px;padding:9px 14px;font:700 12px/1.3 inherit;
+ cursor:pointer;white-space:normal;touch-action:manipulation;
+}
+.v6-three-controls button[aria-pressed="true"] {border-color:#ffc62f;background:#ffc62f;color:#111;}
+.v6-enable-webgl {border-color:#ffc62f;background:#ffc62f;color:#111;}
+.v6-three-controls button:focus-visible,.v6-enable-webgl:focus-visible {
+ outline:3px solid #ffc62f;outline-offset:3px;box-shadow:0 0 0 5px #111;
+}
+@media(max-width:800px){
+ .v6-three-controls {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
+ .v6-three-controls button,.v6-enable-webgl {width:100%;font-size:12px;}
+ .v6-three-controls button:first-child{grid-column:span 2;}
+}
+@media(prefers-reduced-motion:reduce){
+ .v6-three-mount {display:none!important;transition:none!important;}
+}
