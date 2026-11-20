@@ -225,6 +225,12 @@ try{
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
   if(w===390||w===320){
+   // Simulate a script-unavailable page in the loaded DOM. This exercises
+   // the exact no-JS CSS selector without needing a second browser session.
+   const fallback=await js('(()=>{const root=document.documentElement;root.classList.remove("js-enabled");const nav=document.querySelector(".main-nav"),btn=document.querySelector(".menu-button"),header=document.querySelector(".site-header");const p={navDisplay:getComputedStyle(nav).display,menuDisplay:getComputedStyle(btn).display,headerHeight:header.getBoundingClientRect().height,links:[...nav.querySelectorAll("a")].map(a=>({text:a.textContent.trim(),height:a.getBoundingClientRect().height}))};root.classList.add("js-enabled");return p})()');
+   if(fallback.navDisplay!=="flex"||fallback.menuDisplay!=="none"||fallback.headerHeight<70||fallback.links.length<4||fallback.links.some(l=>l.height<42))
+     report.failures.push("V6.8 no-JS mobile navigation failed: "+JSON.stringify(fallback));
+   report.tests.push({name:"V6.8 resilient mobile navigation without JavaScript "+w,fallback});
    const radius=await js('(()=>({stage:parseFloat(getComputedStyle(document.querySelector(".v5-city-stage")).borderTopLeftRadius),pitch:parseFloat(getComputedStyle(document.querySelector(".business-pitch")).borderTopLeftRadius),screen:document.documentElement.clientWidth}))()');
    if(radius.stage<15||radius.pitch<17)report.failures.push("V6.6 mobile curves missing: "+JSON.stringify(radius));
    report.tests.push({name:"V6.6 mobile curved surfaces "+w,radius});
