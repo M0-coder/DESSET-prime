@@ -45,18 +45,33 @@ const create=(name)=>{
   mesh.name=name;mesh.position.set(x,y,z);mesh.rotation.set(...rotation);group.add(mesh);return mesh;
  };
  const box=(w,h,d,name,x,y,z,rot)=>add(new THREE.BoxGeometry(w,h,d),name,x,y,z,rot);
+ // RENDER-03: restrained vertical edge chamfer, 8-side footprint, no subdivision.
+ const chamferBox=(w,h,d,name,x,y,z,radius=.10,rot)=>{
+  const bevel=Math.min(radius,w*.22,d*.22),hw=w/2,hd=d/2;
+  const outline=new THREE.Shape();
+  outline.moveTo(-hw+bevel,-hd);
+  outline.lineTo(hw-bevel,-hd);outline.lineTo(hw,-hd+bevel);
+  outline.lineTo(hw,hd-bevel);outline.lineTo(hw-bevel,hd);
+  outline.lineTo(-hw+bevel,hd);outline.lineTo(-hw,hd-bevel);
+  outline.lineTo(-hw,-hd+bevel);outline.closePath();
+  const geo=new THREE.ExtrudeGeometry(outline,{depth:h,steps:1,bevelEnabled:false,curveSegments:1});
+  geo.rotateX(Math.PI/2);geo.translate(0,h/2,0);
+  const mesh=add(geo,name,x,y,z,rot);mesh.userData.render03Chamfer=true;
+  return mesh;
+ };
+
  const cyl=(r1,r2,h,name,x,y,z,n=12,rot)=>add(new THREE.CylinderGeometry(r1,r2,h,n),name,x,y,z,rot);
  const ball=(r,name,x,y,z,n=12)=>add(new THREE.SphereGeometry(r,n,8),name,x,y,z);
  const torus=(r,t,name,x,y,z)=>add(new THREE.TorusGeometry(r,t,9,22),name,x,y,z);
  const slab=(w,d)=>{box(w,.2,d,"royalDark",0,-.16,0);box(w-.23,.035,d-.23,"asphalt",0,-.04,0)};
- return {group,box,cyl,ball,torus,slab};
+ return {group,box,chamferBox,cyl,ball,torus,slab};
 };
 function commerce(){
  const m=create("DESSET-Commerce");
- const {box,cyl,ball,slab}=m;
+ const {box,chamferBox,cyl,ball,slab}=m;
  slab(4.12,3.14);
- box(3,2.25,2.08,"royal",0,1.16,-.29);
- box(3.27,.21,2.34,"royalLight",0,2.37,-.29);
+ chamferBox(3,2.25,2.08,"royal",0,1.16,-.29,.13);
+ chamferBox(3.27,.21,2.34,"royalLight",0,2.37,-.29,.10);
  box(3.2,.09,.07,"steel",0,2.45,1.01);
  // Horizontal architectural wall ribs
  for(let y=.40;y<2.18;y+=.36){
@@ -76,7 +91,7 @@ function commerce(){
   box(.37,.065,.12,"goldDark",x,.47,.84);
  }
  // Warm premium canopy with alternating fabric stripes and valance
- box(3.35,.21,1.30,"gold",0,1.89,1.13);
+ chamferBox(3.35,.21,1.30,"gold",0,1.89,1.13,.09);
  for(let i=0;i<10;i++){
   const x=-1.52+i*.338;
   box(.19,.045,1.23,i%2?"cream":"red",x,1.79,1.15);
@@ -89,6 +104,9 @@ function commerce(){
  // Shop name sign holder: actual readable label is applied in the browser.
  box(1.63,.40,.07,"royalDark",0,2.11,.90);
  box(1.52,.33,.02,"cream",0,2.11,.952);
+ // RENDER-03: precise architectural facade accents.
+ for(const x of [-1.48,1.48])box(.078,1.45,.085,"royalLight",x,1.12,.792);
+ box(3.09,.055,.092,"royalDark",0,2.26,.95);
  // A/C, ceiling detail, parcels and decorative awning pipes
  box(.62,.49,.30,"steel",.85,2.04,-1.48);
  for(let i=0;i<5;i++)box(.082,.26,.012,"royalDark",.63+i*.10,2.05,-1.644);
@@ -109,7 +127,7 @@ function commerce(){
 }
 function courier(){
  const m=create("DESSET-Courier");
- const {box,cyl,ball,torus,slab}=m;
+ const {box,chamferBox,cyl,ball,torus,slab}=m;
  slab(3.9,2.73);
  // Wheels with rims, spokes, forks and suspension
  for(const x of [-.93,.94]){
@@ -122,7 +140,7 @@ function courier(){
   box(.05,.57,.05,"steel",x,.68,.48);
  }
  box(1.87,.15,.52,"red",0,.75,.36);
- box(.95,.49,.67,"royal",-.02,1.04,.21);
+ chamferBox(.95,.49,.67,"royal",-.02,1.04,.21,.08);
  box(.77,.24,.48,"royalLight",-.24,1.29,.12);
  box(.36,.12,.69,"rubber",-.17,1.37,.06);
  box(.23,.38,.27,"steel",-.99,.85,.20);
@@ -148,13 +166,15 @@ function courier(){
  box(.46,.15,.07,"rubber",-.06,2.59,.275);
  box(.32,.06,.06,"steel",-.19,2.80,.10);
  // Insulated delivery trunk / panel
- box(1.09,.92,.92,"gold",.86,1.61,-.31);
- box(1.17,.095,.98,"red",.86,2.12,-.31);
+ chamferBox(1.09,.92,.92,"gold",.86,1.61,-.31,.12);
+ chamferBox(1.17,.095,.98,"red",.86,2.12,-.31,.07);
  for(const x of [.35,1.35]){
   box(.065,.72,.045,"cream",x,1.61,.174);
  }
  box(.60,.45,.022,"royal",.84,1.61,.178);
  box(.26,.26,.031,"cream",.84,1.61,.198);
+ // RENDER-03: real trim around the insulated delivery box.
+ for(const y of [1.36,1.865])box(.66,.038,.033,"royalDark",.84,y,.212);
  // Safety reflectors and tail lamps
  box(.15,.10,.08,"red",1.48,1.00,.45);
  ball(.075,"light",-1.19,1.01,.58);
@@ -163,9 +183,9 @@ function courier(){
 }
 function destination(){
  const m=create("DESSET-Destination");
- const {box,cyl,ball,slab}=m;
+ const {box,chamferBox,cyl,ball,slab}=m;
  slab(3.76,3.28);
- box(2.80,2.16,2.22,"red",0,1.11,0);
+ chamferBox(2.80,2.16,2.22,"red",0,1.11,0,.11);
  // Articulated pitched roof, ridge cap, tiles, gutter
  const roof=new THREE.Mesh(new THREE.ConeGeometry(2.20,1.35,4),material("cream",P.cream));
  roof.position.set(0,2.82,0);roof.rotation.y=Math.PI/4;m.group.add(roof);
@@ -176,12 +196,15 @@ function destination(){
   box(.075,.045,1.03,"goldDark",1.18,2.37+j*.03,z,[0,0,-.24]);
  }
  // Main door, relief frame, handle, archway and threshold
- box(.93,1.64,.08,"royalDark",.33,.85,1.16);
+ chamferBox(.93,1.64,.08,"royalDark",.33,.85,1.16,.045);
  box(1.01,.10,.12,"steel",.33,1.67,1.20);
  box(.09,1.60,.09,"steel",-.18,.84,1.20);
  box(.09,1.60,.09,"steel",.84,.84,1.20);
  ball(.055,"gold",.71,.82,1.24);
  box(1.27,.13,.43,"cream",.33,.08,1.36);
+ // RENDER-03: shallow entrance canopy, original house roof intact.
+ box(1.27,.11,.38,"royalDark",.33,1.77,1.39);
+ box(1.22,.038,.065,"steel",.33,1.77,1.608);
  // Windows multi pane
  for(const [x,y,z] of [[-0.84,1.33,1.18],[.88,1.42,-1.15]]){
   box(.69,.73,.06,"glass",x,y,z);
@@ -198,7 +221,7 @@ function destination(){
  ball(.12,"light",-.54,1.71,1.36,12);
  box(1.47,.29,.085,"royalDark",0,2.21,1.16);
  box(1.35,.24,.035,"cream",0,2.21,1.205);
- box(.71,.53,.54,"gold",1.39,.26,1.06);
+ chamferBox(.71,.53,.54,"gold",1.39,.26,1.06,.085);
  box(.75,.05,.60,"cream",1.39,.55,1.06);
  cyl(.16,.20,.41,"stone",-1.62,.15,.94,12);
  for(let i=0;i<5;i++)ball(.14,"leaf",-1.62+Math.sin(i)*.12,.42+i*.045,.94+Math.cos(i)*.14);
@@ -218,10 +241,11 @@ for(const [name,group] of Object.entries(models)){
  // Batch all surfaces by PBR material to minimize per-frame mobile draw calls.
  group.updateMatrixWorld(true);
  const buckets=new Map();
- let sourceMeshes=0;
+ let sourceMeshes=0,chamferedSourceMeshes=0;
  group.traverse(node=>{
   if(!node.isMesh)return;
   sourceMeshes++;
+  if(node.userData.render03Chamfer===true)chamferedSourceMeshes++;
   let geo=node.geometry.clone();
   geo.applyMatrix4(node.matrixWorld);
   if(geo.index)geo=geo.toNonIndexed();
@@ -245,7 +269,7 @@ for(const [name,group] of Object.entries(models)){
  await writeFile(filename,bytes);
  report.models.push({name,path:filename,rawBytes:bytes.length,
   sha256:createHash("sha256").update(bytes).digest("hex"),
-  sourceMeshes,drawMeshes:packed.children.length,
+  sourceMeshes,chamferedSourceMeshes,drawMeshes:packed.children.length,
   glbVersion:bytes.readUInt32LE(4),format:"glTF2 GLB"});
  for(const geo of buckets.values())for(const item of geo)item.dispose();
 }
