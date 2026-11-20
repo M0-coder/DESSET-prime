@@ -24,7 +24,7 @@ test("PERF-01 three original photos remain lazy and are explicitly low-priority"
   assert.match(html,new RegExp('srcset="\\./assets/scene-'+n+'\\.webp"'));
   assert.match(html,new RegExp('src="\\./assets/scene-'+n+'\\.svg" width="320" height="220" alt="" decoding="async" loading="lazy" fetchpriority="low"'));
  }
- assert.equal((html.match(/loading="lazy" fetchpriority="low"/g)||[]).length,3);
+ assert.equal((html.match(/loading="lazy" fetchpriority="low"/g)||[]).length,4,"three story photographs plus one opt-in 3D poster");
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/Hablemos de tu negocio/);
  assert.match(html,/deliver-assets-mark\.png/);
