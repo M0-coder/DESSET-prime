@@ -10,7 +10,7 @@ import {fileURLToPath} from "node:url";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const target=resolve(root,"dist");
 const assets=await readdir(resolve(root,"assets"));
-const allowStatic=assets.filter(name=>/^[a-z0-9-]+\.(?:png|svg|webp)$/.test(name))
+const allowStatic=assets.filter(name=>name!=="roles-geometry-v2.svg"&&/^[a-z0-9-]+\.(?:png|svg|webp)$/.test(name))
  .map(name=>"assets/"+name);
 const compiled=["assets/v6-three.bundle.js",
  "assets/v62-commerce.glb","assets/v62-courier.glb","assets/v62-destination.glb"];
