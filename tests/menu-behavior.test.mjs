@@ -9,6 +9,7 @@ function createHarness(script=source,withElements=true){
  const handlers={menu:{},nav:{},document:{}};
  const attrs={"aria-expanded":"false","aria-label":"Abrir navegación"};
  let focused=0;
+ const rootClasses=new Set();
  const menu={
   setAttribute(key,value){attrs[key]=value},
   getAttribute(key){return attrs[key]},
@@ -17,6 +18,7 @@ function createHarness(script=source,withElements=true){
  };
  const nav={dataset:{},addEventListener(event,fn){handlers.nav[event]=fn}};
  const document={
+  documentElement:{classList:{add:(name)=>rootClasses.add(name)}},
   querySelector(selector){
    if(!withElements)return null;
    if(selector===".menu-button")return menu;
@@ -27,7 +29,7 @@ function createHarness(script=source,withElements=true){
  };
  runInNewContext(script,{document},{timeout:1000});
  return {
-  attrs,nav,handlers,
+  attrs,nav,handlers,rootClasses,
   clickMenu(){handlers.menu.click()},
   clickNav(isAnchor){handlers.nav.click({target:{closest:(selector)=>selector==="a"&&isAnchor?{}:null}})},
   keydown(key){handlers.document.keydown({key})},
@@ -38,6 +40,7 @@ function createHarness(script=source,withElements=true){
 function contract(script=source){
  const h=createHarness(script);
  assert.equal(h.attrs["aria-expanded"],"false");
+ assert.ok(h.rootClasses.has("js-enabled"),"Progressive navigation is activated after handlers are registered");
  h.clickMenu();
  assert.equal(h.attrs["aria-expanded"],"true");
  assert.equal(h.attrs["aria-label"],"Cerrar navegación");
@@ -65,6 +68,7 @@ test("missing optional navigation nodes must not throw",()=>{
  const h=createHarness(source,false);
  assert.equal(Object.keys(h.handlers.menu).length,0);
  assert.equal(Object.keys(h.handlers.nav).length,0);
+ assert.ok(!h.rootClasses.has("js-enabled"),"Static fallback must survive missing menu nodes");
 });
 test("mutation smoke: altering Escape behavior is rejected by the contract",()=>{
  const mutant=source.replace('event.key==="Escape"','event.key==="Enter"');
