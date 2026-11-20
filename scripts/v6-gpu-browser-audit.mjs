@@ -89,6 +89,8 @@ try{
  check("Desktop WebGL2 real draw calls",desktop.webgl&&desktop.triangles>100&&desktop.drawCalls>0,{desktop});
  check("Real Three.js revision",desktop.threeRevision==="187",{revision:desktop.threeRevision});
  check("Exactly one GPU canvas",desktop.domCanvas===1,{count:desktop.domCanvas});
+ check("V6.1 real GPU shadows and painted sign textures",desktop.shadows===true&&desktop.textureCount>=2&&desktop.cinematic==="v6.1",{shadows:desktop.shadows,textures:desktop.textureCount,cinematic:desktop.cinematic});
+ check("V6.1 desktop geometry and draw call budgets",desktop.geometryCount>35&&desktop.geometryCount<180&&desktop.drawCalls<160,{geometryCount:desktop.geometryCount,drawCalls:desktop.drawCalls});
  await screenshot("desktop-three-webgl.png");
  await evalJS('document.querySelector("[data-v6-camera=commerce]").click()');
  const commerce=await waitUntil("desktop commerce camera",async()=>evalJS('window.__dessetV6Probe?.().currentView==="commerce"'));
@@ -104,7 +106,23 @@ try{
  await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
  const mobile=await waitUntil("mobile real GPU after consent",async()=>evalJS('(()=>{const e=document.querySelector(".v5-city-stage"),p=window.__dessetV6Probe?.();return e.dataset.v6State==="active"&&p?.triangles>0&&p?.frames>2?p:null})()'),15000);
  check("Mobile WebGL2 after explicit opt-in",mobile.webgl&&mobile.triangles>100,{mobile});
+ check("Mobile suppresses expensive shadow maps but keeps 3D materials",mobile.shadows===false&&mobile.textureCount>=2,{shadows:mobile.shadows,textures:mobile.textureCount});
  await screenshot("mobile-three-webgl-optin.png");
+
+ await evalJS('document.querySelector(".v6-pause").click()');
+ const pausedBefore=await evalJS('window.__dessetV6Probe?.().frames');
+ await sleep(340);
+ const pausedAfter=await evalJS('window.__dessetV6Probe?.().frames');
+ check("Pause stops the WebGL animation loop",pausedAfter===pausedBefore,{pausedBefore,pausedAfter});
+ await evalJS('document.querySelector(".v6-pause").click()');
+ await waitUntil("WebGL resumes",async()=>evalJS('window.__dessetV6Probe?.().frames > '+pausedAfter),5000);
+ check("Resume restarts WebGL frame delivery",true);
+ await evalJS('document.querySelector(".v6-poster").click()');
+ const poster=await evalJS('(()=>{const e=document.querySelector(".v5-city-stage");return {state:e.dataset.v6State,canvases:e.querySelectorAll(".v6-three-mount canvas").length,reopen:!e.querySelector(".v6-enable-webgl").hidden,controls:e.querySelector(".v6-three-controls").hidden}})()');
+ check("Poster frees GPU canvas and restores accessible fallback",poster.state==="poster"&&poster.canvases===0&&poster.reopen&&poster.controls,{poster});
+ await evalJS('document.querySelector(".v6-enable-webgl").click()');
+ const reopened=await waitUntil("WebGL reopened after poster",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.triangles>100&&p?.domCanvas===1?p:null})()'),15000);
+ check("WebGL scene reopens cleanly without duplicate canvas",reopened.domCanvas===1&&reopened.triangles>100,{reopened});
 
  await viewport(390,844,true);
  const reduced=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),button:document.querySelector(".v6-enable-webgl")?.hidden,poster:!!document.querySelector(".v5-stage-render")}))()');
