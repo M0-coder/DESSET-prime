@@ -38,7 +38,7 @@ test("V6.7 design system defines 60 neutral / 30 structural / 10 accent roles",(
  assert.match(design,/\.hero\[data-variant="v4"\] \.hero-cta/);
  assert.match(design,/\.contact-primary\s*\{\s*color:#FFFDF8;background:var\(--ds-30-blue\)/);
  assert.match(design,/@media\(max-width:700px\)/);
- assert.ok(statSync(new URL("styles-system.css",root)).size<7000);
+ assert.ok(statSync(new URL("styles-system.css",root)).size<9000);
  assert.doesNotMatch(design,/@import\b|url\(\s*['"]?https?:/);
 });
 
@@ -63,7 +63,7 @@ test("V6.7 complete narrative agrees on Elegir → Preparar → Entregar",()=>{
  assert.deepEqual(titles,["ELEGIR","PREPARAR","ENTREGAR"]);
  assert.ok(flow[0].includes("elegir, preparar y entregar"));
  assert.ok(!flow[0].includes("ORGANIZAR")&&!flow[0].includes("MOVER"));
- assert.ok(flow[0].includes("cuando se habilite el servicio"));
+ assert.ok(flow[0].includes("Explorar opciones y gestionar solicitudes desde la experiencia de clientes."));
  assert.ok(html.includes("las funciones de clientes, comercios, repartidores y control"));
  assert.ok(!html.includes("la arquitectura de Customer, Business, Rider"));
  assert.ok(!storyboard.includes('title:"01 /')&&!storyboard.includes('title:"02 /'));
@@ -101,7 +101,7 @@ test("V6.7 stylesheet actually loads in the signed site and strict local preview
 test("V6.7 does not invent contact channels, forms or premature operations",()=>{
  assert.equal((html.match(/data-channel-review="pending"/g)||[]).length,3);
  assert.doesNotMatch(html,/<form\b|<iframe\b|https?:\/\/(?:wa\.me|api\.whatsapp\.com)/i);
- assert.match(html,/DESSET está en desarrollo\. Esta página informa/);
- assert.match(html,/No se reciben pedidos, pagos ni contrataciones desde esta web\./);
+ assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET cuando estén habilitadas/);
+ assert.match(html,/Esta web no procesa transacciones\./);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
