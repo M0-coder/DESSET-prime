@@ -107,6 +107,12 @@ async function viewport(width,height,reduce=false){
   if(diag.railWords.length!==4||diag.railWords.some(w=>!w.visible||!w.inside||w.width<45))fails.push("mobile editorial keyword rail clips or hides a word: "+JSON.stringify(diag.railWords));
   if(diag.typeSizes.heroLead<14||diag.typeSizes.sectionTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
+  const perf01=await js('(()=>{const hints=[...document.querySelectorAll("link[rel=preload][as=image]")];const active=hints.filter(x=>matchMedia(x.media).matches);const hero=document.querySelector("#inicio .prime-photo-image");const selected=hero?.currentSrc||"";const chosen=active[0]?.getAttribute("href")?.slice(2);const cards=[...document.querySelectorAll(".v03-photo-story img")];return {hints:hints.map(x=>({media:x.media,href:x.getAttribute("href"),priority:x.fetchPriority})),activeCount:active.length,correctSource:!!chosen&&selected.endsWith("/"+chosen),heroPriority:hero?.fetchPriority,heroLoading:hero?.loading,stories:cards.map(x=>({loading:x.loading,priority:x.fetchPriority}))}})()');
+ if(perf01.hints.length!==2||perf01.activeCount!==1||!perf01.correctSource||perf01.heroPriority!=="high"||perf01.heroLoading!=="eager"||perf01.stories.length!==3||
+    perf01.stories.some(x=>x.loading!=="lazy"||x.priority!=="low"))
+  report.failures.push("PERF-01 responsive LCP priority or lazy triptych failed: "+JSON.stringify(perf01));
+ report.tests.push({name:"PERF-01 exact responsive hero preload and deferred triptych priority",width,perf01});
+
  report.viewports.push({width,height,reduce,...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
  return diag;
