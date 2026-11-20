@@ -100,6 +100,8 @@ try{
  check("V6.2 desktop three independently loaded GLB models",detailedDesktop.glbLoaded===3&&detailedDesktop.glbModels.every(x=>x.meshes>=5&&x.triangles>=250),{models:detailedDesktop.glbModels,status:detailedDesktop.glbStatus});
  check("V6.1 real GPU shadows and painted sign textures",desktop.shadows===true&&desktop.textureCount>=2&&desktop.cinematic==="v6.2",{shadows:desktop.shadows,textures:desktop.textureCount,cinematic:desktop.cinematic});
  check("V6.1 desktop geometry and draw call budgets",desktop.geometryCount>35&&desktop.geometryCount<180&&desktop.drawCalls<160,{geometryCount:desktop.geometryCount,drawCalls:desktop.drawCalls});
+ check("RENDER-02 three GLB PBR finish profiles and shared linear micrograin",detailedDesktop.glbModels.every(x=>x.finishMaterials>=4&&x.roughnessMapped>=2)&&detailedDesktop.glbModels.filter(x=>x.name!=="courier").every(x=>x.texturedMaterials>=4)&&desktop.textureCount<=22,
+ {finishes:detailedDesktop.glbModels.map(x=>({name:x.name,finished:x.finishMaterials,micrograin:x.roughnessMapped})),textures:desktop.textureCount});
  check("RENDER-01 desktop local cinematic floor lighting",desktop.render01Pools===3&&desktop.render01Texture===true&&desktop.drawCalls<160,{pools:desktop.render01Pools,localTexture:desktop.render01Texture,drawCalls:desktop.drawCalls});
  await screenshot("desktop-three-webgl.png");
  await evalJS('document.querySelector("[data-v6-camera=commerce]").click()');
@@ -142,6 +144,8 @@ try{
  const detailedMobile=await waitUntil("three GLB models after mobile user consent",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3?p:null})()'),17000);
  check("V6.2 mobile loads all 3 detailed GLB originals after explicit consent",detailedMobile.glbLoaded===3&&detailedMobile.glbModels.length===3,{models:detailedMobile.glbModels});
  check("Mobile suppresses expensive shadow maps but keeps 3D materials",mobile.shadows===false&&mobile.textureCount>=2,{shadows:mobile.shadows,textures:mobile.textureCount});
+ check("RENDER-02 mobile material finish budget without physical GPU shadows",detailedMobile.glbModels.every(x=>x.finishMaterials>=4&&x.roughnessMapped>=2)&&detailedMobile.glbModels.filter(x=>x.name!=="courier").every(x=>x.texturedMaterials>=4)&&mobile.textureCount<=19&&!mobile.shadows,
+ {finishes:detailedMobile.glbModels.map(x=>({name:x.name,finished:x.finishMaterials,micrograin:x.roughnessMapped})),textures:mobile.textureCount,shadows:mobile.shadows});
  check("RENDER-01 mobile reuses local floor lighting without shadow maps",mobile.render01Pools===3&&mobile.render01Texture===true&&!mobile.shadows,{pools:mobile.render01Pools,localTexture:mobile.render01Texture,shadows:mobile.shadows});
  const groups=Object.entries(detailedMobile.objectBounds||{});
  const fullyFramed=groups.length===3&&groups.every(([name,b])=>b.minX>=-1.02&&b.maxX<=1.02&&b.minY>=-1.02&&b.maxY<=1.02);
