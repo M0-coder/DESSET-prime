@@ -109,8 +109,12 @@
  .v5-city-stage {margin-bottom:25px;}
 }
 @media(max-width:430px){
- .v5-stage-world {aspect-ratio:1.12;min-height:260px;}
- .v5-stage-legend {font-size:10px;max-width:calc(100% - 24px);padding:9px 10px;left:12px;}
+ /* A dedicated vertical diorama preserves all three stations instead of cutting off the destination. */
+ .v5-stage-world {aspect-ratio:390 / 560;min-height:0;}
+ .v5-responsive-art {display:block;width:100%;height:100%;}
+ .v5-stage-render {object-fit:contain;object-position:center;}
+ .v5-route-overlay {display:none;} /* SVG mobile includes its own route. */
+ .v5-stage-legend {display:none;} /* Caption directly below provides the equivalent text. */
  .v5-stage-caption {display:block;padding:12px;font-size:12px;}
  .v5-stage-caption strong {display:block;margin-bottom:3px;}
  .v5-contact-light {left:14%;width:72%;}
