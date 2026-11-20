@@ -47,7 +47,7 @@ function send(method,params={},page=true){
 }
 async function evalJS(expression){
  const x=await send("Runtime.evaluate",{expression,returnByValue:true,awaitPromise:true});
- if(x.exceptionDetails)throw Error("Eval failed "+JSON.stringify(x.exceptionDetails));
+ if(x.result?.exceptionDetails)throw Error("Eval failed "+JSON.stringify(x.result.exceptionDetails));
  return x.result.result.value;
 }
 async function waitUntil(label,predicate,timeoutMs=10000){
@@ -98,7 +98,7 @@ try{
  check("Camera destination works",Boolean(destination));
 
  await viewport(390,844);
- const initialMobile=await evalJS('(()=>({script:!!document.querySelector("script[src*=v6-three.bundle]"),button:document.querySelector(".v6-enable-webgl")?.hidden,state:document.querySelector(".v5-city-stage").dataset.v6State}))()');
+ const initialMobile=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),button:document.querySelector(".v6-enable-webgl")?.hidden,state:document.querySelector(".v5-city-stage").dataset.v6State}))()');
  check("Mobile 3D is opt-in and not preloaded",!initialMobile.script&&initialMobile.button===false,{initialMobile});
  await evalJS('document.querySelector(".v6-enable-webgl").click()');
  await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
@@ -107,7 +107,7 @@ try{
  await screenshot("mobile-three-webgl-optin.png");
 
  await viewport(390,844,true);
- const reduced=await evalJS('(()=>({script:!!document.querySelector("script[src*=v6-three.bundle]"),button:document.querySelector(".v6-enable-webgl")?.hidden,poster:!!document.querySelector(".v5-stage-render")}))()');
+ const reduced=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),button:document.querySelector(".v6-enable-webgl")?.hidden,poster:!!document.querySelector(".v5-stage-render")}))()');
  check("Reduced-motion remains static and never loads WebGL",!reduced.script&&reduced.button===true&&reduced.poster,{reduced});
  await screenshot("mobile-reduced-poster.png");
 }catch(e){failures.push(String(e.stack||e))}
