@@ -15,6 +15,15 @@
   }
   if(reduced || typeof window.IntersectionObserver!=="function"){
     root.dataset.v5Mode=reduced?"reduced":"static";
+    // On devices where 3D cannot be started, the link remains useful but
+    // must not claim that WebGL will play.
+    const link=document.querySelector("[data-v64-tour-launch]");
+    if(link){
+      link.setAttribute("aria-label","Ver recorrido ilustrado de DESSET");
+      for(const node of link.childNodes){
+        if(node.nodeType===3){node.textContent="Ver recorrido ilustrado ";break}
+      }
+    }
     return;
   }
 
@@ -36,25 +45,46 @@
   const threeStart=stage.querySelector(".v6-enable-webgl");
   const mobile=window.matchMedia?.("(max-width: 800px)")?.matches===true;
   if(threeStart && mobile)threeStart.hidden=false;
+  const loadStatus=stage.querySelector(".v65-load-status");
   let webglRequested=false;
+  const runRequestedTour=()=>{
+    if(stage.dataset.v64Requested!=="tour" || stage.dataset.v6State!=="active")return;
+    stage.dataset.v64Requested="";
+    const tour=stage.querySelector(".v63-tour");
+    if(tour?.getAttribute("aria-pressed")!=="true")
+      stage.querySelector(".v63-tour")?.click();
+  };
+  stage.addEventListener("desset:v6-ready",()=>{
+    if(loadStatus)loadStatus.hidden=true;
+    webglRequested=false;
+    runRequestedTour();
+  });
+  stage.addEventListener("desset:v6-unavailable",()=>{
+    stage.dataset.v64Requested="";
+    webglRequested=false;
+    if(loadStatus)loadStatus.hidden=true;
+    if(threeStart)threeStart.hidden=false;
+  });
   const loadThree=()=>{
     if(webglRequested || stage.dataset.v6State==="active")return;
     webglRequested=true;
     stage.dataset.v6State="loading";
+    if(threeStart)threeStart.hidden=true;
+    if(loadStatus){loadStatus.textContent="Preparando los modelos 3D de DESSET…";loadStatus.hidden=false}
     const script=document.createElement("script");
     script.src="./assets/v6-three.bundle.js";
     script.async=true;
+    // Three.js only signals READY after all three GLB models have been loaded
+    // and an actual frame has been drawn. A script load alone is not ready.
     script.onload=()=>{
       webglRequested=false;
-      if(stage.dataset.v64Requested==="tour" && stage.dataset.v6State==="active"){
-        stage.dataset.v64Requested="";
-        stage.querySelector(".v63-tour")?.click();
-      }
+      runRequestedTour();
     };
     script.onerror=()=>{
       webglRequested=false;
       stage.dataset.v6State="fallback";
       stage.dataset.v64Requested="";
+      if(loadStatus)loadStatus.hidden=true;
       if(threeStart)threeStart.hidden=false;
     };
     document.head.appendChild(script);
