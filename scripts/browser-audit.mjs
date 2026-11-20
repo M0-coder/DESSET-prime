@@ -72,7 +72,7 @@ async function viewport(width,height,reduce=false){
  await sleep(130);
  const diag=await js(`(()=>{
  const viewport=document.documentElement.clientWidth;
- const logo=[...document.images].map(x=>({src:x.getAttribute('src'),complete:x.complete,naturalWidth:x.naturalWidth,naturalHeight:x.naturalHeight}));
+ const logo=[...document.images].map(x=>({src:x.getAttribute('src'),loading:x.loading,complete:x.complete,naturalWidth:x.naturalWidth,naturalHeight:x.naturalHeight}));
  const text=[...document.querySelectorAll('.motion-line, .statement h2, .contact h2')].map(el=>{
   const r=document.createRange();r.selectNodeContents(el);
   return {text:el.innerText,contentWidth:Math.round(r.getBoundingClientRect().width),visibleWidth:Math.round(el.getBoundingClientRect().width),clientWidth:el.clientWidth,scrollWidth:el.scrollWidth};
@@ -100,7 +100,7 @@ async function viewport(width,height,reduce=false){
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
- if(diag.logo.some(x=>!x.complete||x.naturalWidth===0))fails.push("broken image");
+ if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
  if(width<=700){
@@ -144,9 +144,9 @@ try{
  report.tests.push({name:"V5 cinematic identity and local asset",v5Cover});
  await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(580);
- const v5Stage=await js('(()=>{const e=document.querySelector(".v5-city-stage"),im=e.querySelector("img"),r=e.getBoundingClientRect(),route=e.querySelector(".v5-route-line");return {visible:e.classList.contains("v5-visible"),imageLoaded:im.complete,width:im.naturalWidth,height:im.naturalHeight,routeAnimation:getComputedStyle(route).animationName,left:r.left,right:r.right,viewport:document.documentElement.clientWidth,caption:e.querySelector("figcaption")?.textContent?.trim()}})()');
- if(!v5Stage.visible||!v5Stage.imageLoaded||v5Stage.width!==1200||v5Stage.height!==560||v5Stage.routeAnimation!=="v5-route-draw"||v5Stage.left< -2||v5Stage.right>v5Stage.viewport+2||!v5Stage.caption?.includes("conceptual")) report.failures.push("V5 rendered route or truthfulness failed: "+JSON.stringify(v5Stage));
- report.tests.push({name:"V5 original rendered 2.5D sequence",v5Stage});
+ const v5Stage=await js('(()=>{const e=document.querySelector(".v5-city-stage"),im=e.querySelector("img"),r=e.getBoundingClientRect();return {visible:e.classList.contains("v5-visible"),imageLoaded:im.complete,source:im.currentSrc,width:im.naturalWidth,height:im.naturalHeight,renderAnimation:getComputedStyle(im).animationName,obsoleteOverlay:!!e.querySelector(".v5-route-overlay"),left:r.left,right:r.right,viewport:document.documentElement.clientWidth,caption:e.querySelector("figcaption")?.textContent?.trim()}})()');
+ if(!v5Stage.visible||!v5Stage.imageLoaded||!v5Stage.source?.includes("v5-cinematic-desktop.webp")||v5Stage.width!==1752||v5Stage.height!==897||v5Stage.renderAnimation!=="v5-camera-arrive"||v5Stage.obsoleteOverlay||v5Stage.left< -2||v5Stage.right>v5Stage.viewport+2||!v5Stage.caption?.includes("conceptual"))report.failures.push("V5.2 desktop WebP render and cinematic framing failed: "+JSON.stringify(v5Stage));
+ report.tests.push({name:"V5.2 original high-fidelity desktop WebP render",v5Stage});
  await capture("desktop-v5-scene-motion.png");
  await sleep(1750);
  await capture("desktop-v5-scene-final.png");
@@ -241,8 +241,8 @@ try{
    report.tests.push({name:"mobile technical detail expandable",detailOpen});
    await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
    await sleep(350);
-   const v5Mobile=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {visible:e.classList.contains("v5-visible"),left:r.left,right:r.right,viewport:v,overflow:document.documentElement.scrollWidth>v+2,caption:e.querySelector("figcaption")?.textContent?.trim(),imageLoaded:e.querySelector("img")?.naturalWidth>0,source:e.querySelector("img")?.currentSrc,overlay:getComputedStyle(e.querySelector(".v5-route-overlay")).display,ratio:Math.round(e.querySelector(".v5-stage-world").getBoundingClientRect().height/e.querySelector(".v5-stage-world").getBoundingClientRect().width*100)/100}})()');
-   if(!v5Mobile.visible||v5Mobile.left< -2||v5Mobile.right>v5Mobile.viewport+2||v5Mobile.overflow||!v5Mobile.imageLoaded||!v5Mobile.source?.includes("v5-logistics-mobile.svg")||v5Mobile.overlay!=="none"||v5Mobile.ratio<1.3||!v5Mobile.caption?.includes("conceptual"))report.failures.push("V5 mobile 390 scene failed: "+JSON.stringify(v5Mobile));
+   const v5Mobile=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {visible:e.classList.contains("v5-visible"),left:r.left,right:r.right,viewport:v,overflow:document.documentElement.scrollWidth>v+2,caption:e.querySelector("figcaption")?.textContent?.trim(),imageLoaded:e.querySelector("img")?.naturalWidth>0,source:e.querySelector("img")?.currentSrc,width:e.querySelector("img")?.naturalWidth,height:e.querySelector("img")?.naturalHeight,obsoleteOverlay:!!e.querySelector(".v5-route-overlay"),ratio:Math.round(e.querySelector(".v5-stage-world").getBoundingClientRect().height/e.querySelector(".v5-stage-world").getBoundingClientRect().width*100)/100}})()');
+   if(!v5Mobile.visible||v5Mobile.left< -2||v5Mobile.right>v5Mobile.viewport+2||v5Mobile.overflow||!v5Mobile.imageLoaded||!v5Mobile.source?.includes("v5-cinematic-mobile.webp")||v5Mobile.width!==1024||v5Mobile.height!==1536||v5Mobile.obsoleteOverlay||v5Mobile.ratio<1.4||!v5Mobile.caption?.includes("conceptual"))report.failures.push("V5 mobile 390 scene failed: "+JSON.stringify(v5Mobile));
    report.tests.push({name:"V5 mobile 390 cinematic layout",v5Mobile});
    await capture("mobile-v5-scene.png");
   }
@@ -254,8 +254,8 @@ try{
    await capture("mobile-320-full.png",true);
    await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
    await sleep(250);
-   const v5Narrow=await js('(()=>{const e=document.querySelector(".v5-city-stage"),art=e.querySelector("img"),b=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {src:art.currentSrc,width:art.naturalWidth,height:art.naturalHeight,inside:b.left>=-2&&b.right<=v+2,overlay:getComputedStyle(e.querySelector(".v5-route-overlay")).display}})()');
-   if(!v5Narrow.src?.includes("v5-logistics-mobile.svg")||v5Narrow.width!==390||v5Narrow.height!==560||!v5Narrow.inside||v5Narrow.overlay!=="none")report.failures.push("V5 mobile 320 narrative composition failed: "+JSON.stringify(v5Narrow));
+   const v5Narrow=await js('(()=>{const e=document.querySelector(".v5-city-stage"),art=e.querySelector("img"),b=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {src:art.currentSrc,width:art.naturalWidth,height:art.naturalHeight,inside:b.left>=-2&&b.right<=v+2,obsoleteOverlay:!!e.querySelector(".v5-route-overlay")}})()');
+   if(!v5Narrow.src?.includes("v5-cinematic-mobile.webp")||v5Narrow.width!==1024||v5Narrow.height!==1536||!v5Narrow.inside||v5Narrow.obsoleteOverlay)report.failures.push("V5 mobile 320 narrative composition failed: "+JSON.stringify(v5Narrow));
    report.tests.push({name:"V5 mobile 320 full narrative",v5Narrow});
    await capture("mobile-320-v5-scene.png");
   }
@@ -266,8 +266,8 @@ try{
  const reducedAnimations=await js('(()=>({blue:getComputedStyle(document.querySelector(".v4-shape-blue")).animationName,stamp:getComputedStyle(document.querySelector(".v4-canvas-stamp")).animationName,headline:document.querySelector(".motion-headline").textContent.trim(),cta:document.querySelector(".hero-cta").getAttribute("href"),closing:document.querySelector("#contact-title").textContent.trim()}))()');
  if(reducedAnimations.blue!=="none"||reducedAnimations.stamp!=="none"||!reducedAnimations.headline.includes("EL COMERCIO")||reducedAnimations.cta!=="#contacto"||!reducedAnimations.closing.includes("CONEXIONES"))report.failures.push("V4.5 reduced motion/essential information failed: "+JSON.stringify(reducedAnimations));
  report.tests.push({name:"V4.5 full-fidelity reduced motion fallback",reducedAnimations});
- const v5Reduced=await js('(()=>({mode:document.documentElement.dataset.v5Mode,route:getComputedStyle(document.querySelector(".v5-route-line")).animationName,light:getComputedStyle(document.querySelector(".v5-contact-light")).animationName,asset:document.querySelector(".v5-stage-render")?.getAttribute("src"),caption:document.querySelector(".v5-stage-caption")?.textContent?.trim()}))()');
- if(v5Reduced.mode!=="reduced"||v5Reduced.route!=="none"||v5Reduced.light!=="none"||!v5Reduced.asset?.includes("v5-logistics-scene.svg")||!v5Reduced.caption?.includes("conceptual"))report.failures.push("V5 reduced-motion content/visibility failed: "+JSON.stringify(v5Reduced));
+ const v5Reduced=await js('(()=>({mode:document.documentElement.dataset.v5Mode,render:getComputedStyle(document.querySelector(".v5-stage-render")).animationName,scan:getComputedStyle(document.querySelector(".v5-stage-scan")).animationName,light:getComputedStyle(document.querySelector(".v5-contact-light")).animationName,source:document.querySelector(' + "'"+ '.v5-responsive-art source[type="image/webp"]' + "'"+ ')?.getAttribute("srcset"),caption:document.querySelector(".v5-stage-caption")?.textContent?.trim()}))()');
+ if(v5Reduced.mode!=="reduced"||v5Reduced.render!=="none"||v5Reduced.scan!=="none"||v5Reduced.light!=="none"||!v5Reduced.source?.includes("v5-cinematic-mobile.webp")||!v5Reduced.caption?.includes("conceptual"))report.failures.push("V5.2 reduced-motion content/visibility failed: "+JSON.stringify(v5Reduced));
  report.tests.push({name:"V5 full reduced-motion fallback",v5Reduced});
  await capture("mobile-reduced-motion.png");
  report.tests.push({name:"reduced motion",animation:reduced.animation});
