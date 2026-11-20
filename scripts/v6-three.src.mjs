@@ -94,7 +94,7 @@ if(!stage||!mount||!controls||reduced){
   box(parent,w*.86,.04,d*.85,0,.025,0,mats.road);
  };
  function storefront(){
-  const g=new THREE.Group();g.position.set(coarse?-.7:-5,0,coarse?-4.7:0);scene.add(g);
+  const g=new THREE.Group();g.name="commerce";g.position.set(coarse?-.7:-5,0,coarse?-4.7:0);scene.add(g);
   plinth(g,4.1,3.1);
   box(g,2.7,2.3,1.95,0,1.22,-.2,mats.blue);
   box(g,3.1,.27,2.25,0,2.47,-.22,mats.cyan);
@@ -112,7 +112,7 @@ if(!stage||!mount||!controls||reduced){
   sphere(g,.064,.20,1.0,.852,mats.headlight);
  }
  function destination(){
-  const g=new THREE.Group();g.position.set(coarse?.7:5.03,0,coarse?4.7:-.35);scene.add(g);
+  const g=new THREE.Group();g.name="destination";g.position.set(coarse?.7:5.03,0,coarse?4.7:-.35);scene.add(g);
   plinth(g,3.65,3.15);
   box(g,2.65,2.12,2.18,0,1.12,0,mats.red);
   const roof=new THREE.Mesh(new THREE.ConeGeometry(2.14,1.28,4,1),mats.cream);
@@ -128,7 +128,7 @@ if(!stage||!mount||!controls||reduced){
   box(g,.05,.67,.09,-.81,1.32,1.166,mats.chrome);
  }
  function courier(){
-  const g=new THREE.Group();g.position.set(coarse?0:.98,.13,coarse?0:1.18);scene.add(g);
+  const g=new THREE.Group();g.name="courier";g.position.set(coarse?0:.98,.13,coarse?0:1.18);scene.add(g);
   plinth(g,3.9,2.65);
   for(const x of [-.92,.91]){
    const tyre=new THREE.Mesh(new THREE.TorusGeometry(.39,.115,8,18),mats.dark);
@@ -365,13 +365,31 @@ if(!stage||!mount||!controls||reduced){
    camera.position.set(...presets.overview.pos);cameraTarget.set(...presets.overview.look);camera.lookAt(cameraTarget);
    applyView("overview");
    renderer.render(scene,camera);
+   const objectBounds=()=>{
+     const result={};
+     for(const name of ["commerce","courier","destination"]){
+       const object=scene.getObjectByName(name);
+       if(!object)continue;
+       const b=new THREE.Box3().setFromObject(object);
+       const points=[];
+       for(const x of [b.min.x,b.max.x])for(const y of [b.min.y,b.max.y])
+         for(const z of [b.min.z,b.max.z])
+           points.push(new THREE.Vector3(x,y,z).project(camera));
+       result[name]={
+         minX:Math.min(...points.map(p=>p.x)),maxX:Math.max(...points.map(p=>p.x)),
+         minY:Math.min(...points.map(p=>p.y)),maxY:Math.max(...points.map(p=>p.y))
+       };
+     }
+     return result;
+   };
    window.__dessetV6Probe=()=>({threeRevision:THREE.REVISION,webgl:true,frames:Number(stage.dataset.v6Frames||0),
       triangles:renderer?.info.render.triangles||0,drawCalls:renderer?.info.render.calls||0,
       currentView:cameraPreset,domCanvas:mount.querySelectorAll("canvas").length,
       shadows:renderer?.shadowMap.enabled===true,
       geometryCount:renderer?.info.memory.geometries||0,
       textureCount:renderer?.info.memory.textures||0,
-      material:"PBR",colorSpace:"srgb",cinematic:"v6.1"});
+      material:"PBR",colorSpace:"srgb",cinematic:"v6.1",
+      objectBounds:objectBounds()});
   }
  }catch(e){console.warn("DESSET experimental Three.js fallback:",String(e));fail("unsupported")}
 }
