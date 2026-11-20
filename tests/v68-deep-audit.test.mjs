@@ -40,10 +40,11 @@ test("V6.8 navigation works progressively when scripts fail or are disabled",()=
 });
 
 test("V6.8 signed inventory records every updated static asset",()=>{
- for(const path of ["assets/roles-geometry-v2.svg","assets/roles-geometry-es.svg","styles-system.css","scripts/app.js"]){
+ for(const path of ["assets/roles-geometry-es.svg","styles-system.css","scripts/app.js"]){
   const found=pack.files.find(x=>x.path===path);
   assert.ok(found&&found.bytes>0,"Package omits "+path);
  }
+ assert.ok(!pack.files.some(x=>x.path==="assets/roles-geometry-v2.svg"),"Do not ship the original English SVG");
  assert.equal(pack.noindex,true);
  assert.equal(pack.domain,"none");
  assert.match(html,/name="robots" content="noindex,nofollow"/);
