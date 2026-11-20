@@ -3,6 +3,7 @@
  * The V5 WebP image remains the functional fallback and accessible context. */
 import * as THREE from "three";
 import {hydrateGLBModels} from "./v62-glb-loader.src.mjs";
+import {STORY_BEATS,STORY_DURATION,storyAtTime,routeProgress} from "./v63-storyboard.mjs";
 
 const stage=document.querySelector(".v5-city-stage");
 const mount=stage?.querySelector(".v6-three-mount");
@@ -15,6 +16,12 @@ if(!stage||!mount||!controls||reduced){
  let renderer,scene,camera,ro,observer,raf=0,alive=false,onscreen=true,paused=false;
  let cameraPreset="overview",frame=0,particle,parcel,routeHalo;
  let modelStats={ready:false,models:[]};
+ let storyActive=false,storyElapsed=0,storyBeat=-1;
+ const storyPanel=stage.querySelector(".v63-story");
+ const storyTitle=stage.querySelector(".v63-story-title");
+ const storyDetail=stage.querySelector(".v63-story-detail");
+ const storyProgress=stage.querySelector(".v63-story-progress");
+ const storyButton=controls.querySelector(".v63-tour");
  let pointer={x:0,y:0},last=0,lastRender=0;
  let onMove,onLeave,onResize,onVisibility,onControls;
  const ownedTextures=[];
@@ -188,6 +195,7 @@ if(!stage||!mount||!controls||reduced){
   particle=sphere(scene,.18,0,0,0,mats.gold);
   particle.userData.curve=curve;
   parcel=new THREE.Group();
+  parcel.userData.curve=curve;
   box(parcel,.82,.64,.71,0,0,0,mats.gold);
   box(parcel,.10,.66,.73,0,.005,0,mats.cream);
   box(parcel,.85,.07,.12,0,.34,0,mats.cream);
@@ -242,10 +250,12 @@ if(!stage||!mount||!controls||reduced){
  const presets=coarse?{
   overview:{pos:[3.5,14.8,15.2],look:[0,1,0]},
   commerce:{pos:[3.2,10.8,7.0],look:[-.7,1.1,-4.7]},
+  courier:{pos:[3.4,9.3,9.7],look:[0,1.1,0]},
   destination:{pos:[4.8,10.8,14.5],look:[.7,1.1,4.7]}
  }:{
   overview:{pos:[12,11,18],look:[0,1,0]},
   commerce:{pos:[-.3,8.2,12],look:[-4.2,1.0,0]},
+  courier:{pos:[7.8,8.1,11.3],look:[.98,1.1,1.18]},
   destination:{pos:[7.6,8.7,12],look:[4.1,1,.1]}
  };
  const cameraTarget=new THREE.Vector3();
@@ -263,6 +273,9 @@ if(!stage||!mount||!controls||reduced){
  }
  function fail(reason){
   stop();stage.dataset.v6State=reason;
+  storyActive=false;stage.dataset.v63Tour="stopped";
+  if(storyPanel)storyPanel.hidden=true;
+  if(storyButton){storyButton.textContent="Ver recorrido 3D";storyButton.setAttribute("aria-pressed","false")}
   controls.hidden=true;stage.dataset.v6View="poster";
   ro?.disconnect();observer?.disconnect();
   if(onMove)mount.removeEventListener("pointermove",onMove);
