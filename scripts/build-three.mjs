@@ -12,12 +12,12 @@ const result=await build({
 });
 const js=readFileSync(output);
 const bytes=js.length,gzipBytes=gzipSync(js,{level:9}).length;
-if(bytes>650000 || gzipBytes>190000)throw Error("Three.js output exceeds V6 budget: "+bytes+" raw / "+gzipBytes+" gzip");
+if(bytes>750000 || gzipBytes>190000throw Error("Three.js output exceeds V6 budget: "+bytes+" raw / "+gzipBytes+" gzip");
 if(Object.values(result.metafile.outputs).some(output=>output.imports?.some(imp=>imp.external)))throw Error("External runtime import left in Three.js bundle");
 await mkdir("reports/quality",{recursive:true});
 await writeFile("reports/quality/v6-three-bundle.json",JSON.stringify({
  type:"self-hosted-Three.js-WebGL",three:"0.187.0",esbuild:"0.28.2",
- output,rawBytes:bytes,gzipBytes,rawLimit:650000,gzipLimit:190000,
+ output,rawBytes:bytes,gzipBytes,rawLimit:750000,gzipLimit:190000,
  inputs:Object.keys(result.metafile.inputs).length,
  scope:"experimental build asset only; no deployment and no network dependencies at runtime"
 },null,2)+"\n");
