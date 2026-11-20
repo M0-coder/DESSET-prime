@@ -91,7 +91,7 @@ try{
  check("Exactly one GPU canvas",desktop.domCanvas===1,{count:desktop.domCanvas});
  const detailedDesktop=await waitUntil("three real glTF binary models loaded in desktop",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3?p:null})()'),17000);
  check("V6.2 desktop three independently loaded GLB models",detailedDesktop.glbLoaded===3&&detailedDesktop.glbModels.every(x=>x.meshes>=5&&x.triangles>=250),{models:detailedDesktop.glbModels,status:detailedDesktop.glbStatus});
- check("V6.1 real GPU shadows and painted sign textures",desktop.shadows===true&&desktop.textureCount>=2&&desktop.cinematic==="v6.1",{shadows:desktop.shadows,textures:desktop.textureCount,cinematic:desktop.cinematic});
+ check("V6.1 real GPU shadows and painted sign textures",desktop.shadows===true&&desktop.textureCount>=2&&desktop.cinematic==="v6.2",{shadows:desktop.shadows,textures:desktop.textureCount,cinematic:desktop.cinematic});
  check("V6.1 desktop geometry and draw call budgets",desktop.geometryCount>35&&desktop.geometryCount<180&&desktop.drawCalls<160,{geometryCount:desktop.geometryCount,drawCalls:desktop.drawCalls});
  await screenshot("desktop-three-webgl.png");
  await evalJS('document.querySelector("[data-v6-camera=commerce]").click()');
