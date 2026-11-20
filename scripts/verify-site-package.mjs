@@ -39,6 +39,7 @@ for(const name of ["commerce","courier","destination"]){
  check(bytes.toString("ascii",0,4)==="glTF"&&bytes.readUInt32LE(4)===2,"invalid GLB "+name);
 }
 check(expected.has("assets/v6-three.bundle.js"),"Three.js bundle is missing");
+check(expected.has("styles-system.css")&&html.includes('href="./styles-system.css"'),"60/30/10 design CSS not packaged");
 check(![...expected].some(x=>x.endsWith(".md")||x.includes("workflow")||x.includes("package")||x.includes("node_modules")), "development files in static site");
 async function inventory(path=""){
  const entries=await readdir(resolve(dist,path),{withFileTypes:true});
