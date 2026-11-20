@@ -3,6 +3,7 @@ import {build} from "esbuild";
 import {stat,writeFile,mkdir} from "node:fs/promises";
 import {gzipSync} from "node:zlib";
 import {readFileSync} from "node:fs";
+await import("./build-glb-models.mjs");
 const output="assets/v6-three.bundle.js";
 const result=await build({
  entryPoints:["scripts/v6-three.src.mjs"],bundle:true,platform:"browser",format:"iife",
