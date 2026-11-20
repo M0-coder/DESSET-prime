@@ -107,6 +107,9 @@ try{
  const mobile=await waitUntil("mobile real GPU after consent",async()=>evalJS('(()=>{const e=document.querySelector(".v5-city-stage"),p=window.__dessetV6Probe?.();return e.dataset.v6State==="active"&&p?.triangles>0&&p?.frames>2?p:null})()'),15000);
  check("Mobile WebGL2 after explicit opt-in",mobile.webgl&&mobile.triangles>100,{mobile});
  check("Mobile suppresses expensive shadow maps but keeps 3D materials",mobile.shadows===false&&mobile.textureCount>=2,{shadows:mobile.shadows,textures:mobile.textureCount});
+ const groups=Object.entries(mobile.objectBounds||{});
+ const fullyFramed=groups.length===3&&groups.every(([name,b])=>b.minX>=-1.02&&b.maxX<=1.02&&b.minY>=-1.02&&b.maxY<=1.02);
+ check("Mobile 3D stations remain within camera frame",fullyFramed,{objectBounds:mobile.objectBounds});
  await screenshot("mobile-three-webgl-optin.png");
 
  await evalJS('document.querySelector(".v6-pause").click()');
