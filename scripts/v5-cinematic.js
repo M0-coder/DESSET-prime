@@ -15,15 +15,7 @@
   }
   if(reduced || typeof window.IntersectionObserver!=="function"){
     root.dataset.v5Mode=reduced?"reduced":"static";
-    // On devices where 3D cannot be started, the link remains useful but
-    // must not claim that WebGL will play.
-    const link=document.querySelector("[data-v64-tour-launch]");
-    if(link){
-      link.setAttribute("aria-label","Ver recorrido ilustrado de DESSET");
-      for(const node of link.childNodes){
-        if(node.nodeType===3){node.textContent="Ver recorrido ilustrado ";break}
-      }
-    }
+    // Static poster remains accessible when reduced motion or IntersectionObserver is unavailable.
     return;
   }
 
@@ -116,19 +108,6 @@
     },{rootMargin:"0px",threshold:0.12});
     activationObserver.observe(stage);
   }
-
-  // Primary-site integration: one intentional hero click opens the ecosystem
-  // section and requests the actual GLB tour. Same explicit click is mobile
-  // consent to load WebGL; reduced-motion visitors keep the static poster.
-  document.querySelector("[data-v64-tour-launch]")?.addEventListener("click",()=>{
-    if(stage.dataset.v6State==="active"){
-      const tour=stage.querySelector(".v63-tour");
-      if(tour?.getAttribute("aria-pressed")!=="true")tour?.click();
-      return;
-    }
-    stage.dataset.v64Requested="tour";
-    loadThree();
-  });
 
   // ANIM-01: decorative lens stays still. No cursor-following game interaction.
 })();
