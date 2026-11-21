@@ -20,7 +20,8 @@ test('manual publishing requires exact sha, main, confirmation, and disabled-by-
    "vars.DESSET_PRIME_VISUAL_APPROVED_SHA == inputs.release_sha",
    "vars.DESSET_PRIME_RIGHTS_APPROVED == 'true'",
    "vars.DESSET_PRIME_CONTACT_APPROVED == 'true'",
-   "vars.DESSET_PRIME_SECURITY_APPROVED == 'true'"])
+   "vars.DESSET_PRIME_SECURITY_APPROVED == 'true'",
+   "vars.DESSET_PRIME_ROLLBACK_BACKUP_APPROVED == 'true'"])
    assert.ok(job.includes(part),part);
 });
 test('environment approval and secrets apply ONLY to manual job',()=>{
@@ -45,4 +46,11 @@ test('release checks both domains and static security/rollback handling',()=>{
  assert.match(job,/content-security-policy:/);
  assert.match(job,/NO automatic rollback/);
  assert.match(job,/vars\.DESSET_PRIME_INDEX_APPROVED == 'true'/);
+});
+
+test('every GitHub expression has both braces and no malformed delimiters',()=>{
+ const expressions=[...doc.matchAll(/\$\{\{([^}]+)\}\}/g)];
+ assert.ok(expressions.length>=20,'Expected many GitHub expressions in workflow');
+ assert.ok(!/\$\{\{[^}\n]+\}(?!\})/.test(doc),'Missing second closing brace in expression');
+ assert.ok(!/GH\{/.test(doc),'Unresolved authoring placeholder');
 });
