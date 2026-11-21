@@ -16,7 +16,7 @@ function fixture(t,seo='NOINDEX'){
 }
 test('manual NOINDEX package validates independently for each file',t=>{
  const f=fixture(t);const r=verifyManualPackage(f);
- assert.equal(r.result,'PASS');assert.equal(r.files,33);assert.equal(r.production_deployed,false);
+ assert.equal(r.result,'PASS');assert.equal(r.files,34);assert.equal(r.production_deployed,false);
 });
 test('explicit INDEX package validates independently for each file',t=>{
  const f=fixture(t,'INDEX');assert.equal(verifyManualPackage(f).result,'PASS');
@@ -34,5 +34,18 @@ test('different policy blocks wrong SEO',t=>{
 test('a falsified production authorization in audit is rejected',t=>{
  const f=fixture(t);const r=JSON.parse(readFileSync(f.reportPath,'utf8'));r.production_authorized=true;
  writeFileSync(f.reportPath,JSON.stringify(r));
+ assert.throws(()=>verifyManualPackage(f),/NO-GO/);
+});
+
+test('removing complete MIT notice prevents release',t=>{
+ const f=fixture(t);
+ writeFileSync(join(f.publicDir,'THIRD-PARTY-NOTICES.txt'),'missing terms');
+ assert.throws(()=>verifyManualPackage(f),/NO-GO/);
+});
+test('tampered MIT license evidence cannot pass independently',t=>{
+ const f=fixture(t);
+ const report=JSON.parse(readFileSync(f.reportPath,'utf8'));
+ report.third_party_notice_sha256='0'.repeat(64);
+ writeFileSync(f.reportPath,JSON.stringify(report));
  assert.throws(()=>verifyManualPackage(f),/NO-GO/);
 });
