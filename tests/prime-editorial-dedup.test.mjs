@@ -48,7 +48,6 @@ test("Removal preserves real visual service, mobile imagery, GPU scene, honest a
     'class="v63-tour"','class="v6-pause"',
     'scene-choose.webp','scene-prepare.webp','scene-move.webp',
     'data-service-access','data-app-links hidden',
-    'Representación conceptual · No corresponde a operaciones activas de DESSET',
   ])assert.ok(html.includes(required),"Functional element removed: "+required);
   assert.equal((html.match(/data-channel-basis="owner-attested"/g)||[]).length,5);
   assert.match(cinematic,/activationObserver\.observe\(stage\)/);
@@ -85,7 +84,9 @@ test("EDITORIAL-09 actually deletes the two marked desktop ornaments without hid
  assert.match(html,/class="v6-three-mount"/);
  assert.match(html,/class="v63-tour"/);
  assert.equal((html.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,3);
- assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/);
+ assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/);
+ assert.doesNotMatch(css,/\.prime-photo-caption/);
+ assert.match(html,/aria-label="Escena conceptual:/);
  assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
  assert.equal((html.match(/data-channel-basis="owner-attested"/g)||[]).length,5);
 });

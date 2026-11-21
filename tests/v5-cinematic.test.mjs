@@ -52,7 +52,8 @@ test("Correct original assets and noindex cannot regress",()=>{
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/src="\.\/assets\/deliver-assets-mark\.png"/);
  assert.match(html,/class="v5-city-stage"/);
- assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/);
+ assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/);
+ assert.match(html,/aria-label="Escena conceptual:/);
  assert.doesNotMatch(html,/https?:\/\/[^\s"']+\.(?:js|css|mp4|webm)/i);
  assert.match(workflow,/permissions:\s*\n\s*contents:\s*read/);
  assert.match(workflow,/No deployment mechanisms/);

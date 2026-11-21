@@ -32,7 +32,8 @@ test("V6.6 punctuation stays in natural prose and legal availability disclosures
  assert.match(html,/DESSET reúne comercio, tecnología y logística en un ecosistema de servicios/);
  assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET/);
  assert.match(html,/no procesa pedidos ni pagos\./);
- assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/);
+ assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/);
+ assert.match(html,/aria-label="Escena conceptual:/);
  assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
  assert.match(html,/Acceso público no habilitado/);
  assert.match(html,/Esta web no procesa transacciones\./);
