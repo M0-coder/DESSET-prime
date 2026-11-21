@@ -55,7 +55,7 @@ jobs:
           npm run verify:site
           node --check scripts/prime-manual-cutover-gate.mjs
           node --check scripts/prime-manual-cutover-package.mjs
-          node --test tests/prime-manual-cutover-gate.test.mjs tests/prime-manual-cutover-package.test.mjs tests/prime-manual-release-workflow.test.mjs
+          node --test tests/prime-manual-cutover-gate.test.mjs tests/prime-manual-cutover-package.test.mjs tests/prime-manual-release-workflow.test.mjs tests/verify-prime-manual-package.test.mjs
           test -z "$(git diff --name-only)"
 
   publish-only-after-independent-authorization:
@@ -131,6 +131,7 @@ jobs:
           node scripts/prime-manual-cutover-package.mjs \
             "$GITHUB_WORKSPACE/dist" "$RELEASE_SHA" "$SEO_POLICY" \
             "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof"
+          node scripts/verify-prime-manual-package.mjs "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof/prime-manual-release-package.json" "$RELEASE_SHA" "$SEO_POLICY"
           test "$(find "$RUNNER_TEMP/prime-manual-public" -type f | wc -l)" -eq 33
           test ! -f "$RUNNER_TEMP/prime-manual-public/site-manifest.json"
           test -f "$RUNNER_TEMP/prime-manual-public/_headers"
