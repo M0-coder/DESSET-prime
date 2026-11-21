@@ -26,7 +26,8 @@ test('two independently created staging packages match file-by-file; evidence st
  assert.ok(!report.publication_checks_pending.includes(''));
  assert.deepEqual(JSON.parse(readFileSync(join(evidenceDir,'prime-release-evidence.json'),'utf8')),report);
  assert.match(readFileSync(join(artifactDir,'robots.txt'),'utf8'),/Disallow: \/$/m);
- assert.ok(!report.assets);
+ assert.equal(report.files.length,33);
+ assert.ok(report.files.every(x=>/^[a-f0-9]{64}$/.test(x.sha256))); 
  assert.deepEqual(readFileSync(join(artifactDir,'assets/scene-move.webp')),readFileSync(join(realDist,'assets/scene-move.webp')));
 });
 test('different checkout Git SHA is a hard failure',()=>{
