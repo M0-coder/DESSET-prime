@@ -53,12 +53,24 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           npm run build:site
           npm run verify:site
-          node scripts/prime-rights-license-audit.mjs "$GITHUB_WORKSPACE/dist"
+          npm audit --audit-level=high
+          node scripts/prime-rights-license-audit.mjs "$GITHUB_WORKSPACE/dist" "$RUNNER_TEMP/prime-rights-and-sbom.json"
+          npm sbom --package-lock-only --sbom-format=spdx > "$RUNNER_TEMP/prime-npm-sbom.spdx.json"
+          node -e 'const s=require(process.env.RUNNER_TEMP+"/prime-npm-sbom.spdx.json");if(!s.spdxVersion||!Array.isArray(s.packages)||s.packages.length<2)process.exit(1)'
           node --test tests/prime-rights-license-audit.test.mjs
           node --check scripts/prime-manual-cutover-gate.mjs
           node --check scripts/prime-manual-cutover-package.mjs
           node --test tests/prime-manual-cutover-gate.test.mjs tests/prime-manual-cutover-package.test.mjs tests/prime-manual-release-workflow.test.mjs tests/verify-prime-manual-package.test.mjs
           test -z "$(git diff --name-only)"
+      - name: Archive offline ownership, license and SPDX evidence (NO release authority)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: prime-owner-declaration-sbom-NO-GO-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/prime-rights-and-sbom.json
+            ${{ runner.temp }}/prime-npm-sbom.spdx.json
+          if-no-files-found: error
+          retention-days: 14
 
   publish-only-after-independent-authorization:
     name: Manual verified cutover to existing Pages project
