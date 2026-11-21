@@ -60,8 +60,8 @@ Fuentes técnicas:
 - [Rollback de Cloudflare Pages](https://developers.cloudflare.com/pages/configuration/rollbacks/)
 - [GitHub environment protection](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments)
 
-### Evidencia privada de administración para la publicación
+### Aceptación de canales oficiales
 
-La persona que revisa la evidencia contrasta las cinco URL de `config/prime-social-owner-attestation.json` con el perfil y un control de administración visible en la sesión autenticada de cada plataforma. Para un enlace compartido de Facebook debe comprobar también a qué página conduce. Conserva las pruebas en privado y calcula el SHA-256 de cada archivo original. Si una cuenta carece de prueba, deja la revisión pendiente.
+El titular confirmó la lista exacta de cinco URL del registro público. El paso de publicación comprueba que todos los enlaces externos estén declarados y coincidan con ese registro. Exige la aprobación de contacto y que el SHA solicitado sea el de la ejecución. El resultado conserva la clasificación `OWNER_ATTESTED` y los indicadores de verificación técnica en `false`. Una URL nueva o pendiente bloquea el corte.
 
-Una vez comprobadas las cinco cuentas, guarda el acta como secreto de entorno `DESSET_CHANNEL_ADMIN_REVIEW` en `desset-prime-production`. El acta JSON contiene `schema` igual a `desset-prime-channel-admin-review-v1`, `repository` igual a `M0-coder/DESSET-prime`, el `source_sha` completo de main, `reviewer`, `reviewed_at` en UTC y `channels` con cinco entradas. Cada entrada contiene `platform`, la `url` exacta que se publica, `method` igual a `authenticated-admin-control-observed` y el `evidence_sha256` de la prueba revisada. El administrador del entorno custodia el acta. El workflow comprueba su alcance y consistencia; la comprobación de la prueba original corresponde a la persona que la revisa. Los resultados de CI de un PR siguen usando exclusivamente la declaración pública. La aprobación final de despliegue es independiente.
+El modo separado `--require-verified` permite una auditoría privada de administración cuando se disponga de pruebas. La publicación institucional utiliza `--accept-owner-declaration`. Siguen vigentes la autorización de publicación por SHA y el visto bueno del titular en el entorno protegido.

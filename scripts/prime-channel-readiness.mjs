@@ -112,7 +112,13 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   const [htmlPath,statePath,reportPath,mode]=process.argv.slice(2);
   strict(htmlPath&&statePath&&isAbsolute(htmlPath)&&isAbsolute(statePath),'absolute source paths required');
   let report=inspectInstitutionalChannels({html:readFileSync(htmlPath,'utf8'),serviceState:readFileSync(statePath,'utf8')});
-  if(mode!==undefined){
+  if(mode==='--accept-owner-declaration'){
+   const {CONTACT_APPROVED,RELEASE_SHA,GITHUB_SHA}=process.env;
+   strict(CONTACT_APPROVED==='true'&&/^[a-f0-9]{40}$/.test(RELEASE_SHA??'')&&RELEASE_SHA===GITHUB_SHA,
+    'contact approval must apply to the running release SHA');
+   strict(report.channels_status==='OWNER_ATTESTED'&&report.unconfirmed_count===0&&report.owner_attested_count===5,
+    'every public channel must match the owner declaration');
+  }else if(mode!==undefined){
    strict(mode==='--require-verified','unknown channel verification mode');
    report=verifyAdminReview(report,process.env.DESSET_CHANNEL_ADMIN_REVIEW,process.env.GITHUB_SHA);
   }
