@@ -10,7 +10,7 @@ const sha='a'.repeat(40);
 const valid={repository:'M0-coder/DESSET-prime',ref:'refs/heads/main',event:'workflow_dispatch',
  expectedSha:sha,checkoutSha:sha,previousId:target.recovery_deployment_id,confirm:CONFIRM,
  seoPolicy:'NOINDEX',target,flags:{enabled:'true',visualApprovedSha:sha,rightsApproved:'true',
-  contactApproved:'true',securityApproved:'true',indexApproved:'false'}};
+  contactApproved:'true',securityApproved:'true',rollbackBackupApproved:'true',indexApproved:'false'}};
 const project={success:true,result:{name:'desset-institucional',production_branch:'release-approved',
  latest_deployment:{id:target.recovery_deployment_id,environment:'production',latest_stage:{status:'success'},
   uses_functions:false,deployment_trigger:{type:'ad_hoc',metadata:{commit_dirty:false}}}}};
@@ -34,7 +34,7 @@ test('feature flag and signed visual exact SHA are mandatory',()=>{
  assert.equal(validateReleaseIntent({...valid,flags:{...valid.flags,visualApprovedSha:'b'.repeat(40)}}).result,'NO-GO');
 });
 test('business, contact and technical acceptance flags cannot be skipped',()=>{
- for(const name of ['rightsApproved','contactApproved','securityApproved'])assert.equal(validateReleaseIntent({...valid,flags:{...valid.flags,[name]:'false'}}).result,'NO-GO');
+ for(const name of ['rightsApproved','contactApproved','securityApproved','rollbackBackupApproved'])assert.equal(validateReleaseIntent({...valid,flags:{...valid.flags,[name]:'false'}}).result,'NO-GO');
 });
 test('indexing explicitly needs a further independent approval',()=>{
  assert.equal(validateReleaseIntent({...valid,seoPolicy:'INDEX'}).result,'NO-GO');
