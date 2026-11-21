@@ -21,7 +21,10 @@ test("truthful service and conceptual 3D disclosures remain without redundant th
  const flow=html.match(/<section class="ecosystem"[\s\S]*?<\/section>/)?.[0]||"";
  assert.ok(flow.length>1500,"Actual three-step flow must remain");
  assert.match(flow,/class="v6-three-mount"/);
- assert.match(flow,/DESSET todavía no realiza pedidos ni entregas comerciales/);
+ assert.match(flow,/aria-label="Renderización gráfica conceptual de DESSET"/);
+ assert.match(flow,/alt="Escena conceptual tridimensional:/);
+ assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/);
+ assert.doesNotMatch(flow,/v5-stage-caption|motion-story-bridge/);
  for(const stage of ["ELEGIR","PREPARAR","ENTREGAR"])
   assert.ok(flow.includes("<h3>"+stage+"</h3>"),"Real conceptual stage missing: "+stage);
  assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
