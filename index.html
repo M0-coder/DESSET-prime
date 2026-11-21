@@ -9,6 +9,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>DESSET — Comercio en movimiento</title>
   <link rel="icon" type="image/png" href="./assets/deliver-assets-mark.png">
+  <!-- Only the viewport-selected approved photograph is high-priority. Both assets are unchanged. -->
+  <link rel="preload" as="image" type="image/webp" href="./assets/desset-hero-entrega-mobile.webp" media="(max-width: 700px)" fetchpriority="high">
+  <link rel="preload" as="image" type="image/webp" href="./assets/desset-hero-entrega-dos-espejos.webp" media="(min-width: 701px)" fetchpriority="high">
   <link rel="preload" href="./fonts/inter-latin-variable.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
   <link rel="preload" href="./fonts/plus-jakarta-sans-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
