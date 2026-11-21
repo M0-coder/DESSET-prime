@@ -34,5 +34,7 @@ test("Fonts are linked locally and typography never reaches third-party servers"
  assert.doesNotMatch(css,/@import|https?:\/\//);
  assert.match(css,/font-weight:100 900/);
  assert.match(css,/font-weight:200 800/);
+ assert.match(css,/font-synthesis:none/);
+ assert.match(html,/fetchpriority="low"/);
  assert.match(css,/#inicio \.motion-headline/);
 });

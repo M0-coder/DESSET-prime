@@ -9,4 +9,4 @@
 body{font-family:var(--ds-type-body)}
 /* Keep brandmark, navigation, controls and 3D UI on the readable Inter metrics.
  * Apply Jakarta only to explicitly editorial headings; avoid synthetic 900/950. */
-#inicio .motion-headline,.statement h2,.solutions-grid .service--main h3,.motion-story-unit h3,.business-pitch h3,.contact .closing-title{font-family:var(--ds-type-display);font-weight:800;font-synthesis:weight none}
+#inicio .motion-headline,.statement h2,.solutions-grid .service--main h3,.motion-story-unit h3,.business-pitch h3,.contact .closing-title{font-family:var(--ds-type-display);font-weight:800;font-synthesis:none}
