@@ -15,7 +15,8 @@ test("V6.6 all presentation headings and standalone labels omit terminal ornamen
  assert.ok(headings.length>=16,"Expected all six sections to be inspected");
  for(const heading of headings)
   assert.ok(!/[.]$/.test(heading.text),"Ornamental full stop remains in "+heading.tag+": "+heading.text);
- assert.match(html,/aria-label="Recorrido visual: elegir, preparar y entregar"/);
+ assert.match(html,/aria-label="Tres momentos conceptuales de un pedido: elegir, preparar y entregar"/);
+ assert.match(html,/aria-label="Escena tridimensional conceptual de DESSET"/);
  assert.doesNotMatch(html,/id="ecosystem-title"/);
  assert.doesNotMatch(html,/>COMERCIO · TECNOLOGÍA · LOGÍSTICA<\/p>/);
  assert.match(html,/id="hero-title"/);

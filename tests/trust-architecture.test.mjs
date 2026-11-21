@@ -19,14 +19,16 @@ test("institutional statement retains business direction without fictitious oper
 
 test("truthful service and conceptual 3D disclosures remain without redundant three-pillar trust panels",()=>{
  const flow=html.match(/<section class="ecosystem"[\s\S]*?<\/section>/)?.[0]||"";
- assert.ok(flow.length>1500,"Actual three-step flow must remain");
+ const statement=html.match(/<section class="statement"[\s\S]*?<\/section>/)?.[0]||"";
+ assert.ok(flow.length>1500&&statement.length>1000,"3D scene and three-step statement must remain");
  assert.match(flow,/class="v6-three-mount"/);
  assert.match(flow,/aria-label="Renderización gráfica conceptual de DESSET"/);
  assert.match(flow,/class="v6-static-fallback"/);
  assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/);
  assert.doesNotMatch(flow,/v5-stage-caption|motion-story-bridge/);
  for(const stage of ["ELEGIR","PREPARAR","ENTREGAR"])
-  assert.ok(flow.includes("<h3>"+stage+"</h3>"),"Real conceptual stage missing: "+stage);
+  assert.ok(statement.includes("<h3>"+stage+"</h3>"),"Relocated narrative step missing: "+stage);
+ assert.doesNotMatch(flow,/<h3>(?:ELEGIR|PREPARAR|ENTREGAR)<\/h3>|class="motion-story-unit"/);
  assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
  assert.match(html,/Esta web no procesa transacciones/);
  assert.doesNotMatch(html,/class="trust-ledger"|UN ECOSISTEMA, TRES PILARES/);

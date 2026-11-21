@@ -23,8 +23,10 @@ test("V6.4 packages the actual Prime website, not only an isolated GPU demo",()=
 });
 test("V6.4 viewport starts Three.js GLBs in the ecosystem; guided-tour control remains",()=>{
  assert.ok(!html.includes('data-v64-tour-launch'));
- assert.ok(html.includes('aria-label="Recorrido visual: elegir, preparar y entregar"'));
+ assert.ok(html.includes('aria-label="Escena tridimensional conceptual de DESSET"'));
  assert.ok(html.includes('id="ecosistema"'));
+ assert.ok(html.includes('class="v4-flow motion-story statement-journey"'));
+ assert.ok(html.indexOf('class="v4-flow motion-story statement-journey"')<html.indexOf('id="ecosistema"'));
  assert.ok(html.includes('class="v6-three-mount" aria-hidden="true"'));
  assert.ok(html.includes('class="v63-tour"'));
  assert.ok(loader.includes('activationObserver.observe(stage)'));
