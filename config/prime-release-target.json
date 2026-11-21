@@ -1,0 +1,11 @@
+{
+  "schema": "desset-prime-release-target-v1",
+  "repository": "M0-coder/DESSET-prime",
+  "cloudflare_project": "desset-institucional",
+  "production_branch": "release-approved",
+  "domain": "desset.lat",
+  "recovery_deployment_id": "b107eff2-6511-4e04-a780-fbd28e93e4e9",
+  "requires_fresh_owner_approval": true,
+  "production_deploy_enabled": false,
+  "note": "Historical recovery reference only. Must be observed again live before any release. NO authorization."
+}
