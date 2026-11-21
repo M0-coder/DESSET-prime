@@ -21,7 +21,7 @@ for(const [path,want] of Object.entries(a)){
 }
 const availability=text("scripts/service-state.js");
 require("Prime remains presentation only",
- /No corresponde a operaciones activas de DESSET/i.test(html)&&
+ /aria-label="Escena conceptual:[^"]*No representa operaciones comerciales activas de DESSET\."/i.test(html)&&
  /no procesa pedidos ni pagos/i.test(html)&&
  /data-service-status[^>]*>Acceso público no habilitado/.test(html)&&
  /applicationDistribution:"not_published"/.test(availability)&&
