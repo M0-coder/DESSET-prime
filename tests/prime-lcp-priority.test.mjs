@@ -40,7 +40,8 @@ test("Mobile LCP entrance finishes promptly without changing desktop or reduced 
  const packed=readFileSync(new URL("../dist/styles-hero-photo.css",import.meta.url),"utf8");
  assert.equal(packed,original,"Source and verified packaged CSS must match exactly");
  assert.match(original,/animation:anim02-frame 1\.35s/,"Retain desktop composition and keyframes");
- assert.match(original,/@media \(max-width:700px\) and \(prefers-reduced-motion:no-preference\)\{\s*#inicio \.prime-photo-surface\{animation-duration:\.65s;animation-delay:0s\}/);
+ assert.match(original,/animation:anim02-focus 2\.05s/,"Retain desktop image-focus animation");
+ assert.match(original,/@media \(max-width:700px\) and \(prefers-reduced-motion:no-preference\)\{\s*#inicio \.prime-photo-surface,#inicio \.prime-photo-image\{animation-duration:\.65s;animation-delay:0s\}/);
  assert.match(original,/@media\(prefers-reduced-motion:reduce\)[\s\S]*#inicio \.prime-photo-surface[\s\S]*animation:none!important/);
  assert.match(original,/@keyframes anim02-frame\{/);
 });
