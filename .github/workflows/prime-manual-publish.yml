@@ -215,10 +215,10 @@ jobs:
           set -euo pipefail
           test -n "$CLOUDFLARE_API_TOKEN"
           test -n "$CLOUDFLARE_ACCOUNT_ID"
-          curl --fail-with-body -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+          curl --fail-with-body -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional" \
             -o "$RUNNER_TEMP/prime-current-project.json"
-          curl --fail-with-body -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+          curl --fail-with-body -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional/domains" \
             -o "$RUNNER_TEMP/prime-current-domains.json"
           node scripts/prime-manual-cutover-gate.mjs cloudflare \
@@ -230,7 +230,7 @@ jobs:
           PREVIOUS_DEPLOYMENT_ID: ${{ inputs.expected_previous_deployment }}
         run: |
           set -euo pipefail
-          curl --fail-with-body -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+          curl --fail-with-body -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional" \
             -o "$RUNNER_TEMP/prime-current-project.json"
           node scripts/prime-manual-cutover-gate.mjs cloudflare \
@@ -256,7 +256,7 @@ jobs:
         run: |
           set -euo pipefail
           for i in $(seq 1 12); do
-            curl --fail-with-body -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            curl --fail-with-body -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
               "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional" \
               -o "$RUNNER_TEMP/prime-published-project.json"
             if jq -e --arg sha "$RELEASE_SHA" '
@@ -275,7 +275,7 @@ jobs:
           SEO_POLICY: ${{ inputs.seo_policy }}
         run: |
           set -euo pipefail
-          curl --retry 4 --retry-delay 3 --fail-with-body -fsSL https://desset.lat/ -o "$RUNNER_TEMP/prime-live.html"
+          curl --retry 4 --retry-delay 3 --fail-with-body -sSL https://desset.lat/ -o "$RUNNER_TEMP/prime-live.html"
           grep -Fq 'DESSET — Comercio en movimiento' "$RUNNER_TEMP/prime-live.html"
           grep -Fq 'rel="canonical" href="https://desset.lat/"' "$RUNNER_TEMP/prime-live.html"
           if [ "$SEO_POLICY" = INDEX ]; then
@@ -285,10 +285,10 @@ jobs:
           fi
           for file in THIRD-PARTY-NOTICES.txt robots.txt sitemap.xml styles.css styles-v5.css styles-system.css styles-hero-photo.css styles-visual02.css scripts/app.js scripts/motion.js scripts/v5-cinematic.js scripts/service-state.js assets/deliver-assets-mark.png assets/scene-move.webp assets/v62-courier.glb; do
             mkdir -p "$RUNNER_TEMP/live/$(dirname "$file")"
-            curl --retry 4 --retry-delay 3 --fail-with-body -fsSL "https://desset.lat/$file" -o "$RUNNER_TEMP/live/$file"
+            curl --retry 4 --retry-delay 3 --fail-with-body -sSL "https://desset.lat/$file" -o "$RUNNER_TEMP/live/$file"
             cmp -s "$RUNNER_TEMP/prime-manual-public/$file" "$RUNNER_TEMP/live/$file"
           done
-          curl --fail-with-body -fsSL https://www.desset.lat/ -o "$RUNNER_TEMP/prime-www.html"
+          curl --fail-with-body -sSL https://www.desset.lat/ -o "$RUNNER_TEMP/prime-www.html"
           grep -Fq 'DESSET — Comercio en movimiento' "$RUNNER_TEMP/prime-www.html"
           status="$(curl --silent --show-error -L -o /dev/null -w '%{http_code}' https://desset.lat/__desset_prime_missing_path__)"
           test "$status" = "404"
