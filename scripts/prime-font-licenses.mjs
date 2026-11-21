@@ -16,7 +16,7 @@ const pinned=[
   license:"fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt",licenseBlob:"d82b0820892c94be963fd958ef1817245c52a472",family:"DESSET Jakarta"}
 ];
 const fail=reason=>{throw Error("FONT RIGHTS NO-GO: "+reason)};
-const gitBlob=bytes=>createHash("sha1").update(Buffer.from("blob "+bytes.length+" ")).update(Buffer.from([0])).update(bytes).digest("hex");
+const gitBlob=bytes=>createHash("sha1").update(Buffer.from("blob "+bytes.length)).update(Buffer.from([0])).update(bytes).digest("hex");
 function valid(root,path,sha){
  const full=join(root,path),st=lstatSync(full);
  if(!st.isFile()||st.isSymbolicLink())fail("non-regular file "+path);

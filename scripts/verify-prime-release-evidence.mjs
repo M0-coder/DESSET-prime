@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 const sha = b => createHash('sha256').update(b).digest('hex');
 const fail = message=>{throw new Error('NO-GO: '+message)};
 const check = (cond,msg)=>{if(!cond)fail(msg)};
-function safeName(p){return typeof p==='string'&&/^[a-z0-9_.\/-]+$/.test(p)&&!p.startsWith('/')&&!p.split('/').some(x=>!x||x==='.'||x==='..');}
+function safeName(p){return typeof p==='string'&&(/^[a-z0-9_.\/-]+$/.test(p)||/^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(p))&&!p.startsWith('/')&&!p.split('/').some(x=>!x||x==='.'||x==='..');}
 export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha}) {
  check(isAbsolute(publicDir)&&isAbsolute(evidencePath),'absolute paths required');
  const info=JSON.parse(readFileSync(evidencePath,'utf8'));

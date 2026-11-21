@@ -23,7 +23,7 @@ const REQUIRED=['index.html','_headers','scripts/service-state.js','assets/deliv
  'styles-typography.css','fonts/inter-latin-variable.woff2','fonts/plus-jakarta-sans-latin-variable.woff2',
  'fonts/LICENSE-Inter-OFL.txt','fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt'];
 
-function safeName(name){return typeof name==='string'&&/^[a-z0-9_.\/-]+$/.test(name)&&!name.startsWith('/')&&!name.split('/').some(part=>!part||part==='.'||part==='..');}
+function safeName(name){return typeof name==='string'&&(/^[a-z0-9_.\/-]+$/.test(name)||/^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(name))&&!name.startsWith('/')&&!name.split('/').some(part=>!part||part==='.'||part==='..');}
 function assert(ok,message){if(!ok)throw Error('NO-GO: '+message)}
 function verifyManifest(dist){
  assert(isAbsolute(dist),'dist path must be absolute');

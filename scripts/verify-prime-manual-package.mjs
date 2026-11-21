@@ -17,7 +17,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(hash(Buffer.from(JSON.stringify(m.assets)))===m.assets_manifest_sha256,'Manifest SHA changed');
  const want=new Map(),seen=new Set();
  for(const a of m.assets){
-  check(typeof a.path==='string'&&(/^[a-z0-9_.\/-]+$/.test(a.path)||a.path==='THIRD-PARTY-NOTICES.txt')&&!a.path.startsWith('/')&&
+  check(typeof a.path==='string'&&(/^[a-z0-9_.\/-]+$/.test(a.path)||a.path==='THIRD-PARTY-NOTICES.txt'||/^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(a.path))&&!a.path.startsWith('/')&&
     !a.path.split('/').some(s=>!s||s==='.'||s==='..')&&!want.has(a.path),'Unsafe or repeated path');
   check(Number.isSafeInteger(a.bytes)&&a.bytes>0&&/^[a-f0-9]{64}$/.test(a.sha256),'Invalid expected file hash');
   want.set(a.path,a);
