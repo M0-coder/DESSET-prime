@@ -28,10 +28,12 @@ for(const entry of manifest.files){
 check(total===manifest.totalBytes,"package size mismatch");
 const html=await readFile(resolve(dist,"index.html"),"utf8");
 const loader=await readFile(resolve(dist,"scripts/v5-cinematic.js"),"utf8");
-check(html.includes('href="#ecosistema" data-v64-tour-launch'),"hero journey is not linked to real site");
+check(html.includes('id="ecosistema"')&&html.includes('aria-label="Recorrido visual: elegir, preparar y entregar"')&&
+ !html.includes('data-v64-tour-launch'),"3D section landmark or duplicate hero CTA regression");
 check(html.includes('class="v63-tour"')&&html.includes('class="v6-three-mount"'),"3D tour not mounted in ecosystem");
 check(html.includes('name="robots" content="noindex,nofollow"'),"noindex absent");
-check(loader.includes('stage.dataset.v64Requested="tour"')&&loader.includes('stage.querySelector(".v63-tour")?.click()'),"hero link cannot activate Three.js journey");
+check(loader.includes('activationObserver.observe(stage)')&&loader.includes('threeStart?.addEventListener("click",loadThree)')&&
+ loader.includes('./assets/v6-three.bundle.js'),"3D viewport activation or manual fallback not connected");
 for(const name of ["commerce","courier","destination"]){
  const path="assets/v62-"+name+".glb";
  check(expected.has(path),"GLB missing "+name);
@@ -65,4 +67,4 @@ async function inventory(path=""){
 const actual=await inventory();
 check(actual.length===expected.size+1,"unexpected file/s in packed site");
 check(actual.every(x=>x==="site-manifest.json"||expected.has(x)),"unknown web package content");
-console.log("DESSET Prime built website PASS: "+expected.size+" SHA-256-verified files (not cryptographically signed), "+total+" bytes; Three.js and three GLB ready, hero-to-ecosystem tour connected");
+console.log("DESSET Prime built website PASS: "+expected.size+" SHA-256-verified files (not cryptographically signed), "+total+" bytes; Three.js and three GLB ready, viewport-activated WebGL2 and local guided tour connected");
