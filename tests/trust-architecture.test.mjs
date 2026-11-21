@@ -32,9 +32,9 @@ test("transparent status is explicit, short, and not a decorative trust seal",()
  assert.doesNotMatch(panel,/100% seguro|certificado|verificado por|avalado por|garantizado/i);
 });
 
-test("contact promises only an existing link, not verified ownership or DM responsiveness",()=>{
+test("contact profiles carry owner declaration, not platform-admin proof or DM responsiveness",()=>{
  assert.match(html,/Ver perfil en Instagram/);
- assert.match(html,/data-channel-review="pending"/);
+ assert.match(html,/data-channel-review="verified" data-channel-basis="owner-attested"/);
  assert.equal((html.match(/class="contact-primary"/g)||[]).length,1);
  assert.doesNotMatch(html,/Abrir Instagram para conversar|contacto verificado|responderemos en|WhatsApp oficial/i);
  assert.doesNotMatch(html,/<form\b|<input\b/i);

@@ -21,7 +21,7 @@ Antes de **habilitar** el workflow manual debe comprobarse en GitHub:
 - Capturar respaldo íntegro del sitio experimental y verificar que el despliegue anterior sigue elegible para rollback. Cloudflare conserva versiones según su política de retención, que no equivale a una garantía de archivo perpetuo. No eliminar el repositorio antiguo antes de documentar y conservar este respaldo.
 
 
-- La preparación **NO certifica** de forma automática la titularidad de perfiles sociales: tres enlaces siguen `data-channel-review="pending"`. El workflow de producción comprueba el estado en la fuente y **falla** mientras alguno siga pendiente, aunque exista una variable de aprobación.
+- El titular de DESSET **confirmó** que los tres perfiles sociales enlazados pertenecen al proyecto. Las tres URL exactas están registradas en `config/prime-social-owner-attestation.json` y los enlaces llevan `data-channel-basis="owner-attested"`; no se afirma haber verificado mediante login el acceso administrativo. El workflow detiene la publicación si cualquiera de las URL cambia o aparece un enlace adicional sin declaración, aunque exista una variable de aprobación.
 - El workflow de PR ejecuta dos compilaciones desde árboles limpios y compara bit a bit los manifiestos SHA-256 del sitio original. Esta evidencia no sustituye pruebas en iOS/Android físicos.
 - Se distribuye `THIRD-PARTY-NOTICES.txt` con las licencias completas de Three.js y esbuild, sin alterar el logotipo, fotografías, SVG ni GLB originales.
 

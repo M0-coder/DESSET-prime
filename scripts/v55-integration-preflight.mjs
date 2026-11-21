@@ -5,6 +5,7 @@ import {createHash} from "node:crypto";
 import {readFileSync,statSync,mkdirSync,writeFileSync} from "node:fs";
 import {resolve} from "node:path";
 import {fileURLToPath} from "node:url";
+import {inspectInstitutionalChannels} from "./prime-channel-readiness.mjs";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const file=x=>readFileSync(resolve(root,x));
 const text=x=>file(x).toString("utf8");
@@ -30,7 +31,11 @@ require("Prime stays noindex",html.includes('name="robots" content="noindex,nofo
 require("Prime continues to prohibit remote scripts",/script-src 'self'/.test(html)&&/script-src 'self'/.test(headers));
 require("Production branch and workflow metadata are explicit",snap.official.observed_cloudflare.production_branch==="release-approved"&&snap.official.production_requirements.manual_workflow===".github/workflows/cloudflare-pages-production.yml");
 require("Owner approval cannot be implied",snap.prime.approval==="pending"&&snap.official.production_requirements.owner_design_approval_required===true);
-require("Channels still flagged pending",((html.match(/data-channel-review="pending"/g)||[]).length)>=3);
+const channels=inspectInstitutionalChannels({html,serviceState:availability});
+require("Three DESSET social URLs match owner attestation",
+ channels.channels_status==="OWNER_ATTESTED"&&channels.owner_attested_count===3&&
+ channels.unconfirmed_count===0&&channels.real_world_account_ownership_verified===false&&
+ channels.technical_platform_admin_access_tested===false);
 require("Release deployment remains absent from Prime workflow",!/(?:wrangler\s+pages\s+deploy|\bvercel\s+deploy\b|\bpages:\s*write\b)/.test(text(".github/workflows/preview-checks.yml")));
 require("Current Prime is larger than historical packaging baseline",Object.keys(a).length===2&&statSync(resolve(root,"assets/v5-cinematic-desktop.webp")).size>0&&statSync(resolve(root,"assets/v5-cinematic-mobile.webp")).size>0);
 const report={schema:"desset-prime-v55-integration-parity-v1",snapshot_at_local:snap.captured_at_local,
@@ -38,9 +43,9 @@ checks:test,failures:fails,source_scope:"Prime working branch, OFFLINE; official
 unchanged_common_assets:Object.keys(a),official_deployment_snapshot:snap.official.observed_cloudflare,
 release_readiness:"NO-GO",reason:"Figma, physical devices, accessibility human review, legal, exact-SHA approval, production packaging and separate release consent are pending",
 suggested_next_steps:["confirm latest Cloudflare Pages SHA again immediately before any migration","obtain Figma and brand owner approval",
-"open separate authorized change PR in M0-coder/DESSET and satisfy official visual-baseline gate",
+"integrate the approved Prime branches into the Prime repository only, by exact SHA",
 "run complete official packaging/CI and independent staged preview","require separate manual release instruction","prepare rollback by exact previous deployment id"],
-limitations:["No direct inspection of live HTTP or image pixels","Not a substitution for official production repository's release and visual authorization gates.","Source and snapshot parity only; no Cloudflare data was fetched by this script."]};
+limitations:["No direct inspection of live HTTP or image pixels","Not a substitute for the Prime repository's separate human release and visual authorization gates.","Source and snapshot parity only; no Cloudflare data was fetched by this script."]};
 mkdirSync(resolve(root,"reports/quality"),{recursive:true});
 writeFileSync(resolve(root,"reports/quality/v55-integration-preflight.json"),JSON.stringify(report,null,2)+"\n");
 console.log("V5.5 read-only integration preflight: "+(fails.length?"FAIL":"PASS")+" "+(test.length-fails.length)+"/"+test.length+" checks; publishing decision remains "+report.release_readiness);

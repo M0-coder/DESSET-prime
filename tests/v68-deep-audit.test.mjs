@@ -58,7 +58,7 @@ test("V6.8 signed inventory records every updated static asset",()=>{
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
 
-test("V6.8 release readiness is NOT implied by an unverified social link",()=>{
- assert.equal((html.match(/data-channel-review="pending"/g)||[]).length,3);
+test("V6.8 release readiness is NOT implied merely by owner-declared social links",()=>{
+ assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,3);
  assert.doesNotMatch(html,/<form\b/i);
 });
