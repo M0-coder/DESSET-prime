@@ -81,19 +81,44 @@ export function inspectInstitutionalChannels({html,serviceState,attestation=defa
   technical_platform_admin_access_tested:false,
   release_authorized:false};
 }
+// The protected production environment supplies the result of a private human review.
+// Public attestations and ordinary offline/PR checks never read this record.
+export function verifyAdminReview(report, reviewText, sourceSha){
+ strict(typeof reviewText==='string'&&reviewText.trim().length>0,
+  'independent platform ownership verification is required for manual production release');
+ let review;
+ try{review=JSON.parse(reviewText);}catch{reject('invalid private channel review JSON');}
+ strict(review?.schema==='desset-prime-channel-admin-review-v1'&&
+  review.repository==='M0-coder/DESSET-prime'&&typeof sourceSha==='string'&&
+  /^[a-f0-9]{40}$/.test(sourceSha)&&review.source_sha===sourceSha,'channel review belongs to another release');
+ const reviewedAt=Date.parse(review.reviewed_at);
+ strict(typeof review.reviewer==='string'&&review.reviewer.trim().length>0&&
+  Number.isFinite(reviewedAt)&&reviewedAt<=Date.now(),'missing reviewer or invalid review date');
+ strict(report.unconfirmed_count===0&&report.owner_attested_count===5&&
+  Array.isArray(review.channels)&&review.channels.length===5,'incomplete channel review');
+ for(const link of report.external_links){
+  const matches=review.channels.filter(entry=>entry?.platform===link.platform&&entry.url===link.href);
+  strict(matches.length===1,'missing or duplicate review for '+link.platform);
+  const entry=matches[0];
+  strict(entry.method==='authenticated-admin-control-observed'&&
+   typeof entry.evidence_sha256==='string'&&/^[a-f0-9]{64}$/.test(entry.evidence_sha256),
+   'missing authenticated admin observation or evidence digest for '+link.platform);
+ }
+ return {...report,channels_status:'ADMIN_REVIEW_VERIFIED',
+  real_world_account_ownership_verified:true,technical_platform_admin_access_tested:true};
+}
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{
   const [htmlPath,statePath,reportPath,mode]=process.argv.slice(2);
   strict(htmlPath&&statePath&&isAbsolute(htmlPath)&&isAbsolute(statePath),'absolute source paths required');
-  const report=inspectInstitutionalChannels({html:readFileSync(htmlPath,'utf8'),serviceState:readFileSync(statePath,'utf8')});
+  let report=inspectInstitutionalChannels({html:readFileSync(htmlPath,'utf8'),serviceState:readFileSync(statePath,'utf8')});
+  if(mode!==undefined){
+   strict(mode==='--require-verified','unknown channel verification mode');
+   report=verifyAdminReview(report,process.env.DESSET_CHANNEL_ADMIN_REVIEW,process.env.GITHUB_SHA);
+  }
   if(reportPath){strict(isAbsolute(reportPath),'report path must be absolute');writeFileSync(reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx'});}
   console.log(JSON.stringify({channels_status:report.channels_status,owner_attested_count:report.owner_attested_count,
    unconfirmed:report.unconfirmed_count,release_authorized:false,
-   technical_platform_admin_access_tested:false}));
-  if(mode==='--require-verified'){
-   strict(report.unconfirmed_count===0&&report.real_world_account_ownership_verified===true&&
-    report.technical_platform_admin_access_tested===true,
-    'independent platform ownership verification is required for manual production release');
-  }
+   technical_platform_admin_access_tested:report.technical_platform_admin_access_tested}));
  }catch(e){console.error(e.message);process.exitCode=2;}
 }
