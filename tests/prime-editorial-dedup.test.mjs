@@ -63,3 +63,30 @@ test("Dead styles were deleted rather than turned into display:none",()=>{
   assert.match(css,/\.statement-body\{display:grid;grid-template-columns:minmax\(0,1fr\)/);
   assert.doesNotMatch(css,/\.trust-ledger[^\n]*display:none/);
 });
+
+test("EDITORIAL-09 actually deletes the two marked desktop ornaments without hiding or breaking 3D",()=>{
+ const removedMarkup=[
+  "v4-hero-declaration",
+  "v5-stage-caption",
+  "motion-story-bridge",
+  "EL COMERCIO CONECTADO",
+  "Visualización conceptual del sistema previsto",
+  "COMERCIO · TECNOLOGÍA · LOGÍSTICA",
+ ];
+ for(const token of removedMarkup)assert.ok(!html.includes(token),"Redundant UI must be removed from HTML: "+token);
+ const stylesheetNames=["styles.css","styles-v5.css","styles-hero-photo.css","styles-system.css","styles-visual02.css"];
+ for(const sheet of stylesheetNames){
+  const cssSource=read(sheet);
+  assert.doesNotMatch(cssSource,/\.v4-hero-declaration\b|\.v5-stage-caption\b|\.motion-story-bridge(?:-start|-line|-end)?\b/,
+   "Do not retain or hide obsolete ornament CSS in "+sheet);
+  assert.doesNotMatch(cssSource,/@keyframes (?:prime-bridge-draw|v45-declaration-in|v45-route-point)\b/);
+ }
+ assert.match(html,/<figure class="v5-city-stage" aria-label="Renderización gráfica conceptual de DESSET">/);
+ assert.match(html,/alt="Escena conceptual tridimensional:/);
+ assert.match(html,/class="v6-three-mount"/);
+ assert.match(html,/class="v63-tour"/);
+ assert.equal((html.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,3);
+ assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/);
+ assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
+ assert.equal((html.match(/data-channel-basis="owner-attested"/g)||[]).length,5);
+});
