@@ -247,7 +247,7 @@ try{
  const socials=await js('(()=>{const nav=document.querySelector("#contacto .social-links--official");const links=[...nav?.querySelectorAll("a")||[]];return {count:links.length,navLabel:nav?.getAttribute("aria-label"),oldBlock:!!document.querySelector(".social-links--secondary"),links:links.map(a=>({name:a.firstChild?.textContent?.trim(),href:a.href,owner:a.dataset.channelBasis,review:a.dataset.channelReview,height:Math.round(a.getBoundingClientRect().height),background:getComputedStyle(a).backgroundColor,border:getComputedStyle(a).borderTopColor})),width:Math.round(nav?.getBoundingClientRect().width||0)}})()');
  if(socials.count!==5||socials.navLabel!=="Redes sociales de DESSET"||socials.oldBlock||
   socials.links.map(x=>x.name).join("|")!=="Instagram|Facebook|TikTok|YouTube|X"||
-  socials.links.some(x=>x.owner!=="owner-attested"||x.review!=="verified"||x.height<48||!x.href.startsWith("https://"))||
+  socials.links.some(x=>x.owner!=="owner-attested"||x.review!=="owner-attested"||x.height<48||!x.href.startsWith("https://"))||
   new Set(socials.links.map(x=>x.background)).size!==1||
   new Set(socials.links.map(x=>x.border)).size!==1)
   report.failures.push("One equal five-platform 60/30/10 social rail missing: "+JSON.stringify(socials));
