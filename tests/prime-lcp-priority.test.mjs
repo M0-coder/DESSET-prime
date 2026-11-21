@@ -41,9 +41,7 @@ test("Mobile LCP entrance finishes promptly without changing desktop or reduced 
  assert.equal(packed,original,"Source and verified packaged CSS must match exactly");
  assert.match(original,/animation:anim02-frame 1\.35s/,"Retain desktop composition and keyframes");
  assert.match(original,/animation:anim02-focus 2\.05s/,"Retain desktop image-focus animation");
- assert.match(original,/@keyframes prime-mobile-photo-enter\{/);
- assert.match(original,/@media \(max-width:700px\) and \(prefers-reduced-motion:no-preference\)\{\s*#inicio \.prime-photo-surface\{animation:prime-mobile-photo-enter \.38s ease-out both\}\s*#inicio \.prime-photo-image\{animation:none\}/);
- assert.doesNotMatch(original,/@media \(max-width:700px\) and \(prefers-reduced-motion:no-preference\)\{[^}]*anim02-focus/);
+ assert.match(original,/@media \(max-width:700px\) and \(prefers-reduced-motion:no-preference\)\{\s*#inicio \.prime-photo-surface,#inicio \.prime-photo-image\{animation-duration:\.65s;animation-delay:0s\}/);
  assert.match(original,/@media\(prefers-reduced-motion:reduce\)[\s\S]*#inicio \.prime-photo-surface[\s\S]*animation:none!important/);
  assert.match(original,/@keyframes anim02-frame\{/);
 });
