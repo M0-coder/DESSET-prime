@@ -107,6 +107,12 @@ async function viewport(width,height,reduce=false){
   if(diag.railWords.length!==4||diag.railWords.some(w=>!w.visible||!w.inside||w.width<45))fails.push("mobile editorial keyword rail clips or hides a word: "+JSON.stringify(diag.railWords));
   if(diag.typeSizes.heroLead<14||diag.typeSizes.sectionTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
+ const perf01=await js('(()=>{const hero=document.querySelector("#inicio .prime-photo-image"),stage=document.querySelector(".v5-stage-render"),cards=[...document.querySelectorAll(".v03-photo-story img")],selected=hero?.currentSrc||"";const desired=matchMedia("(max-width: 700px)").matches?"desset-hero-entrega-mobile.webp":"desset-hero-entrega-dos-espejos.webp";return {preloads:document.querySelectorAll("link[rel=preload][as=image]").length,correctHero:selected.endsWith("/"+desired),heroLoading:hero?.loading,heroPriority:hero?.fetchPriority,posterLoading:stage?.loading,posterPriority:stage?.fetchPriority,stories:cards.map(x=>({loading:x.loading,priority:x.fetchPriority}))}})()');
+ if(perf01.preloads!==0||!perf01.correctHero||perf01.heroLoading!=="eager"||perf01.heroPriority!=="high"||
+    perf01.posterLoading!=="eager"||perf01.posterPriority!=="low"||perf01.stories.length!==3||
+    perf01.stories.some(x=>x.loading!=="lazy"||x.priority!=="low"))
+  report.failures.push("PERF-01 preserve hero/poster and lazy narrative priority failed: "+JSON.stringify(perf01));
+ report.tests.push({name:"PERF-01 correct hero, immediate 3D poster fallback and low-priority story photos",width,perf01});
  report.viewports.push({width,height,reduce,...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
  return diag;
