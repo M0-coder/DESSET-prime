@@ -92,7 +92,7 @@ async function viewport(width,height,reduce=false){
  });
  const typeSizes={
   heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
-  sectionTitle:parseFloat(getComputedStyle(document.querySelector(".section-head h2")).fontSize),
+  serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
   storyTitle:parseFloat(getComputedStyle(document.querySelector(".motion-story-unit h3")).fontSize)
  };
  return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
@@ -105,7 +105,7 @@ async function viewport(width,height,reduce=false){
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
  if(width<=700){
   if(diag.railWords.length!==4||diag.railWords.some(w=>!w.visible||!w.inside||w.width<45))fails.push("mobile editorial keyword rail clips or hides a word: "+JSON.stringify(diag.railWords));
-  if(diag.typeSizes.heroLead<14||diag.typeSizes.sectionTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
+  if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
  report.viewports.push({width,height,reduce,...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
@@ -176,8 +176,8 @@ try{
  report.tests.push({name:"ANIM-02 real photographic opening, official mark, editorial chronology",anim02});
 
 
- const smallUI=await js('(()=>{const selector=".header-descriptor,.v4-hero-caption,.hero-kicker,.v4-canvas-top,.v4-canvas-bottom,.hero-meta,.section-label,.kicker,.service-top,.ecosystem-board-top,.motion-story-index,.motion-story-status,.audience-no,.audience-tag,.business-pitch-top,.closing-kicker-signal";return {decorativeLabelCount:document.querySelectorAll(selector).length,numberedTokens:document.body.textContent.match(/\\b0[1-9]\\s*\\/\\s*/g)||[],statusVisible:document.querySelector(".trust-ledger-item strong")?.textContent?.trim()}})()');
- if(smallUI.decorativeLabelCount!==0||smallUI.numberedTokens.length!==0||!smallUI.statusVisible)report.failures.push("Editorial numeric labels survived cleanup: "+JSON.stringify(smallUI));
+ const smallUI=await js('(()=>{const selector=".header-descriptor,.v4-hero-caption,.hero-kicker,.v4-canvas-top,.v4-canvas-bottom,.hero-meta,.section-label,.kicker,.service-top,.ecosystem-board-top,.motion-story-index,.motion-story-status,.audience-no,.audience-tag,.business-pitch-top,.closing-kicker-signal";return {decorativeLabelCount:document.querySelectorAll(selector).length,numberedTokens:document.body.textContent.match(/\\b0[1-9]\\s*\\/\\s*/g)||[],statement:document.querySelector("#vision h2")?.textContent?.trim(),removedBlocks:document.querySelectorAll(".trust-ledger,.statement-side,.section-head,.ecosystem-footnote,.hero-secondary").length}})()');
+ if(smallUI.decorativeLabelCount!==0||smallUI.numberedTokens.length!==0||!smallUI.statement?.includes("ES CONECTAR")||smallUI.removedBlocks!==0)report.failures.push("Editorial numeric labels survived cleanup: "+JSON.stringify(smallUI));
  report.tests.push({name:"Zero editorial numeric labels and redundant tiny captions",smallUI});
  await capture("desktop-entry.png");
  await sleep(1100);
@@ -251,12 +251,12 @@ try{
  await js('document.querySelector(".future-services").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(120);
  await capture("desktop-expansion-optional.png");
- await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
- await sleep(180);
- const trustDesktop=await js('(()=>{const el=document.querySelector(".trust-ledger"),cards=[...el.querySelectorAll(".trust-ledger-item")],grid=el.querySelector(".trust-ledger-grid"),v=document.documentElement.clientWidth;return {cards:cards.map(x=>({title:x.querySelector("strong")?.textContent?.trim(),right:Math.round(x.getBoundingClientRect().right),width:Math.round(x.getBoundingClientRect().width),font:parseFloat(getComputedStyle(x.querySelector("p")).fontSize)})),gridCols:getComputedStyle(grid).gridTemplateColumns.split(" ").length,viewport:v,heading:el.querySelector("h3")?.textContent?.trim()}})()');
- if(trustDesktop.cards.length!==3||trustDesktop.gridCols!==3||trustDesktop.cards.some(x=>x.right>trustDesktop.viewport+2||x.font<14)||!trustDesktop.heading.includes("UN ECOSISTEMA, TRES PILARES"))report.failures.push("Trust content broken on desktop: "+JSON.stringify(trustDesktop));
- report.tests.push({name:"Credibility status ledger desktop",trustDesktop});
- await capture("desktop-trust-status.png");
+  await js('document.querySelector("#vision").scrollIntoView({block:"center",behavior:"instant"})');
+  await sleep(180);
+  const leanDesktop=await js('(()=>{const s=document.querySelector("#vision"),b=s.querySelector(".statement-body"),h=s.querySelector("h2"),r=h.getBoundingClientRect();return {children:b.children.length,cols:getComputedStyle(b).gridTemplateColumns.split(" ").length,text:h.textContent.trim(),left:r.left,right:r.right,height:r.height,viewport:document.documentElement.clientWidth,duplicates:s.querySelectorAll(".statement-side,.trust-ledger").length}})()');
+  if(leanDesktop.children!==1||leanDesktop.cols!==1||leanDesktop.duplicates!==0||leanDesktop.left< -2||leanDesktop.right>leanDesktop.viewport+2||leanDesktop.height<60||!leanDesktop.text.includes("ES CONECTAR"))report.failures.push("Lean original editorial message broken on desktop: "+JSON.stringify(leanDesktop));
+  report.tests.push({name:"Editorial dedup desktop: one-column message, no duplicate cards",leanDesktop});
+  await capture("desktop-lean-statement.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
@@ -287,12 +287,12 @@ try{
    if(mobileClosing.some(x=>x.opacity<.99))report.failures.push("V6.7 mobile closing text loses opacity: "+JSON.stringify(mobileClosing));
    report.tests.push({name:"V6.7 mobile contact heading maintains legibility",mobileClosing});
    await capture("mobile-contact-final.png");
-   await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
-   await sleep(160);
-   const trustMobile=await js('(()=>{const el=document.querySelector(".trust-ledger"),cards=[...el.querySelectorAll(".trust-ledger-item")],v=document.documentElement.clientWidth;return {viewport:v,cols:getComputedStyle(el.querySelector(".trust-ledger-grid")).gridTemplateColumns.split(" ").length,cards:cards.map(c=>({right:Math.round(c.getBoundingClientRect().right),left:Math.round(c.getBoundingClientRect().left),height:Math.round(c.getBoundingClientRect().height),font:parseFloat(getComputedStyle(c.querySelector("p")).fontSize)}))}})()');
-   if(trustMobile.cards.length!==3||trustMobile.cols!==1||trustMobile.cards.some(c=>c.left < -2||c.right>trustMobile.viewport+2||c.height<70||c.font<14))report.failures.push("Trust content clipped or unreadable on mobile: "+JSON.stringify(trustMobile));
-   report.tests.push({name:"Credibility status ledger mobile",trustMobile});
-   await capture("mobile-trust-status.png");
+    await js('document.querySelector("#vision").scrollIntoView({block:"center",behavior:"instant"})');
+    await sleep(160);
+    const leanMobile=await js('(()=>{const s=document.querySelector("#vision"),b=s.querySelector(".statement-body"),h=s.querySelector("h2"),r=h.getBoundingClientRect();return {children:b.children.length,cols:getComputedStyle(b).gridTemplateColumns.split(" ").length,left:r.left,right:r.right,height:r.height,viewport:document.documentElement.clientWidth,duplicates:s.querySelectorAll(".statement-side,.trust-ledger").length,font:parseFloat(getComputedStyle(h).fontSize)}})()');
+    if(leanMobile.children!==1||leanMobile.cols!==1||leanMobile.duplicates!==0||leanMobile.left< -2||leanMobile.right>leanMobile.viewport+2||leanMobile.height<70||leanMobile.font<31)report.failures.push("Lean original editorial message clipped or duplicated on mobile: "+JSON.stringify(leanMobile));
+    report.tests.push({name:"Editorial dedup mobile: no overflow and no duplicate cards",leanMobile});
+    await capture("mobile-lean-statement.png");
    await js("document.querySelector('.menu-button').click()");
    const menu=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),display:getComputedStyle(document.querySelector('.main-nav')).display})");
    if(menu.expanded!=="true"||menu.display==="none")report.failures.push("Mobile navigation did not open");
