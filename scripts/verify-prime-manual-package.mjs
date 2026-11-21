@@ -13,11 +13,11 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(['INDEX','NOINDEX'].includes(seoPolicy)&&seoPolicy===m.seo_policy,'SEO policy differs');
  check(m.project==='desset-institucional'&&m.canonical==='https://desset.lat/','Wrong Pages destination');
  check(m.production_authorized===false&&m.production_deployed===false,'Report attempts to authorize production');
- check(m.original_files===30&&m.package_files===33&&Array.isArray(m.assets)&&m.assets.length===33,'Missing/extra source assets');
+ check(m.original_files===30&&m.package_files===34&&Array.isArray(m.assets)&&m.assets.length===34,'Missing/extra source assets');
  check(hash(Buffer.from(JSON.stringify(m.assets)))===m.assets_manifest_sha256,'Manifest SHA changed');
  const want=new Map(),seen=new Set();
  for(const a of m.assets){
-  check(typeof a.path==='string'&&/^[a-z0-9_.\/-]+$/.test(a.path)&&!a.path.startsWith('/')&&
+  check(typeof a.path==='string'&&(/^[a-z0-9_.\/-]+$/.test(a.path)||a.path==='THIRD-PARTY-NOTICES.txt')&&!a.path.startsWith('/')&&
     !a.path.split('/').some(s=>!s||s==='.'||s==='..')&&!want.has(a.path),'Unsafe or repeated path');
   check(Number.isSafeInteger(a.bytes)&&a.bytes>0&&/^[a-f0-9]{64}$/.test(a.sha256),'Invalid expected file hash');
   want.set(a.path,a);
@@ -30,13 +30,22 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
    else {check(stat.isFile()&&!seen.has(rel),'Not a regular file: '+rel);seen.add(rel);}
   }
  }
- scan(publicDir);check(seen.size===33,'Unexpected file count');
+ scan(publicDir);check(seen.size===34,'Unexpected file count');
  for(const path of seen)check(want.has(path),'Unexpected file: '+path);
  for(const [path,spec] of want){
   check(seen.has(path),'Missing file: '+path);
   const bytes=readFileSync(join(publicDir,path));
   check(bytes.length===spec.bytes&&hash(bytes)===spec.sha256,'File differs: '+path);
  }
+ const notices=readFileSync(join(publicDir,'THIRD-PARTY-NOTICES.txt'),'utf8');
+ check(m.third_party_notice_sha256===hash(Buffer.from(notices)),'Third-party license SHA does not match evidence');
+ check(Array.isArray(m.third_party_licenses)&&m.third_party_licenses.length===2,'Missing third-party license descriptors');
+ for(const pkg of ['three','esbuild']){
+  const info=m.third_party_licenses.find(x=>x.package===pkg);
+  check(info?.license==='MIT'&&notices.includes(pkg+' '+info.version+' (MIT)'),'Missing installed-package MIT notice for '+pkg);
+ }
+ check((notices.match(/Permission is hereby granted/g)||[]).length===2,'Full MIT permission terms missing');
+ check(!notices.includes('PROPRIETARY'),'Third-party license misclassified');
  const html=readFileSync(join(publicDir,'index.html'),'utf8');
  const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');
  const map=readFileSync(join(publicDir,'sitemap.xml'),'utf8');
@@ -53,7 +62,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(!seen.has('site-manifest.json')&&!seen.has('prime-manual-release-package.json'),'Private evidence exposed publicly');
  const status=readFileSync(join(publicDir,'scripts/service-state.js'),'utf8');
  check(status.includes('applicationDistribution:"not_published"')&&status.includes('verified:false'),'Application status changed');
- return {result:'PASS',source_sha:sourceSha,seo:seoPolicy,files:33,production_authorized:false,production_deployed:false};
+ return {result:'PASS',source_sha:sourceSha,seo:seoPolicy,files:34,production_authorized:false,production_deployed:false};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{const [publicDir,reportPath,sourceSha,seoPolicy]=process.argv.slice(2);

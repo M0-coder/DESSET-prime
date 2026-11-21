@@ -14,13 +14,15 @@ function fixture(t,seoPolicy='NOINDEX',src=dist){
  return {parent,outputDir,evidenceDir,report};
 }
 test('NOINDEX release shape preserves source and blocks crawling',t=>{
- const f=fixture(t);assert.equal(f.report.package_files,33);
+ const f=fixture(t);assert.equal(f.report.package_files,34);
  assert.equal(f.report.production_deployed,false);assert.equal(f.report.production_authorized,false);
  assert.match(readFileSync(join(f.outputDir,'index.html'),'utf8'),/name="robots" content="noindex,nofollow"/);
  assert.equal(readFileSync(join(f.outputDir,'robots.txt'),'utf8'),'User-agent: *\nDisallow: /\n');
  assert.ok(!readFileSync(join(f.outputDir,'sitemap.xml'),'utf8').includes('<loc>'));
  assert.deepEqual(JSON.parse(readFileSync(join(f.evidenceDir,'prime-manual-release-package.json'),'utf8')),f.report);
  assert.ok(!readdirSync(f.outputDir).includes('prime-manual-release-package.json'));
+ assert.match(readFileSync(join(f.outputDir,'THIRD-PARTY-NOTICES.txt'),'utf8'),/three 0\.187\.0 \(MIT\)/);
+ assert.match(readFileSync(join(f.outputDir,'THIRD-PARTY-NOTICES.txt'),'utf8'),/esbuild 0\.28\.2 \(MIT\)/);
 });
 test('INDEX release shape has explicit canonical, OG, robots and sitemap',t=>{
  const f=fixture(t,'INDEX'),html=readFileSync(join(f.outputDir,'index.html'),'utf8');

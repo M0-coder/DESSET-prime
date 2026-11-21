@@ -8,7 +8,7 @@
 - Destino: proyecto existente **Cloudflare Pages Direct Upload** `desset-institucional`; rama interna de producción `release-approved`; dominios `desset.lat` y `www.desset.lat`, sin cambios DNS.
 - Referencia actual de recuperación: despliegue `b107eff2-6511-4e04-a780-fbd28e93e4e9`; SHA experimental `9f48d62cdadb43135fc9c2072cdc9e31f695c9ab`. Ambos se **vuelven a verificar EN VIVO** en la futura ventana de publicación. Si cambian, NO-GO hasta actualizar la autorización.
 - `.github/workflows/prime-manual-publish.yml`: PR = **pruebas únicamente**; producción = `workflow_dispatch` exclusivamente sobre `main`. La operación requiere bandera **desactivada por defecto**, confirmación literal, SHA exacto, aprobaciones institucionales, entorno GitHub protegido, preflight Cloudflare y token de acceso limitado a Pages.
-- `scripts/prime-manual-cutover-package.mjs`: genera los 33 archivos del sitio desde la compilación nativa Prime sin incorporar archivos del experimento. Los únicos bytes modificados respecto a la copia de ensayo son `index.html`, `_headers`, `robots.txt` y `sitemap.xml`; el logo, las fotos, Three.js, GLB y JS permanecen intactos. `scripts/verify-prime-manual-package.mjs` verifica SHA-256 de todos los archivos.
+- `scripts/prime-manual-cutover-package.mjs`: genera los 34 archivos del paquete de publicación (33 de la copia verificada más `THIRD-PARTY-NOTICES.txt` con los textos completos MIT de las dependencias instaladas) desde la compilación nativa Prime sin incorporar archivos del experimento. Los únicos archivos originales modificados respecto a la copia de ensayo son `index.html`, `_headers`, `robots.txt` y `sitemap.xml`; el logo, las fotos, Three.js, GLB y JS permanecen intactos. `scripts/verify-prime-manual-package.mjs` verifica SHA-256 de todos los archivos.
 
 ## 2. Controles previos al release: requeridos pero NO configurados en este PR
 
@@ -19,6 +19,11 @@ Antes de **habilitar** el workflow manual debe comprobarse en GitHub:
 - Las siguientes variables **deben permanecer vacías o en false hasta autorización expresa**: `DESSET_PRIME_RELEASE_ENABLED`, `DESSET_PRIME_RIGHTS_APPROVED`, `DESSET_PRIME_CONTACT_APPROVED`, `DESSET_PRIME_SECURITY_APPROVED`, `DESSET_PRIME_ROLLBACK_BACKUP_APPROVED`, `DESSET_PRIME_INDEX_APPROVED`. `DESSET_PRIME_VISUAL_APPROVED_SHA` debe contener exactamente el SHA final revisado.
 - Alcance de aceptación: arquitectura y compilación, pruebas unitarias e instrumentadas, cobertura real productiva, SAST/SCA/SBOM, licencias, calidad CI, reproducibilidad de compilaciones independientes, mutation testing de funciones relevantes, deuda técnica, accesibilidad manual, móviles físicos y evidencia por SHA. CI verde no certifica todo lo anterior.
 - Capturar respaldo íntegro del sitio experimental y verificar que el despliegue anterior sigue elegible para rollback. Cloudflare conserva versiones según su política de retención, que no equivale a una garantía de archivo perpetuo. No eliminar el repositorio antiguo antes de documentar y conservar este respaldo.
+
+
+- La preparación **NO certifica** de forma automática la titularidad de perfiles sociales: tres enlaces siguen `data-channel-review="pending"`. El workflow de producción comprueba el estado en la fuente y **falla** mientras alguno siga pendiente, aunque exista una variable de aprobación.
+- El workflow de PR ejecuta dos compilaciones desde árboles limpios y compara bit a bit los manifiestos SHA-256 del sitio original. Esta evidencia no sustituye pruebas en iOS/Android físicos.
+- Se distribuye `THIRD-PARTY-NOTICES.txt` con las licencias completas de Three.js y esbuild, sin alterar el logotipo, fotografías, SVG ni GLB originales.
 
 ## 3. Ejecución futura — SOLO tras autorización de merge y release independientes
 
