@@ -35,7 +35,6 @@
 /* Institutional close: stronger hierarchy, no invented contact channels. */
 #contacto .contact-bottom{border-top:1px solid #b9c6d5;padding-top:clamp(22px,3vw,34px)}
 #contacto .contact-status{border-left:3px solid var(--v02-blue);padding-left:14px}
-#contacto .contact-primary{box-shadow:0 8px 23px rgba(21,81,216,.16)}
 @media(max-width:860px){
 
 
