@@ -91,22 +91,39 @@
     document.head.appendChild(script);
   };
   threeStart?.addEventListener("click",loadThree);
-  // Intersection-triggered, once-only GPU activation. Nothing heavy on initial page load.
-  const canAutoStart=()=>{
-    if(navigator.connection?.saveData===true)return false;
-    if(typeof navigator.deviceMemory==="number"&&navigator.deviceMemory<4)return false;
-    try{return !!document.createElement("canvas").getContext("webgl2")}
-    catch{return false}
-  };
+  // The synchronous WebGL capability probe is expensive on throttled mobile CPUs:
+  // run it only after a visitor really scrolls towards this section, never on initial paint.
+  const canAutoStart=()=>navigator.connection?.saveData!==true&&
+    (typeof navigator.deviceMemory!=="number"||navigator.deviceMemory>=4);
   const auto3D=canAutoStart();
   stage.dataset.v6Autostart=auto3D?"enabled":"manual";
   if(auto3D){
-    const activationObserver=new window.IntersectionObserver((entries,self)=>{
-      if(!entries.some(entry=>entry.isIntersecting))return;
-      self.disconnect();
+    let stageNear=false,finished=false;
+    const startOnArrival=()=>{
+      if(finished||!stageNear||window.scrollY<120)return;
+      finished=true;
+      activationObserver.disconnect();
+      window.removeEventListener("scroll",startOnArrival);
+      try{
+        if(!document.createElement("canvas").getContext("webgl2")){
+          stage.dataset.v6Autostart="unsupported";
+          if(threeStart)threeStart.hidden=true;
+          return;
+        }
+      }catch{
+        stage.dataset.v6Autostart="unsupported";
+        if(threeStart)threeStart.hidden=true;
+        return;
+      }
       loadThree();
+    };
+    const activationObserver=new window.IntersectionObserver((entries,self)=>{
+      stageNear=entries.some(entry=>entry.isIntersecting);
+      if(stageNear&&window.scrollY>=120)self.disconnect();
+      startOnArrival();
     },{rootMargin:"140px 0px",threshold:0.01});
     activationObserver.observe(stage);
+    window.addEventListener("scroll",startOnArrival,{passive:true});
   }
 
   // Primary-site integration: one intentional hero click opens the ecosystem

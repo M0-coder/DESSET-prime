@@ -9,7 +9,10 @@ test("SCENE3D-01 automatic scene uses viewport intersection, not page-start down
  assert.match(loader,/activationObserver\.observe\(stage\)/);
  assert.match(loader,/self\.disconnect\(\)/);
  assert.match(loader,/navigator\.connection\?\.saveData===true/);
- assert.match(loader,/navigator\.deviceMemory<4/);
+ assert.match(loader,/navigator\.deviceMemory>=4/);
+ assert.match(loader,/window\.scrollY<120/);
+ assert.match(loader,/window\.addEventListener\("scroll",startOnArrival/);
+ assert.match(loader,/activationObserver\.disconnect\(\)/);
  assert.match(loader,/getContext\("webgl2"\)/);
  assert.match(loader,/if\(reduced \|\| typeof window\.IntersectionObserver/);
  assert.match(loader,/stage\.dataset\.v6State="loading"/);
