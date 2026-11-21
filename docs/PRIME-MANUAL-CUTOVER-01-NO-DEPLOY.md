@@ -4,7 +4,7 @@
 
 ## 1. Arquitectura
 
-- Origen: `DESSET-prime`, rama `main` **una vez aprobadas y fusionadas por separado** las ramas de diseño y los PR #14, #15 y este PR. Los PR abiertos no equivalen a autorización de merge.
+- Origen: `DESSET-prime`, rama `main` **únicamente tras autorización y revisión final del PR canónico #24, por SHA exacto**. `main` contiene solo README hasta que exista merge aprobado. No fusionar PRs históricos encadenados por inferencia.
 - Destino: proyecto existente **Cloudflare Pages Direct Upload** `desset-institucional`; rama interna de producción `release-approved`; dominios `desset.lat` y `www.desset.lat`, sin cambios DNS.
 - Referencia actual de recuperación: despliegue `b107eff2-6511-4e04-a780-fbd28e93e4e9`; SHA experimental `9f48d62cdadb43135fc9c2072cdc9e31f695c9ab`. Ambos se **vuelven a verificar EN VIVO** en la futura ventana de publicación. Si cambian, NO-GO hasta actualizar la autorización.
 - `.github/workflows/prime-manual-publish.yml`: PR = **pruebas únicamente**; producción = `workflow_dispatch` exclusivamente sobre `main`. La operación requiere bandera **desactivada por defecto**, confirmación literal, SHA exacto, aprobaciones institucionales, entorno GitHub protegido, preflight Cloudflare y token de acceso limitado a Pages.
@@ -21,7 +21,7 @@ Antes de **habilitar** el workflow manual debe comprobarse en GitHub:
 - Capturar respaldo íntegro del sitio experimental y verificar que el despliegue anterior sigue elegible para rollback. Cloudflare conserva versiones según su política de retención, que no equivale a una garantía de archivo perpetuo. No eliminar el repositorio antiguo antes de documentar y conservar este respaldo.
 
 
-- El titular de DESSET **confirmó** que los tres perfiles sociales enlazados pertenecen al proyecto. Las tres URL exactas están registradas en `config/prime-social-owner-attestation.json` y los enlaces llevan `data-channel-basis="owner-attested"`; no se afirma haber verificado mediante login el acceso administrativo. El workflow detiene la publicación si cualquiera de las URL cambia o aparece un enlace adicional sin declaración, aunque exista una variable de aprobación.
+- Los cinco enlaces sociales (Instagram, Facebook, TikTok, YouTube y X) constan como **declarados por el titular** en `config/prime-social-owner-attestation.json`, cada uno con URL exacta y `data-channel-basis="owner-attested"`. **No existe prueba independiente de acceso administrativo**. El workflow debe bloquear cambios no declarados y jamás confundir esta declaración con verificación de plataforma.
 - El workflow de PR ejecuta dos compilaciones desde árboles limpios y compara bit a bit los manifiestos SHA-256 del sitio original. Esta evidencia no sustituye pruebas en iOS/Android físicos.
 - Se distribuye `THIRD-PARTY-NOTICES.txt` con las licencias completas de Three.js y esbuild, sin alterar el logotipo, fotografías, SVG ni GLB originales.
 
@@ -52,7 +52,7 @@ Si falla el smoke **después** de una publicación, no ejecutar automáticamente
 
 Permite **probar el mecanismo y sus negativas** en CI, no ejecutar una publicación. Este PR no modifica archivos visuales de DESSET Prime ni `main`, Cloudflare, DNS, tokens, variables, entornos, releases o repositorios existentes.
 
-**Decisión actual: NO-GO para publicación**, pendiente de aprobación técnica, visual, institucional y de despliegue por SHA exacto.
+**Decisión actual: NO-GO para publicación**, pendiente de aprobación técnica, visual, institucional y de despliegue por SHA exacto. Ver también `docs/PRIME-WORK-RELEASE-HANDOFF-2026-11-21.md` para el inventario observado en vivo y el traspaso operativo a Work.
 
 Fuentes técnicas:
 - [Cloudflare Pages Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/)
