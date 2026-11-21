@@ -1,0 +1,101 @@
+{
+  "schema": "desset-prime-original-assets-v1",
+  "source_repository": "M0-coder/DESSET-prime",
+  "assertion": {
+    "scope": "original visual brand materials actually included in Prime's current production candidate",
+    "status": "owner-declared",
+    "statement": "El responsable del proyecto declara que los activos originales actualmente utilizados por DESSET Prime pertenecen al proyecto. Los cuatro antiguos pósteres V5 se excluyeron por no formar parte del diseño 3D.",
+    "as_of": "2026-11-20",
+    "external_chain_of_title": "not_attached",
+    "legal_entity_transfer": "not_established_by_this_register",
+    "independent_legal_verification": false
+  },
+  "excluded_generated_asset": "assets/v6-three.bundle.js",
+  "exclusion_reason": "Build output includes third-party Three.js and is not wholly proprietary.",
+  "assets": [
+    {
+      "path": "assets/deliver-assets-mark.png",
+      "sha256": "740e142d3e6026f67bec4aca3021e1bfa2a988eb0150af4633a57813ad81b7f4",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/desset-hero-entrega-dos-espejos.webp",
+      "sha256": "9f7940ed40dac21dcd286655930750ffd1008cf84830ed8b2e086a40c4cd00f1",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/desset-hero-entrega-mobile.webp",
+      "sha256": "4a2043a8dfceb15d5f4cc008904feb49467a42f79f8f9c54db2bdcad0e33767e",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/roles-geometry-es.svg",
+      "sha256": "d7ea01e5479dbe411329b16e5d7f42ddc8b74a888a2ede05cdf1b52cc8842f69",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/roles-geometry-mobile-es.svg",
+      "sha256": "d703600b5891a7e04033dd65a73db14b0c0abe6e196a56c905e24d88d123b7f2",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/scene-choose.svg",
+      "sha256": "694729e55f56ccfcb2e835114032a77aff7d6016b164a4aa0fdda58e005f1a4d",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/scene-choose.webp",
+      "sha256": "dec4dc273aea16cc18a284fbd655be5f737a4569db8f1ada864d6647e3d43f16",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/scene-move.svg",
+      "sha256": "f6e84896ab7c2e1f156dc1899368cffaba35491698942d9f174b1f984531c2e1",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/scene-move.webp",
+      "sha256": "13cfbac37a561198544f7e639b7fc730c07747ce6d800f0cf555ac1d96326224",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/scene-prepare.svg",
+      "sha256": "5047f9a274f0f3bff021e4740e3d456867c66c46935b88b004bf1ef7d521b011",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/scene-prepare.webp",
+      "sha256": "df910bf70b1c1ee10eb359e5eea61d42c91d3d00312c70150ba85a828648189c",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/v62-commerce.glb",
+      "sha256": "dba0705979c8e96f14501ba0efe54b3e752fa32fb9799b068733f16927cf68e0",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/v62-courier.glb",
+      "sha256": "eb6002db4c419a66d6b1935df379a7e28c224f9fb94fae3403e3db7926fc48ab",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    },
+    {
+      "path": "assets/v62-destination.glb",
+      "sha256": "f0a746d55023f85e2393abfedfecef16010db7c8917f532e68662aeb3644c0c2",
+      "claim": "owner-declared",
+      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+    }
+  ]
+}

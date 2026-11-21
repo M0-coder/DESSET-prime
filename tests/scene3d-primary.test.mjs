@@ -1,0 +1,34 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const read=p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
+const html=read("index.html"),loader=read("scripts/v5-cinematic.js"),css=read("styles-v5.css"),gpu=read("scripts/v6-gpu-browser-audit.mjs");
+test("SCENE3D-01 automatic scene uses viewport intersection, not page-start download",()=>{
+ assert.match(loader,/const auto3D=canAutoStart\(\)/);
+ assert.match(loader,/rootMargin:"0px",threshold:0\.12/);
+ assert.match(loader,/activationObserver\.observe\(stage\)/);
+ assert.match(loader,/self\.disconnect\(\)/);
+ assert.match(loader,/navigator\.connection\?\.saveData!==true/);
+ assert.match(loader,/navigator\.deviceMemory>=4/);
+ assert.match(loader,/entry\.intersectionRatio>=0\.12/);
+ assert.doesNotMatch(loader,/addEventListener\("scroll"/);
+ assert.match(loader,/getContext\("webgl2"\)/);
+ assert.match(loader,/if\(reduced \|\| typeof window\.IntersectionObserver/);
+ assert.match(loader,/stage\.dataset\.v6State="loading"/);
+ assert.match(loader,/script\.onerror=/);
+});
+test("SCENE3D-01 hides redundant controls and retains functional route/pause/fallback",()=>{
+ assert.doesNotMatch(html,/data-v6-camera=/);
+ assert.doesNotMatch(html,/class="v6-poster"/);
+ assert.match(html,/class="v63-tour" type="button"/);
+ assert.match(html,/class="v6-pause" type="button"/);
+ assert.doesNotMatch(css,/\.v6-three-controls \[data-v6-camera/);
+ assert.match(css,/\.v5-city-stage\[data-v6-autostart="enabled"\] \.v6-enable-webgl/);
+ assert.match(html,/class="v6-static-fallback"/);
+ assert.match(html,/aria-label="Renderización gráfica conceptual de DESSET"/);
+ assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
+ assert.doesNotMatch(html,/v5-stage-caption|motion-story-bridge/);
+ assert.match(gpu,/Desktop loads WebGL without a user click/);
+ assert.match(gpu,/Mobile loads WebGL automatically when compatible/);
+ assert.match(gpu,/Tablet scene loads automatically/);
+});

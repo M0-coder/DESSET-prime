@@ -1,0 +1,232 @@
+/* DESSET PRIME V5.2 | cinematic depth on top of the unreleased V4.5 candidate.
+   Source-preserving additive layer. No remote assets, layout traps or infinite loops. */
+:root { --v5-electric:#5F94FF; --v5-gold:#FFC62F; --v5-fire:#FF3328; }
+.hero[data-variant="v4"] .v4-motion-canvas { isolation:isolate; }
+.v5-city-stage {
+  position:relative; display:block; isolation:isolate; overflow:hidden;
+  margin:8px 0 18px; width:100%; border:1px solid rgba(230,239,255,.28);
+  background:#0B0E19; color:#F7F5EE;
+  box-shadow:0 26px 64px rgba(0,0,0,.24),0 0 0 1px rgba(255,198,47,.07);
+}
+.v5-city-stage:before {
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.11),transparent 37%,rgba(21,81,216,.09) 72%,rgba(0,0,0,.25));
+}
+/* A restrained highlight frames the finished image without covering the subject. */
+.v5-city-stage:after {
+ content:"";position:absolute;z-index:6;left:0;top:0;right:0;height:2px;
+ pointer-events:none;background:linear-gradient(90deg,transparent,#FFC62F 38%,#5F94FF 75%,transparent);
+ transform-origin:left;opacity:.8;
+}
+.v5-stage-world { position:relative; aspect-ratio:1752/897; min-height:265px; overflow:hidden; }
+/* This image-free, accessible fallback is visible without WebGL or with reduced motion.
+   WebGL hides it only after a verified GPU frame has been drawn. */
+.v6-static-fallback{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.7vw,18px);padding:clamp(18px,4vw,46px);text-align:center;background:radial-gradient(ellipse at 55% 35%,rgba(21,81,216,.33),transparent 58%),#0b1024;color:#f7f5ee}
+.v6-static-fallback__eyebrow{color:#ffc62f;font-size:clamp(10px,1vw,14px);font-weight:800;letter-spacing:.14em}
+.v6-static-fallback__headline{font-size:clamp(20px,3.1vw,48px);line-height:1.1;letter-spacing:-.025em;max-width:850px}
+.v6-static-fallback__note{margin:0;max-width:550px;color:#e4eaf8;font-size:clamp(12px,1.3vw,16px);line-height:1.5}
+
+/* Higher specificity than legacy .ecosystem-board img (max-width:900/max-height:420).
+   Prevent letterboxing: render must occupy the intended responsive frame. */
+.contact {position:relative;isolation:isolate;}
+.v5-contact-light {
+ position:absolute;z-index:0;left:18%;top:4%;width:62%;height:70%;
+ pointer-events:none;opacity:.58;
+ background:radial-gradient(ellipse at 45% 50%,rgba(21,81,216,.20),transparent 61%),
+ linear-gradient(110deg,transparent 27%,rgba(255,198,47,.13) 51%,transparent 70%);
+ filter:blur(13px);transform:translate3d(-2%,2%,0) rotate(-7deg);
+}
+.contact > :not(.v5-contact-light) {position:relative;z-index:1;}
+@media (prefers-reduced-motion:no-preference) {
+ .v5-motion-ready .v5-city-stage.v5-visible::after {animation:v52-edge-light 1.25s cubic-bezier(.18,.82,.21,1) both;}
+ .v5-motion-ready .contact.v5-visible .v5-contact-light {animation:v5-contact-arrive 1.6s ease-out both;}
+}
+@keyframes v52-edge-light {from{opacity:0;transform:scaleX(0)}to{opacity:.8;transform:scaleX(1)}}
+@keyframes v5-contact-arrive {from{opacity:0;transform:translate3d(-8%,10%,0) rotate(-10deg)}to{opacity:.58;transform:translate3d(-2%,2%,0) rotate(-7deg)}}
+@media(max-width:800px) {
+ .v5-stage-world {aspect-ratio:1.9;min-height:245px;}
+ .v5-city-stage {margin-bottom:18px;}
+}
+@media(max-width:430px){
+ /* A dedicated vertical render keeps all stages in frame instead of cropping the destination. */
+ .v5-stage-world {aspect-ratio:2 / 3;min-height:0;}
+ .v5-contact-light {left:14%;width:72%;}
+}
+@media(prefers-reduced-motion:reduce) {
+ .v5-contact-light {
+   animation:none!important;transition:none!important;
+ }
+ .v5-contact-light {opacity:.43!important;transform:none!important;}
+}
+
+/* V5.4: keyboard focus stays visible on dark/light surfaces and accordions.
+   Complements the V4 a/button focus-visible rule without changing mouse appearance. */
+.menu-button:focus-visible,
+.future-services summary:focus-visible,
+.v4-architecture-details summary:focus-visible {
+ outline:3px solid #FFC62F;
+ outline-offset:4px;
+ box-shadow:0 0 0 6px #111111;
+}
+
+/* V6 REAL GPU STAGE — CSS is only shell/fallback, actual geometry is WebGL. */
+.v6-three-mount {
+ position:absolute;inset:0;z-index:3;opacity:0;pointer-events:none;
+ background:#0b1024;transition:opacity .35s ease;
+}
+.v6-three-mount .v6-three-canvas {display:block!important;width:100%!important;height:100%!important;}
+.v5-city-stage[data-v6-state="active"] .v6-three-mount {opacity:1;pointer-events:auto;}
+.v5-city-stage[data-v6-state="active"] .v6-static-fallback {opacity:0;pointer-events:none;visibility:hidden;}
+.v6-three-toolbar {
+ position:relative;z-index:7;background:#0d1525;color:#f7f5ee;
+ border-top:1px solid rgba(247,245,238,.16);padding:10px clamp(12px,2vw,22px);
+}
+.v6-three-controls {display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.v6-three-controls[hidden],.v6-enable-webgl[hidden] {display:none!important;}
+.v6-three-controls button,.v6-enable-webgl {
+ background:transparent;color:#f7f5ee;
+ border:1px solid rgba(247,245,238,.35);min-height:44px;
+ border-radius:4px;padding:9px 14px;font:700 12px/1.3 inherit;
+ cursor:pointer;white-space:normal;touch-action:manipulation;
+}
+.v6-three-controls button[aria-pressed="true"] {border-color:#ffc62f;background:#ffc62f;color:#111;}
+.v6-enable-webgl {border-color:#ffc62f;background:#ffc62f;color:#111;}
+.v6-three-controls button:focus-visible,.v6-enable-webgl:focus-visible {
+ outline:3px solid #ffc62f;outline-offset:3px;box-shadow:0 0 0 5px #111;
+}
+@media(max-width:800px){
+ .v6-three-controls {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
+ .v6-three-controls button,.v6-enable-webgl {width:100%;font-size:12px;}
+ .v6-three-controls button:first-child{grid-column:span 2;}
+}
+@media(prefers-reduced-motion:reduce){
+ .v6-three-mount {display:none!important;transition:none!important;}
+}
+
+/* V6.3 — guided cinematic route; zero animation dependencies or scroll hijacking. */
+.v6-three-controls .v63-tour{
+ background:#ffc62f;color:#0b1024;border-color:#ffc62f;
+ font-weight:800;letter-spacing:.02em;
+}
+.v6-three-controls .v63-tour[aria-pressed="true"]{
+ background:#f8f0d3;border-color:#f8f0d3;color:#0b1024;
+}
+.v63-story[hidden]{display:none!important;}
+.v63-story{
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(160px,230px);
+ align-items:center;gap:3px 16px;
+ margin-top:10px;padding:12px 13px;
+ background:#131f36;border:1px solid rgba(255,198,47,.35);
+ border-left:3px solid #ffc62f;border-radius:4px;
+}
+.v63-story-title{
+ font:800 clamp(12px,1.4vw,15px)/1.4 system-ui,sans-serif;
+ letter-spacing:.075em;text-transform:uppercase;color:#ffc62f;
+}
+.v63-story-detail{
+ grid-column:1;
+ color:#e4eaf8;font:500 12px/1.45 system-ui,sans-serif;
+}
+.v63-story-progress{
+ grid-column:2;grid-row:1/3;align-self:center;
+ width:100%;height:9px;accent-color:#ffc62f;
+}
+.v63-story-progress::-webkit-progress-bar{background:#26354c;border-radius:999px;}
+.v63-story-progress::-webkit-progress-value{background:#ffc62f;border-radius:999px;}
+@media(max-width:800px){
+ .v63-story{grid-template-columns:minmax(0,1fr);gap:6px;padding:12px;}
+ .v63-story-detail,.v63-story-progress{grid-column:1;grid-row:auto;}
+ .v63-story-progress{margin-top:5px;}
+ .v6-three-controls .v63-tour{grid-column:span 2;}
+}
+@media(prefers-reduced-motion:reduce){
+ .v63-story{transition:none!important;}
+}
+
+/* V6.3.1: cinema caption remains within view instead of below mobile controls.
+   Status and progress are semantic HTML; this is a visual positioning only. */
+.v5-city-stage[data-v63-tour="playing"] .v63-story,
+.v5-city-stage[data-v63-tour="complete"] .v63-story{
+ position:absolute;left:clamp(12px,2vw,22px);bottom:calc(100% + 14px);
+ width:min(520px,calc(100% - 32px));max-width:calc(100% - 32px);
+ padding:11px 15px;margin:0;
+ background:rgba(10,18,33,.91);
+ border:1px solid rgba(255,198,47,.48);
+ border-left:3px solid #ffc62f;
+ box-shadow:0 12px 35px rgba(0,0,0,.22);
+ z-index:8;pointer-events:none;
+ backdrop-filter:blur(6px);
+}
+@media(max-width:800px){
+ .v5-city-stage[data-v63-tour="playing"] .v63-story,
+ .v5-city-stage[data-v63-tour="complete"] .v63-story{
+  left:10px;right:10px;bottom:calc(100% + 10px);
+  width:auto;max-width:none;padding:9px 11px;gap:3px;
+  background:rgba(10,18,33,.94);backdrop-filter:none;
+ }
+ .v63-story-title{font-size:11px;letter-spacing:.05em;}
+ .v63-story-detail{font-size:10px;line-height:1.35;}
+ .v63-story-progress{height:6px;margin-top:2px;}
+}
+
+/* V6.5 — reveal poster first, never show an empty WebGL loading frame. */
+.v5-city-stage[data-v6-state="loading"] .v6-three-mount,
+.v5-city-stage[data-v6-state="preparing"] .v6-three-mount {
+ opacity:0;pointer-events:none;
+}
+.v65-load-status[hidden]{display:none!important;}
+.v65-load-status{
+ display:block;padding:10px 12px;margin-bottom:10px;
+ color:#ffe8a6;background:#19243c;
+ border-left:3px solid #ffc62f;
+ font:700 12px/1.45 system-ui,sans-serif;
+}
+.v5-city-stage[data-v6-state="active"] .v6-three-mount{
+ opacity:1;transition:opacity .25s ease-out;
+}
+@media(max-width:800px){
+ /* Four compact but 44px-tall camera controls; primary tour gets its own row. */
+ .v6-three-controls{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+ .v6-three-controls button{
+  min-height:44px;font-size:clamp(10px,2.7vw,12px);
+  line-height:1.2;padding:7px 4px;white-space:normal;
+ }
+ .v6-three-controls button:first-child{grid-column:auto;}
+ .v6-three-controls .v63-tour{grid-column:1 / -1;order:-1;}
+ .v6-three-controls .v6-pause{grid-column:span 2;}
+}
+@media(prefers-reduced-motion:reduce){
+ .v5-city-stage[data-v6-state="active"] .v6-three-mount{transition:none;}
+}
+
+/* V6.6 — curva editorial: suaviza superficies, conserva trazos y geometría DESSET. */
+:root{
+ --prime-radius-sm:12px;--prime-radius-md:18px;--prime-radius-lg:26px;
+}
+.hero[data-variant="v4"] .v4-motion-canvas{border-radius:var(--prime-radius-lg);}
+.v4-motion-canvas::after{border-radius:18px;}
+.v4-canvas-stamp{border-radius:var(--prime-radius-sm);}
+.hero[data-variant="v4"] .hero-cta,.main-nav .nav-contact,
+.business-pitch-cta,.contact-primary,.contact .social-links a:first-child,
+.skip-link{border-radius:var(--prime-radius-sm);}
+.service,.business-pitch,.ecosystem-board{border-radius:var(--prime-radius-lg);}
+.v5-city-stage{border-radius:22px;}
+.v4-architecture-inner{border-radius:var(--prime-radius-md);}
+.v6-three-controls button,.v6-enable-webgl{border-radius:var(--prime-radius-sm);}
+.v63-story,.v65-load-status{border-radius:var(--prime-radius-sm);}
+@media(max-width:700px){
+ .hero[data-variant="v4"] .v4-motion-canvas,
+ .business-pitch,.ecosystem-board{border-radius:var(--prime-radius-md);}
+ .service,.v5-city-stage{border-radius:16px;}
+ .v4-canvas-stamp{border-radius:10px;}
+}
+
+/* SCENE3D-01 — 3D main viewport experience with WebP fallback preserved. */
+.v6-three-controls button[hidden] {display:none!important}
+.v5-city-stage[data-v6-autostart="enabled"] .v6-enable-webgl {display:none!important}
+.v6-three-controls {display:flex;flex-wrap:wrap;gap:10px}
+.v6-three-controls .v63-tour,.v6-three-controls .v6-pause {flex:0 1 auto}
+@media(max-width:800px){
+ .v6-three-controls {display:flex;flex-wrap:wrap}
+ .v6-three-controls .v63-tour,.v6-three-controls .v6-pause{width:auto;min-width:145px;flex:1 1 145px}
+}

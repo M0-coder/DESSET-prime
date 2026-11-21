@@ -1,0 +1,61 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {readFileSync,statSync} from "node:fs";
+const root=new URL("../",import.meta.url);
+const read=p=>readFileSync(new URL(p,root),"utf8");
+const html=read("index.html");
+const css=read("styles-v5.css");
+const loader=read("scripts/v5-cinematic.js");
+const engine=read("scripts/v6-three.src.mjs");
+const workflow=read(".github/workflows/preview-checks.yml");
+
+test("Prime 3D has no hidden static WebP/SVG illustration or permanently hidden camera buttons",()=>{
+ assert.match(html,/class="v6-static-fallback"/);
+ assert.match(html,/class="v6-three-mount" aria-hidden="true"/);
+ assert.match(html,/class="v63-tour" type="button"/);
+ assert.match(html,/class="v6-pause" type="button"/);
+ assert.doesNotMatch(html,/v5-cinematic-(?:desktop|mobile)\.webp|v5-logistics-(?:scene|mobile)\.svg/);
+ assert.doesNotMatch(html,/v5-responsive-art|v5-stage-render|v5-stage-scan|data-v6-camera|v6-poster/);
+ assert.doesNotMatch(html,/<video\b|<canvas\b|<iframe\b|<form\b/i);
+ assert.ok(statSync(new URL("index.html",root)).size<35000);
+ assert.ok(statSync(new URL("styles-v5.css",root)).size<16000);
+});
+test("Image-free 3D fallback is truthful, visually styled and accessible",()=>{
+ assert.match(html,/ECOSISTEMA DESSET/);
+ assert.match(html,/COMERCIO · REPARTO · DESTINO/);
+ assert.match(html,/No corresponde a pedidos ni entregas activas/);
+ assert.match(html,/aria-label="Renderización gráfica conceptual de DESSET"/);
+ assert.match(css,/\.v6-static-fallback\{/);
+ assert.match(css,/\.v6-static-fallback__eyebrow\{/);
+ assert.match(css,/\.v6-static-fallback__headline\{/);
+ assert.match(css,/\.v6-static-fallback__note\{/);
+ assert.match(css,/\.v5-city-stage\[data-v6-state="active"\] \.v6-static-fallback \{opacity:0;pointer-events:none;visibility:hidden;\}/);
+ assert.match(css,/\.v5-stage-world \{aspect-ratio:2 \/ 3;min-height:0;\}/);
+ assert.doesNotMatch(css,/v5-responsive-art|v5-stage-render|v5-stage-scan|v5-hero-refraction/);
+});
+test("V5 reduction disables motion, the backup remains readable, WebGL stays progressive",()=>{
+ assert.match(css,/@media\(prefers-reduced-motion:reduce\) \{\s*\.v5-contact-light/);
+ assert.match(css,/animation:none!important;transition:none!important/);
+ assert.match(css,/\.v6-three-mount \{display:none!important;transition:none!important;\}/);
+ assert.match(loader,/const reduced=media\?\.matches===true/);
+ assert.match(loader,/if\(reduced \|\| typeof window\.IntersectionObserver/);
+ assert.match(loader,/activationObserver\.observe\(stage\)/);
+ assert.match(loader,/threeStart\?\.addEventListener\("click",loadThree\)/);
+ assert.match(loader,/\.\/assets\/v6-three\.bundle\.js/);
+ assert.match(engine,/fail\("fallback"\)/);
+ assert.match(engine,/stage\.dataset\.v6State="active"/);
+ assert.doesNotMatch(engine,/classList\.contains\("v6-poster"\)|\[data-v6-camera\]/);
+ assert.doesNotMatch(loader,/\bfetch\s*\(|localStorage|sendBeacon|WebSocket/);
+});
+test("Correct original assets and noindex cannot regress",()=>{
+ assert.match(html,/src="\.\/assets\/desset-hero-entrega-dos-espejos\.webp"/);
+ assert.match(html,/name="robots" content="noindex,nofollow"/);
+ assert.match(html,/src="\.\/assets\/deliver-assets-mark\.png"/);
+ assert.match(html,/class="v5-city-stage"/);
+ assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/);
+ assert.match(html,/aria-label="Escena conceptual:/);
+ assert.doesNotMatch(html,/https?:\/\/[^\s"']+\.(?:js|css|mp4|webm)/i);
+ assert.match(workflow,/permissions:\s*\n\s*contents:\s*read/);
+ assert.match(workflow,/No deployment mechanisms/);
+ assert.doesNotMatch(workflow,/pages:\s*write|id-token:\s*write|^\s*deploy:\s*$/m);
+});
