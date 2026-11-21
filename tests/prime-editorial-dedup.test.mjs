@@ -49,7 +49,7 @@ test("Removal preserves real visual service, mobile imagery, GPU scene, honest a
     'scene-choose.webp','scene-prepare.webp','scene-move.webp',
     'v5-cinematic-desktop.webp','v5-cinematic-mobile.webp',
     'data-service-access','data-app-links hidden',
-    'DESSET todavía no realiza pedidos ni entregas comerciales',
+    'Representación conceptual · No corresponde a operaciones activas de DESSET',
   ])assert.ok(html.includes(required),"Functional element removed: "+required);
   assert.equal((html.match(/data-channel-basis="owner-attested"/g)||[]).length,5);
   assert.match(cinematic,/activationObserver\.observe\(stage\)/);
