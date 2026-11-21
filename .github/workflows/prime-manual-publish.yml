@@ -40,7 +40,7 @@ jobs:
       - name: Checkout exactly the proposed Prime head
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
-          ref: ${{ github.event.pull_request.head.sha }
+          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
       - name: Exact Node
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
@@ -70,6 +70,7 @@ jobs:
       vars.DESSET_PRIME_RIGHTS_APPROVED == 'true' &&
       vars.DESSET_PRIME_CONTACT_APPROVED == 'true' &&
       vars.DESSET_PRIME_SECURITY_APPROVED == 'true' &&
+      vars.DESSET_PRIME_ROLLBACK_BACKUP_APPROVED == 'true' &&
       (inputs.seo_policy == 'NOINDEX' || vars.DESSET_PRIME_INDEX_APPROVED == 'true')
     runs-on: ubuntu-24.04
     timeout-minutes: 35
@@ -83,7 +84,7 @@ jobs:
       - name: Checkout exact manual-approved main HEAD
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
-          ref: ${{ github.sha }
+          ref: ${{ github.sha }}
           persist-credentials: false
       - name: Fixed Node version
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
@@ -92,16 +93,17 @@ jobs:
           cache: npm
       - name: Exact-SHA and independent business authorization preflight
         env:
-          RELEASE_SHA: ${{ inputs.release_sha }
-          PREVIOUS_DEPLOYMENT_ID: ${{ inputs.expected_previous_deployment }
-          CONFIRM: ${{ inputs.confirmation }
-          SEO_POLICY: ${{ inputs.seo_policy }
-          RELEASE_ENABLED: ${{ vars.DESSET_PRIME_RELEASE_ENABLED }
-          VISUAL_APPROVED_SHA: ${{ vars.DESSET_PRIME_VISUAL_APPROVED_SHA }
-          RIGHTS_APPROVED: ${{ vars.DESSET_PRIME_RIGHTS_APPROVED }
-          CONTACT_APPROVED: ${{ vars.DESSET_PRIME_CONTACT_APPROVED }
-          SECURITY_APPROVED: ${{ vars.DESSET_PRIME_SECURITY_APPROVED }
-          INDEX_APPROVED: ${{ vars.DESSET_PRIME_INDEX_APPROVED }
+          RELEASE_SHA: ${{ inputs.release_sha }}
+          PREVIOUS_DEPLOYMENT_ID: ${{ inputs.expected_previous_deployment }}
+          CONFIRM: ${{ inputs.confirmation }}
+          SEO_POLICY: ${{ inputs.seo_policy }}
+          RELEASE_ENABLED: ${{ vars.DESSET_PRIME_RELEASE_ENABLED }}
+          VISUAL_APPROVED_SHA: ${{ vars.DESSET_PRIME_VISUAL_APPROVED_SHA }}
+          RIGHTS_APPROVED: ${{ vars.DESSET_PRIME_RIGHTS_APPROVED }}
+          CONTACT_APPROVED: ${{ vars.DESSET_PRIME_CONTACT_APPROVED }}
+          SECURITY_APPROVED: ${{ vars.DESSET_PRIME_SECURITY_APPROVED }}
+          ROLLBACK_BACKUP_APPROVED: ${{ vars.DESSET_PRIME_ROLLBACK_BACKUP_APPROVED }}
+          INDEX_APPROVED: ${{ vars.DESSET_PRIME_INDEX_APPROVED }}
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
@@ -122,8 +124,8 @@ jobs:
           test -z "$(git diff --name-only)"
       - name: Generate indexed or noindex production-shaped site, still offline
         env:
-          RELEASE_SHA: ${{ inputs.release_sha }
-          SEO_POLICY: ${{ inputs.seo_policy }
+          RELEASE_SHA: ${{ inputs.release_sha }}
+          SEO_POLICY: ${{ inputs.seo_policy }}
         run: |
           set -euo pipefail
           node scripts/prime-manual-cutover-package.mjs \
@@ -142,10 +144,9 @@ jobs:
           "$RUNNER_TEMP/prime-wrangler/node_modules/.bin/wrangler" pages deploy --help >/dev/null
       - name: Check Cloudflare account, unchanged production, domains and rollback target
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }
-          EXPECTED_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }
-          PREVIOUS_DEPLOYMENT_ID: ${{ inputs.expected_previous_deployment }
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }}
+          PREVIOUS_DEPLOYMENT_ID: ${{ inputs.expected_previous_deployment }}
         run: |
           set -euo pipefail
           test -n "$CLOUDFLARE_API_TOKEN"
@@ -160,10 +161,9 @@ jobs:
             "$RUNNER_TEMP/prime-current-project.json" "$RUNNER_TEMP/prime-current-domains.json"
       - name: Refresh the production deployment ID IMMEDIATELY before mutation
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }
-          EXPECTED_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }
-          PREVIOUS_DEPLOYMENT_ID: ${{ inputs.expected_previous_deployment }
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }}
+          PREVIOUS_DEPLOYMENT_ID: ${{ inputs.expected_previous_deployment }}
         run: |
           set -euo pipefail
           curl --fail-with-body -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
@@ -174,9 +174,9 @@ jobs:
       - name: PUBLISH — only mutation, requires manual dispatch, all gates and protected environment
         id: prime_publish
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }
-          RELEASE_SHA: ${{ inputs.release_sha }
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }}
+          RELEASE_SHA: ${{ inputs.release_sha }}
         run: |
           set -euo pipefail
           "$RUNNER_TEMP/prime-wrangler/node_modules/.bin/wrangler" pages deploy \
@@ -186,9 +186,9 @@ jobs:
             --commit-hash="$RELEASE_SHA"
       - name: Verify real Pages production SHA, static mode and status
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }
-          RELEASE_SHA: ${{ inputs.release_sha }
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }}
+          RELEASE_SHA: ${{ inputs.release_sha }}
         run: |
           set -euo pipefail
           for i in $(seq 1 12); do
@@ -208,7 +208,7 @@ jobs:
           done
       - name: Check public HTTPS, resources, SEO policy, CSP and 404
         env:
-          SEO_POLICY: ${{ inputs.seo_policy }
+          SEO_POLICY: ${{ inputs.seo_policy }}
         run: |
           set -euo pipefail
           curl --retry 4 --retry-delay 3 --fail-with-body -fsSL https://desset.lat/ -o "$RUNNER_TEMP/prime-live.html"
