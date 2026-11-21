@@ -50,11 +50,10 @@
  #inicio .hero-actions{animation:anim02-enter .8s cubic-bezier(.2,.78,.22,1) .70s both}
  #inicio .prime-photo-surface{animation:anim02-frame 1.35s cubic-bezier(.17,.8,.21,1) .10s both}
  #inicio .prime-photo-image{animation:anim02-focus 2.05s cubic-bezier(.19,.7,.23,1) .10s both}
- .statement h2.motion-active,.solutions .section-head.motion-active,
- .ecosystem .section-head.motion-active,.audiences .section-head.motion-active{
+ .statement h2.motion-active{
   animation:anim02-chapter .95s cubic-bezier(.16,.74,.21,1) both
  }
- .statement-side.motion-active,.solutions-grid .service--main.motion-active,
+ .solutions-grid .service--main.motion-active,
  .business-pitch.motion-active,.audience-grid--compact .audience.motion-active,
  .contact-bottom--rc.motion-active,.motion-story-unit.motion-active{
   animation:anim02-panel .86s cubic-bezier(.17,.76,.25,1) both
@@ -71,8 +70,7 @@
 @media(prefers-reduced-motion:reduce){
  #inicio .v4-hero-declaration,#inicio .motion-line__inner,#inicio .hero-lead,
  #inicio .hero-actions,#inicio .prime-photo-surface,#inicio .prime-photo-image,
- .statement h2,.solutions .section-head,.ecosystem .section-head,.audiences .section-head,
- .statement-side,.solutions-grid .service--main,.business-pitch,
+ .statement h2,.solutions-grid .service--main,.business-pitch,
  .audience-grid--compact .audience,.contact-bottom--rc,.motion-story-unit{
   animation:none!important;transform:none!important;clip-path:none!important;
   filter:none!important;opacity:1!important
