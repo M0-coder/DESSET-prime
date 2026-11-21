@@ -31,7 +31,8 @@ test("V6.1 motion and disposal remain finite and progressively enhanced",()=>{
  assert.match(src,/mesh\.castShadow=!coarse/);
  assert.match(src,/if\(routeHalo\)routeHalo\.material\.opacity=/);
  assert.match(src,/Math\.min\(window\.devicePixelRatio\|\|1,coarse\?1:1\.4\)/);
- assert.match(html,/Visualización conceptual del sistema previsto/);
+ assert.match(html,/aria-label="Renderización gráfica conceptual de DESSET"/);
+ assert.doesNotMatch(html,/v5-stage-caption/);
  assert.doesNotMatch(src,/setInterval\s*\(|addEventListener\(["']scroll|fetch\s*\(|WebSocket|localStorage/);
 });
 test("CI proves actual triangle rendering, expensive features desktop-only and poster recovery",()=>{
