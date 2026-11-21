@@ -21,7 +21,7 @@ for(const [path,want] of Object.entries(a)){
 }
 const availability=text("scripts/service-state.js");
 require("Prime remains presentation only",
- /todavía no realiza pedidos ni entregas comerciales/i.test(html)&&
+ /No corresponde a operaciones activas de DESSET/i.test(html)&&
  /no procesa pedidos ni pagos/i.test(html)&&
  /data-service-status[^>]*>Acceso público no habilitado/.test(html)&&
  /applicationDistribution:"not_published"/.test(availability)&&
@@ -32,8 +32,8 @@ require("Prime continues to prohibit remote scripts",/script-src 'self'/.test(ht
 require("Production branch and workflow metadata are explicit",snap.official.observed_cloudflare.production_branch==="release-approved"&&snap.official.production_requirements.manual_workflow===".github/workflows/cloudflare-pages-production.yml");
 require("Owner approval cannot be implied",snap.prime.approval==="pending"&&snap.official.production_requirements.owner_design_approval_required===true);
 const channels=inspectInstitutionalChannels({html,serviceState:availability});
-require("Three DESSET social URLs match owner attestation",
- channels.channels_status==="OWNER_ATTESTED"&&channels.owner_attested_count===3&&
+require("Five DESSET social URLs match owner attestation",
+ channels.channels_status==="OWNER_ATTESTED"&&channels.owner_attested_count===5&&
  channels.unconfirmed_count===0&&channels.real_world_account_ownership_verified===false&&
  channels.technical_platform_admin_access_tested===false);
 require("Release deployment remains absent from Prime workflow",!/(?:wrangler\s+pages\s+deploy|\bvercel\s+deploy\b|\bpages:\s*write\b)/.test(text(".github/workflows/preview-checks.yml")));

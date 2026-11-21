@@ -92,7 +92,7 @@ async function viewport(width,height,reduce=false){
  });
  const typeSizes={
   heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
-  sectionTitle:parseFloat(getComputedStyle(document.querySelector(".section-head h2")).fontSize),
+  serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
   storyTitle:parseFloat(getComputedStyle(document.querySelector(".motion-story-unit h3")).fontSize)
  };
  return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
@@ -105,7 +105,7 @@ async function viewport(width,height,reduce=false){
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
  if(width<=700){
   if(diag.railWords.length!==4||diag.railWords.some(w=>!w.visible||!w.inside||w.width<45))fails.push("mobile editorial keyword rail clips or hides a word: "+JSON.stringify(diag.railWords));
-  if(diag.typeSizes.heroLead<14||diag.typeSizes.sectionTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
+  if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
  report.viewports.push({width,height,reduce,...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
@@ -176,8 +176,8 @@ try{
  report.tests.push({name:"ANIM-02 real photographic opening, official mark, editorial chronology",anim02});
 
 
- const smallUI=await js('(()=>{const selector=".header-descriptor,.v4-hero-caption,.hero-kicker,.v4-canvas-top,.v4-canvas-bottom,.hero-meta,.section-label,.kicker,.service-top,.ecosystem-board-top,.motion-story-index,.motion-story-status,.audience-no,.audience-tag,.business-pitch-top,.closing-kicker-signal";return {decorativeLabelCount:document.querySelectorAll(selector).length,numberedTokens:document.body.textContent.match(/\\b0[1-9]\\s*\\/\\s*/g)||[],statusVisible:document.querySelector(".trust-ledger-item strong")?.textContent?.trim()}})()');
- if(smallUI.decorativeLabelCount!==0||smallUI.numberedTokens.length!==0||!smallUI.statusVisible)report.failures.push("Editorial numeric labels survived cleanup: "+JSON.stringify(smallUI));
+ const smallUI=await js('(()=>{const selector=".header-descriptor,.v4-hero-caption,.hero-kicker,.v4-canvas-top,.v4-canvas-bottom,.hero-meta,.section-label,.kicker,.service-top,.ecosystem-board-top,.motion-story-index,.motion-story-status,.audience-no,.audience-tag,.business-pitch-top,.closing-kicker-signal";return {decorativeLabelCount:document.querySelectorAll(selector).length,numberedTokens:document.body.textContent.match(/\\b0[1-9]\\s*\\/\\s*/g)||[],statement:document.querySelector("#vision h2")?.textContent?.trim(),removedBlocks:document.querySelectorAll(".trust-ledger,.statement-side,.section-head,.ecosystem-footnote,.hero-secondary").length}})()');
+ if(smallUI.decorativeLabelCount!==0||smallUI.numberedTokens.length!==0||!smallUI.statement?.includes("ES CONECTAR")||smallUI.removedBlocks!==0)report.failures.push("Editorial numeric labels survived cleanup: "+JSON.stringify(smallUI));
  report.tests.push({name:"Zero editorial numeric labels and redundant tiny captions",smallUI});
  await capture("desktop-entry.png");
  await sleep(1100);
@@ -190,8 +190,8 @@ try{
  report.tests.push({name:"V5 cinematic identity and local asset",v5Cover});
  await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(580);
- const v5Stage=await js('(()=>{const e=document.querySelector(".v5-city-stage"),im=e.querySelector("img"),r=e.getBoundingClientRect();const w=e.querySelector(".v5-stage-world").getBoundingClientRect(),i=im.getBoundingClientRect();return {visible:e.classList.contains("v5-visible"),imageLoaded:im.complete,source:im.currentSrc,width:im.naturalWidth,height:im.naturalHeight,fillX:+(i.width/w.width).toFixed(2),fillY:+(i.height/w.height).toFixed(2),renderAnimation:getComputedStyle(im).animationName,obsoleteOverlay:!!e.querySelector(".v5-route-overlay"),left:r.left,right:r.right,viewport:document.documentElement.clientWidth,caption:e.querySelector("figcaption")?.textContent?.trim()}})()');
- if(!v5Stage.visible||!v5Stage.imageLoaded||!v5Stage.source?.includes("v5-cinematic-desktop.webp")||v5Stage.width!==1752||v5Stage.height!==897||v5Stage.renderAnimation!=="v5-camera-arrive"||v5Stage.fillX<.98||v5Stage.fillY<.98||v5Stage.obsoleteOverlay||v5Stage.left< -2||v5Stage.right>v5Stage.viewport+2||!v5Stage.caption?.includes("conceptual"))report.failures.push("V5.2 desktop WebP render and cinematic framing failed: "+JSON.stringify(v5Stage));
+ const v5Stage=await js('(()=>{const e=document.querySelector(".v5-city-stage"),im=e.querySelector("img"),r=e.getBoundingClientRect();const w=e.querySelector(".v5-stage-world").getBoundingClientRect(),i=im.getBoundingClientRect();return {visible:e.classList.contains("v5-visible"),imageLoaded:im.complete,source:im.currentSrc,width:im.naturalWidth,height:im.naturalHeight,fillX:+(i.width/w.width).toFixed(2),fillY:+(i.height/w.height).toFixed(2),renderAnimation:getComputedStyle(im).animationName,obsoleteOverlay:!!e.querySelector(".v5-route-overlay"),left:r.left,right:r.right,viewport:document.documentElement.clientWidth,sceneDescription:e.getAttribute("aria-label"),noCaption:!e.querySelector("figcaption,.v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge")}})()');
+ if(!v5Stage.visible||!v5Stage.imageLoaded||!v5Stage.source?.includes("v5-cinematic-desktop.webp")||v5Stage.width!==1752||v5Stage.height!==897||v5Stage.renderAnimation!=="v5-camera-arrive"||v5Stage.fillX<.98||v5Stage.fillY<.98||v5Stage.obsoleteOverlay||v5Stage.left< -2||v5Stage.right>v5Stage.viewport+2||!v5Stage.sceneDescription?.includes("conceptual")||!v5Stage.noCaption||!v5Stage.noBridge)report.failures.push("V5.2 desktop WebP render and cinematic framing failed: "+JSON.stringify(v5Stage));
  report.tests.push({name:"V5.2 original high-fidelity desktop WebP render",v5Stage});
  await capture("desktop-v5-scene-motion.png");
  await sleep(1750);
@@ -213,8 +213,8 @@ try{
  report.tests.push({name:"VISUAL-03 three different approved photos, exact sizes, original SVG fallbacks",v03});
 
  await capture("desktop-story-motion.png");
- const kineticJourney=await js('(()=>{const cards=[...document.querySelectorAll(".motion-story-unit")].map(c=>({active:c.classList.contains("motion-active"),animation:getComputedStyle(c.querySelector("img")).animationName}));const route=getComputedStyle(document.querySelector(".motion-story-bridge-line")).animationName;return {cards,route}})()');
- if(kineticJourney.cards.length!==3||kineticJourney.cards.some(x=>!x.active||x.animation!=="v45-scene-illustration")||kineticJourney.route!=="prime-bridge-draw")report.failures.push("Three-beat narrative sequence failed: "+JSON.stringify(kineticJourney));
+ const kineticJourney=await js('(()=>{const cards=[...document.querySelectorAll(".motion-story-unit")].map(c=>({active:c.classList.contains("motion-active"),animation:getComputedStyle(c.querySelector("img")).animationName}));return {cards,noBridge:!document.querySelector(".motion-story-bridge"),noHeroLabel:!document.querySelector(".v4-hero-declaration")}})()');
+ if(kineticJourney.cards.length!==3||kineticJourney.cards.some(x=>!x.active||x.animation!=="v45-scene-illustration")||!kineticJourney.noBridge||!kineticJourney.noHeroLabel)report.failures.push("Three-beat narrative sequence failed: "+JSON.stringify(kineticJourney));
  report.tests.push({name:"V4.5 staggered real-scene illustration motion",kineticJourney});
  await sleep(1250);
  await capture("desktop-story-final.png");
@@ -244,6 +244,14 @@ try{
  const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const future=document.querySelector(".future-services");const prim=document.querySelector(".contact-primary");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),futureCollapsed:!future.open,futureCards:future.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.textContent.trim(),contactTarget:prim.getAttribute("target"),candidateStatus:document.querySelector(".contact-status")?.textContent,headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');
  if(rc.primaryHref!=="#contacto"||!rc.futureCollapsed||rc.futureCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||!rc.candidateStatus.includes("Esta web no procesa transacciones")||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
  report.tests.push({name:"V4.3 commercial focus & primary contact",rc});
+ const socials=await js('(()=>{const nav=document.querySelector("#contacto .social-links--official");const links=[...nav?.querySelectorAll("a")||[]];return {count:links.length,navLabel:nav?.getAttribute("aria-label"),oldBlock:!!document.querySelector(".social-links--secondary"),links:links.map(a=>({name:a.firstChild?.textContent?.trim(),href:a.href,owner:a.dataset.channelBasis,review:a.dataset.channelReview,height:Math.round(a.getBoundingClientRect().height),background:getComputedStyle(a).backgroundColor,border:getComputedStyle(a).borderTopColor})),width:Math.round(nav?.getBoundingClientRect().width||0)}})()');
+ if(socials.count!==5||socials.navLabel!=="Redes sociales de DESSET"||socials.oldBlock||
+  socials.links.map(x=>x.name).join("|")!=="Instagram|Facebook|TikTok|YouTube|X"||
+  socials.links.some(x=>x.owner!=="owner-attested"||x.review!=="verified"||x.height<48||!x.href.startsWith("https://"))||
+  new Set(socials.links.map(x=>x.background)).size!==1||
+  new Set(socials.links.map(x=>x.border)).size!==1)
+  report.failures.push("One equal five-platform 60/30/10 social rail missing: "+JSON.stringify(socials));
+ report.tests.push({name:"SOCIAL-05 five equal owner-declared channels in one navigation",socials});
  await js('document.querySelector(".future-services summary").click()');
  const expandedFuture=await js('(()=>{const d=document.querySelector(".future-services");return {open:d.open,cards:[...d.querySelectorAll(".service")].map(e=>({height:Math.round(e.getBoundingClientRect().height),description:e.querySelector(".service-body p")?.textContent?.trim()}))}})()');
  if(!expandedFuture.open||expandedFuture.cards.length!==2||expandedFuture.cards.some(x=>x.height<170||(x.description?.length||0)<40))report.failures.push("Future services toggle contract failed: "+JSON.stringify(expandedFuture));
@@ -251,12 +259,12 @@ try{
  await js('document.querySelector(".future-services").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(120);
  await capture("desktop-expansion-optional.png");
- await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
- await sleep(180);
- const trustDesktop=await js('(()=>{const el=document.querySelector(".trust-ledger"),cards=[...el.querySelectorAll(".trust-ledger-item")],grid=el.querySelector(".trust-ledger-grid"),v=document.documentElement.clientWidth;return {cards:cards.map(x=>({title:x.querySelector("strong")?.textContent?.trim(),right:Math.round(x.getBoundingClientRect().right),width:Math.round(x.getBoundingClientRect().width),font:parseFloat(getComputedStyle(x.querySelector("p")).fontSize)})),gridCols:getComputedStyle(grid).gridTemplateColumns.split(" ").length,viewport:v,heading:el.querySelector("h3")?.textContent?.trim()}})()');
- if(trustDesktop.cards.length!==3||trustDesktop.gridCols!==3||trustDesktop.cards.some(x=>x.right>trustDesktop.viewport+2||x.font<14)||!trustDesktop.heading.includes("UN ECOSISTEMA, TRES PILARES"))report.failures.push("Trust content broken on desktop: "+JSON.stringify(trustDesktop));
- report.tests.push({name:"Credibility status ledger desktop",trustDesktop});
- await capture("desktop-trust-status.png");
+  await js('document.querySelector("#vision").scrollIntoView({block:"center",behavior:"instant"})');
+  await sleep(180);
+  const leanDesktop=await js('(()=>{const s=document.querySelector("#vision"),b=s.querySelector(".statement-body"),h=s.querySelector("h2"),r=h.getBoundingClientRect();return {children:b.children.length,cols:getComputedStyle(b).gridTemplateColumns.split(" ").length,text:h.textContent.trim(),left:r.left,right:r.right,height:r.height,viewport:document.documentElement.clientWidth,duplicates:s.querySelectorAll(".statement-side,.trust-ledger").length}})()');
+  if(leanDesktop.children!==1||leanDesktop.cols!==1||leanDesktop.duplicates!==0||leanDesktop.left< -2||leanDesktop.right>leanDesktop.viewport+2||leanDesktop.height<60||!leanDesktop.text.includes("ES CONECTAR"))report.failures.push("Lean original editorial message broken on desktop: "+JSON.stringify(leanDesktop));
+  report.tests.push({name:"Editorial dedup desktop: one-column message, no duplicate cards",leanDesktop});
+  await capture("desktop-lean-statement.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
@@ -283,16 +291,21 @@ try{
    const mobileContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {label:a.textContent.trim(),left:r.left,right:r.right,height:r.height,viewport:v}})()');
    if(mobileContact.left < -2||mobileContact.right>mobileContact.viewport+2||mobileContact.height<48)report.failures.push("Primary mobile contact clipped or too small: "+JSON.stringify(mobileContact));
    report.tests.push({name:"Mobile primary contact tap target",mobileContact});
+   const socialMobile=await js('(()=>{const nav=document.querySelector("#contacto .social-links--official"),v=document.documentElement.clientWidth;return {viewport:v,overflow:document.documentElement.scrollWidth>v+2,links:[...nav.querySelectorAll("a")].map(a=>({name:a.firstChild?.textContent?.trim(),left:a.getBoundingClientRect().left,right:a.getBoundingClientRect().right,height:a.getBoundingClientRect().height}))}})()');
+   if(socialMobile.overflow||socialMobile.links.length!==5||
+    socialMobile.links.some(x=>x.left < -2||x.right>socialMobile.viewport+2||x.height<48))
+    report.failures.push("Social link rail clipped on 390px mobile: "+JSON.stringify(socialMobile));
+   report.tests.push({name:"SOCIAL-05 mobile five profiles visible and tappable",socialMobile});
    const mobileClosing=await js('(()=>[...document.querySelectorAll(".contact .closing-line")].map(e=>({text:e.textContent.trim(),opacity:Number(getComputedStyle(e).opacity)})))()');
    if(mobileClosing.some(x=>x.opacity<.99))report.failures.push("V6.7 mobile closing text loses opacity: "+JSON.stringify(mobileClosing));
    report.tests.push({name:"V6.7 mobile contact heading maintains legibility",mobileClosing});
    await capture("mobile-contact-final.png");
-   await js('document.querySelector(".trust-ledger").scrollIntoView({block:"center",behavior:"instant"})');
-   await sleep(160);
-   const trustMobile=await js('(()=>{const el=document.querySelector(".trust-ledger"),cards=[...el.querySelectorAll(".trust-ledger-item")],v=document.documentElement.clientWidth;return {viewport:v,cols:getComputedStyle(el.querySelector(".trust-ledger-grid")).gridTemplateColumns.split(" ").length,cards:cards.map(c=>({right:Math.round(c.getBoundingClientRect().right),left:Math.round(c.getBoundingClientRect().left),height:Math.round(c.getBoundingClientRect().height),font:parseFloat(getComputedStyle(c.querySelector("p")).fontSize)}))}})()');
-   if(trustMobile.cards.length!==3||trustMobile.cols!==1||trustMobile.cards.some(c=>c.left < -2||c.right>trustMobile.viewport+2||c.height<70||c.font<14))report.failures.push("Trust content clipped or unreadable on mobile: "+JSON.stringify(trustMobile));
-   report.tests.push({name:"Credibility status ledger mobile",trustMobile});
-   await capture("mobile-trust-status.png");
+    await js('document.querySelector("#vision").scrollIntoView({block:"center",behavior:"instant"})');
+    await sleep(160);
+    const leanMobile=await js('(()=>{const s=document.querySelector("#vision"),b=s.querySelector(".statement-body"),h=s.querySelector("h2"),r=h.getBoundingClientRect();return {children:b.children.length,cols:getComputedStyle(b).gridTemplateColumns.split(" ").length,left:r.left,right:r.right,height:r.height,viewport:document.documentElement.clientWidth,duplicates:s.querySelectorAll(".statement-side,.trust-ledger").length,font:parseFloat(getComputedStyle(h).fontSize)}})()');
+    if(leanMobile.children!==1||leanMobile.cols!==1||leanMobile.duplicates!==0||leanMobile.left< -2||leanMobile.right>leanMobile.viewport+2||leanMobile.height<70||leanMobile.font<31)report.failures.push("Lean original editorial message clipped or duplicated on mobile: "+JSON.stringify(leanMobile));
+    report.tests.push({name:"Editorial dedup mobile: no overflow and no duplicate cards",leanMobile});
+    await capture("mobile-lean-statement.png");
    await js("document.querySelector('.menu-button').click()");
    const menu=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),display:getComputedStyle(document.querySelector('.main-nav')).display})");
    if(menu.expanded!=="true"||menu.display==="none")report.failures.push("Mobile navigation did not open");
@@ -320,8 +333,8 @@ try{
    report.tests.push({name:"mobile technical detail expandable",detailOpen});
    await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
    await sleep(350);
-   const v5Mobile=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {visible:e.classList.contains("v5-visible"),left:r.left,right:r.right,viewport:v,overflow:document.documentElement.scrollWidth>v+2,caption:e.querySelector("figcaption")?.textContent?.trim(),imageLoaded:e.querySelector("img")?.naturalWidth>0,source:e.querySelector("img")?.currentSrc,width:e.querySelector("img")?.naturalWidth,height:e.querySelector("img")?.naturalHeight,obsoleteOverlay:!!e.querySelector(".v5-route-overlay"),fillX:+(e.querySelector("img").getBoundingClientRect().width/e.querySelector(".v5-stage-world").getBoundingClientRect().width).toFixed(2),fillY:+(e.querySelector("img").getBoundingClientRect().height/e.querySelector(".v5-stage-world").getBoundingClientRect().height).toFixed(2),ratio:Math.round(e.querySelector(".v5-stage-world").getBoundingClientRect().height/e.querySelector(".v5-stage-world").getBoundingClientRect().width*100)/100}})()');
-   if(!v5Mobile.visible||v5Mobile.left< -2||v5Mobile.right>v5Mobile.viewport+2||v5Mobile.overflow||!v5Mobile.imageLoaded||!v5Mobile.source?.includes("v5-cinematic-mobile.webp")||v5Mobile.width!==1024||v5Mobile.height!==1536||v5Mobile.fillX<.98||v5Mobile.fillY<.98||v5Mobile.obsoleteOverlay||v5Mobile.ratio<1.4||!v5Mobile.caption?.includes("conceptual"))report.failures.push("V5 mobile 390 scene failed: "+JSON.stringify(v5Mobile));
+   const v5Mobile=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),v=document.documentElement.clientWidth;return {visible:e.classList.contains("v5-visible"),left:r.left,right:r.right,viewport:v,overflow:document.documentElement.scrollWidth>v+2,sceneDescription:e.getAttribute("aria-label"),noCaption:!e.querySelector("figcaption,.v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge"),imageLoaded:e.querySelector("img")?.naturalWidth>0,source:e.querySelector("img")?.currentSrc,width:e.querySelector("img")?.naturalWidth,height:e.querySelector("img")?.naturalHeight,obsoleteOverlay:!!e.querySelector(".v5-route-overlay"),fillX:+(e.querySelector("img").getBoundingClientRect().width/e.querySelector(".v5-stage-world").getBoundingClientRect().width).toFixed(2),fillY:+(e.querySelector("img").getBoundingClientRect().height/e.querySelector(".v5-stage-world").getBoundingClientRect().height).toFixed(2),ratio:Math.round(e.querySelector(".v5-stage-world").getBoundingClientRect().height/e.querySelector(".v5-stage-world").getBoundingClientRect().width*100)/100}})()');
+   if(!v5Mobile.visible||v5Mobile.left< -2||v5Mobile.right>v5Mobile.viewport+2||v5Mobile.overflow||!v5Mobile.imageLoaded||!v5Mobile.source?.includes("v5-cinematic-mobile.webp")||v5Mobile.width!==1024||v5Mobile.height!==1536||v5Mobile.fillX<.98||v5Mobile.fillY<.98||v5Mobile.obsoleteOverlay||v5Mobile.ratio<1.4||!v5Mobile.sceneDescription?.includes("conceptual")||!v5Mobile.noCaption||!v5Mobile.noBridge)report.failures.push("V5 mobile 390 scene failed: "+JSON.stringify(v5Mobile));
    report.tests.push({name:"V5 mobile 390 cinematic layout",v5Mobile});
    await capture("mobile-v5-scene.png");
    // Capture entire page only after below-fold poster has been decoded.
@@ -358,8 +371,8 @@ try{
   report.failures.push("ANIM-02 reduced-motion accessibility contract failed: "+JSON.stringify(anim02Reduced));
  report.tests.push({name:"ANIM-02 reduced motion leaves approved image and copy static",anim02Reduced});
 
- const v5Reduced=await js('(()=>({mode:document.documentElement.dataset.v5Mode,render:getComputedStyle(document.querySelector(".v5-stage-render")).animationName,scan:getComputedStyle(document.querySelector(".v5-stage-scan")).animationName,light:getComputedStyle(document.querySelector(".v5-contact-light")).animationName,source:document.querySelector(' + "'"+ '.v5-responsive-art source[type="image/webp"]' + "'"+ ')?.getAttribute("srcset"),caption:document.querySelector(".v5-stage-caption")?.textContent?.trim()}))()');
- if(v5Reduced.mode!=="reduced"||v5Reduced.render!=="none"||v5Reduced.scan!=="none"||v5Reduced.light!=="none"||!v5Reduced.source?.includes("v5-cinematic-mobile.webp")||!v5Reduced.caption?.includes("conceptual"))report.failures.push("V5.2 reduced-motion content/visibility failed: "+JSON.stringify(v5Reduced));
+ const v5Reduced=await js('(()=>({mode:document.documentElement.dataset.v5Mode,render:getComputedStyle(document.querySelector(".v5-stage-render")).animationName,scan:getComputedStyle(document.querySelector(".v5-stage-scan")).animationName,light:getComputedStyle(document.querySelector(".v5-contact-light")).animationName,source:document.querySelector(' + "'"+ '.v5-responsive-art source[type="image/webp"]' + "'"+ ')?.getAttribute("srcset"),sceneDescription:document.querySelector(".v5-city-stage")?.getAttribute("aria-label"),noCaption:!document.querySelector(".v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge")}))()');
+ if(v5Reduced.mode!=="reduced"||v5Reduced.render!=="none"||v5Reduced.scan!=="none"||v5Reduced.light!=="none"||!v5Reduced.source?.includes("v5-cinematic-mobile.webp")||!v5Reduced.sceneDescription?.includes("conceptual")||!v5Reduced.noCaption||!v5Reduced.noBridge)report.failures.push("V5.2 reduced-motion content/visibility failed: "+JSON.stringify(v5Reduced));
  report.tests.push({name:"V5 full reduced-motion fallback",v5Reduced});
  await capture("mobile-reduced-motion.png");
  report.tests.push({name:"reduced motion",animation:reduced.animation});

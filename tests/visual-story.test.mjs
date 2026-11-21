@@ -59,9 +59,11 @@ test("visual narrative uses original geometry grammar but makes no operational c
  assert.equal((html.match(/src="\.\/assets\/deliver-assets-mark\.png"/g)||[]).length,3);
 });
 test("motion is finite, reduced-accessible and never depends on external services",()=>{
- for(const key of ["prime-thread-paint","prime-scene-rise","prime-bridge-draw","prime-shape-in","prime-type-line"]){
+ for(const key of ["prime-thread-paint","prime-scene-rise","prime-shape-in","prime-type-line"]){
   assert.match(css,new RegExp("@keyframes "+key));
  }
+ assert.doesNotMatch(css,/prime-bridge-draw|motion-story-bridge/);
+ assert.doesNotMatch(html,/motion-story-bridge/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
  assert.doesNotMatch(css,/animation-iteration-count:\s*infinite|animation:\s*[^;}]*infinite/i);
  assert.doesNotMatch(src,/fetch\s*\(|setInterval\s*\(|setTimeout\s*\(|scrollTo\s*\(|localStorage|document\.write/);

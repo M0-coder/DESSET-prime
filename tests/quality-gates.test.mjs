@@ -39,7 +39,8 @@ test("preview cannot be published or indexed by code changes to front-end assets
  assert.doesNotMatch(html,/<form\b|<input\b|<script[^>]*src="https?:\/\//i);
  assert.doesNotMatch(html,/iniciar sesión|descarga (?:la|nuestra) app|seguimiento en tiempo real/i);
  assert.match(html,/Acceso público no habilitado/);
- assert.match(html,/todavía no realiza pedidos ni entregas comerciales/i);
+ assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/i);
+ assert.doesNotMatch(html,/v5-stage-caption|motion-story-bridge/);
  assert.doesNotMatch(workflow,/^\s*deploy:\s*$/m);
  assert.match(workflow,/permissions:\s*\n\s*contents:\s*read/);
  assert.match(workflow,/No deployment mechanisms/);

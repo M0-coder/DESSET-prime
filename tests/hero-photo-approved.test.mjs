@@ -8,7 +8,9 @@ test('HERO-PHOTO-01 official brand and direct commerce CTA are retained',()=>{
  assert.match(html,/class="brand-mark" src="\.\/assets\/deliver-assets-mark\.png"/);
  assert.match(html,/Hablemos de tu negocio/);
  assert.match(html,/EL COMERCIO/);assert.match(html,/SE MUEVE/);
- assert.match(html,/data-v64-tour-launch/);
+ assert.doesNotMatch(html,/data-v64-tour-launch/);
+ assert.match(html,/class="v5-city-stage"/);
+ assert.match(html,/class="v63-tour"/);
  assert.doesNotMatch(html,/IDEAS<\/span>|ACCIÓN<\/span>|cuaderno/i);
  assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);

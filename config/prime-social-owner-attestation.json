@@ -24,8 +24,18 @@
       "platform": "Facebook",
       "url": "https://www.facebook.com/share/1EtpsZNFwQ/",
       "status": "owner-attested"
+    },
+    {
+      "platform": "TikTok",
+      "url": "https://www.tiktok.com/@deliver_assets",
+      "status": "owner-attested"
+    },
+    {
+      "platform": "YouTube",
+      "url": "https://www.youtube.com/@deliver_assets",
+      "status": "owner-attested"
     }
   ],
   "release_authorized": false,
-  "notes": "Records source owner confirmation only; does not attest to independent platform authentication or authorize publication."
+  "notes": "Instagram, X y Facebook conservados. URL exactas de TikTok y YouTube recuperadas del registro histórico M0-coder/DESSET/src/content.mjs, e inclusión solicitada por el titular el 2026-11-21. Declaración del titular, sin comprobación independiente de administración de cuentas ni autorización de publicación."
 }

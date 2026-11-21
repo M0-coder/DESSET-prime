@@ -7,9 +7,8 @@
  const root=document.documentElement;
  root.dataset.kineticVersion="v45";
  const cues=document.querySelectorAll(
-  ".statement h2, .solutions .section-head, .ecosystem .section-head, "+
-  ".motion-story, .motion-story-unit, .audiences .section-head, "+
-  ".statement-side, .solutions-grid .service--main, .business-pitch, "+
+  ".statement h2, .motion-story, .motion-story-unit, "+
+  ".solutions-grid .service--main, .business-pitch, "+
   ".audience-grid--compact .audience, .contact-bottom--rc, "+
   ".contact, .closing-line"
  );

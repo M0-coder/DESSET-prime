@@ -5,13 +5,11 @@
 /* Statement reads as the dark editorial chapter after the photo, not an arcade. */
 #vision.statement{background:var(--v02-deep)}
 #vision .statement-body{gap:clamp(25px,4vw,64px)}
-#vision .statement-side{padding:clamp(20px,2.5vw,32px);border-left:3px solid var(--v02-gold);background:rgba(255,255,255,.045);border-radius:0 16px 16px 0}
-#vision .statement-symbol{font-size:clamp(44px,5vw,70px);line-height:.92}
-#vision .trust-ledger{border-top-color:rgba(255,255,255,.35)}
-#vision .trust-ledger-item strong{letter-spacing:-.025em}
-/* Commercial chapters share a legible editorial hierarchy with the hero. */
-#soluciones .section-head>p,#ecosistema .section-head>p,
-#negocios .section-head>p{border-left:3px solid var(--v02-blue);padding-left:20px}
+
+
+
+
+
 #soluciones .solutions-grid .service--main{border:1px solid #1755d4;border-top:5px solid var(--v02-gold);box-shadow:var(--v02-soft)}
 #soluciones .service-arrow{font-size:27px;opacity:.9}
 #soluciones .service-access{border-top:3px solid var(--v02-blue);box-shadow:0 12px 28px rgba(20,34,57,.07)}
@@ -26,7 +24,7 @@
 #ecosistema .motion-story-unit{border-color:rgba(255,255,255,.25)}
 #ecosistema .motion-story-art img{filter:drop-shadow(0 12px 18px rgba(0,0,0,.2))}
 #ecosistema .motion-story-unit p{color:#e3e8f1}
-#ecosistema .ecosystem-footnote{color:#475568;max-width:72ch}
+
 /* Remove the old comic-book offset shadow, keep DESSET royal blue and gold. */
 #negocios .business-pitch{border-top:5px solid var(--v02-gold);box-shadow:0 22px 55px rgba(20,34,57,.2)}
 #negocios .business-pitch h3{letter-spacing:-.065em}
@@ -37,18 +35,15 @@
 /* Institutional close: stronger hierarchy, no invented contact channels. */
 #contacto .contact-bottom{border-top:1px solid #b9c6d5;padding-top:clamp(22px,3vw,34px)}
 #contacto .contact-status{border-left:3px solid var(--v02-blue);padding-left:14px}
-#contacto .contact-primary{box-shadow:0 8px 23px rgba(21,81,216,.16)}
 @media(max-width:860px){
- #vision .statement-side{padding:20px 22px}
- #soluciones .section-head>p,#ecosistema .section-head>p,
- #negocios .section-head>p{padding-left:14px}
+
+
  #ecosistema .ecosystem-board{box-shadow:0 14px 34px rgba(18,32,50,.15)}
  #negocios .business-pitch{box-shadow:0 15px 32px rgba(20,34,57,.17)}
 }
 @media(max-width:700px){
- #vision .statement-side{padding:16px 18px}
- #soluciones .section-head>p,#ecosistema .section-head>p,
- #negocios .section-head>p{border-left-width:2px;padding-left:12px}
+
+
  #soluciones .solutions-grid .service--main{box-shadow:0 12px 27px rgba(20,34,57,.12)}
  #ecosistema .ecosystem-board{padding:17px 16px 19px}
  #ecosistema .motion-story-unit{border-right:0}

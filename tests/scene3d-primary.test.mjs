@@ -25,7 +25,9 @@ test("SCENE3D-01 hides redundant controls and retains functional route/pause/fal
  assert.match(css,/\.v6-three-controls \[data-v6-camera\]/);
  assert.match(css,/\.v5-city-stage\[data-v6-autostart="enabled"\] \.v6-enable-webgl/);
  assert.match(html,/class="v5-stage-render"/);
- assert.match(html,/todavía no realiza pedidos ni entregas comerciales/);
+ assert.match(html,/aria-label="Renderización gráfica conceptual de DESSET"/);
+ assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
+ assert.doesNotMatch(html,/v5-stage-caption|motion-story-bridge/);
  assert.match(gpu,/Desktop loads WebGL without a user click/);
  assert.match(gpu,/Mobile loads WebGL automatically when compatible/);
  assert.match(gpu,/Tablet scene loads automatically/);

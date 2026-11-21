@@ -28,10 +28,10 @@ function simulate(source=control){
 }
 test("V6.9 describes services as a lasting institutional identity, not as a startup pitch",()=>{
  assert.match(html,/DESSET reúne comercio, tecnología y logística en un ecosistema de servicios/);
- assert.match(html,/UN ECOSISTEMA, TRES PILARES/);
- for(const phrase of ["Comercio conectado","Logística de última milla","Tecnología DESSET",
- "Pedidos y","Paquetería y transporte","Comercio y servicios",
- "Elegir, preparar","APLICACIONES DESSET"])
+ assert.doesNotMatch(html,/UN ECOSISTEMA, TRES PILARES/);
+ assert.match(html,/class="business-pitch"/);
+ for(const phrase of ["Pedidos y","Paquetería y transporte","Comercio y servicios",
+ "ELEGIR","PREPARAR","ENTREGAR","APLICACIONES DESSET"])
   assert.ok(html.includes(phrase),"Missing institutional service facet "+phrase);
  assert.doesNotMatch(html,/Proyecto en desarrollo|En construcción|En desarrollo: una plataforma|Horizonte futuro|antes del lanzamiento|validar necesidades con comercios|estamos construyendo un sistema/i);
  assert.equal((html.match(/<section\b/g)||[]).length,6);
@@ -45,7 +45,7 @@ test("V6.9 keeps website informational, operations gated to apps, no invented la
  assert.match(html,/data-service-status role="status" aria-live="polite">Acceso público no habilitado/);
  assert.match(html,/data-app-links hidden/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
- assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,3);
+ assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,5);
  assert.doesNotMatch(html,/<form\b|<iframe\b|href="https?:\/\/(?:play\.google\.com|apps\.apple\.com|wa\.me)/i);
  assert.match(control,/applicationDistribution:"not_published"/);
  assert.match(control,/verified:false/);

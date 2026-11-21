@@ -12,11 +12,13 @@ function visibleText(markup){
 test("V6.6 all presentation headings and standalone labels omit terminal ornamental dots",()=>{
  const headings=[...html.matchAll(/<(h[1-4]|strong)\b[^>]*>([\s\S]*?)<\/\1>/gi)]
   .map(x=>({tag:x[1],text:visibleText(x[2])}));
- assert.ok(headings.length>=22,"Expected all six sections to be inspected");
+ assert.ok(headings.length>=16,"Expected all six sections to be inspected");
  for(const heading of headings)
   assert.ok(!/[.]$/.test(heading.text),"Ornamental full stop remains in "+heading.tag+": "+heading.text);
- assert.match(html,/<h2 id="ecosystem-title">Elegir, preparar<br>y entregar<\/h2>/);
- assert.match(html,/>COMERCIO · TECNOLOGÍA · LOGÍSTICA<\/p>/);
+ assert.match(html,/aria-label="Recorrido visual: elegir, preparar y entregar"/);
+ assert.doesNotMatch(html,/id="ecosystem-title"/);
+ assert.doesNotMatch(html,/>COMERCIO · TECNOLOGÍA · LOGÍSTICA<\/p>/);
+ assert.match(html,/id="hero-title"/);
  assert.match(html,/>UNA CONEXIÓN \/ TRES MOMENTOS</);
  for(const action of ["ELEGIR","PREPARAR","ENTREGAR"])
   assert.ok(html.includes("<h3>"+action+"</h3>"),"Missing clean action "+action);
@@ -29,7 +31,9 @@ test("V6.6 punctuation stays in natural prose and legal availability disclosures
  assert.match(html,/DESSET reúne comercio, tecnología y logística en un ecosistema de servicios/);
  assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET/);
  assert.match(html,/no procesa pedidos ni pagos\./);
- assert.match(html,/no representa una operación activa\. Las aplicaciones/);
+ assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/);
+ assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
+ assert.match(html,/Acceso público no habilitado/);
  assert.match(html,/Esta web no procesa transacciones\./);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
@@ -55,9 +59,11 @@ test("V6.6 rounded design uses disciplined radius scale, not global clipping",()
 
 test("V6.6 change is limited to presentation: no commerce launch or public publishing",()=>{
  assert.equal((html.match(/<section\b/g)||[]).length,6);
- assert.match(html,/href="#ecosistema" data-v64-tour-launch/);
+ assert.doesNotMatch(html,/data-v64-tour-launch/);
+ assert.match(html,/id="ecosistema" aria-label/);
+ assert.match(html,/class="v63-tour"/);
  assert.match(html,/class="v6-three-mount" aria-hidden="true"/);
  assert.match(html,/href="#contacto"/);
  assert.doesNotMatch(html,/<form\b|<iframe\b/i);
- assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,3);
+ assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,5);
 });

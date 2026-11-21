@@ -24,7 +24,9 @@ test("commercial contact CTA resolves locally and avoids fictitious contact deta
  assert.ok(pitch);
  assert.match(pitch[1],/href="#contacto"/);
  assert.match(html,/id="contacto"/);
- assert.match(html,/Ver perfil en Instagram/);
+ assert.match(html,/Instagram <span/);
+ assert.match(html,/TikTok <span/);
+ assert.match(html,/YouTube <span/);
  assert.match(html,/href="https:\/\/www\.instagram\.com\/deliver_assets\/"/);
  assert.doesNotMatch(html,/<a\b[^>]+href="(?:mailto:|tel:|https:\/\/wa\.me\/)/i,"Cannot invent or publish personal/uncorroborated contact details");
 });

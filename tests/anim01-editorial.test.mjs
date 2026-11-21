@@ -7,7 +7,7 @@ const css=read("styles.css"),system=read("styles-system.css"),motion=read("scrip
 test("ANIM-01 original hero, corporate CTA, logo and 3D semantics preserved",()=>{
  assert.match(html,/<a class="hero-cta" href="#contacto">Hablemos de tu negocio/);
  assert.match(html,/EL COMERCIO/);assert.match(html,/SE MUEVE/);
- assert.match(html,/data-v64-tour-launch/);assert.match(html,/assets\/deliver-assets-mark\.png/);
+ assert.doesNotMatch(html,/data-v64-tour-launch/);assert.match(html,/class="v6-three-mount"/);assert.match(html,/class="v63-tour"/);assert.match(html,/assets\/deliver-assets-mark\.png/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
 test("ANIM-01 removes arcade scan, glint and pointer-driven lens",()=>{

@@ -19,13 +19,15 @@ test("V6.4 packages the actual Prime website, not only an isolated GPU demo",()=
   assert.ok(statSync(new URL("dist/"+file,root)).size>0,"Missing: "+file);
  }
 });
-test("V6.4 hero CTA launches the Three.js GLB journey in the ecosystem section",()=>{
- assert.ok(html.includes('href="#ecosistema" data-v64-tour-launch'));
+test("V6.4 viewport starts Three.js GLBs in the ecosystem; guided-tour control remains",()=>{
+ assert.ok(!html.includes('data-v64-tour-launch'));
+ assert.ok(html.includes('aria-label="Recorrido visual: elegir, preparar y entregar"'));
  assert.ok(html.includes('id="ecosistema"'));
  assert.ok(html.includes('class="v6-three-mount" aria-hidden="true"'));
  assert.ok(html.includes('class="v63-tour"'));
- assert.ok(loader.includes('stage.dataset.v64Requested="tour"'));
- assert.ok(loader.includes('stage.querySelector(".v63-tour")?.click()'));
+ assert.ok(loader.includes('activationObserver.observe(stage)'));
+ assert.ok(loader.includes('rootMargin:"0px",threshold:0.12'));
+ assert.ok(loader.includes('threeStart?.addEventListener("click",loadThree)'));
  assert.ok(loader.includes('threeStart?.addEventListener("click",loadThree)'));
  assert.ok(loader.includes('if(threeStart)threeStart.hidden=false'));
  assert.ok(!loader.includes('trigger3D.observe'));

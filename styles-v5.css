@@ -30,7 +30,7 @@
 }
 .v5-city-stage {
   position:relative; display:block; isolation:isolate; overflow:hidden;
-  margin:8px 0 30px; width:100%; border:1px solid rgba(230,239,255,.28);
+  margin:8px 0 18px; width:100%; border:1px solid rgba(230,239,255,.28);
   background:#0B0E19; color:#F7F5EE;
   box-shadow:0 26px 64px rgba(0,0,0,.24),0 0 0 1px rgba(255,198,47,.07);
 }
@@ -61,14 +61,6 @@
  backdrop-filter:blur(8px);
 }
 .v5-stage-legend:before {content:"";width:9px;height:9px;background:#FFC62F;transform:rotate(45deg);flex:none;}
-.v5-stage-caption {
- position:relative;z-index:5;display:flex;justify-content:space-between;align-items:baseline;
- gap:14px;padding:12px clamp(14px,2.4vw,29px);
- background:#101521;border-top:1px solid rgba(247,245,238,.16);
- color:#DEDFE7;font-size:13px;line-height:1.45;
-}
-.v5-stage-caption strong {color:#FFC62F;font-weight:850;}
-.v5-stage-caption span {max-width:790px;}
 /* Higher specificity than legacy .ecosystem-board img (max-width:900/max-height:420).
    Prevent letterboxing: render must occupy the intended responsive frame. */
 .v5-city-stage .v5-stage-render {
@@ -104,16 +96,13 @@
  .v5-stage-world {aspect-ratio:1.9;min-height:245px;}
  .v5-stage-render {object-position:center;}
  .v5-stage-legend {bottom:12px;}
- .v5-stage-caption {font-size:12px;}
- .v5-city-stage {margin-bottom:25px;}
+ .v5-city-stage {margin-bottom:18px;}
 }
 @media(max-width:430px){
  /* A dedicated vertical render keeps all stages in frame instead of cropping the destination. */
  .v5-stage-world {aspect-ratio:2 / 3;min-height:0;}
  .v5-stage-render {object-fit:contain;object-position:center;}
- .v5-stage-legend {display:none;} /* Caption directly below provides the equivalent text. */
- .v5-stage-caption {display:block;padding:12px;font-size:12px;}
- .v5-stage-caption strong {display:block;margin-bottom:3px;}
+ .v5-stage-legend {display:none;} /* Mobile image remains described by the stage's accessible name and image alt. */
  .v5-contact-light {left:14%;width:72%;}
 }
 @media(prefers-reduced-motion:reduce) {

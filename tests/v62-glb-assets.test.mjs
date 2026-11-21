@@ -55,7 +55,7 @@ test("V6.2 preserves static fallback, consent and security boundaries",()=>{
  const html=read("index.html"),loader=read("scripts/v5-cinematic.js");
  const source=read("scripts/v6-three.src.mjs");
  assert.match(html,/v5-cinematic-mobile\.webp/);
- assert.match(html,/todavía no realiza pedidos ni entregas comerciales/);
+ assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/);
  assert.match(loader,/threeStart\?\.addEventListener\("click",loadThree\)/);
  assert.match(source,/if\(!probe\.getContext\("webgl2"\)\)/);
  assert.match(source,/stage\.dataset\.v6State="active"/);

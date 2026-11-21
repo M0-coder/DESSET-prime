@@ -56,7 +56,8 @@ test("V6.7 key foregrounds meet WCAG AA contrast for normal text",()=>{
 });
 
 test("V6.7 complete narrative agrees on Elegir → Preparar → Entregar",()=>{
- assert.ok(html.includes('<h2 id="ecosystem-title">Elegir, preparar<br>y entregar</h2>'));
+ assert.ok(html.includes('aria-label="Recorrido visual: elegir, preparar y entregar"'));
+ assert.ok(!html.includes('id="ecosystem-title"'));
  const flow=html.match(/<div class="v4-flow motion-story"[\s\S]*?<\/div>\s*<\/div>\s*<details class="v4-architecture-details">/);
  assert.ok(flow,"No complete three-step flow");
  const titles=[...flow[0].matchAll(/<h3>(.*?)<\/h3>/g)].map(x=>x[1]);
@@ -100,7 +101,7 @@ test("V6.7 stylesheet actually loads in the signed site and strict local preview
 });
 
 test("V6.7 does not invent contact channels, forms or premature operations",()=>{
- assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,3);
+ assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,5);
  assert.doesNotMatch(html,/<form\b|<iframe\b|https?:\/\/(?:wa\.me|api\.whatsapp\.com)/i);
  assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET cuando estén habilitadas/);
  assert.match(html,/Esta web no procesa transacciones\./);

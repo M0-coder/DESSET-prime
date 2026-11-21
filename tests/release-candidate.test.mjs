@@ -35,14 +35,16 @@ test("V4.3: delivery first and optional expansion do not compete in initial view
 test("V4.3: hero CTA reaches the unique primary contact path and is accessible",()=>{
  const hero=html.match(/<div class="hero-actions">([\s\S]*?)<\/div>/)?.[1]||"";
  assert.match(hero,/<a class="hero-cta" href="#contacto">Hablemos de tu negocio/);
- assert.match(hero,/<a class="hero-secondary" href="#ecosistema" data-v64-tour-launch aria-label="Explorar el recorrido 3D de DESSET">Explorar recorrido 3D/);
+ assert.doesNotMatch(hero,/hero-secondary|data-v64-tour-launch/);
+ assert.equal((hero.match(/<a\b/g)||[]).length,1,"Only one primary hero CTA survives");
+ assert.match(html,/class="v63-tour"/);
  assert.match(html,/class="contact-primary" href="https:\/\/www\.instagram\.com\/deliver_assets\/"/);
- assert.match(html,/Ver perfil en Instagram/);
+ assert.match(html,/Instagram <span/);
  assert.match(css,/\.contact-primary:focus-visible/);
  assert.match(css,/\.contact-primary\{[^}]*min-height:56px/s);
  assert.equal((html.match(/class="contact-primary"/g)||[]).length,1);
- assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,3,
-   "Three DESSET accounts require exact owner attestation; platform admin access remains untested");
+ assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,5,
+   "Five DESSET accounts require exact owner attestation; platform admin access remains untested");
  assert.doesNotMatch(html,/<a\b[^>]+href="(?:mailto:|tel:|https:\/\/wa\.me\/)/i);
  assert.match(html,/no procesa pedidos ni pagos/i);
 });

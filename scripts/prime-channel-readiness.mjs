@@ -26,15 +26,27 @@ export function inspectInstitutionalChannels({html,serviceState,attestation=defa
   attestation?.assertion?.independently_verified_by_platform===false&&
   attestation?.release_authorized===false,'unsafe or exaggerated channel certification');
  const entries=attestation.exact_channels;
- strict(Array.isArray(entries)&&entries.length===3,'unexpected owner-declared channel count');
+ const allowedHosts=Object.freeze({
+  Instagram:'www.instagram.com',X:'x.com',Facebook:'www.facebook.com',
+  TikTok:'www.tiktok.com',YouTube:'www.youtube.com'
+ });
+ strict(Array.isArray(entries)&&entries.length===5,'expected exactly five owner-declared channels');
  const approved=new Map();
  for(const item of entries){
-  strict(['Instagram','X','Facebook'].includes(item.platform)&&
-   item.status==='owner-attested'&&/^https:\/\/[^/\s]+\//.test(item.url)&&
-   !approved.has(item.url),'invalid owner-declared URL');
+  strict(Object.hasOwn(allowedHosts,item.platform)&&item.status==='owner-attested'&&
+   typeof item.url==='string'&&!approved.has(item.url),'invalid owner-declared URL');
+  let url;
+  try{url=new URL(item.url);}catch{reject('malformed owner-declared URL');}
+  strict(url.protocol==='https:'&&url.hostname===allowedHosts[item.platform]&&
+   url.username===''&&url.password===''&&url.hash===''&&url.search===''&&
+   url.pathname.length>1,'channel must use the expected platform HTTPS host and profile path');
   approved.set(item.url,item.platform);
  }
- strict(new Set(entries.map(x=>x.platform)).size===3,'duplicate attested platform');
+ strict(new Set(entries.map(x=>x.platform)).size===5,'duplicate attested platform');
+ const nav=html.match(/<nav class="social-links social-links--official" aria-label="Redes sociales de DESSET">([\s\S]*?)<\/nav>/)?.[1];
+ strict(typeof nav==='string'&&(nav.match(/<a\b/g)||[]).length===5,
+  'five channels must appear together in the single institutional social navigation');
+ strict(!html.includes('social-links--secondary'),'old split/secondary social block must not return');
  const external=[];
  for(const hit of html.matchAll(/<a\b([^>]+)>/g)){
   const a=hit[1],href=a.match(/\bhref="([^"]+)"/)?.[1]??'';
@@ -54,7 +66,7 @@ export function inspectInstitutionalChannels({html,serviceState,attestation=defa
   }
   external.push({href,state,basis,platform:approved.get(href)??'unclassified'});
  }
- strict(external.length>=3&&external.length<=8,'unexpected number of external links');
+ strict(external.length>=5&&external.length<=8,'unexpected number of external links');
  for(const url of approved.keys()){
   strict(external.filter(x=>x.href===url).length===1,'owner-declared channel URL missing or duplicated: '+url);
  }
