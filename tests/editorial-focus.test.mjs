@@ -36,7 +36,8 @@ test("primary business narrative remains intelligible without decorative microco
  assert.equal((html.match(/class="role" role="listitem"/g)||[]).length,4);
  assert.match(html,/Un modelo integrado para solicitudes de clientes/);
  assert.match(html,/Área complementaria del modelo logístico/);
- assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/i);
+ assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/i);
+ assert.match(html,/aria-label="Escena conceptual:/);
  assert.match(html,/Acceso público no habilitado/);
  assert.match(html,/Este sitio no procesa pedidos ni pagos/);
 });
