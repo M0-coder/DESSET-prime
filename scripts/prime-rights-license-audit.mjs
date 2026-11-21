@@ -7,6 +7,7 @@ import {readFileSync,lstatSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {join,resolve,dirname,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {checkPrimeFonts} from './prime-font-licenses.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const requireSafe=(okay,reason)=>{if(!okay)throw Error('NO-GO: '+reason)};
@@ -18,6 +19,7 @@ export function checkAssetRightsAndLicenses({
 }){
  requireSafe(isAbsolute(dist),'dist must be absolute');
  const source=JSON.parse(readFileSync(join(dist,'site-manifest.json'),'utf8'));
+ const fontEvidence=checkPrimeFonts({distDir:dist});
  requireSafe(source.schema==='desset-prime-static-web-package-v1'&&source.noindex===true,
   'wrong Prime source package');
  requireSafe(register.schema==='desset-prime-original-assets-v1'&&
@@ -74,7 +76,9 @@ export function checkAssetRightsAndLicenses({
   assets_checked:verified.length,assets:verified,
   third_party_packages:packages.sort((a,b)=>a.name.localeCompare(b.name)),
   compiled_bundle:'assets/v6-three.bundle.js',compiled_bundle_contains_third_party:true,
-  note:'Original media ownership was declared by the project owner. Independent assignment/rights proofs are not attached. All npm packages are separately MIT-licensed; honor license notices.',
+  fonts_checked:fontEvidence.families,font_license:fontEvidence.license,
+  fonts_are_third_party:true,fonts_upstream_commit:fontEvidence.commit,
+  note:'Original media ownership was declared by the project owner. Independent assignment/rights proofs are not attached. All npm packages are separately MIT-licensed, while Inter and Plus Jakarta Sans are separately OFL 1.1-licensed; preserve both license files.',
   publication_authorized:false,release_decision:'NO-GO'};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){

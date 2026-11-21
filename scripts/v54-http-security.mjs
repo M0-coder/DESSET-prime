@@ -38,6 +38,11 @@ async function check(){
  record("HTML noindex and accessible image-free 3D fallback",html.includes('name="robots" content="noindex,nofollow"')&&html.includes('class="v6-static-fallback"')&&!html.includes("v5-cinematic-"));
  const head=await fetch(host+"/assets/v62-courier.glb",{method:"HEAD",signal:AbortSignal.timeout(5000)});
  record("HEAD original 3D GLB asset",head.status===200&&head.headers.get("content-type")==="model/gltf-binary"&&Number(head.headers.get("content-length"))>100000);
+ for(const name of ["inter-latin-variable","plus-jakarta-sans-latin-variable"]){
+  const font=await fetch(host+"/fonts/"+name+".woff2",{signal:AbortSignal.timeout(5000)});
+  const signature=font.status===200?(await font.arrayBuffer()).slice(0,4):new ArrayBuffer(0);
+  record("Locally served WOFF2 "+name,font.status===200&&font.headers.get("content-type")?.startsWith("font/woff2")&&Buffer.from(signature).toString()==="wOF2");
+ }
  const css=await fetch(host+"/styles-v5.css",{signal:AbortSignal.timeout(5000)});
  record("CSS served with correct MIME",css.status===200&&css.headers.get("content-type")?.startsWith("text/css"));
  const blocked=["/.git/config","/.github/workflows/preview-checks.yml","/scripts/local-preview.mjs","/docs/V5.3-RELEASE-GATE.md","/%2e%2e/%2e%2e/secret.env","/package.json"];

@@ -14,7 +14,7 @@ function fixture(t,seoPolicy='NOINDEX',src=dist){
  return {parent,outputDir,evidenceDir,report};
 }
 test('NOINDEX release shape preserves source and blocks crawling',t=>{
- const f=fixture(t);assert.equal(f.report.package_files,30);
+ const f=fixture(t);assert.equal(f.report.package_files,35);
  assert.equal(f.report.production_deployed,false);assert.equal(f.report.production_authorized,false);
  assert.match(readFileSync(join(f.outputDir,'index.html'),'utf8'),/name="robots" content="noindex,nofollow"/);
  assert.equal(readFileSync(join(f.outputDir,'robots.txt'),'utf8'),'User-agent: *\nDisallow: /\n');
@@ -23,6 +23,8 @@ test('NOINDEX release shape preserves source and blocks crawling',t=>{
  assert.ok(!readdirSync(f.outputDir).includes('prime-manual-release-package.json'));
  assert.match(readFileSync(join(f.outputDir,'THIRD-PARTY-NOTICES.txt'),'utf8'),/three 0\.187\.0 \(MIT\)/);
  assert.match(readFileSync(join(f.outputDir,'THIRD-PARTY-NOTICES.txt'),'utf8'),/esbuild 0\.28\.2 \(MIT\)/);
+ assert.match(readFileSync(join(f.outputDir,'fonts/LICENSE-Inter-OFL.txt'),'utf8'),/SIL OPEN FONT LICENSE Version 1.1/);
+ assert.match(readFileSync(join(f.outputDir,'fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt'),'utf8'),/SIL OPEN FONT LICENSE Version 1.1/);
 });
 test('INDEX release shape has explicit canonical, OG, robots and sitemap',t=>{
  const f=fixture(t,'INDEX'),html=readFileSync(join(f.outputDir,'index.html'),'utf8');

@@ -13,8 +13,10 @@ const host="127.0.0.1";
 const port=4173;
 const mime={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",
  ".js":"text/javascript; charset=utf-8",".svg":"image/svg+xml",
- ".png":"image/png",".webp":"image/webp",".glb":"model/gltf-binary"};
-const permitted=rel=>rel==="index.html"||rel==="styles.css"||rel==="styles-v5.css"||rel==="styles-system.css"||rel==="styles-hero-photo.css"||rel==="styles-visual02.css"
+ ".png":"image/png",".webp":"image/webp",".woff2":"font/woff2",".txt":"text/plain; charset=utf-8",".glb":"model/gltf-binary"};
+const permitted=rel=>rel==="index.html"||rel==="styles.css"||rel==="styles-v5.css"||rel==="styles-system.css"||rel==="styles-hero-photo.css"||rel==="styles-visual02.css"||rel==="styles-typography.css"
+ || /^fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2$/.test(rel)
+ || /^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(rel)
  || /^scripts\/(?:app|motion|v5-cinematic|service-state)\.js$/.test(rel)
  || /^assets\/[a-z0-9-]+\.(?:png|svg|webp)$/.test(rel)
  || rel==="assets/v6-three.bundle.js"
@@ -22,7 +24,7 @@ const permitted=rel=>rel==="index.html"||rel==="styles.css"||rel==="styles-v5.cs
 const server=createServer(async(req,res)=>{
  const headers={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff",
   "X-Robots-Tag":"noindex, nofollow","Referrer-Policy":"no-referrer",
-  "Content-Security-Policy":"default-src 'self'; base-uri 'none'; object-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; form-action 'none'; frame-ancestors 'none'"};
+  "Content-Security-Policy":"default-src 'self'; base-uri 'none'; object-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; form-action 'none'; frame-ancestors 'none'"};
  const reject=(code)=>{res.writeHead(code,headers);res.end();};
  if(req.method!=="GET"&&req.method!=="HEAD")return reject(405);
  let rel;

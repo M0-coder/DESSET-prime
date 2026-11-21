@@ -41,6 +41,19 @@ for(const name of ["commerce","courier","destination"]){
  check(bytes.toString("ascii",0,4)==="glTF"&&bytes.readUInt32LE(4)===2,"invalid GLB "+name);
 }
 check(expected.has("assets/v6-three.bundle.js"),"Three.js bundle is missing");
+check(expected.has("styles-typography.css")&&html.includes('href="./styles-typography.css"'),"Locally hosted type system missing");
+const typography=await readFile(resolve(dist,"styles-typography.css"),"utf8");
+for(const file of ["inter-latin-variable.woff2","plus-jakarta-sans-latin-variable.woff2"]){
+ const path="fonts/"+file;
+ check(expected.has(path)&&typography.includes("./"+path),"Local WOFF2 unlinked: "+path);
+ check((await readFile(resolve(dist,path))).subarray(0,4).toString()==="wOF2","Invalid WOFF2 font: "+path);
+}
+for(const file of ["LICENSE-Inter-OFL.txt","LICENSE-Plus-Jakarta-Sans-OFL.txt"]){
+ const path="fonts/"+file;
+ check(expected.has(path),"Open Font License notice missing: "+path);
+ check((await readFile(resolve(dist,path),"utf8")).includes("SIL OPEN FONT LICENSE Version 1.1"),"Malformed OFL license: "+path);
+}
+check(html.includes('rel="preload" href="./fonts/inter-latin-variable.woff2"')&&html.includes('rel="preload" href="./fonts/plus-jakarta-sans-latin-variable.woff2"'),"Local font preload missing");
 check(expected.has("styles-system.css")&&html.includes('href="./styles-system.css"'),"60/30/10 design CSS not packaged");
 check(expected.has("styles-hero-photo.css")&&html.includes('href="./styles-hero-photo.css"'),"Photographic stylesheet missing");
 check(expected.has("styles-visual02.css")&&html.includes('href="./styles-visual02.css"'),"VISUAL-02 editorial stylesheet missing");

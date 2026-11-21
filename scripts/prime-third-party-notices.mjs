@@ -23,7 +23,8 @@ export function generateThirdPartyNotices({sourceRoot=root}={}){
  must(pkg.dependencies?.three==='0.187.0'&&pkg.devDependencies?.esbuild==='0.28.2','unreviewed dependency versions');
  const blocks=['DESSET PRIME — THIRD-PARTY LICENSE NOTICES',
   'This notice accompanies the DESSET Prime static website. Original DESSET branding, photography and models remain separate from third-party software.',
-  'The full terms below are reproduced from the pinned installed npm packages.'];
+  'The full terms below are reproduced from the pinned installed npm packages.',
+  'Third-party font files: Inter (SIL OFL 1.1) and Plus Jakarta Sans (SIL OFL 1.1). Full font license terms and copyright notices are distributed alongside the fonts at fonts/LICENSE-Inter-OFL.txt and fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt. These typefaces are not original DESSET assets.'];
  const info=[];
  for(const spec of packages){
   const locked=lock.packages?.['node_modules/'+spec.name];

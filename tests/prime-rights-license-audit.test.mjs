@@ -19,6 +19,8 @@ test('14 owner-declared active original media are individually SHA-256 verified'
  const r=checkAssetRightsAndLicenses(opts);
  assert.equal(r.outcome,'PASS');assert.equal(r.assets_checked,14);
  assert.equal(r.legal_title_independently_verified,false);
+ assert.equal(r.fonts_checked,2);assert.equal(r.font_license,'SIL-OFL-1.1');
+ assert.equal(r.fonts_are_third_party,true);
  assert.equal(r.publication_authorized,false);assert.equal(r.release_decision,'NO-GO');
  assert.ok(r.assets.every(a=>a.claim==='owner-declared'&&a.sha256.length===64));
  assert.ok(!r.assets.some(a=>/v5-(?:cinematic|logistics)/.test(a.path)),'Orphan 2D poster must not be part of release assets');

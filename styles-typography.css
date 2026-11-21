@@ -1,0 +1,12 @@
+/* DESSET PRIME TYPOGRAPHY-01 — licensed, local, opt-in draft PR; no remote requests.
+ * Weight axis Inter 100–900, Plus Jakarta Sans 200–800. Latin covers Spanish glyphs.
+ * Copyright/redistribution notices: fonts/LICENSE-Inter-OFL.txt and
+ * fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt (SIL OFL 1.1).
+ */
+@font-face{font-family:"DESSET Inter";src:url("./fonts/inter-latin-variable.woff2") format("woff2");font-style:normal;font-weight:100 900;font-display:swap}
+@font-face{font-family:"DESSET Jakarta";src:url("./fonts/plus-jakarta-sans-latin-variable.woff2") format("woff2");font-style:normal;font-weight:200 800;font-display:swap}
+:root{--ds-type-body:"DESSET Inter","Helvetica Neue",Arial,system-ui,sans-serif;--ds-type-display:"DESSET Jakarta","DESSET Inter",Arial,system-ui,sans-serif}
+body{font-family:var(--ds-type-body)}
+/* Keep brandmark, navigation, controls and 3D UI on the readable Inter metrics.
+ * Apply Jakarta only to explicitly editorial headings; avoid synthetic 900/950. */
+#inicio .motion-headline,.statement h2,.solutions-grid .service--main h3,.motion-story-unit h3,.business-pitch h3,.contact .closing-title{font-family:var(--ds-type-display);font-weight:800;font-synthesis:weight none}
