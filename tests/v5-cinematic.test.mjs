@@ -38,8 +38,9 @@ test("V5 renders three conceptual scenes without fabricating commerce",()=>{
   assert.match(html,/v5-hero-refraction/);
   assert.match(html,/class="v5-city-stage"/);
   assert.match(html,/v5-contact-light/);
-  assert.match(html,/Visualización conceptual del sistema previsto/);
-  assert.match(html,/todavía no realiza pedidos ni entregas comerciales/);
+  assert.match(html,/aria-label="Renderización gráfica conceptual de DESSET"/);
+  assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/);
+  assert.doesNotMatch(html,/v5-stage-caption|motion-story-bridge|v4-hero-declaration/);
   assert.match(html,/alt="Escena conceptual tridimensional:/);
   assert.doesNotMatch(html,/class="v5-route-overlay"/);
   assert.match(html,/deliver-assets-mark\.png/);
