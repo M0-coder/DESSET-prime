@@ -9,7 +9,9 @@ test("V4: portada comercial editorial con mensaje legible, CTA reales y sin oper
  assert.ok(head.length>1500);
  assert.match(head,/EL COMERCIO/);
  assert.match(head,/SE MUEVE/);
- for(const keyword of ["COMERCIO","LOGÍSTICA","CONEXIÓN","TECNOLOGÍA","FUTURO","SE MUEVE"])assert.match(head,new RegExp(keyword));
+ for(const keyword of ["COMERCIO","LOGÍSTICA","CONEXIÓN","FUTURO","SE MUEVE"])assert.match(head,new RegExp(keyword));
+ assert.match(head,/tecnología/i);
+ assert.doesNotMatch(head,/v4-hero-declaration|COMERCIO · TECNOLOGÍA · LOGÍSTICA/);
  assert.match(head,/href="#contacto"/);
  assert.doesNotMatch(head,/href="#ecosistema"/);
  assert.match(html,/id="ecosistema" aria-label="Recorrido visual:/);
