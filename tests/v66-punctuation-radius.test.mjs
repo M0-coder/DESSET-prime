@@ -65,5 +65,5 @@ test("V6.6 change is limited to presentation: no commerce launch or public publi
  assert.match(html,/class="v6-three-mount" aria-hidden="true"/);
  assert.match(html,/href="#contacto"/);
  assert.doesNotMatch(html,/<form\b|<iframe\b/i);
- assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,5);
+ assert.equal((html.match(/data-channel-review="owner-attested" data-channel-basis="owner-attested"/g)||[]).length,5);
 });

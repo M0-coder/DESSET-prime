@@ -43,7 +43,7 @@ test("V4.3: hero CTA reaches the unique primary contact path and is accessible",
  assert.match(css,/\.contact-primary:focus-visible/);
  assert.match(css,/\.contact-primary\{[^}]*min-height:56px/s);
  assert.equal((html.match(/class="contact-primary"/g)||[]).length,1);
- assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,5,
+ assert.equal((html.match(/data-channel-review="owner-attested" data-channel-basis="owner-attested"/g)||[]).length,5,
    "Five DESSET accounts require exact owner attestation; platform admin access remains untested");
  assert.doesNotMatch(html,/<a\b[^>]+href="(?:mailto:|tel:|https:\/\/wa\.me\/)/i);
  assert.match(html,/no procesa pedidos ni pagos/i);

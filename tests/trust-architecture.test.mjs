@@ -35,7 +35,7 @@ test("truthful service and conceptual 3D disclosures remain without redundant th
 
 test("contact profiles carry owner declaration, not platform-admin proof or DM responsiveness",()=>{
  assert.match(html,/Instagram <span/);
- assert.match(html,/data-channel-review="verified" data-channel-basis="owner-attested"/);
+ assert.match(html,/data-channel-review="owner-attested" data-channel-basis="owner-attested"/);
  assert.equal((html.match(/class="contact-primary"/g)||[]).length,1);
  assert.doesNotMatch(html,/Abrir Instagram para conversar|contacto verificado|responderemos en|WhatsApp oficial/i);
  assert.doesNotMatch(html,/<form\b|<input\b/i);
