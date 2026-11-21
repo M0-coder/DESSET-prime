@@ -21,15 +21,16 @@ const files=[
 ].sort();
 const original=await readFile(resolve(root,"index.html"),"utf8");
 const loader=await readFile(resolve(root,"scripts/v5-cinematic.js"),"utf8");
-if(!original.includes('data-v64-tour-launch')||!original.includes('id="ecosistema"')||
+if(!original.includes('id="ecosistema"')||!original.includes('aria-label="Recorrido visual: elegir, preparar y entregar"')||
  !original.includes('class="v6-three-mount"')||
  !original.includes('class="v63-tour"')||
  !original.includes('name="robots" content="noindex,nofollow"'))
  throw Error("Missing integrated Three.js site, guided tour, or noindex gate.");
-if(!loader.includes('stage.dataset.v64Requested="tour"')||
+if(!loader.includes('activationObserver.observe(stage)')||
+ !loader.includes('threeStart?.addEventListener("click",loadThree)')||
  !loader.includes('./assets/v6-three.bundle.js'))
- throw Error("Hero link is not connected to locally bundled WebGL.");
-if(files.length>40)throw Error("Too many release files for DESSET Prime experiment: "+files.length);
+ throw Error("Viewport-activated 3D scene is not connected to bundled WebGL or manual fallback.");
+if(files.length>40)throw Error("Too many release files for DESSET Prime: "+files.length);
 for(const path of files){
  if(path.split("/").includes("..") || !(path==="assets/v6-three.bundle.js" || /^(?:index\.html|styles(?:-v5|-system|-hero-photo|-visual02)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb))$/.test(path)))
    throw Error("Unexpected package path: "+path);
