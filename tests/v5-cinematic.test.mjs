@@ -35,7 +35,7 @@ test("V5 is an additive local layer with a reversible surface",()=>{
 
 test("V5 renders three conceptual scenes without fabricating commerce",()=>{
   for(const id of ["inicio","ecosistema","contacto"])assert.match(html,new RegExp('id="'+id+'"'));
-  assert.match(html,/v5-hero-refraction/);
+   assert.doesNotMatch(html,/v5-hero-refraction/);
   assert.match(html,/class="v5-city-stage"/);
   assert.match(html,/v5-contact-light/);
   assert.match(html,/aria-label="Renderización gráfica conceptual de DESSET"/);
@@ -89,7 +89,7 @@ test("V5 animations are finite and accessible; no scroll listener, tracking or b
     assert.match(css,new RegExp("@keyframes "+frame+"\\s*\\{"));
   }
   assert.match(css,/@media\s*\(prefers-reduced-motion:reduce\)/);
-  assert.match(css,/@media\(prefers-reduced-motion:reduce\) \{\s*\.v5-hero-refraction/);
+   assert.doesNotMatch(html,/class="v5-glint"|class="v5-lens"/);
   assert.match(css,/\.v5-stage-render \{filter:none!important;transform:none!important;\}/);
   assert.match(motion,/const reduced=media\?\.matches===true/);
   assert.match(motion,/instance\.unobserve\(entry\.target\)/);

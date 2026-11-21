@@ -109,5 +109,5 @@
     activationObserver.observe(stage);
   }
 
-  // ANIM-01: decorative lens stays still. No cursor-following game interaction.
+  // ANIM-01: viewport-activated 3D remains independent of cursor-following ornaments.
 })();

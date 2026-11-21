@@ -51,12 +51,12 @@ test("visual narrative uses original geometry grammar but makes no operational c
  assert.equal((html.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,3);
  for(const label of ["ELEGIR","PREPARAR","ENTREGAR"])assert.match(html,new RegExp("<h3>"+label));
  assert.match(html,/no representa una operación activa/i);
- assert.match(html,/class="motion-brand-thread"/);
+  assert.doesNotMatch(html,/class="motion-brand-thread"/);
  assert.match(html,/class="closing-title"/);
  assert.equal((html.match(/class="closing-line/g)||[]).length,3);
  assert.match(html,/src="\.\/scripts\/motion\.js"/);
  assert.equal((html.match(/roles-geometry-es.svg/g)||[]).length,1);
- assert.equal((html.match(/src="\.\/assets\/deliver-assets-mark\.png"/g)||[]).length,3);
+  assert.equal((html.match(/src="\.\/assets\/deliver-assets-mark\.png"/g)||[]).length,2);
 });
 test("motion is finite, reduced-accessible and never depends on external services",()=>{
  for(const key of ["prime-thread-paint","prime-scene-rise","prime-shape-in","prime-type-line"]){

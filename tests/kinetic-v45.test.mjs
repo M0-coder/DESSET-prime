@@ -6,6 +6,7 @@ const root=new URL("../",import.meta.url);
 const html=readFileSync(new URL("index.html",root),"utf8");
 const css=readFileSync(new URL("styles.css",root),"utf8");
 const script=readFileSync(new URL("scripts/motion.js",root),"utf8");
+const photoCss=readFileSync(new URL("styles-hero-photo.css",root),"utf8");
 
 test("V4.5 retains exactly three cinematic beats around truthful current content",()=>{
  for(const id of ["inicio","ecosistema","contacto"])assert.match(html,new RegExp('id="'+id+'"'));
@@ -23,7 +24,7 @@ test("V4.5 uses native finite keyframes for original geometry and original SVG s
  assert.match(css,/\.motion-story-unit--organize\.motion-active \.motion-story-art img\{animation-delay:\.16s\}/);
  assert.match(css,/\.motion-story-unit--move\.motion-active \.motion-story-art img\{animation-delay:\.27s\}/);
  for(const illustration of ["choose","prepare","move"])assert.match(html,new RegExp("assets/scene-"+illustration+".svg"));
- assert.match(html,/v4-canvas-stamp"><img src="\.\/assets\/deliver-assets-mark\.png"/);
+ assert.match(html,/class="brand-mark" src="\.\/assets\/deliver-assets-mark\.png"/);
  assert.doesNotMatch(css,/animation-iteration-count\s*:\s*infinite|animation\s*:[^;}]*\binfinite\b/i);
 });
 
@@ -32,8 +33,8 @@ test("V4.5 chooses IntersectionObserver once, never drives scroll positions, and
  assert.match(script,/\.contact, \.closing-line/);
  assert.match(script,/instance\.unobserve\(entry\.target\)/);
  assert.match(script,/if\(reduced\|\|typeof window\.IntersectionObserver!=="function"\)/);
- assert.match(css,/@media\(prefers-reduced-motion:no-preference\)\{[\s\S]*?\.v4-shape-blue\{animation:v45-blue-strike/);
- assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{[\s\S]*?\.v4-shape-blue,\.v4-canvas-stamp/);
+ assert.match(photoCss,/@media\(prefers-reduced-motion:no-preference\)/);
+ assert.match(photoCss,/@media\(prefers-reduced-motion:reduce\)/);
  assert.doesNotMatch(script,/addEventListener\(["']scroll|setInterval|setTimeout|requestAnimationFrame|scrollTo|localStorage|fetch\s*\(/);
  assert.doesNotMatch(html,/<video\b|<canvas\b|<iframe\b|<form\b/i);
 });

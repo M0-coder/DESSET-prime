@@ -28,8 +28,8 @@ test("V4: identidad visual original y movimiento finito + accesible",()=>{
  assert.match(css,/prefers-reduced-motion:reduce/);
  assert.match(css,/\.hero\[data-variant="v4"\]/);
  assert.doesNotMatch(css,/animation-iteration-count:\s*infinite|animation:\s*[^;}]*infinite/i);
- assert.match(head,/assets\/deliver-assets-mark\.png/);
- assert.equal((head.match(/assets\/deliver-assets-mark\.png/g)||[]).length,1,"Never repeat the brand mark in hero");
+  assert.match(html,/class="brand-mark" src="\.\/assets\/deliver-assets-mark\.png"/);
+  assert.equal((html.match(/src="\.\/assets\/deliver-assets-mark\.png"/g)||[]).length,2,"Only visible header and footer marks; no hidden hero duplicate");
 });
 test("V4: la secuencia cotidiana es visible y el diagrama técnico no domina la página",()=>{
  assert.match(html,/v4-flow-board/);

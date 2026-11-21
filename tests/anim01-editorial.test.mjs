@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {readFileSync,statSync} from "node:fs";
 const root=new URL("../",import.meta.url),read=p=>readFileSync(new URL(p,root),"utf8");
 const css=read("styles.css"),system=read("styles-system.css"),motion=read("scripts/motion.js"),
- cinematic=read("scripts/v5-cinematic.js"),browser=read("scripts/browser-audit.mjs"),html=read("index.html");
+ cinematic=read("scripts/v5-cinematic.js"),browser=read("scripts/browser-audit.mjs"),html=read("index.html"),photoCss=read("styles-hero-photo.css");
 test("ANIM-01 original hero, corporate CTA, logo and 3D semantics preserved",()=>{
  assert.match(html,/<a class="hero-cta" href="#contacto">Hablemos de tu negocio/);
  assert.match(html,/EL COMERCIO/);assert.match(html,/SE MUEVE/);
@@ -12,12 +12,12 @@ test("ANIM-01 original hero, corporate CTA, logo and 3D semantics preserved",()=
 });
 test("ANIM-01 removes arcade scan, glint and pointer-driven lens",()=>{
  assert.match(css,/ANIM-01: game-like scan\/glint suppressed/);
- assert.match(css,/\.v5-hero-refraction \.v5-glint,\.v5-city-stage \.v5-stage-scan\{display:none\}/);
- assert.match(css,/\.v5-hero-refraction\{transform:none!important;transition:none!important\}/);
+  assert.match(css,/\.v5-city-stage \.v5-stage-scan\{display:none\}/);
+  assert.doesNotMatch(html,/v5-hero-refraction|v5-glint|class="v4-shape|motion-brand-thread/);
  assert.doesNotMatch(cinematic,/pointermove|pointerleave|requestAnimationFrame/);
- assert.match(cinematic,/ANIM-01: decorative lens stays still/);
- assert.match(css,/@keyframes v4-red-pop\{from\{transform:translate\(7%,6%\) rotate\(27deg\) scale\(\.97\)/);
- assert.match(css,/@keyframes v4-canvas-reveal\{from\{opacity:\.85;transform:translateY\(12px\)/);
+  assert.match(cinematic,/ANIM-01: viewport-activated 3D remains independent of cursor-following ornaments/);
+  assert.match(css,/@keyframes v45-editorial-rise/);
+  assert.match(photoCss,/@keyframes anim02-frame/);
 });
 test("ANIM-01 sequences real sections one time without hiding content or risking trust block",()=>{
  for(const sel of [".solutions-grid .service--main",".business-pitch",".audience-grid--compact .audience",".contact-bottom--rc"])
@@ -32,9 +32,9 @@ test("ANIM-01 sequences real sections one time without hiding content or risking
 });
 test("ANIM-01 browser style proof and strict legacy payload budgets",()=>{
  assert.match(browser,/ANIM-01 no scanner, glint, cursor-game lens or bouncing hero/);
- assert.match(browser,/anim01\.glint!=="none"/);
- assert.match(browser,/anim01\.scan!=="none"/);
- assert.match(browser,/anim01\.red!=="v4-red-pop"/);
+  assert.match(browser,/anim01\.scan!=="none"/);
+  assert.match(browser,/!anim01\.noDecor/);
+  assert.match(browser,/anim01\.direction!=="editorial-cinematic-v1"/);
  assert.ok(statSync(new URL("styles.css",root)).size<45000);
  assert.ok(statSync(new URL("styles-system.css",root)).size<=9000);
 });
