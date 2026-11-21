@@ -95,10 +95,11 @@ async function viewport(width,height,reduce=false){
   serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
   storyTitle:parseFloat(getComputedStyle(document.querySelector(".motion-story-unit h3")).fontSize)
  };
- return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
+  if(diag.disclosures.technical!==false||diag.disclosures.future!==false)fails.push("Freshly navigated page must start with both native disclosures CLOSED: "+JSON.stringify(diag.disclosures));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
@@ -257,6 +258,10 @@ try{
  await js('document.querySelector(".future-services").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(120);
  await capture("desktop-expansion-optional.png");
+ await js('document.querySelector(".future-services summary").click()');
+ const futureClosed=await js('document.querySelector(".future-services").open === false');
+ if(!futureClosed)report.failures.push("Optional services disclosure not restored to collapsed after test");
+ report.tests.push({name:"Optional services disclosure restored to native closed state",futureClosed});
   await js('document.querySelector("#vision").scrollIntoView({block:"center",behavior:"instant"})');
   await sleep(180);
    const leanDesktop=await js("(()=>{const x=document.querySelector(\"#vision\"),b=x.querySelector(\".statement-body\"),h=x.querySelector(\"h2\"),j=x.querySelector(\".statement-journey\"),t=h.getBoundingClientRect(),r=j.getBoundingClientRect(),last=h.querySelector(\".statement-last\").getBoundingClientRect(),cards=[...j.querySelectorAll(\".motion-story-unit\")];return {children:b.children.length,cols:getComputedStyle(b).gridTemplateColumns.split(\" \").length,text:h.textContent.trim(),left:t.left,right:t.right,titleContentRight:last.right,journeyLeft:r.left,journeyRight:r.right,storyCards:cards.length,photos:cards.map(c=>c.querySelector(\"img\").getBoundingClientRect().width),viewport:document.documentElement.clientWidth,duplicates:x.querySelectorAll(\".statement-side,.trust-ledger\").length,empty3d:!document.querySelector(\"#ecosistema .motion-story-unit\"),scrollWidth:document.documentElement.scrollWidth}})()");
@@ -329,6 +334,10 @@ try{
    report.tests.push({name:"V6.8 art-directed legible mobile SVG diagram",mobileDiagram});
    await capture("mobile-architecture-expanded.png");
    report.tests.push({name:"mobile technical detail expandable",detailOpen});
+   await js('document.querySelector(".v4-architecture-details summary").click()');
+   const detailsClosed=await js('document.querySelector(".v4-architecture-details").open === false');
+   if(!detailsClosed)report.failures.push("Technical details remained expanded after mobile accordion test");
+   report.tests.push({name:"Mobile technical accordion restored closed after testing",detailsClosed});
    await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
    await sleep(350);
     const v5Mobile=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),w=e.querySelector(".v5-stage-world").getBoundingClientRect(),v=document.documentElement.clientWidth,t=e.querySelector(".v6-static-fallback");return {visible:e.classList.contains("v5-visible"),left:r.left,right:r.right,viewport:v,overflow:document.documentElement.scrollWidth>v+2,sceneDescription:e.getAttribute("aria-label"),noCaption:!e.querySelector("figcaption,.v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge"),fallbackText:t?.textContent.includes("COMERCIO"),noImage:!e.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),ratio:+(w.height/w.width).toFixed(2)}})()');
@@ -336,6 +345,9 @@ try{
     report.tests.push({name:"V5 mobile 390 image-free stage",v5Mobile});
    await capture("mobile-v5-scene.png");
    // Capture full page after activation without any poster image.
+   const wholePageClosed=await js('(()=>({technical:document.querySelector(".v4-architecture-details").open,future:document.querySelector(".future-services").open}))()');
+   if(wholePageClosed.technical||wholePageClosed.future)report.failures.push("390px full-page screenshot would misrepresent default closed state: "+JSON.stringify(wholePageClosed));
+   report.tests.push({name:"390px full-page capture defaults both disclosures CLOSED",wholePageClosed});
    await capture("mobile-full.png",true);
   }
   if(w===320){
@@ -351,6 +363,9 @@ try{
     report.tests.push({name:"V5 mobile 320 image-free fallback",v5Narrow});
    await capture("mobile-320-v5-scene.png");
    // Capture full page after activation without any poster image.
+   const narrowPageClosed=await js('(()=>({technical:document.querySelector(".v4-architecture-details").open,future:document.querySelector(".future-services").open}))()');
+   if(narrowPageClosed.technical||narrowPageClosed.future)report.failures.push("320px full-page screenshot would misrepresent default closed state: "+JSON.stringify(narrowPageClosed));
+   report.tests.push({name:"320px full-page capture defaults both disclosures CLOSED",narrowPageClosed});
    await capture("mobile-320-full.png",true);
   }
  }
