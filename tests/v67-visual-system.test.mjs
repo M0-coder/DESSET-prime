@@ -100,7 +100,7 @@ test("V6.7 stylesheet actually loads in the signed site and strict local preview
 });
 
 test("V6.7 does not invent contact channels, forms or premature operations",()=>{
- assert.equal((html.match(/data-channel-review="pending"/g)||[]).length,3);
+ assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,3);
  assert.doesNotMatch(html,/<form\b|<iframe\b|https?:\/\/(?:wa\.me|api\.whatsapp\.com)/i);
  assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET cuando estén habilitadas/);
  assert.match(html,/Esta web no procesa transacciones\./);
