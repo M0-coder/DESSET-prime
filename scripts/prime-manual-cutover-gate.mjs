@@ -59,7 +59,7 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    const [projectPath,domainPath]=process.argv.slice(3);
    const out=validateCloudflareSnapshot({projectResponse:JSON.parse(readFileSync(projectPath,'utf8')),
      domainsResponse:JSON.parse(readFileSync(domainPath,'utf8')),
-     previousId:process.env.PREVIOUS_DEPLOYMENT_ID,expectedAccount:process.env.EXPECTED_ACCOUNT_ID,actualAccount:process.env.CLOUDFLARE_ACCOUNT_ID});
+     previousId:process.env.PREVIOUS_DEPLOYMENT_ID,expectedAccount:target.cloudflare_account_id,actualAccount:process.env.CLOUDFLARE_ACCOUNT_ID});
    console.log(JSON.stringify(out));if(out.result!=='READY-FOR-MANUAL-DEPLOY')process.exitCode=2;
   }else throw Error('Usage: node scripts/prime-manual-cutover-gate.mjs request|cloudflare ...');
  }catch(e){console.error('NO-GO: '+e.message);process.exitCode=2}
