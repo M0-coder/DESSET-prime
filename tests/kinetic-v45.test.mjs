@@ -42,7 +42,9 @@ test("V4.5 enlarges typography while keeping narrow-phone and semantic link fall
  assert.match(css,/@media\(min-width:1181px\)\{[\s\S]*?font-size:clamp\(65px,8\.05vw,143px\)/);
  assert.match(css,/@media\(max-width:360px\)\{[\s\S]*?font-size:38px/);
  assert.match(html,/<a class="hero-cta" href="#contacto">/);
- assert.match(html,/Ver perfil en Instagram/);
+ assert.match(html,/Instagram <span/);
+ assert.match(html,/TikTok <span/);
+ assert.match(html,/YouTube <span/);
  assert.match(html,/data-channel-review="verified" data-channel-basis="owner-attested"/);
  assert.doesNotMatch(html,/clientes activos|entregas en tiempo real|garantizamos la entrega/i);
 });
