@@ -25,6 +25,7 @@ export function validateReleaseIntent({repository,ref,event,expectedSha,checkout
  mark(err,flags?.rightsApproved==='true','Brand and imagery rights not approved');
  mark(err,flags?.contactApproved==='true','Institutional contact not approved');
  mark(err,flags?.securityApproved==='true','Security and physical-device gate not approved');
+ mark(err,flags?.rollbackBackupApproved==='true','Rollback snapshot and access not verified');
  if(seoPolicy==='INDEX')mark(err,flags?.indexApproved==='true','Search engine indexation not approved');
  return {result:err.length?'NO-GO':'READY-FOR-LIVE-PREFLIGHT',failures:err,release_authorized:false,requires_fresh_cloudflare_check:true};
 }
@@ -53,7 +54,7 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
      confirm:e.CONFIRM,seoPolicy:e.SEO_POLICY,target,
      flags:{enabled:e.RELEASE_ENABLED,visualApprovedSha:e.VISUAL_APPROVED_SHA,
        rightsApproved:e.RIGHTS_APPROVED,contactApproved:e.CONTACT_APPROVED,
-       securityApproved:e.SECURITY_APPROVED,indexApproved:e.INDEX_APPROVED}});
+       securityApproved:e.SECURITY_APPROVED,rollbackBackupApproved:e.ROLLBACK_BACKUP_APPROVED,indexApproved:e.INDEX_APPROVED}});
    console.log(JSON.stringify(out));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
   }else if(task==='cloudflare'){
    const [projectPath,domainPath]=process.argv.slice(3);
