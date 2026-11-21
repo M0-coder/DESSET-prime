@@ -37,8 +37,8 @@ test('live Cloudflare state checked twice before the one real Pages mutation',()
  assert.match(job,/--branch=release-approved/);
  assert.match(job,/--commit-hash="\$RELEASE_SHA"/);
  assert.match(job,/--project-name=desset-institucional/);
- const matches=job.match(/wrangler" pages deploy/g)||[];
- assert.equal(matches.length,1,'exactly one deployment mutation');
+ const deployLines=job.split("\n").filter(line=>line.includes('wrangler" pages deploy')&&!line.includes("--help"));
+ assert.equal(deployLines.length,1,"Exactly one mutation command, excluding --help probe");
 });
 test('release checks both domains and static security/rollback handling',()=>{
  assert.match(job,/https:\/\/desset\.lat\//);
