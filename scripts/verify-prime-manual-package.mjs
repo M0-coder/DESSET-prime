@@ -13,7 +13,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(['INDEX','NOINDEX'].includes(seoPolicy)&&seoPolicy===m.seo_policy,'SEO policy differs');
  check(m.project==='desset-institucional'&&m.canonical==='https://desset.lat/','Wrong Pages destination');
  check(m.production_authorized===false&&m.production_deployed===false,'Report attempts to authorize production');
- check(m.original_files===30&&m.package_files===34&&Array.isArray(m.assets)&&m.assets.length===34,'Missing/extra source assets');
+ check(m.original_files===26&&m.package_files===30&&Array.isArray(m.assets)&&m.assets.length===30,'Missing/extra source assets');
  check(hash(Buffer.from(JSON.stringify(m.assets)))===m.assets_manifest_sha256,'Manifest SHA changed');
  const want=new Map(),seen=new Set();
  for(const a of m.assets){
@@ -30,7 +30,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
    else {check(stat.isFile()&&!seen.has(rel),'Not a regular file: '+rel);seen.add(rel);}
   }
  }
- scan(publicDir);check(seen.size===34,'Unexpected file count');
+ scan(publicDir);check(seen.size===30,'Unexpected file count');
  for(const path of seen)check(want.has(path),'Unexpected file: '+path);
  for(const [path,spec] of want){
   check(seen.has(path),'Missing file: '+path);
@@ -62,7 +62,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(!seen.has('site-manifest.json')&&!seen.has('prime-manual-release-package.json'),'Private evidence exposed publicly');
  const status=readFileSync(join(publicDir,'scripts/service-state.js'),'utf8');
  check(status.includes('applicationDistribution:"not_published"')&&status.includes('verified:false'),'Application status changed');
- return {result:'PASS',source_sha:sourceSha,seo:seoPolicy,files:34,production_authorized:false,production_deployed:false};
+ return {result:'PASS',source_sha:sourceSha,seo:seoPolicy,files:30,production_authorized:false,production_deployed:false};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{const [publicDir,reportPath,sourceSha,seoPolicy]=process.argv.slice(2);

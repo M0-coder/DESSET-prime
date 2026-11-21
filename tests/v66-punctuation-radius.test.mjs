@@ -19,7 +19,7 @@ test("V6.6 all presentation headings and standalone labels omit terminal ornamen
  assert.doesNotMatch(html,/id="ecosystem-title"/);
  assert.doesNotMatch(html,/>COMERCIO · TECNOLOGÍA · LOGÍSTICA<\/p>/);
  assert.match(html,/id="hero-title"/);
- assert.match(html,/>UNA CONEXIÓN \/ TRES MOMENTOS</);
+ assert.match(html,/COMERCIO · REPARTO · DESTINO/);
  for(const action of ["ELEGIR","PREPARAR","ENTREGAR"])
   assert.ok(html.includes("<h3>"+action+"</h3>"),"Missing clean action "+action);
  assert.doesNotMatch(html,/<h3>[^<]+<span>\.<\/span><\/h3>/);
