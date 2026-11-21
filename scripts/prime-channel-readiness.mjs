@@ -39,7 +39,7 @@ export function inspectInstitutionalChannels({html,serviceState,attestation=defa
   try{url=new URL(item.url);}catch{reject('malformed owner-declared URL');}
   strict(url.protocol==='https:'&&url.hostname===allowedHosts[item.platform]&&
    url.username===''&&url.password===''&&url.hash===''&&url.search===''&&
-   url.pathname.length>1,'channel must use the expected platform's exact HTTPS host and profile path');
+   url.pathname.length>1,'channel must use the expected platform HTTPS host and profile path');
   approved.set(item.url,item.platform);
  }
  strict(new Set(entries.map(x=>x.platform)).size===5,'duplicate attested platform');
