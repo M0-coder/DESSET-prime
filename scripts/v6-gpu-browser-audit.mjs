@@ -86,8 +86,9 @@ try{
  await viewport(1440,900);
  await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
  const desktopInitial=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),poster:document.querySelector(".v5-stage-render")?.complete,trigger:document.querySelector(".v6-enable-webgl")?.hidden}))()');
- check("Desktop keeps cinematic render until explicit Three.js opt-in",!desktopInitial.script&&desktopInitial.trigger===false&&desktopInitial.poster,{desktopInitial});
- await evalJS('document.querySelector(".v6-enable-webgl").click()');
+ check("Desktop keeps WebP while the real scene is preparing",desktopInitial.poster,{desktopInitial});
+  const autoDesktop=await waitUntil("desktop automatic WebGL request",async()=>evalJS('!![...document.scripts].find(s=>s.src.includes("v6-three.bundle"))'),8000);
+  check("Desktop loads WebGL without a user click",autoDesktop);
  const desktopEarly=await evalJS('(()=>{const e=document.querySelector(".v5-city-stage"),p=window.__dessetV6Probe?.();return {state:e.dataset.v6State,glbLoaded:p?.glbLoaded||0,posterOpacity:getComputedStyle(e.querySelector(".v5-responsive-art")).opacity}})()');
  check("No premature WebGL reveal before all three GLBs load",
    desktopEarly.state!=="active"?(desktopEarly.posterOpacity!=="0"):desktopEarly.glbLoaded===3,
@@ -133,9 +134,10 @@ try{
  
  await viewport(390,844);
  const initialMobile=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),button:document.querySelector(".v6-enable-webgl")?.hidden,state:document.querySelector(".v5-city-stage").dataset.v6State}))()');
- check("Mobile 3D is opt-in and not preloaded",!initialMobile.script&&initialMobile.button===false,{initialMobile});
- await evalJS('document.querySelector(".v6-enable-webgl").click()');
- await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+ check("Mobile does not preload off-screen 3D",!initialMobile.script,{initialMobile});
+  await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+  const autoMobile=await waitUntil("mobile automatic WebGL request",async()=>evalJS('!![...document.scripts].find(s=>s.src.includes("v6-three.bundle"))'),8000);
+  check("Mobile loads WebGL automatically when compatible",autoMobile);
  const mobile=await waitUntil("mobile real GPU after consent",async()=>evalJS('(()=>{const e=document.querySelector(".v5-city-stage"),p=window.__dessetV6Probe?.();return e.dataset.v6State==="active"&&p?.triangles>0&&p?.frames>2?p:null})()'),15000);
  check("Mobile WebGL2 after explicit opt-in",mobile.webgl&&mobile.triangles>100,{mobile});
  const detailedMobile=await waitUntil("three GLB models after mobile user consent",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3?p:null})()'),17000);
@@ -186,8 +188,9 @@ try{
  await viewport(768,1024);
  await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
  const tabletPoster=await evalJS('(()=>({stage:document.querySelector(".v5-city-stage"),trigger:document.querySelector(".v6-enable-webgl").hidden,script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle"))}))()');
- check("Tablet starts with the premium static poster",tabletPoster.trigger===false&&!tabletPoster.script);
- await evalJS('document.querySelector(".v6-enable-webgl").click()');
+ check("Tablet retains fallback until automatic 3D loads",!!tabletPoster.stage,{tabletPoster});
+  const autoTablet=await waitUntil("tablet automatic WebGL request",async()=>evalJS('!![...document.scripts].find(s=>s.src.includes("v6-three.bundle"))'),8000);
+  check("Tablet scene loads automatically",autoTablet);
  const tablet=await waitUntil("three GLB models render in 768px layout",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3&&p.frames>2?p:null})()'),17000);
  const tabletBounds=Object.values(tablet.objectBounds||{});
  const tabletFramed=tabletBounds.length===3&&tabletBounds.every(b=>b.minX>=-1.04&&b.maxX<=1.04&&b.minY>=-1.04&&b.maxY<=1.04);
