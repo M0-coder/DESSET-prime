@@ -9,10 +9,10 @@ const html=readFileSync(join(root,'index.html'),'utf8');
 const state=readFileSync(join(root,'scripts/service-state.js'),'utf8');
 const owner=JSON.parse(readFileSync(join(root,'config/prime-social-owner-attestation.json'),'utf8'));
 const deep=x=>JSON.parse(JSON.stringify(x));
-test('Three official DESSET social accounts carry owner attestation without fake platform verification',()=>{
+test('Five owner-declared DESSET social accounts carry owner attestation without fake platform verification',()=>{
  const r=inspectInstitutionalChannels({html,serviceState:state});
  assert.equal(r.unconfirmed_count,0);
- assert.equal(r.owner_attested_count,3);
+ assert.equal(r.owner_attested_count,5);
  assert.equal(r.channels_status,'OWNER_ATTESTED');
  assert.equal(r.real_world_account_ownership_verified,false);
  assert.equal(r.technical_platform_admin_access_tested,false);
@@ -26,7 +26,7 @@ test('Extra unclassified external URL is NOT automatically official',()=>{
  const modified=html.replace('</body>','<a href="https://example.org/">unknown</a></body>');
  const r=inspectInstitutionalChannels({html:modified,serviceState:state});
  assert.equal(r.unconfirmed_count,1);
- assert.equal(r.owner_attested_count,3);
+ assert.equal(r.owner_attested_count,5);
  assert.equal(r.channels_status,'PENDING');
 });
 test('Changing a reviewed URL to an unapproved destination fails closed',()=>{
@@ -53,6 +53,19 @@ test('A channel deliberately downgraded to pending remains a launch blocker',()=
  const r=inspectInstitutionalChannels({html:changed,serviceState:state});
  assert.equal(r.unconfirmed_count,1);
  assert.equal(r.channels_status,'PENDING');
+});
+test('TikTok and YouTube are each included once in the same accessible five-link nav',()=>{
+ const nav=html.match(/<nav class="social-links social-links--official" aria-label="Redes sociales de DESSET">([\s\S]*?)<\/nav>/)?.[1];
+ assert.ok(nav);
+ assert.equal((nav.match(/<a\b/g)||[]).length,5);
+ for(const platform of ['Instagram','Facebook','TikTok','YouTube','X'])assert.ok(nav.includes('>'+platform+' <span'),platform);
+ for(const platform of ['TikTok','YouTube'])assert.ok(owner.exact_channels.some(c=>c.platform===platform));
+});
+test('Spoofed TikTok hostname is rejected even if forged in the registry and HTML',()=>{
+ const reg=deep(owner);
+ reg.exact_channels.find(c=>c.platform==='TikTok').url='https://www.tiktok.com.evil.example/@deliver_assets';
+ const forged=html.replace('https://www.tiktok.com/@deliver_assets','https://www.tiktok.com.evil.example/@deliver_assets');
+ assert.throws(()=>inspectInstitutionalChannels({html:forged,serviceState:state,attestation:reg}),/NO-GO/);
 });
 test('A changed registry address is not silently accepted',()=>{
  const changed=deep(owner);
