@@ -55,11 +55,11 @@ export function inspectInstitutionalChannels({html,serviceState,attestation=defa
   strict(!/\s|javascript:|data:/i.test(href),'untrusted external link');
   const state=a.match(/\bdata-channel-review="([^"]+)"/)?.[1]??'unclassified';
   const basis=a.match(/\bdata-channel-basis="([^"]+)"/)?.[1]??'none';
-  strict(['pending','verified','unclassified'].includes(state),'unknown channel review state');
+  strict(['pending','owner-attested','unclassified'].includes(state),'unknown channel review state');
   if(a.includes('target="_blank"'))strict(/\brel="[^"]*\bnoopener\b[^"]*\bnoreferrer\b[^"]*"/.test(a),
    'unsafe external tab link');
-  if(state==='verified'){
-   strict(basis==='owner-attested','marked verified without owner-attested provenance: '+href);
+  if(state==='owner-attested'){
+   strict(basis==='owner-attested','owner-attested channel without owner provenance: '+href);
    strict(approved.has(href),'approved channel URL differs from owner attestation: '+href);
   }else{
    strict(basis==='none','pending channel has misleading attested provenance');
@@ -70,11 +70,11 @@ export function inspectInstitutionalChannels({html,serviceState,attestation=defa
  for(const url of approved.keys()){
   strict(external.filter(x=>x.href===url).length===1,'owner-declared channel URL missing or duplicated: '+url);
  }
- const pending=external.filter(x=>x.state!=='verified');
+ const pending=external.filter(x=>x.state!=='owner-attested');
  return {schema:'desset-prime-institutional-channel-audit-v2',
   source_record:'config/prime-social-owner-attestation.json',
   external_links:external,unconfirmed:pending,unconfirmed_count:pending.length,
-  owner_attested_count:external.filter(x=>x.state==='verified').length,
+  owner_attested_count:external.filter(x=>x.state==='owner-attested').length,
   application_distribution:'not_published',web_payments:false,
   channels_status:pending.length?'PENDING':'OWNER_ATTESTED',
   real_world_account_ownership_verified:false,
@@ -90,6 +90,10 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   console.log(JSON.stringify({channels_status:report.channels_status,owner_attested_count:report.owner_attested_count,
    unconfirmed:report.unconfirmed_count,release_authorized:false,
    technical_platform_admin_access_tested:false}));
-  if(mode==='--require-verified'&&report.unconfirmed_count)process.exitCode=2;
+  if(mode==='--require-verified'){
+   strict(report.unconfirmed_count===0&&report.real_world_account_ownership_verified===true&&
+    report.technical_platform_admin_access_tested===true,
+    'independent platform ownership verification is required for manual production release');
+  }
  }catch(e){console.error(e.message);process.exitCode=2;}
 }

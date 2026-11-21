@@ -1,3 +1,4 @@
+import {spawnSync} from 'node:child_process';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -35,7 +36,7 @@ test('Changing a reviewed URL to an unapproved destination fails closed',()=>{
 });
 test('Marking an unreviewed profile as owner-attested without a registry entry fails',()=>{
  const changed=html.replace('</body>',
-  '<a href="https://example.org/" data-channel-review="verified" data-channel-basis="owner-attested">X</a></body>');
+  '<a href="https://example.org/" data-channel-review="owner-attested" data-channel-basis="owner-attested">X</a></body>');
  assert.throws(()=>inspectInstitutionalChannels({html:changed,serviceState:state}),/NO-GO/);
 });
 test('False claim that platform admin access was technically checked is rejected',()=>{
@@ -43,12 +44,12 @@ test('False claim that platform admin access was technically checked is rejected
  assert.throws(()=>inspectInstitutionalChannels({html,serviceState:state,attestation:changed}),/NO-GO/);
 });
 test('Missing provenance basis is not considered owner confirmation',()=>{
- const changed=html.replace('data-channel-review="verified" data-channel-basis="owner-attested"',
+ const changed=html.replace('data-channel-review="owner-attested" data-channel-basis="owner-attested"',
   'data-channel-review="verified"');
  assert.throws(()=>inspectInstitutionalChannels({html:changed,serviceState:state}),/NO-GO/);
 });
 test('A channel deliberately downgraded to pending remains a launch blocker',()=>{
- const changed=html.replace('data-channel-review="verified" data-channel-basis="owner-attested"',
+ const changed=html.replace('data-channel-review="owner-attested" data-channel-basis="owner-attested"',
   'data-channel-review="pending"');
  const r=inspectInstitutionalChannels({html:changed,serviceState:state});
  assert.equal(r.unconfirmed_count,1);
@@ -85,7 +86,15 @@ test('External HTTP URLs cannot be official',()=>{
  assert.throws(()=>inspectInstitutionalChannels({html:changed,serviceState:state}),/NO-GO/);
 });
 test('Outbound third-party tabs keep safe rel attributes',()=>{
- const changed=html.replace('rel="noopener noreferrer" data-channel-review="verified"',
-   'rel="" data-channel-review="verified"');
+ const changed=html.replace('rel="noopener noreferrer" data-channel-review="owner-attested"',
+   'rel="" data-channel-review="owner-attested"');
  assert.throws(()=>inspectInstitutionalChannels({html:changed,serviceState:state}),/NO-GO/);
+});
+
+test('Manual production gate cannot treat owner attestation as independent platform verification',()=>{
+ const out=spawnSync(process.execPath,[join(root,'scripts/prime-channel-readiness.mjs'),
+  join(root,'index.html'),join(root,'scripts/service-state.js'),'','--require-verified'],
+  {encoding:'utf8'});
+ assert.equal(out.status,2,'manual release must fail closed until independent proof exists');
+ assert.match(out.stderr,/independent platform ownership verification is required/);
 });
