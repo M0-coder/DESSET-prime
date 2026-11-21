@@ -1,0 +1,7 @@
+node_modules/
+dist/
+reports/
+assets/v6-three.bundle.js
+assets/v62-commerce.glb
+assets/v62-courier.glb
+assets/v62-destination.glb

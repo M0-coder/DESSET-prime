@@ -1,0 +1,298 @@
+name: DESSET Prime - MANUAL production cutover (disabled by default)
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: "SHA-40 exacto aprobado del HEAD de main"
+        required: true
+        type: string
+      expected_previous_deployment:
+        description: "ID exacto del despliegue de Cloudflare que se sustituye"
+        required: true
+        type: string
+      confirmation:
+        description: "Escribir PUBLICAR_PRIME_DESSET"
+        required: true
+        type: string
+      seo_policy:
+        description: "INDEX requiere aprobación independiente; NOINDEX conserva bloqueo"
+        required: true
+        type: choice
+        options:
+          - NOINDEX
+          - INDEX
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desset-prime-cloudflare-manual-cutover
+  cancel-in-progress: false
+
+jobs:
+  verify-pull-request:
+    name: Offline gate tests, NEVER deploy
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - name: Checkout exactly the proposed Prime head
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Exact Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "22.16.0"
+          cache: npm
+      - name: Build Prime and test the publication boundary, with no credentials
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build:site
+          npm run verify:site
+          npm audit --audit-level=high
+          node scripts/prime-rights-license-audit.mjs "$GITHUB_WORKSPACE/dist" "$RUNNER_TEMP/prime-rights-and-sbom.json"
+          npm sbom --package-lock-only --sbom-format=spdx > "$RUNNER_TEMP/prime-npm-sbom.spdx.json"
+          node -e 'const s=require(process.env.RUNNER_TEMP+"/prime-npm-sbom.spdx.json");if(!s.spdxVersion||!Array.isArray(s.packages)||s.packages.length<2)process.exit(1)'
+          node --test tests/prime-rights-license-audit.test.mjs tests/prime-third-party-notices.test.mjs tests/prime-channel-readiness.test.mjs tests/prime-launch-readiness-contract.test.mjs
+          node scripts/prime-channel-readiness.mjs "$GITHUB_WORKSPACE/dist/index.html" "$GITHUB_WORKSPACE/dist/scripts/service-state.js" "$RUNNER_TEMP/prime-channel-readiness.json"
+          node --check scripts/prime-manual-cutover-gate.mjs
+          node --check scripts/prime-third-party-notices.mjs
+          node --check scripts/prime-manual-cutover-package.mjs
+          node --test tests/prime-manual-cutover-gate.test.mjs tests/prime-manual-cutover-package.test.mjs tests/prime-manual-release-workflow.test.mjs tests/verify-prime-manual-package.test.mjs
+          test -z "$(git diff --name-only)"
+      - name: Rebuild Prime independently in two fresh source trees (NO DEPLOY)
+        run: |
+          set -euo pipefail
+          for n in A B; do
+            work="$RUNNER_TEMP/prime-repro-$n"
+            mkdir -p "$work"
+            git archive --format=tar HEAD | tar -xf - -C "$work"
+            (
+              cd "$work"
+              npm ci --ignore-scripts --no-audit --no-fund
+              npm run build:site
+              npm run verify:site
+              node scripts/prime-rights-license-audit.mjs "$work/dist"
+            )
+          done
+          cmp "$RUNNER_TEMP/prime-repro-A/dist/site-manifest.json" "$RUNNER_TEMP/prime-repro-B/dist/site-manifest.json"
+          cmp "$GITHUB_WORKSPACE/dist/site-manifest.json" "$RUNNER_TEMP/prime-repro-A/dist/site-manifest.json"
+          echo "sha256: $(sha256sum "$RUNNER_TEMP/prime-repro-A/dist/site-manifest.json" | cut -d' ' -f1)" > "$RUNNER_TEMP/prime-two-independent-builds.txt"
+          printf 'base_commit: %s\nsource_trees: 2\nclean_installations: 2\ncompilations: 2\ncomparison: byte-identical source manifests\nstatus: PASS\nrelease_authorized: false\n' "$(git rev-parse HEAD)" >> "$RUNNER_TEMP/prime-two-independent-builds.txt"
+      - name: Exercise the real manual NOINDEX package CLI without credentials
+        run: |
+          set -euo pipefail
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          node scripts/prime-manual-cutover-package.mjs \
+            "$GITHUB_WORKSPACE/dist" "$SOURCE_SHA" NOINDEX \
+            "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof"
+          node scripts/verify-prime-manual-package.mjs \
+            "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof/prime-manual-release-package.json" "$SOURCE_SHA" NOINDEX
+      - name: Preserve the verified manual package for review (NOT permission to publish)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: prime-manual-NOINDEX-package-${{ github.event.pull_request.head.sha }}
+          path: |
+            ${{ runner.temp }}/prime-manual-public/
+            ${{ runner.temp }}/prime-manual-proof/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Archive offline ownership, license and SPDX evidence (NO release authority)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: prime-owner-declaration-sbom-NO-GO-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/prime-rights-and-sbom.json
+            ${{ runner.temp }}/prime-npm-sbom.spdx.json
+            ${{ runner.temp }}/prime-channel-readiness.json
+            ${{ runner.temp }}/prime-two-independent-builds.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-only-after-independent-authorization:
+    name: Manual verified cutover to existing Pages project
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      github.repository == 'M0-coder/DESSET-prime' &&
+      github.ref == 'refs/heads/main' &&
+      inputs.confirmation == 'PUBLICAR_PRIME_DESSET' &&
+      vars.DESSET_PRIME_RELEASE_ENABLED == 'true' &&
+      vars.DESSET_PRIME_VISUAL_APPROVED_SHA == inputs.release_sha &&
+      vars.DESSET_PRIME_RIGHTS_APPROVED == 'true' &&
+      vars.DESSET_PRIME_CONTACT_APPROVED == 'true' &&
+      vars.DESSET_PRIME_SECURITY_APPROVED == 'true' &&
+      vars.DESSET_PRIME_ROLLBACK_BACKUP_APPROVED == 'true' &&
+      (inputs.seo_policy == 'NOINDEX' || vars.DESSET_PRIME_INDEX_APPROVED == 'true')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    environment:
+      name: desset-prime-production
+      url: https://desset.lat
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout exact manual-approved main HEAD
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Fixed Node version
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "22.16.0"
+          cache: npm
+      - name: Exact-SHA and independent business authorization preflight
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+          PREVIOUS_DEPLOYMENT_ID: ${{ inputs.expected_previous_deployment }}
+          CONFIRM: ${{ inputs.confirmation }}
+          SEO_POLICY: ${{ inputs.seo_policy }}
+          RELEASE_ENABLED: ${{ vars.DESSET_PRIME_RELEASE_ENABLED }}
+          VISUAL_APPROVED_SHA: ${{ vars.DESSET_PRIME_VISUAL_APPROVED_SHA }}
+          RIGHTS_APPROVED: ${{ vars.DESSET_PRIME_RIGHTS_APPROVED }}
+          CONTACT_APPROVED: ${{ vars.DESSET_PRIME_CONTACT_APPROVED }}
+          SECURITY_APPROVED: ${{ vars.DESSET_PRIME_SECURITY_APPROVED }}
+          ROLLBACK_BACKUP_APPROVED: ${{ vars.DESSET_PRIME_ROLLBACK_BACKUP_APPROVED }}
+          INDEX_APPROVED: ${{ vars.DESSET_PRIME_INDEX_APPROVED }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+          node scripts/prime-manual-cutover-gate.mjs request
+      - name: Build, audit and browser checks without Cloudflare credentials
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm audit --omit=dev --audit-level=high
+          npm run build:site
+          npm run verify:site
+          node scripts/prime-rights-license-audit.mjs "$GITHUB_WORKSPACE/dist"
+          node scripts/prime-channel-readiness.mjs "$GITHUB_WORKSPACE/dist/index.html" "$GITHUB_WORKSPACE/dist/scripts/service-state.js" "" --require-verified
+          node --test tests/*.test.mjs
+          node scripts/static-gate.mjs
+          node scripts/v54-http-security.mjs
+          node scripts/browser-audit.mjs
+          DESSET_PRIME_WEB_ROOT=dist node scripts/v54-http-security.mjs
+          DESSET_PRIME_WEB_ROOT=dist node scripts/v6-gpu-browser-audit.mjs
+          test -z "$(git diff --name-only)"
+      - name: Generate indexed or noindex production-shaped site, still offline
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+          SEO_POLICY: ${{ inputs.seo_policy }}
+        run: |
+          set -euo pipefail
+          node scripts/prime-manual-cutover-package.mjs \
+            "$GITHUB_WORKSPACE/dist" "$RELEASE_SHA" "$SEO_POLICY" \
+            "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof"
+          node scripts/verify-prime-manual-package.mjs "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof/prime-manual-release-package.json" "$RELEASE_SHA" "$SEO_POLICY"
+          grep -Fq "three 0.187.0 (MIT)" "$RUNNER_TEMP/prime-manual-public/THIRD-PARTY-NOTICES.txt"
+          grep -Fq "esbuild 0.28.2 (MIT)" "$RUNNER_TEMP/prime-manual-public/THIRD-PARTY-NOTICES.txt"
+          test ! -f "$RUNNER_TEMP/prime-manual-public/site-manifest.json"
+          test -f "$RUNNER_TEMP/prime-manual-public/_headers"
+      - name: Prepare and audit exact Wrangler version without credentials
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/prime-wrangler"
+          printf '{"name":"prime-pages-tool","version":"1.0.0","private":true}\n' > "$RUNNER_TEMP/prime-wrangler/package.json"
+          npm install --prefix "$RUNNER_TEMP/prime-wrangler" --save-exact --ignore-scripts --no-audit --no-fund wrangler@4.162.0
+          npm audit --prefix "$RUNNER_TEMP/prime-wrangler" --audit-level=high
+          "$RUNNER_TEMP/prime-wrangler/node_modules/.bin/wrangler" pages deploy --help >/dev/null
+      - name: Check Cloudflare account, unchanged production, domains and rollback target
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }}
+          PREVIOUS_DEPLOYMENT_ID: ${{ inputs.expected_previous_deployment }}
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          curl --fail-with-body -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional" \
+            -o "$RUNNER_TEMP/prime-current-project.json"
+          curl --fail-with-body -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional/domains" \
+            -o "$RUNNER_TEMP/prime-current-domains.json"
+          node scripts/prime-manual-cutover-gate.mjs cloudflare \
+            "$RUNNER_TEMP/prime-current-project.json" "$RUNNER_TEMP/prime-current-domains.json"
+      - name: Refresh the production deployment ID IMMEDIATELY before mutation
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }}
+          PREVIOUS_DEPLOYMENT_ID: ${{ inputs.expected_previous_deployment }}
+        run: |
+          set -euo pipefail
+          curl --fail-with-body -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional" \
+            -o "$RUNNER_TEMP/prime-current-project.json"
+          node scripts/prime-manual-cutover-gate.mjs cloudflare \
+            "$RUNNER_TEMP/prime-current-project.json" "$RUNNER_TEMP/prime-current-domains.json"
+      - name: PUBLISH — only mutation, requires manual dispatch, all gates and protected environment
+        id: prime_publish
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }}
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/prime-wrangler/node_modules/.bin/wrangler" pages deploy \
+            "$RUNNER_TEMP/prime-manual-public" \
+            --project-name=desset-institucional \
+            --branch=release-approved \
+            --commit-hash="$RELEASE_SHA"
+      - name: Verify real Pages production SHA, static mode and status
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }}
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 12); do
+            curl --fail-with-body -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional" \
+              -o "$RUNNER_TEMP/prime-published-project.json"
+            if jq -e --arg sha "$RELEASE_SHA" '
+              .success == true and
+              .result.name == "desset-institucional" and
+              .result.canonical_deployment.environment == "production" and
+              .result.canonical_deployment.deployment_trigger.metadata.commit_hash == $sha and
+              .result.canonical_deployment.latest_stage.status == "success" and
+              .result.canonical_deployment.uses_functions == false
+            ' "$RUNNER_TEMP/prime-published-project.json" >/dev/null; then break; fi
+            if [ "$i" = 12 ]; then echo "::error::Deployment did not reach expected exact SHA"; exit 1; fi
+            sleep 5
+          done
+      - name: Check public HTTPS, resources, SEO policy, CSP and 404
+        env:
+          SEO_POLICY: ${{ inputs.seo_policy }}
+        run: |
+          set -euo pipefail
+          curl --retry 4 --retry-delay 3 --fail-with-body -fsSL https://desset.lat/ -o "$RUNNER_TEMP/prime-live.html"
+          grep -Fq 'DESSET — Comercio en movimiento' "$RUNNER_TEMP/prime-live.html"
+          grep -Fq 'rel="canonical" href="https://desset.lat/"' "$RUNNER_TEMP/prime-live.html"
+          if [ "$SEO_POLICY" = INDEX ]; then
+            grep -Fq 'name="robots" content="index,follow"' "$RUNNER_TEMP/prime-live.html"
+          else
+            grep -Fq 'name="robots" content="noindex,nofollow"' "$RUNNER_TEMP/prime-live.html"
+          fi
+          for file in THIRD-PARTY-NOTICES.txt robots.txt sitemap.xml styles.css styles-v5.css styles-system.css styles-hero-photo.css styles-visual02.css scripts/app.js scripts/motion.js scripts/v5-cinematic.js scripts/service-state.js assets/deliver-assets-mark.png assets/scene-move.webp assets/v62-courier.glb; do
+            mkdir -p "$RUNNER_TEMP/live/$(dirname "$file")"
+            curl --retry 4 --retry-delay 3 --fail-with-body -fsSL "https://desset.lat/$file" -o "$RUNNER_TEMP/live/$file"
+            cmp -s "$RUNNER_TEMP/prime-manual-public/$file" "$RUNNER_TEMP/live/$file"
+          done
+          curl --fail-with-body -fsSL https://www.desset.lat/ -o "$RUNNER_TEMP/prime-www.html"
+          grep -Fq 'DESSET — Comercio en movimiento' "$RUNNER_TEMP/prime-www.html"
+          status="$(curl --silent --show-error -L -o /dev/null -w '%{http_code}' https://desset.lat/__desset_prime_missing_path__)"
+          test "$status" = "404"
+          curl -fsSI https://desset.lat/ -o "$RUNNER_TEMP/prime-live-headers.txt"
+          grep -iq '^content-security-policy:' "$RUNNER_TEMP/prime-live-headers.txt"
+          echo "PUBLIC LIVE SMOKE PASS at exactly $GITHUB_SHA"
+      - name: Emergency rollback instructions if live checks fail (NO automatic rollback)
+        if: failure() && steps.prime_publish.outcome == 'success'
+        run: |
+          echo "::error::DESSET PRIME PUBLICATION HAD AN ERROR AFTER DEPLOYMENT."
+          echo "::error::Use the documented Cloudflare Pages rollback to the previously confirmed deployment, only after checking current state."
+          echo "::error::No automatic rollback to avoid undoing another operator's concurrent changes."

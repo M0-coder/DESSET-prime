@@ -1,0 +1,49 @@
+/** Preview HTTP estricto SOLO para auditoría local CI. NO DESPLIEGUE. */
+import {createServer} from "node:http";
+import {createReadStream} from "node:fs";
+import {stat} from "node:fs/promises";
+import {resolve,sep} from "node:path";
+import {fileURLToPath} from "node:url";
+
+const projectRoot=resolve(fileURLToPath(new URL("../",import.meta.url)));
+const root=process.env.DESSET_PRIME_WEB_ROOT==="dist"
+ ? resolve(projectRoot,"dist")
+ : projectRoot;
+const host="127.0.0.1";
+const port=4173;
+const mime={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",
+ ".js":"text/javascript; charset=utf-8",".svg":"image/svg+xml",
+ ".png":"image/png",".webp":"image/webp",".woff2":"font/woff2",".txt":"text/plain; charset=utf-8",".glb":"model/gltf-binary"};
+const permitted=rel=>rel==="index.html"||rel==="styles.css"||rel==="styles-v5.css"||rel==="styles-system.css"||rel==="styles-hero-photo.css"||rel==="styles-visual02.css"||rel==="styles-typography.css"
+ || /^fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2$/.test(rel)
+ || /^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(rel)
+ || /^scripts\/(?:app|motion|v5-cinematic|service-state)\.js$/.test(rel)
+ || /^assets\/[a-z0-9-]+\.(?:png|svg|webp)$/.test(rel)
+ || rel==="assets/v6-three.bundle.js"
+ || /^assets\/v62-(?:commerce|courier|destination)\.glb$/.test(rel);
+const server=createServer(async(req,res)=>{
+ const headers={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff",
+  "X-Robots-Tag":"noindex, nofollow","Referrer-Policy":"no-referrer",
+  "Content-Security-Policy":"default-src 'self'; base-uri 'none'; object-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; form-action 'none'; frame-ancestors 'none'"};
+ const reject=(code)=>{res.writeHead(code,headers);res.end();};
+ if(req.method!=="GET"&&req.method!=="HEAD")return reject(405);
+ let rel;
+ try{
+  const url=new URL(req.url,"http://"+host+":"+port);
+  if(url.hostname!==host)return reject(400);
+  rel=decodeURIComponent(url.pathname).replace(/^\/+/, "")||"index.html";
+ }catch{return reject(400)}
+ if(!permitted(rel)||rel.includes("..")||rel.includes("\\"))return reject(404);
+ const abs=resolve(root,rel);
+ if(!abs.startsWith(root+sep))return reject(404);
+ try{
+  const info=await stat(abs);
+  if(!info.isFile())return reject(404);
+  const ext="."+rel.split(".").at(-1);
+  res.writeHead(200,{...headers,"Content-Type":mime[ext]||"application/octet-stream",
+   "Content-Length":info.size});
+  if(req.method==="HEAD")return res.end();
+  createReadStream(abs).on("error",()=>res.destroy()).pipe(res);
+ }catch{return reject(404)}
+});
+server.listen(port,host,()=>console.log("DESSET V5 CI-only preview http://"+host+":"+port));

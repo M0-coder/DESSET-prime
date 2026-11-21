@@ -1,0 +1,469 @@
+import assert from "node:assert/strict";
+import {spawn} from "node:child_process";
+import {readFile, writeFile, mkdir, mkdtemp, rm} from "node:fs/promises";
+import {join, resolve} from "node:path";
+import {tmpdir} from "node:os";
+import {pathToFileURL} from "node:url";
+
+const output=resolve("reports/browser");
+await mkdir(output,{recursive:true});
+const profile=await mkdtemp(join(tmpdir(),"desset-chrome-"));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const child=spawn(process.env.CHROME_BIN||"google-chrome",[
+ "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
+ "--no-first-run","--no-default-browser-check","--disable-background-networking",
+ "--remote-debugging-pipe","--user-data-dir="+profile,"about:blank"
+],{stdio:["ignore","ignore","pipe","pipe","pipe"],env:{...process.env,DBUS_SESSION_BUS_ADDRESS:"",DBUS_SYSTEM_BUS_ADDRESS:""}});
+let chromeError="";
+child.stderr.on("data",b=>{chromeError+=String(b).slice(-900)});
+let requestId=0,sessionId=null,pipeBuffer="";
+const pending=new Map();
+const report={timestamp:new Date().toISOString(),viewports:[],screenshots:[],tests:[],failures:[]};
+async function until(fn,label){
+ for(let i=0;i<110;i++){
+  if(child.exitCode!==null)throw new Error("Chrome exited during "+label+": "+chromeError.slice(-500));
+  try{const v=await fn();if(v)return v}catch{}
+  await sleep(100);
+ }
+ throw new Error("Timeout waiting for "+label+"; Chrome stderr: "+chromeError.slice(-1200));
+}
+child.stdio[4].on("data",chunk=>{
+ pipeBuffer+=chunk.toString();
+ let pos;
+ while((pos=pipeBuffer.indexOf("\0"))!==-1){
+  const frame=pipeBuffer.slice(0,pos);pipeBuffer=pipeBuffer.slice(pos+1);
+  if(!frame)continue;
+  let msg;try{msg=JSON.parse(frame)}catch(e){chromeError+=" CDP parse error: "+String(e);continue}
+  if(!msg.id)continue;
+  const pendingCall=pending.get(msg.id);if(!pendingCall)continue;
+  clearTimeout(pendingCall.timeout);pending.delete(msg.id);
+  if(msg.error)pendingCall.reject(new Error(msg.error.message));
+  else pendingCall.accept(msg);
+ }
+});
+function call(method,params={},page=true){
+ const id=++requestId;
+ return new Promise((accept,reject)=>{
+  const timeout=setTimeout(()=>{pending.delete(id);reject(new Error("CDP timeout "+method+"; Chrome stderr: "+chromeError.slice(-400)))},25000);
+  pending.set(id,{accept,reject,timeout});
+  const msg={id,method,params};
+  if(page&&sessionId)msg.sessionId=sessionId;
+  child.stdio[3].write(JSON.stringify(msg)+"\0");
+ });
+}
+async function js(expression){
+ const response=await call("Runtime.evaluate",{expression,returnByValue:true,awaitPromise:true});
+ if(response.exceptionDetails)throw new Error("Browser evaluation failed: "+JSON.stringify(response.exceptionDetails));
+ return response.result.result.value;
+}
+async function capture(name,full=false){
+ const x=await call("Page.captureScreenshot",{format:"png",captureBeyondViewport:full,fromSurface:true});
+ const buf=Buffer.from(x.result.data,"base64");
+ assert.ok(buf.length>2000,"Screenshot unexpectedly empty: "+name);
+ await writeFile(join(output,name),buf);
+ report.screenshots.push({name,size_bytes:buf.length});
+}
+const URL=pathToFileURL(resolve("index.html")).href;
+async function viewport(width,height,reduce=false){
+ await call("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:width<=800});
+ await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:reduce?"reduce":"no-preference"}]});
+ await call("Page.navigate",{url:URL});
+ await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.hero--motion')"),"page render");
+ await sleep(130);
+ const diag=await js(`(()=>{
+ const viewport=document.documentElement.clientWidth;
+ const logo=[...document.images].map(x=>({src:x.getAttribute('src'),loading:x.loading,complete:x.complete,naturalWidth:x.naturalWidth,naturalHeight:x.naturalHeight}));
+ const text=[...document.querySelectorAll('.motion-line, .statement h2, .contact h2')].map(el=>{
+  const r=document.createRange();r.selectNodeContents(el);
+  return {text:el.innerText,contentWidth:Math.round(r.getBoundingClientRect().width),visibleWidth:Math.round(el.getBoundingClientRect().width),clientWidth:el.clientWidth,scrollWidth:el.scrollWidth};
+ });
+ const nodes=[...document.querySelectorAll('body *')].filter(el=>{
+  // Visual montage intentionally clips decorative children; keep checking parent bounds and headline text.
+  const clip=el.closest(".v4-motion-canvas,.v4-hero-rail,.v5-city-stage");
+  if(clip&&clip!==el)return false;
+  const s=getComputedStyle(el),r=el.getBoundingClientRect();
+  return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.left < -2 || (s.display!=='none'&&s.visibility!=='hidden'&&r.right>viewport+2&&r.width>0);
+ }).slice(0,12).map(el=>({tag:el.tagName,className:typeof el.className==='string'?el.className.slice(0,70):'',right:Math.round(el.getBoundingClientRect().right),left:Math.round(el.getBoundingClientRect().left)}));
+ const rail=document.querySelector(".v4-hero-rail");
+ const railBox=rail.getBoundingClientRect();
+ const railWords=[...rail.querySelectorAll("span")].map(el=>{
+  const r=el.getBoundingClientRect(),style=getComputedStyle(el);
+  return {text:el.textContent.trim(),visible:style.display!=="none"&&style.visibility!=="hidden",inside:r.left>=railBox.left-2&&r.right<=railBox.right+2,width:Math.round(r.width)};
+ });
+ const typeSizes={
+  heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
+  serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
+  storyTitle:parseFloat(getComputedStyle(document.querySelector(".motion-story-unit h3")).fontSize)
+ };
+
+  const style=selector=>getComputedStyle(document.querySelector(selector));
+  const palette={
+   rootYellow:style(":root").getPropertyValue("--yellow").trim().toUpperCase(),
+   stageYellow:style("#ecosistema").getPropertyValue("--yellow").trim().toUpperCase(),
+   stageDesignGold:style("#ecosistema").getPropertyValue("--ds-10-gold").trim().toUpperCase(),
+   stageVisualGold:style("#ecosistema").getPropertyValue("--v02-gold").trim().toUpperCase(),
+   heroCTA:style("#inicio .hero-cta").backgroundColor,
+   businessCTA:style("#negocios .business-pitch-cta").backgroundColor,
+   statementAccent:style("#vision h2 span").color,
+   stageSummaryArrow:style("#ecosistema .v4-architecture-details summary span").color,
+   threeTourButton:style("#ecosistema .v63-tour").backgroundColor
+  };
+ return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,palette,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+})()`);
+ const fails=[];
+ if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
+  if(diag.disclosures.technical!==false||diag.disclosures.future!==false)fails.push("Freshly navigated page must start with both native disclosures CLOSED: "+JSON.stringify(diag.disclosures));
+  const expectedLime="rgb(205, 252, 138)",expectedOriginal="rgb(255, 198, 47)";
+  const palette=diag.palette;
+  if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
+   palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
+   palette.heroCTA!==expectedLime||palette.businessCTA!==expectedOriginal||
+   palette.statementAccent!==expectedOriginal||palette.stageSummaryArrow!==expectedOriginal||
+   palette.threeTourButton!==expectedOriginal)
+   fails.push("PRIME-COLOR-02: only the hero CTA may be lime; original palette and 3D must remain yellow: "+JSON.stringify(palette));
+ if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
+ if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
+ if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
+ if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
+ if(width<=700){
+  if(diag.railWords.length!==4||diag.railWords.some(w=>!w.visible||!w.inside||w.width<45))fails.push("mobile editorial keyword rail clips or hides a word: "+JSON.stringify(diag.railWords));
+  if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
+ }
+ report.viewports.push({width,height,reduce,...diag,failures:fails});
+ report.failures.push(...fails.map(x=>width+": "+x));
+ return diag;
+}
+try{
+ // Chromium can initialize asynchronously on cold GitHub runners.
+ await sleep(1400);
+ const target=await call("Target.createTarget",{url:"about:blank"},false);
+ const attached=await call("Target.attachToTarget",{targetId:target.result.targetId,flatten:true},false);
+ sessionId=attached.result.sessionId;
+ if(!sessionId)throw new Error("CDP attach returned no session");
+ await call("Page.enable");
+ await call("Runtime.enable");
+ const d=await viewport(1440,900);
+ const motionMode=await js("document.documentElement.dataset.motionSystem");
+ if(motionMode!=="ready")report.failures.push("Intersection motion system unavailable: "+String(motionMode));
+ report.tests.push({name:"Progressive motion system active",mode:motionMode});
+ const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),flow:!!document.querySelector(".v4-flow-board"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
+ if(!heroQuality.headline?.includes("EL COMERCIO")||!heroQuality.headline?.includes("SE MUEVE")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
+ report.tests.push({name:"V4 motion/design contract",heroQuality});
+ const heroPhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");const f=document.querySelector("#inicio .prime-photo-surface");return {loaded:!!x?.complete&&x.naturalWidth===1671&&x.naturalHeight===941,src:x?.getAttribute("src"),logo:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),oldText:document.querySelector("#inicio")?.textContent?.includes("IDEAS EN ACCIÓN"),ratio:f?.getBoundingClientRect().width/f?.getBoundingClientRect().height}})()');
+ if(!heroPhoto.loaded||!heroPhoto.src?.endsWith("desset-hero-entrega-dos-espejos.webp")||
+    !heroPhoto.logo?.endsWith("deliver-assets-mark.png")||heroPhoto.oldText||heroPhoto.ratio<1.2||heroPhoto.ratio>2)
+    report.failures.push("HERO-PHOTO-01 exact local render, original logo, conceptual disclosure failed: "+JSON.stringify(heroPhoto));
+ report.tests.push({name:"HERO-PHOTO-01 exact local render, original logo, conceptual disclosure",heroPhoto});
+ const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",board:".ecosystem-board",stage:".v5-city-stage",pitch:".business-pitch",contact:".contact-primary"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
+ const decorDots=roundedUI.titles.filter(t=>t.endsWith("."));
+ if(decorDots.length||Object.entries(roundedUI.radii).some(([,v])=>v<10))
+   report.failures.push("V6.6 unexpected heading periods or missing rounded corners: "+JSON.stringify({decorDots,radii:roundedUI.radii}));
+ report.tests.push({name:"V6.6 editorial punctuation and computed corner radii",roundedUI});
+
+ const designSystem=await js('(()=>{const color=sel=>getComputedStyle(document.querySelector(sel)).backgroundColor;return {body:color("body"),contact:color(".contact"),feature:color(".solutions-grid .service--main"),brand:color(".business-pitch"),cssLoaded:[...document.styleSheets].some(s=>s.href?.endsWith("/styles-system.css")),steps:[...document.querySelectorAll(".motion-story-unit h3")].map(e=>e.textContent.trim()),contactStatusColor:getComputedStyle(document.querySelector(".contact-status")).color}})()');
+ const expectedSteps=["ELEGIR","PREPARAR","ENTREGAR"];
+ if(!designSystem.cssLoaded||
+    designSystem.body!=="rgb(247, 245, 238)"||
+    designSystem.contact!=="rgb(247, 245, 238)"||
+    designSystem.feature!=="rgb(21, 81, 216)"||
+    designSystem.brand!=="rgb(21, 81, 216)"||
+    JSON.stringify(designSystem.steps)!==JSON.stringify(expectedSteps))
+   report.failures.push("V6.7 computed 60-30-10 palette or three-step narrative mismatch: "+JSON.stringify(designSystem));
+ report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
+ const visual02=await js('(()=>{const q=s=>document.querySelector(s);const cs=s=>getComputedStyle(q(s));return {cssLoaded:[...document.styleSheets].some(x=>x.href?.endsWith("/styles-visual02.css")),heroPhoto:q("#inicio .prime-photo-image")?.getAttribute("src"),heroLogo:q(".site-header .brand-mark")?.getAttribute("src"),heroCTA:q("#inicio .hero-cta")?.getAttribute("href"),businessShadow:cs("#negocios .business-pitch").boxShadow,storyBorder:cs("#ecosistema .ecosystem-board").borderTopColor,serviceTop:cs("#soluciones .service--main").borderTopWidth,trustBg:cs("#vision").backgroundColor,mobileSafe:document.documentElement.scrollWidth<=document.documentElement.clientWidth+2}})()');
+ if(!visual02.cssLoaded||!visual02.heroPhoto?.endsWith("desset-hero-entrega-dos-espejos.webp")||!visual02.heroLogo?.endsWith("deliver-assets-mark.png")||visual02.heroCTA!=="#contacto"||
+   visual02.serviceTop!=="5px"||visual02.trustBg!=="rgb(20, 34, 57)"||!visual02.mobileSafe)
+  report.failures.push("VISUAL-02 institutional editorial consistency regression: "+JSON.stringify(visual02));
+ report.tests.push({name:"VISUAL-02 corporate style, approved hero and responsive safety",visual02});
+
+ const appAccess=await js('(()=>{const p=document.querySelector("[data-service-access]");const status=p?.querySelector("[data-service-status]");const links=p?.querySelector("[data-app-links]");return {found:!!p,availability:p?.dataset.applicationAvailability,status:status?.textContent.trim(),liveLinks:links?.querySelectorAll("a").length,linksHidden:links?.hidden,role:status?.getAttribute("role")}})()');
+ if(!appAccess.found||appAccess.availability!=="not-published"||
+   appAccess.status!=="Acceso público no habilitado"||
+   !appAccess.linksHidden||appAccess.liveLinks!==0||appAccess.role!=="status")
+   report.failures.push("V6.9 web wrongly claims live app availability: "+JSON.stringify(appAccess));
+ report.tests.push({name:"V6.9 enterprise services remain permanent, app availability remains truthful",appAccess});
+ const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),photoLoaded:document.querySelector("#inicio .prime-photo-image")?.complete}))()');
+ if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<60||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png")||!kineticIntro.photoLoaded)report.failures.push("V4.5 visible hero/photo and original brand failed: "+JSON.stringify(kineticIntro));
+ report.tests.push({name:"V4.5 visible headline, photograph and original mark",kineticIntro});
+ const anim01=await js('(()=>({noScan:!document.querySelector(".v5-stage-scan"),noDecor:!document.querySelector("#inicio .v4-shape, #inicio .v4-canvas-stamp, #inicio .v5-hero-refraction, #inicio .motion-brand-thread"),direction:document.documentElement.dataset.motionDirection}))()');
+ if(!anim01.noScan||!anim01.noDecor||anim01.direction!=="editorial-cinematic-v1")
+  report.failures.push("ANIM-01 obsolete ornament or arcade overlay detected: "+JSON.stringify(anim01));
+ report.tests.push({name:"ANIM-01 no scanner, glint, cursor-game lens or bouncing hero",anim01});
+ const anim02=await js('(()=>({photo:getComputedStyle(document.querySelector("#inicio .prime-photo-surface")).animationName,focus:getComputedStyle(document.querySelector("#inicio .prime-photo-image")).animationName,title:getComputedStyle(document.querySelector("#inicio .v4-headline-a .motion-line__inner")).animationName,cta:getComputedStyle(document.querySelector("#inicio .hero-actions")).animationName,chapters:document.documentElement.dataset.anim02,approvedSrc:document.querySelector("#inicio .prime-photo-image")?.getAttribute("src"),logo:document.querySelector(".brand-mark")?.getAttribute("src")}))()');
+ if(anim02.photo!=="anim02-frame"||anim02.focus!=="anim02-focus"||anim02.title!=="anim02-type"||anim02.cta!=="anim02-enter"||anim02.chapters!=="cinematic-chapters"||
+   !anim02.approvedSrc?.endsWith("desset-hero-entrega-dos-espejos.webp")||!anim02.logo?.endsWith("deliver-assets-mark.png"))
+  report.failures.push("ANIM-02 original DESSET hero/finite cinematography contract failed: "+JSON.stringify(anim02));
+ report.tests.push({name:"ANIM-02 real photographic opening, official mark, editorial chronology",anim02});
+
+
+ const smallUI=await js('(()=>{const selector=".header-descriptor,.v4-hero-caption,.hero-kicker,.v4-canvas-top,.v4-canvas-bottom,.hero-meta,.section-label,.kicker,.service-top,.ecosystem-board-top,.motion-story-index,.motion-story-status,.audience-no,.audience-tag,.business-pitch-top,.closing-kicker-signal";return {decorativeLabelCount:document.querySelectorAll(selector).length,numberedTokens:document.body.textContent.match(/\\b0[1-9]\\s*\\/\\s*/g)||[],statement:document.querySelector("#vision h2")?.textContent?.trim(),removedBlocks:document.querySelectorAll(".trust-ledger,.statement-side,.section-head,.ecosystem-footnote,.hero-secondary").length}})()');
+ if(smallUI.decorativeLabelCount!==0||smallUI.numberedTokens.length!==0||!smallUI.statement?.includes("ES CONECTAR")||smallUI.removedBlocks!==0)report.failures.push("Editorial numeric labels survived cleanup: "+JSON.stringify(smallUI));
+ report.tests.push({name:"Zero editorial numeric labels and redundant tiny captions",smallUI});
+ await capture("desktop-entry.png");
+ await sleep(1100);
+ await capture("desktop-transition.png");
+ await sleep(2050);
+ await capture("desktop-final.png");
+ 
+  const v5Cover=await js('(()=>({mode:document.documentElement.dataset.v5Mode,overlayAbsent:!document.querySelector(".v5-hero-refraction"),stage:!!document.querySelector(".v5-city-stage"),staticText:document.querySelector(".v6-static-fallback")?.textContent.includes("COMERCIO"),noPoster:!document.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),contactLight:!!document.querySelector(".v5-contact-light")}))()');
+  if(v5Cover.mode!=="ready"||!v5Cover.overlayAbsent||!v5Cover.stage||!v5Cover.staticText||!v5Cover.noPoster||!v5Cover.contactLight)report.failures.push("V5 image-free 3D section incomplete: "+JSON.stringify(v5Cover));
+  report.tests.push({name:"V5 image-free accessible WebGL fallback",v5Cover});
+ await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(580);
+  const v5Stage=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),w=e.querySelector(".v5-stage-world").getBoundingClientRect(),t=e.querySelector(".v6-static-fallback");return {visible:e.classList.contains("v5-visible"),fallback:!!t,sourceImage:!!e.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),fallbackText:t?.textContent.includes("COMERCIO"),worldWidth:w.width,worldHeight:w.height,obsoleteOverlay:!!e.querySelector(".v5-route-overlay"),left:r.left,right:r.right,viewport:document.documentElement.clientWidth,sceneDescription:e.getAttribute("aria-label"),noCaption:!e.querySelector("figcaption,.v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge")}})()');
+  if(!v5Stage.visible||!v5Stage.fallback||v5Stage.sourceImage||!v5Stage.fallbackText||v5Stage.worldWidth<300||v5Stage.worldHeight<200||v5Stage.obsoleteOverlay||v5Stage.left< -2||v5Stage.right>v5Stage.viewport+2||!v5Stage.sceneDescription?.includes("conceptual")||!v5Stage.noCaption||!v5Stage.noBridge)report.failures.push("V5 image-free desktop stage failed: "+JSON.stringify(v5Stage));
+  report.tests.push({name:"V5 accessible image-free desktop stage",v5Stage});
+ await capture("desktop-v5-scene-motion.png");
+ await sleep(1750);
+ await capture("desktop-v5-scene-final.png");
+   // Capture full page after activation without any poster image.
+   await capture("desktop-full.png",true);
+ await js('document.querySelector(".motion-story").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(450);
+ const storyState=await js('({sequence:document.querySelector(".motion-story").classList.contains("motion-active"),cards:[...document.querySelectorAll(".motion-story-unit")].map(x=>({text:x.querySelector("h3")?.textContent,active:x.classList.contains("motion-active")}))})');
+ if(!storyState.sequence||storyState.cards.length!==3||storyState.cards.some(x=>!x.active))report.failures.push("Narrative motion sequence not activated: "+JSON.stringify(storyState));
+ report.tests.push({name:"Scroll-bound narrative sequence",storyState});
+ const scenes=await js('(()=>[...document.querySelectorAll(".motion-story-art img")].map(el=>({src:el.getAttribute("src"),complete:el.complete,width:el.naturalWidth,height:el.naturalHeight,rendered:el.getBoundingClientRect().width})))()');
+ if(scenes.length!==3||scenes.some(x=>!x.complete||x.width<100||x.height<100||x.rendered<45))report.failures.push("Commercial narrative illustrations missing or too small: "+JSON.stringify(scenes));
+ report.tests.push({name:"Narrative photographs load and SVG fallback attributes remain",scenes});
+ const v03=await js('(()=>[...document.querySelectorAll(".motion-story-art img")].map(x=>({src:x.getAttribute("src"),current:x.currentSrc,photo:!!x.closest("picture.v03-photo-story"),fit:getComputedStyle(x).objectFit,loaded:x.complete&&x.naturalWidth===960&&x.naturalHeight===640})))()');
+ const v03Photos=["scene-choose.webp","scene-prepare.webp","scene-move.webp"];
+ if(v03.length!==3||new Set(v03.map(x=>x.current)).size!==3||v03.some((x,i)=>!x.photo||!x.current.endsWith(v03Photos[i])||x.fit!=="cover"||!x.loaded||!x.src.endsWith(["scene-choose.svg","scene-prepare.svg","scene-move.svg"][i])))
+  report.failures.push("VISUAL-03 distinct user-approved WebP photographs or SVG fallback failed: "+JSON.stringify(v03));
+ report.tests.push({name:"VISUAL-03 three different approved photos, exact sizes, original SVG fallbacks",v03});
+
+ await capture("desktop-story-motion.png");
+ const kineticJourney=await js('(()=>{const cards=[...document.querySelectorAll(".motion-story-unit")].map(c=>({active:c.classList.contains("motion-active"),animation:getComputedStyle(c.querySelector("img")).animationName}));return {cards,noBridge:!document.querySelector(".motion-story-bridge"),noHeroLabel:!document.querySelector(".v4-hero-declaration")}})()');
+ if(kineticJourney.cards.length!==3||kineticJourney.cards.some(x=>!x.active||x.animation!=="v45-scene-illustration")||!kineticJourney.noBridge||!kineticJourney.noHeroLabel)report.failures.push("Three-beat narrative sequence failed: "+JSON.stringify(kineticJourney));
+ report.tests.push({name:"V4.5 staggered real-scene illustration motion",kineticJourney});
+ await sleep(1250);
+ await capture("desktop-story-final.png");
+ await js('document.querySelector("#contacto").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(450);
+ const closing=await js('[...document.querySelectorAll(".closing-line")].map(x=>({word:x.textContent.trim(),active:x.classList.contains("motion-active")}))');
+ if(closing.length!==3||closing.some(x=>!x.active))report.failures.push("Closing editorial sequence not activated: "+JSON.stringify(closing));
+ report.tests.push({name:"Brand closing motion",closing});
+ const closingInk=await js('(()=>[...document.querySelectorAll(".contact .closing-line")].map(e=>({text:e.textContent.trim(),opacity:Number(getComputedStyle(e).opacity)})))()');
+ if(closingInk.some(x=>x.opacity<.99))report.failures.push("V6.7 contact heading loses contrast during motion: "+JSON.stringify(closingInk));
+ report.tests.push({name:"V6.7 closing headline remains opaque during cinema animation",closingInk});
+ await capture("desktop-closing-motion.png");
+ const kineticFinale=await js('(()=>{const contact=document.querySelector("#contacto"),middle=contact.querySelector(".closing-line--middle");return {active:contact.classList.contains("motion-active"),lineAnimation:getComputedStyle(middle).animationName,underlineAnimation:getComputedStyle(middle,"::after").animationName,slashAnimation:getComputedStyle(contact,"::after").animationName}})()');
+ if(!kineticFinale.active||kineticFinale.lineAnimation!=="v45-closing-reveal"||kineticFinale.underlineAnimation!=="v45-underline"||kineticFinale.slashAnimation!=="v45-contact-slash")report.failures.push("Kinetic final contact scene failed: "+JSON.stringify(kineticFinale));
+ report.tests.push({name:"V4.5 closing scene and finite underline",kineticFinale});
+ const v5Finale=await js('(()=>{const e=document.querySelector("#contacto"),light=e.querySelector(".v5-contact-light");return {visible:e.classList.contains("v5-visible"),effect:getComputedStyle(light).animationName}})()');
+ if(!v5Finale.visible||v5Finale.effect!=="v5-contact-arrive")report.failures.push("V5 cinematic contact light did not reveal: "+JSON.stringify(v5Finale));
+ report.tests.push({name:"V5 ambient finale",v5Finale});
+ await sleep(1250);
+ await capture("desktop-closing-final.png");
+ await js('document.querySelector(".business-pitch").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(350);
+ const pitch=await js('(()=>{const section=document.querySelector(".business-pitch");const anchor=section.querySelector("a.business-pitch-cta");return {heading:section.querySelector("h3")?.textContent?.replace(/\\s+/g," ").trim(),href:anchor?.getAttribute("href"),label:anchor?.textContent?.trim(),visible:section.getBoundingClientRect().height>180}})()');
+ if(!pitch.visible||pitch.href!=="#contacto"||!pitch.heading.includes("NEGOCIO")||!pitch.label.includes("Conversemos"))report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
+ report.tests.push({name:"Commercial pitch CTA",pitch});
+ await capture("desktop-business-pitch.png");
+ const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const future=document.querySelector(".future-services");const prim=document.querySelector(".contact-primary");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),futureCollapsed:!future.open,futureCards:future.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.textContent.trim(),contactTarget:prim.getAttribute("target"),candidateStatus:document.querySelector(".contact-status")?.textContent,headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');
+ if(rc.primaryHref!=="#contacto"||!rc.futureCollapsed||rc.futureCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||!rc.candidateStatus.includes("Esta web no procesa transacciones")||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
+ report.tests.push({name:"V4.3 commercial focus & primary contact",rc});
+ const socials=await js('(()=>{const nav=document.querySelector("#contacto .social-links--official");const links=[...nav?.querySelectorAll("a")||[]];return {count:links.length,navLabel:nav?.getAttribute("aria-label"),oldBlock:!!document.querySelector(".social-links--secondary"),links:links.map(a=>({name:a.firstChild?.textContent?.trim(),href:a.href,owner:a.dataset.channelBasis,review:a.dataset.channelReview,height:Math.round(a.getBoundingClientRect().height),background:getComputedStyle(a).backgroundColor,border:getComputedStyle(a).borderTopColor})),width:Math.round(nav?.getBoundingClientRect().width||0)}})()');
+ if(socials.count!==5||socials.navLabel!=="Redes sociales de DESSET"||socials.oldBlock||
+  socials.links.map(x=>x.name).join("|")!=="Instagram|Facebook|TikTok|YouTube|X"||
+  socials.links.some(x=>x.owner!=="owner-attested"||x.review!=="owner-attested"||x.height<48||!x.href.startsWith("https://"))||
+  new Set(socials.links.map(x=>x.background)).size!==1||
+  new Set(socials.links.map(x=>x.border)).size!==1)
+  report.failures.push("One equal five-platform 60/30/10 social rail missing: "+JSON.stringify(socials));
+ report.tests.push({name:"SOCIAL-05 five equal owner-declared channels in one navigation",socials});
+ await js('document.querySelector(".future-services summary").click()');
+ const expandedFuture=await js('(()=>{const d=document.querySelector(".future-services");return {open:d.open,cards:[...d.querySelectorAll(".service")].map(e=>({height:Math.round(e.getBoundingClientRect().height),description:e.querySelector(".service-body p")?.textContent?.trim()}))}})()');
+ if(!expandedFuture.open||expandedFuture.cards.length!==2||expandedFuture.cards.some(x=>x.height<170||(x.description?.length||0)<40))report.failures.push("Future services toggle contract failed: "+JSON.stringify(expandedFuture));
+ report.tests.push({name:"Deferred expansion accordion",expandedFuture});
+ await js('document.querySelector(".future-services").scrollIntoView({block:"center",behavior:"instant"})');
+ await sleep(120);
+ await capture("desktop-expansion-optional.png");
+ await js('document.querySelector(".future-services summary").click()');
+ const futureClosed=await js('document.querySelector(".future-services").open === false');
+ if(!futureClosed)report.failures.push("Optional services disclosure not restored to collapsed after test");
+ report.tests.push({name:"Optional services disclosure restored to native closed state",futureClosed});
+  await js('document.querySelector("#vision").scrollIntoView({block:"center",behavior:"instant"})');
+  await sleep(180);
+   const leanDesktop=await js("(()=>{const x=document.querySelector(\"#vision\"),b=x.querySelector(\".statement-body\"),h=x.querySelector(\"h2\"),j=x.querySelector(\".statement-journey\"),t=h.getBoundingClientRect(),r=j.getBoundingClientRect(),last=h.querySelector(\".statement-last\").getBoundingClientRect(),cards=[...j.querySelectorAll(\".motion-story-unit\")];return {children:b.children.length,cols:getComputedStyle(b).gridTemplateColumns.split(\" \").length,text:h.textContent.trim(),left:t.left,right:t.right,titleContentRight:last.right,journeyLeft:r.left,journeyRight:r.right,storyCards:cards.length,photos:cards.map(c=>c.querySelector(\"img\").getBoundingClientRect().width),viewport:document.documentElement.clientWidth,duplicates:x.querySelectorAll(\".statement-side,.trust-ledger\").length,empty3d:!document.querySelector(\"#ecosistema .motion-story-unit\"),scrollWidth:document.documentElement.scrollWidth}})()");
+   if(leanDesktop.children!==2||leanDesktop.cols!==2||leanDesktop.storyCards!==3||!leanDesktop.empty3d||leanDesktop.duplicates!==0||leanDesktop.left< -2||leanDesktop.journeyRight>leanDesktop.viewport+2||leanDesktop.titleContentRight>leanDesktop.journeyLeft+2||leanDesktop.scrollWidth>leanDesktop.viewport+2||leanDesktop.photos.some(w=>w<80)||!leanDesktop.text.includes("ES CONECTAR"))report.failures.push("PRIME-LAYOUT-01 desktop statement cards overlap or escaped to 3D: "+JSON.stringify(leanDesktop));
+   report.tests.push({name:"PRIME-LAYOUT-01 desktop: editorial statement with three original photographs",leanDesktop});
+  await capture("desktop-lean-statement.png");
+ assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
+ for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
+  await viewport(w,h);
+  if(w===390||w===320){
+   // Simulate a script-unavailable page in the loaded DOM. This exercises
+   // the exact no-JS CSS selector without needing a second browser session.
+   const fallback=await js('(()=>{const root=document.documentElement;root.classList.remove("js-enabled");const nav=document.querySelector(".main-nav"),btn=document.querySelector(".menu-button"),header=document.querySelector(".site-header");const p={navDisplay:getComputedStyle(nav).display,menuDisplay:getComputedStyle(btn).display,headerHeight:header.getBoundingClientRect().height,links:[...nav.querySelectorAll("a")].map(a=>({text:a.textContent.trim(),height:a.getBoundingClientRect().height}))};root.classList.add("js-enabled");p.headerHeightAfter=header.getBoundingClientRect().height;return p})()');
+   if(fallback.navDisplay!=="flex"||fallback.menuDisplay!=="none"||fallback.headerHeight<70||Math.abs(fallback.headerHeight-fallback.headerHeightAfter)>1||fallback.links.length<4||fallback.links.some(l=>l.height<42))
+     report.failures.push("V6.8 no-JS mobile navigation failed: "+JSON.stringify(fallback));
+   report.tests.push({name:"V6.8 resilient mobile navigation without JavaScript "+w,fallback});
+   const radius=await js('(()=>({stage:parseFloat(getComputedStyle(document.querySelector(".v5-city-stage")).borderTopLeftRadius),pitch:parseFloat(getComputedStyle(document.querySelector(".business-pitch")).borderTopLeftRadius),screen:document.documentElement.clientWidth}))()');
+   if(radius.stage<15||radius.pitch<17)report.failures.push("V6.6 mobile curves missing: "+JSON.stringify(radius));
+   report.tests.push({name:"V6.6 mobile curved surfaces "+w,radius});
+  }
+  if(w===390){
+   await sleep(3200);
+   await capture("mobile-final.png");
+   
+   await js('document.querySelector(".business-pitch").scrollIntoView({block:"start",behavior:"instant"})');
+   await sleep(240);
+   await capture("mobile-business-pitch.png");
+   await js('document.querySelector(".contact-primary").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(100);
+   const mobileContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {label:a.textContent.trim(),left:r.left,right:r.right,height:r.height,viewport:v}})()');
+   if(mobileContact.left < -2||mobileContact.right>mobileContact.viewport+2||mobileContact.height<48)report.failures.push("Primary mobile contact clipped or too small: "+JSON.stringify(mobileContact));
+   report.tests.push({name:"Mobile primary contact tap target",mobileContact});
+   const socialMobile=await js('(()=>{const nav=document.querySelector("#contacto .social-links--official"),v=document.documentElement.clientWidth;return {viewport:v,overflow:document.documentElement.scrollWidth>v+2,links:[...nav.querySelectorAll("a")].map(a=>({name:a.firstChild?.textContent?.trim(),left:a.getBoundingClientRect().left,right:a.getBoundingClientRect().right,height:a.getBoundingClientRect().height}))}})()');
+   if(socialMobile.overflow||socialMobile.links.length!==5||
+    socialMobile.links.some(x=>x.left < -2||x.right>socialMobile.viewport+2||x.height<48))
+    report.failures.push("Social link rail clipped on 390px mobile: "+JSON.stringify(socialMobile));
+   report.tests.push({name:"SOCIAL-05 mobile five profiles visible and tappable",socialMobile});
+   const mobileClosing=await js('(()=>[...document.querySelectorAll(".contact .closing-line")].map(e=>({text:e.textContent.trim(),opacity:Number(getComputedStyle(e).opacity)})))()');
+   if(mobileClosing.some(x=>x.opacity<.99))report.failures.push("V6.7 mobile closing text loses opacity: "+JSON.stringify(mobileClosing));
+   report.tests.push({name:"V6.7 mobile contact heading maintains legibility",mobileClosing});
+   await capture("mobile-contact-final.png");
+    await js('document.querySelector("#vision").scrollIntoView({block:"center",behavior:"instant"})');
+    await sleep(160);
+     const leanMobile=await js("(()=>{const x=document.querySelector(\"#vision\"),b=x.querySelector(\".statement-body\"),h=x.querySelector(\"h2\"),j=x.querySelector(\".statement-journey\"),t=h.getBoundingClientRect(),r=j.getBoundingClientRect(),last=h.querySelector(\".statement-last\").getBoundingClientRect(),cards=[...j.querySelectorAll(\".motion-story-unit\")];return {children:b.children.length,cols:getComputedStyle(b).gridTemplateColumns.split(\" \").length,left:t.left,right:t.right,titleRight:last.right,titleBottom:t.bottom,journeyTop:r.top,journeyLeft:r.left,journeyRight:r.right,storyCards:cards.length,photos:cards.map(c=>c.querySelector(\"img\").getBoundingClientRect().width),viewport:document.documentElement.clientWidth,duplicates:x.querySelectorAll(\".statement-side,.trust-ledger\").length,font:parseFloat(getComputedStyle(h).fontSize),scrollWidth:document.documentElement.scrollWidth,empty3d:!document.querySelector(\"#ecosistema .motion-story-unit\")}})()");
+     if(leanMobile.children!==2||leanMobile.cols!==1||leanMobile.storyCards!==3||!leanMobile.empty3d||leanMobile.duplicates!==0||leanMobile.left< -2||leanMobile.journeyRight>leanMobile.viewport+2||leanMobile.titleRight>leanMobile.viewport+2||leanMobile.titleBottom>leanMobile.journeyTop+2||leanMobile.photos.some(w=>w<70)||leanMobile.scrollWidth>leanMobile.viewport+2||leanMobile.font<31)report.failures.push("PRIME-LAYOUT-01 mobile journey clips or overlaps heading: "+JSON.stringify(leanMobile));
+     report.tests.push({name:"PRIME-LAYOUT-01 mobile: three relocated photos and text fully visible",leanMobile});
+    await capture("mobile-lean-statement.png");
+   await js("document.querySelector('.menu-button').click()");
+   const menu=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),display:getComputedStyle(document.querySelector('.main-nav')).display})");
+   if(menu.expanded!=="true"||menu.display==="none")report.failures.push("Mobile navigation did not open");
+   await call("Input.dispatchKeyEvent",{type:"keyDown",key:"Escape",code:"Escape",windowsVirtualKeyCode:27});
+   await call("Input.dispatchKeyEvent",{type:"keyUp",key:"Escape",code:"Escape",windowsVirtualKeyCode:27});
+   const after=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),focused:document.activeElement===document.querySelector('.menu-button')})");
+   if(after.expanded!=="false"||!after.focused)report.failures.push("Escape did not close and focus mobile menu");
+   report.tests.push({name:"mobile navigation + Escape",menu,after});
+   const details=await js('document.querySelector(".v4-architecture-details")?.open');
+   if(details)report.failures.push("Technical roles should be collapsed by default");
+   await js('document.querySelector(".v4-architecture-details summary").click()');
+   const detailOpen=await js('(()=>{const d=document.querySelector(".v4-architecture-details");const cards=[...d.querySelectorAll(".role")];return {open:d.open,visible:cards.every(c=>c.getBoundingClientRect().height>40),roles:cards.length}})()');
+   if(!detailOpen.open||!detailOpen.visible||detailOpen.roles!==4)report.failures.push("Technical roles accordion failed: "+JSON.stringify(detailOpen));
+   await js('document.querySelector(".v4-architecture-details").scrollIntoView({block:"start",behavior:"instant"})');
+   await sleep(100);
+   const mobileDiagram=await js('(()=>{const im=document.querySelector(".v4-architecture-details picture img"),source=document.querySelector(".v4-architecture-details picture source"),r=im.getBoundingClientRect();return {src:im.currentSrc,naturalWidth:im.naturalWidth,naturalHeight:im.naturalHeight,renderWidth:r.width,renderHeight:r.height,source:source?.getAttribute("srcset")}})()');
+   // Chromium may report SVG naturalWidth after responsive-density scaling.
+   // The actual selected source, decoded aspect ratio and rendered CSS size
+   // establish readability more reliably than fixed natural pixel dimensions.
+   const aspect=mobileDiagram.naturalWidth/Math.max(1,mobileDiagram.naturalHeight);
+   if(!mobileDiagram.src.endsWith("roles-geometry-mobile-es.svg")||mobileDiagram.renderWidth<220||mobileDiagram.renderHeight<220||Math.abs(aspect-360/392)>.035)
+    report.failures.push("V6.8 mobile diagram must use legible art-directed SVG: "+JSON.stringify(mobileDiagram));
+   report.tests.push({name:"V6.8 art-directed legible mobile SVG diagram",mobileDiagram});
+   await capture("mobile-architecture-expanded.png");
+   report.tests.push({name:"mobile technical detail expandable",detailOpen});
+   await js('document.querySelector(".v4-architecture-details summary").click()');
+   const detailsClosed=await js('document.querySelector(".v4-architecture-details").open === false');
+   if(!detailsClosed)report.failures.push("Technical details remained expanded after mobile accordion test");
+   report.tests.push({name:"Mobile technical accordion restored closed after testing",detailsClosed});
+   await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(350);
+    const v5Mobile=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),w=e.querySelector(".v5-stage-world").getBoundingClientRect(),v=document.documentElement.clientWidth,t=e.querySelector(".v6-static-fallback");return {visible:e.classList.contains("v5-visible"),left:r.left,right:r.right,viewport:v,overflow:document.documentElement.scrollWidth>v+2,sceneDescription:e.getAttribute("aria-label"),noCaption:!e.querySelector("figcaption,.v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge"),fallbackText:t?.textContent.includes("COMERCIO"),noImage:!e.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),ratio:+(w.height/w.width).toFixed(2)}})()');
+    if(!v5Mobile.visible||v5Mobile.left< -2||v5Mobile.right>v5Mobile.viewport+2||v5Mobile.overflow||!v5Mobile.fallbackText||!v5Mobile.noImage||v5Mobile.ratio<1.4||!v5Mobile.sceneDescription?.includes("conceptual")||!v5Mobile.noCaption||!v5Mobile.noBridge)report.failures.push("V5 mobile 390 image-free fallback failed: "+JSON.stringify(v5Mobile));
+    report.tests.push({name:"V5 mobile 390 image-free stage",v5Mobile});
+   await capture("mobile-v5-scene.png");
+   // Capture full page after activation without any poster image.
+   const wholePageClosed=await js('(()=>({technical:document.querySelector(".v4-architecture-details").open,future:document.querySelector(".future-services").open}))()');
+   if(wholePageClosed.technical||wholePageClosed.future)report.failures.push("390px full-page screenshot would misrepresent default closed state: "+JSON.stringify(wholePageClosed));
+   report.tests.push({name:"390px full-page capture defaults both disclosures CLOSED",wholePageClosed});
+   await capture("mobile-full.png",true);
+  }
+  if(w===320){
+   const narrowContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {left:r.left,right:r.right,height:r.height,viewport:v}})()');
+   if(narrowContact.left < -2||narrowContact.right>narrowContact.viewport+2||narrowContact.height<48)report.failures.push("320px contact button fail: "+JSON.stringify(narrowContact));
+   await sleep(3200);
+   await capture("mobile-320-final.png");
+   
+   await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(250);
+    const v5Narrow=await js('(()=>{const e=document.querySelector(".v5-city-stage"),t=e.querySelector(".v6-static-fallback"),b=e.getBoundingClientRect(),v=document.documentElement.clientWidth,w=e.querySelector(".v5-stage-world").getBoundingClientRect();return {inside:b.left>=-2&&b.right<=v+2,ratio:+(w.height/w.width).toFixed(2),fallback:!!t&&t.textContent.includes("DESTINO"),noImage:!e.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan")}})()');
+    if(!v5Narrow.inside||v5Narrow.ratio<1.4||!v5Narrow.fallback||!v5Narrow.noImage)report.failures.push("V5 mobile 320 text fallback failed: "+JSON.stringify(v5Narrow));
+    report.tests.push({name:"V5 mobile 320 image-free fallback",v5Narrow});
+   await capture("mobile-320-v5-scene.png");
+   // Capture full page after activation without any poster image.
+   const narrowPageClosed=await js('(()=>({technical:document.querySelector(".v4-architecture-details").open,future:document.querySelector(".future-services").open}))()');
+   if(narrowPageClosed.technical||narrowPageClosed.future)report.failures.push("320px full-page screenshot would misrepresent default closed state: "+JSON.stringify(narrowPageClosed));
+   report.tests.push({name:"320px full-page capture defaults both disclosures CLOSED",narrowPageClosed});
+   await capture("mobile-320-full.png",true);
+  }
+ }
+ const reduced=await viewport(390,844,true);
+ const mobilePhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");return {src:x?.currentSrc,width:x?.naturalWidth,height:x?.naturalHeight,loaded:!!x?.complete}})()');
+ if(!mobilePhoto.loaded||!mobilePhoto.src?.includes("desset-hero-entrega-mobile.webp")||mobilePhoto.width!==960)
+  report.failures.push("HERO-PHOTO-01 mobile responsive photo not selected: "+JSON.stringify(mobilePhoto));
+ report.tests.push({name:"HERO-PHOTO-01 60KB mobile WebP actually loaded",mobilePhoto});
+ const reducedMode=await js("document.documentElement.dataset.motionSystem");
+ if(reducedMode!=="reduced")report.failures.push("Motion fallback failed for reduced preference: "+String(reducedMode));
+ const reducedAnimations=await js('(()=>({headline:document.querySelector(".motion-headline").textContent.trim(),cta:document.querySelector(".hero-cta").getAttribute("href"),closing:document.querySelector("#contact-title").textContent.trim(),noDecor:!document.querySelector("#inicio .v4-shape, #inicio .v4-canvas-stamp, #inicio .v5-hero-refraction, #inicio .motion-brand-thread")}))()');
+ if(!reducedAnimations.noDecor||!reducedAnimations.headline.includes("EL COMERCIO")||reducedAnimations.cta!=="#contacto"||!reducedAnimations.closing.includes("CONEXIONES"))report.failures.push("V4.5 reduced motion/essential information failed: "+JSON.stringify(reducedAnimations));
+ report.tests.push({name:"V4.5 full-fidelity reduced motion fallback",reducedAnimations});
+ const anim02Reduced=await js('(()=>({photo:getComputedStyle(document.querySelector("#inicio .prime-photo-surface")).animationName,focus:getComputedStyle(document.querySelector("#inicio .prime-photo-image")).animationName,title:getComputedStyle(document.querySelector("#inicio .v4-headline-a .motion-line__inner")).animationName,cta:document.querySelector("#inicio .hero-cta")?.getAttribute("href"),captionAbsent:!document.querySelector("#inicio .prime-photo-caption")}))()');
+ if(anim02Reduced.photo!=="none"||anim02Reduced.focus!=="none"||anim02Reduced.title!=="none"||anim02Reduced.cta!=="#contacto"||!anim02Reduced.captionAbsent)
+  report.failures.push("ANIM-02 reduced-motion accessibility contract failed: "+JSON.stringify(anim02Reduced));
+ report.tests.push({name:"ANIM-02 reduced motion leaves approved image and copy static",anim02Reduced});
+
+  const v5Reduced=await js('(()=>{const e=document.querySelector(".v5-city-stage"),t=e.querySelector(".v6-static-fallback");return {mode:document.documentElement.dataset.v5Mode,light:getComputedStyle(document.querySelector(".v5-contact-light")).animationName,textVisible:!!t&&getComputedStyle(t).visibility!=="hidden",noImage:!e.querySelector("img,picture,.v5-responsive-art,.v5-stage-render,.v5-stage-scan"),gpuHidden:getComputedStyle(e.querySelector(".v6-three-mount")).display==="none",sceneDescription:e.getAttribute("aria-label"),noCaption:!document.querySelector(".v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge")}})()');
+  if(v5Reduced.mode!=="reduced"||v5Reduced.light!=="none"||!v5Reduced.textVisible||!v5Reduced.noImage||!v5Reduced.gpuHidden||!v5Reduced.sceneDescription?.includes("conceptual")||!v5Reduced.noCaption||!v5Reduced.noBridge)report.failures.push("V5 reduced-motion semantic text fallback failed: "+JSON.stringify(v5Reduced));
+  report.tests.push({name:"V5 image-free reduced-motion fallback",v5Reduced});
+ await capture("mobile-reduced-motion.png");
+ report.tests.push({name:"reduced motion",animation:reduced.animation});
+
+ // V5.4 CDP keyboard accessibility: synthetic interactions, not a manual screen-reader audit.
+ const pressKey=async(key,code,keyCode)=>{
+  // Chrome CDP expects a printable control character for native Enter activation.
+  // raw keyDown without the CR text changes focus but does not generate click.
+  const press={type:"keyDown",key,code,windowsVirtualKeyCode:keyCode,nativeVirtualKeyCode:keyCode};
+  if(key==="Enter"){press.text=String.fromCharCode(13);press.unmodifiedText=String.fromCharCode(13);}
+  await call("Input.dispatchKeyEvent",press);
+  await call("Input.dispatchKeyEvent",{type:"keyUp",key,code,windowsVirtualKeyCode:keyCode,nativeVirtualKeyCode:keyCode});
+ };
+ await pressKey("Tab","Tab",9);
+ const skipFocus=await js('(()=>{const e=document.activeElement,r=e.getBoundingClientRect(),s=getComputedStyle(e);return {className:e.className,href:e.getAttribute("href"),focusVisible:e.matches(":focus-visible"),outlineWidth:s.outlineWidth,left:Math.round(r.left),right:Math.round(r.right),viewport:document.documentElement.clientWidth}})()');
+ if(!skipFocus.className?.includes("skip-link")||skipFocus.href!=="#contenido"||!skipFocus.focusVisible||parseFloat(skipFocus.outlineWidth)<2||skipFocus.left<0||skipFocus.right>skipFocus.viewport+2)
+  report.failures.push("V5.4 keyboard skip-link focus not visible: "+JSON.stringify(skipFocus));
+ report.tests.push({name:"V5.4 keyboard first-Tab skip-link",skipFocus});
+ await capture("mobile-v54-keyboard-focus.png");
+
+ await js('document.querySelector(".menu-button").focus()');
+ await pressKey("Enter","Enter",13);
+ const keyboardMenuOpen=await js('(()=>{const e=document.querySelector(".menu-button");return {expanded:e.getAttribute("aria-expanded"),focus:e===document.activeElement,focusVisible:e.matches(":focus-visible"),outlineWidth:getComputedStyle(e).outlineWidth}})()');
+ if(keyboardMenuOpen.expanded!=="true"||!keyboardMenuOpen.focus||!keyboardMenuOpen.focusVisible||parseFloat(keyboardMenuOpen.outlineWidth)<2)
+  report.failures.push("V5.4 keyboard Enter cannot access menu: "+JSON.stringify(keyboardMenuOpen));
+ await pressKey("Escape","Escape",27);
+ const keyboardMenuClosed=await js('(()=>{const e=document.querySelector(".menu-button");return {expanded:e.getAttribute("aria-expanded"),focused:e===document.activeElement}})()');
+ if(keyboardMenuClosed.expanded!=="false"||!keyboardMenuClosed.focused)
+  report.failures.push("V5.4 keyboard Escape does not restore menu focus: "+JSON.stringify(keyboardMenuClosed));
+ report.tests.push({name:"V5.4 keyboard menu Enter and Escape",keyboardMenuOpen,keyboardMenuClosed});
+
+ await js('document.querySelector(".v4-architecture-details summary").focus()');
+ await pressKey("Enter","Enter",13);
+ const detailsKeyboard=await js('(()=>{const d=document.querySelector(".v4-architecture-details"),e=d.querySelector("summary");return {open:d.open,focused:e===document.activeElement,focusVisible:e.matches(":focus-visible"),outlineWidth:getComputedStyle(e).outlineWidth}})()');
+ if(!detailsKeyboard.open||!detailsKeyboard.focused||!detailsKeyboard.focusVisible||parseFloat(detailsKeyboard.outlineWidth)<2)
+  report.failures.push("V5.4 keyboard accordion Enter or focus failed: "+JSON.stringify(detailsKeyboard));
+ report.tests.push({name:"V5.4 native keyboard disclosure",detailsKeyboard});
+
+ await call("Accessibility.enable");
+ const tree=await call("Accessibility.getFullAXTree");
+ const nodes=tree.result?.nodes||[];
+ const headings=nodes.filter(n=>!n.ignored&&n.role?.value==="heading").map(n=>String(n.name?.value||"").trim());
+ const accessible={nodeCount:nodes.length,headingCount:headings.length,
+   hasHero:headings.some(n=>n.includes("EL COMERCIO")),hasContact:headings.some(n=>n.includes("CONEXIONES"))};
+ if(!accessible.hasHero||!accessible.hasContact||accessible.headingCount<6)
+  report.failures.push("V5.4 accessibility tree missing landmarks or headlines: "+JSON.stringify(accessible));
+ report.tests.push({name:"V5.4 Chromium accessibility tree structural smoke",accessible});
+
+}catch(e){report.failures.push("runner: "+String(e.stack||e));}
+finally{
+ await writeFile(join(output,"audit.json"),JSON.stringify(report,null,2));
+ if(child.stdio[3])child.stdio[3].end();
+ child.kill("SIGTERM");
+ await sleep(80);
+ await rm(profile,{recursive:true,force:true}).catch(()=>{});
+}
+if(report.failures.length){
+ console.error("DESSET browser audit FAIL\n"+report.failures.join("\n"));
+ process.exitCode=1;
+}else console.log("DESSET browser audit PASS: "+report.viewports.length+" render states, "+report.screenshots.length+" screenshots, menu and reduced motion.");
