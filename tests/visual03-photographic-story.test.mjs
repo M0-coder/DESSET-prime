@@ -39,8 +39,8 @@ test("VISUAL-03 replaces the false hero-crop overlay with clean, accessible phot
  assert.match(css,/VISUAL-03: three independent user-approved photographs/);
  assert.match(css,/\.v03-photo-story img\{display:block;width:100%;height:100%;object-fit:cover;/);
  assert.doesNotMatch(css,/\.v03-photo-story::after|--v03-focus|background-image:url\("\.\/assets\/desset-hero-entrega-dos-espejos\.webp"\)/);
- assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{#ecosistema \.v03-photo-story img/);
- assert.ok(statSync(new URL("styles-visual02.css",root)).size<=5200);
+ assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{#vision \.v03-photo-story img/);
+ assert.ok(statSync(new URL("styles-visual02.css",root)).size<=8200);
  assert.doesNotMatch(css,/https?:\/\/|@import|@font-face/);
  assert.match(browser,/VISUAL-03 three different approved photos, exact sizes, original SVG fallbacks/);
 });

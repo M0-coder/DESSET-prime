@@ -56,9 +56,12 @@ test("V6.7 key foregrounds meet WCAG AA contrast for normal text",()=>{
 });
 
 test("V6.7 complete narrative agrees on Elegir → Preparar → Entregar",()=>{
- assert.ok(html.includes('aria-label="Recorrido visual: elegir, preparar y entregar"'));
+ assert.ok(html.includes('aria-label="Tres momentos conceptuales de un pedido: elegir, preparar y entregar"'));
  assert.ok(!html.includes('id="ecosystem-title"'));
- const flow=html.match(/<div class="v4-flow motion-story"[\s\S]*?<\/div>\s*<\/div>\s*<details class="v4-architecture-details">/);
+ const flow=html.match(/<section class="statement" id="vision"[\s\S]*?<\/section>/);
+ assert.match(flow?.[0]||"",/<div class="v4-flow motion-story statement-journey"/);
+ const scene=html.match(/<section class="ecosystem" id="ecosistema"[\s\S]*?<\/section>/);
+ assert.ok(scene&&!scene[0].includes('class="v4-flow motion-story"'),"3D area has no storytelling photo grid");
  assert.ok(flow,"No complete three-step flow");
  const titles=[...flow[0].matchAll(/<h3>(.*?)<\/h3>/g)].map(x=>x[1]);
  assert.deepEqual(titles,["ELEGIR","PREPARAR","ENTREGAR"]);

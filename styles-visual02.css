@@ -20,10 +20,10 @@
 #ecosistema.ecosystem{background:#eef0ef}
 #ecosistema .ecosystem-board{background:var(--v02-deep);border:1px solid #304158;box-shadow:0 23px 60px rgba(18,32,50,.18)}
 #ecosistema .v5-city-stage{border:1px solid rgba(230,236,247,.18);box-shadow:0 14px 32px rgba(0,0,0,.16)}
-#ecosistema .motion-story-grid{border-color:rgba(255,255,255,.25)}
-#ecosistema .motion-story-unit{border-color:rgba(255,255,255,.25)}
-#ecosistema .motion-story-art img{filter:drop-shadow(0 12px 18px rgba(0,0,0,.2))}
-#ecosistema .motion-story-unit p{color:#e3e8f1}
+#vision .motion-story-grid{border-color:rgba(255,255,255,.25)}
+#vision .motion-story-unit{border-color:rgba(255,255,255,.25)}
+#vision .motion-story-art img{filter:drop-shadow(0 12px 18px rgba(0,0,0,.2))}
+#vision .motion-story-unit p{color:#e3e8f1}
 
 /* Remove the old comic-book offset shadow, keep DESSET royal blue and gold. */
 #negocios .business-pitch{border-top:5px solid var(--v02-gold);box-shadow:0 22px 55px rgba(20,34,57,.2)}
@@ -46,7 +46,7 @@
 
  #soluciones .solutions-grid .service--main{box-shadow:0 12px 27px rgba(20,34,57,.12)}
  #ecosistema .ecosystem-board{padding:17px 16px 19px}
- #ecosistema .motion-story-unit{border-right:0}
+ #vision .motion-story-unit{border-right:0}
  #negocios .business-pitch{box-shadow:0 12px 26px rgba(20,34,57,.16)}
  #contacto .contact-status{padding-left:11px}
 }
@@ -55,10 +55,78 @@
 }
 
 /* VISUAL-03: three independent user-approved photographs, no hero duplication. */
-#ecosistema .motion-story-art{overflow:hidden}
-#ecosistema .v03-photo-story{display:block;position:relative;width:100%;height:100%;overflow:hidden;border-radius:14px}
-#ecosistema .v03-photo-story img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;filter:none}
-#ecosistema .motion-story-art--choose img{object-position:48% 50%}
-#ecosistema .motion-story-art--organize img{object-position:50% 48%}
-#ecosistema .motion-story-art--move img{object-position:51% 47%}
-@media(prefers-reduced-motion:reduce){#ecosistema .v03-photo-story img{animation:none!important;transform:none!important;opacity:1!important}}
+#vision .motion-story-art{overflow:hidden}
+#vision .v03-photo-story{display:block;position:relative;width:100%;height:100%;overflow:hidden;border-radius:14px}
+#vision .v03-photo-story img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;filter:none}
+#vision .motion-story-art--choose img{object-position:48% 50%}
+#vision .motion-story-art--organize img{object-position:50% 48%}
+#vision .motion-story-art--move img{object-position:51% 47%}
+@media(prefers-reduced-motion:reduce){#vision .v03-photo-story img{animation:none!important;transform:none!important;opacity:1!important}}
+
+/* PRIME-LAYOUT-01 — Rehouse the three approved narrative photos beside the
+   dark editorial statement. The 3D stage has no duplicate photo cards.
+   A mobile-first reading order remains: headline, then three steps. */
+#vision .statement-body{
+ display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);
+ align-items:center;gap:clamp(22px,3.5vw,56px);
+}
+#vision .statement-body>h2{
+ min-width:0;max-width:100%;font-size:clamp(43px,4.8vw,74px);
+}
+#vision .statement-journey.v4-flow.motion-story{
+ min-width:0;margin:0;color:#fff;
+}
+#vision .statement-journey .motion-story-grid{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ align-items:start;gap:clamp(9px,1vw,16px);border:0;
+}
+#vision .statement-journey .motion-story-unit{
+ display:flex;flex-direction:column;align-items:stretch;
+ min-width:0;min-height:0;padding:0;margin:0;gap:0;
+ border:0;overflow:visible;
+}
+#vision .statement-journey .motion-story-art{
+ display:block;flex:none;min-height:0;max-height:none;
+ width:100%;height:auto;aspect-ratio:3/2;margin:0 0 10px;
+}
+#vision .statement-journey .v03-photo-story{border-radius:10px}
+#vision .statement-journey .motion-story-unit h3{
+ grid-column:auto;grid-row:auto;font-size:clamp(19px,1.8vw,27px);
+ line-height:1.08;letter-spacing:-.05em;margin:0 0 6px;color:#fff;
+}
+#vision .statement-journey .motion-story-unit p{
+ grid-column:auto;grid-row:auto;font-size:clamp(12px,1vw,13px);
+ line-height:1.48;color:#e3e8f1;max-width:none;margin:0;
+}
+@media(max-width:1100px){
+ #vision .statement-body{grid-template-columns:minmax(0,1fr);gap:clamp(18px,3vw,28px)}
+ #vision .statement-body>h2{font-size:clamp(40px,7.1vw,72px)}
+ #vision .statement-journey .motion-story-unit h3{font-size:clamp(21px,2.9vw,28px)}
+ #vision .statement-journey .motion-story-unit p{font-size:clamp(12px,1.7vw,15px)}
+}
+@media(max-width:700px){
+ #vision .statement-body{gap:22px}
+ #vision .statement-body>h2{font-size:clamp(32px,8.2vw,55px)}
+ #vision .statement-journey .motion-story-grid{
+  grid-template-columns:minmax(0,1fr);gap:0;
+ }
+ #vision .statement-journey .motion-story-unit{
+  display:grid;grid-template-columns:minmax(0,108px) minmax(0,1fr);
+  grid-template-rows:auto 1fr;column-gap:13px;row-gap:5px;
+  padding:12px 0;border-top:1px solid rgba(255,255,255,.23);
+ }
+ #vision .statement-journey .motion-story-art{
+  grid-column:1;grid-row:1/3;align-self:start;
+  min-height:0;aspect-ratio:4/3;margin:0;
+ }
+ #vision .statement-journey .motion-story-unit h3{
+  grid-column:2;grid-row:1;font-size:clamp(26px,6.9vw,29px);margin:0;
+ }
+ #vision .statement-journey .motion-story-unit p{
+  grid-column:2;grid-row:2;align-self:start;font-size:12px;line-height:1.45;
+ }
+}
+@media(max-width:360px){
+ #vision .statement-journey .motion-story-unit{grid-template-columns:minmax(0,88px) minmax(0,1fr);column-gap:11px}
+ #vision .statement-journey .motion-story-unit h3{font-size:26px}
+}
