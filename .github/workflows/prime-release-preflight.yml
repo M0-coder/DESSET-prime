@@ -1,0 +1,78 @@
+name: DESSET Prime - release evidence ONLY (NO DEPLOY)
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desset-prime-readonly-release-preflight-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prepare-no-go-artifact:
+    name: Prime release preflight (no credentials, no publication)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - name: Checkout exact source commit (do not persist credentials)
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Pin Node runtime
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22.16.0'
+          cache: npm
+      - name: Establish exact Git SHA (no PR merge ref)
+        env:
+          REQUESTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$REQUESTED_SHA"
+          echo "SOURCE_SHA=$REQUESTED_SHA" >> "$GITHUB_ENV"
+      - name: Install deterministic dependency tree
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Security audit of production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Build Prime's own Three.js and static website
+        run: |
+          npm run build:site
+          npm run verify:site
+      - name: Assert deterministic build did not modify tracked source
+        run: git diff --exit-code
+      - name: Source and hosting contracts
+        run: |
+          node --check scripts/prime-hosting-candidate.mjs
+          node --check scripts/prime-release-preflight.mjs
+          node --test tests/prime-hosting-candidate.test.mjs tests/prime-release-preflight.test.mjs
+          node scripts/static-gate.mjs
+      - name: Build immutable NO-GO package and independent evidence
+        run: |
+          set -euo pipefail
+          PREVIOUS_ID="$(node -e 'console.log(JSON.parse(require("fs").readFileSync("config/prime-release-target.json","utf8")).recovery_deployment_id)')"
+          node scripts/prime-release-preflight.mjs \
+            "$GITHUB_WORKSPACE/dist" \
+            "$SOURCE_SHA" \
+            "$PREVIOUS_ID" \
+            "$RUNNER_TEMP/prime-release-evidence" \
+            "$RUNNER_TEMP/prime-prepared-public"
+          test "$(find "$RUNNER_TEMP/prime-prepared-public" -type f | wc -l)" -eq 33
+          grep -Fq 'Disallow: /' "$RUNNER_TEMP/prime-prepared-public/robots.txt"
+          test -z "$(find "$RUNNER_TEMP/prime-prepared-public" -name site-manifest.json)"
+          node -e 'let r=require(process.env.RUNNER_TEMP+"/prime-release-evidence/prime-release-evidence.json");if(r.release_authorized!==false||r.release_decision!=="NO-GO"||!r.repeated_packaging_identical)process.exit(1)'
+      - name: Archive verified pre-release assets (NOT authorization)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: desset-prime-no-go-release-preparation-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/prime-release-evidence/
+            ${{ runner.temp }}/prime-prepared-public/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Final source identity check (no deployment action in this workflow)
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
