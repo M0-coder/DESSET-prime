@@ -18,7 +18,7 @@ const domains={success:true,result:[{name:'desset.lat',status:'active'},{name:'w
 const account='a'.repeat(32),p={projectResponse:project,domainsResponse:domains,previousId:target.recovery_deployment_id,expectedAccount:account,actualAccount:account};
 test('fully explicit manual intent is only ready for fresh live verification',()=>{
  const r=validateReleaseIntent(valid);
- assert.equal(r.result,'READY-FOR-LIVE-PREFLIGHT');
+ assert.equal(r.result,'READY-FOR-LIVE-PREFLIGHT',JSON.stringify(r.failures));
  assert.equal(r.release_authorized,false);assert.equal(r.requires_fresh_cloudflare_check,true);
 });
 test('PR and push events always fail closed',()=>{
@@ -38,7 +38,7 @@ test('business, contact and technical acceptance flags cannot be skipped',()=>{
 });
 test('indexing explicitly needs a further independent approval',()=>{
  assert.equal(validateReleaseIntent({...valid,seoPolicy:'INDEX'}).result,'NO-GO');
- assert.equal(validateReleaseIntent({...valid,seoPolicy:'INDEX',flags:{...valid.flags,indexApproved:'true'}}).result,'READY-FOR-LIVE-PREFLIGHT');
+ {const r=validateReleaseIntent({...valid,seoPolicy:'INDEX',flags:{...valid.flags,indexApproved:'true'}});assert.equal(r.result,'READY-FOR-LIVE-PREFLIGHT',JSON.stringify(r.failures));}
  assert.equal(validateReleaseIntent({...valid,seoPolicy:'invalid'}).result,'NO-GO');
 });
 test('old-repo or modified release target fail closed',()=>{
@@ -47,7 +47,7 @@ test('old-repo or modified release target fail closed',()=>{
  assert.equal(validateReleaseIntent({...valid,target:{...target,production_deploy_enabled:true}}).result,'NO-GO');
 });
 test('realistic healthy Cloudflare snapshot passes only after authenticated GET',()=>{
- const r=validateCloudflareSnapshot(p);assert.equal(r.result,'READY-FOR-MANUAL-DEPLOY');
+ const r=validateCloudflareSnapshot(p);assert.equal(r.result,'READY-FOR-MANUAL-DEPLOY',JSON.stringify(r.failures));
  assert.equal(r.previous_deployment_id,target.recovery_deployment_id);
 });
 test('changed live deployment, wrong branch and dirty commit fail',()=>{
