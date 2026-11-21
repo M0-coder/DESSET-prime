@@ -53,6 +53,8 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           npm run build:site
           npm run verify:site
+          node scripts/prime-rights-license-audit.mjs "$GITHUB_WORKSPACE/dist"
+          node --test tests/prime-rights-license-audit.test.mjs
           node --check scripts/prime-manual-cutover-gate.mjs
           node --check scripts/prime-manual-cutover-package.mjs
           node --test tests/prime-manual-cutover-gate.test.mjs tests/prime-manual-cutover-package.test.mjs tests/prime-manual-release-workflow.test.mjs tests/verify-prime-manual-package.test.mjs
@@ -115,6 +117,7 @@ jobs:
           npm audit --omit=dev --audit-level=high
           npm run build:site
           npm run verify:site
+          node scripts/prime-rights-license-audit.mjs "$GITHUB_WORKSPACE/dist"
           node --test tests/*.test.mjs
           node scripts/static-gate.mjs
           node scripts/v54-http-security.mjs
