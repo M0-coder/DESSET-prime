@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {dirname,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {createServer} from 'node:http';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const doc=readFileSync(root+'/.github/workflows/prime-manual-publish.yml','utf8');
 const job=doc.split('  publish-only-after-independent-authorization:')[1]||'';
@@ -53,4 +56,35 @@ test('every GitHub expression has both braces and no malformed delimiters',()=>{
  assert.ok(expressions.length>=20,'Expected many GitHub expressions in workflow');
  assert.ok(!/\$\{\{[^}\n]+\}(?!\})/.test(doc),'Missing second closing brace in expression');
  assert.ok(!/GH\{/.test(doc),'Unresolved authoring placeholder');
+});
+
+test('curl invocations use a single HTTP failure mode supported by the release runner',async(t)=>{
+ const commands=job.replace(/\\\n\s*/g,' ').split('\n').filter(line=>/\bcurl\s/.test(line));
+ assert.ok(commands.length>0);
+ const combinations=new Set();
+ for(const line of commands){
+  const flags=line.slice(line.indexOf('curl ')+5).trim().split(/\s+/);
+  const fail=flags.includes('--fail')||flags.some(flag=>/^-[A-Za-z]+$/.test(flag)&&flag.includes('f'));
+  assert.ok(!(fail&&flags.includes('--fail-with-body')),line);
+  if(flags.includes('--fail-with-body')){
+   const prefix=flags.slice(0,flags.findIndex(flag=>flag==='-H'||flag.includes('https://')));
+   combinations.add(prefix.join(' '));
+  }
+  if(!line.includes("'%{http_code}'"))assert.ok(fail||flags.includes('--fail-with-body'),line);
+ }
+ assert.ok(combinations.size>0);
+ const server=createServer((req,res)=>{
+  res.writeHead(req.url==='/ok'?200:404);
+  res.end('probe');
+ });
+ await new Promise((resolve,reject)=>server.once('error',reject).listen(0,'127.0.0.1',resolve));
+ t.after(()=>new Promise(resolve=>server.close(resolve)));
+ const run=promisify(execFile);
+ const base='http://127.0.0.1:'+server.address().port;
+ for(const prefix of combinations){
+  const args=['--noproxy','*',...prefix.split(' ')];
+  assert.equal((await run('curl',[...args,base+'/ok'])).stdout,'probe');
+  await assert.rejects(run('curl',[...args,base+'/missing']),{code:22,stdout:'probe'});
+ }
+
 });
