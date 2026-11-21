@@ -89,9 +89,10 @@ test("V6.7 stylesheet actually loads in the signed site and strict local preview
  assert.ok(html.includes('<link rel="stylesheet" href="./styles-system.css">'));
  assert.ok(html.indexOf('href="./styles-system.css"')>html.indexOf('href="./styles-v5.css"'));
  assert.ok(build.includes('"styles-system.css"'));
- assert.ok(build.includes('styles(?:-v5|-system|-hero-photo|-visual02)?'));
+ assert.ok(build.includes('styles(?:-v5|-system|-hero-photo|-visual02|-typography)?'));
  assert.ok(preview.includes('rel==="styles-system.css"'));
  assert.ok(preview.includes('rel==="styles-visual02.css"'));
+ assert.ok(preview.includes('rel==="styles-typography.css"'));
  const manifest=JSON.parse(read("dist/site-manifest.json"));
  const record=manifest.files.find(f=>f.path==="styles-system.css");
  assert.ok(record&&record.bytes>4000,"Design CSS absent from signed package");
