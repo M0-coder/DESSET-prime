@@ -47,7 +47,7 @@ jobs:
         run: |
           node --check scripts/prime-hosting-candidate.mjs
           node --check scripts/prime-release-preflight.mjs
-          node --test tests/prime-hosting-candidate.test.mjs tests/prime-release-preflight.test.mjs
+          node --test tests/prime-hosting-candidate.test.mjs tests/prime-release-preflight.test.mjs tests/prime-release-workflow-contract.test.mjs tests/verify-prime-release-evidence.test.mjs
           node scripts/static-gate.mjs
       - name: Build immutable NO-GO package and independent evidence
         run: |
@@ -59,6 +59,7 @@ jobs:
             "$PREVIOUS_ID" \
             "$RUNNER_TEMP/prime-release-evidence" \
             "$RUNNER_TEMP/prime-prepared-public"
+          node scripts/verify-prime-release-evidence.mjs "$RUNNER_TEMP/prime-prepared-public" "$RUNNER_TEMP/prime-release-evidence/prime-release-evidence.json" "$SOURCE_SHA"
           test "$(find "$RUNNER_TEMP/prime-prepared-public" -type f | wc -l)" -eq 33
           grep -Fq 'Disallow: /' "$RUNNER_TEMP/prime-prepared-public/robots.txt"
           test -z "$(find "$RUNNER_TEMP/prime-prepared-public" -name site-manifest.json)"
