@@ -6,7 +6,7 @@ import {readFileSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const targetPath=resolve(dirname(fileURLToPath(import.meta.url)),'../config/prime-release-target.json');
-const HEX40=/^[a-f0-9]{40}$/,UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+const HEX40=/^[a-f0-9]{40}$/,UUID=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/;
 export const CONFIRM='PUBLICAR_PRIME_DESSET';
 const mark=(errors,condition,message)=>{if(!condition)errors.push(message)};
 export function validateReleaseIntent({repository,ref,event,expectedSha,checkoutSha,previousId,confirm,seoPolicy,flags,target}){
