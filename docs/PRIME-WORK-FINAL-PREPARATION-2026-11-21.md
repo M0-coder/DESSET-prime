@@ -11,6 +11,8 @@ Base recibida: `82d88317757a381269e9c976d608d49a8f21a0b7`, PR #24. La evidencia 
 3. Con Node 24.22.3 el build genera GLB con hashes distintos y fallan dos contratos de integridad. Repetido con Node 22.16.0: 242/242 tests PASS y hashes originales preservados. Se fija engines/.nvmrc y se rechaza compilación con otra versión antes de generar geometría. No se alteran hashes aprobados para hacer pasar la prueba.
 4. Se excluyen del seguimiento dependencias, dist, informes y binarios generados. No se elimina ningún activo fuente.
 
+5. El workflow manual exigía 34 archivos, pero el paquete real tiene 35 al incluir THIRD-PARTY-NOTICES.txt. Se retira el contador obsoleto: el verificador independiente ya exige el inventario exacto y todos los hashes. El job offline ahora ejecuta las mismas CLI reales de empaquetado/verificación y archiva el paquete NOINDEX para detectar esta divergencia antes de publicar.
+
 ## Estado administrativo observado, solo lectura
 Cloudflare autenticado: cuenta `5a1fbee5f06b8dcec986caa4e080c8d9`, proyecto `desset-institucional`, ID `e9b820a9-744f-44df-b59a-a4650197d440`, producción `release-approved`. Canonical y latest `b107eff2-6511-4e04-a780-fbd28e93e4e9`, success, commit `9f48d62cdadb43135fc9c2072cdc9e31f695c9ab`, sin Functions. Dominios `desset.lat` y `www.desset.lat` activos. Revalidar inmediatamente antes de cualquier corte.
 

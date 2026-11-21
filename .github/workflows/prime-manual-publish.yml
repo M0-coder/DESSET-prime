@@ -83,6 +83,24 @@ jobs:
           cmp "$GITHUB_WORKSPACE/dist/site-manifest.json" "$RUNNER_TEMP/prime-repro-A/dist/site-manifest.json"
           echo "sha256: $(sha256sum "$RUNNER_TEMP/prime-repro-A/dist/site-manifest.json" | cut -d' ' -f1)" > "$RUNNER_TEMP/prime-two-independent-builds.txt"
           printf 'base_commit: %s\nsource_trees: 2\nclean_installations: 2\ncompilations: 2\ncomparison: byte-identical source manifests\nstatus: PASS\nrelease_authorized: false\n' "$(git rev-parse HEAD)" >> "$RUNNER_TEMP/prime-two-independent-builds.txt"
+      - name: Exercise the real manual NOINDEX package CLI without credentials
+        run: |
+          set -euo pipefail
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          node scripts/prime-manual-cutover-package.mjs \
+            "$GITHUB_WORKSPACE/dist" "$SOURCE_SHA" NOINDEX \
+            "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof"
+          node scripts/verify-prime-manual-package.mjs \
+            "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof/prime-manual-release-package.json" "$SOURCE_SHA" NOINDEX
+      - name: Preserve the verified manual package for review (NOT permission to publish)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: prime-manual-NOINDEX-package-${{ github.event.pull_request.head.sha }}
+          path: |
+            ${{ runner.temp }}/prime-manual-public/
+            ${{ runner.temp }}/prime-manual-proof/
+          if-no-files-found: error
+          retention-days: 14
       - name: Archive offline ownership, license and SPDX evidence (NO release authority)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -173,7 +191,6 @@ jobs:
           node scripts/verify-prime-manual-package.mjs "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof/prime-manual-release-package.json" "$RELEASE_SHA" "$SEO_POLICY"
           grep -Fq "three 0.187.0 (MIT)" "$RUNNER_TEMP/prime-manual-public/THIRD-PARTY-NOTICES.txt"
           grep -Fq "esbuild 0.28.2 (MIT)" "$RUNNER_TEMP/prime-manual-public/THIRD-PARTY-NOTICES.txt"
-          test "$(find "$RUNNER_TEMP/prime-manual-public" -type f | wc -l)" -eq 34
           test ! -f "$RUNNER_TEMP/prime-manual-public/site-manifest.json"
           test -f "$RUNNER_TEMP/prime-manual-public/_headers"
       - name: Prepare and audit exact Wrangler version without credentials
