@@ -171,17 +171,18 @@ try{
  const reopened=await waitUntil("WebGL reopened after poster",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.triangles>100&&p?.domCanvas===1?p:null})()'),15000);
  check("WebGL scene reopens cleanly without duplicate canvas",reopened.domCanvas===1&&reopened.triangles>100,{reopened});
 
- // One-click real website integration: hero CTA is the mobile opt-in
- // and must launch the actual guided GLB tour, not just scroll to artwork.
+ // The duplicate hero 3D CTA was deleted; the real section auto-starts
+ // WebGL2 on viewport entry and keeps an explicit guided-tour control.
  await viewport(390,844);
- const beforeHero=await evalJS('(()=>({loading:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),cta:!!document.querySelector("[data-v64-tour-launch]")}))()');
- check("Prime mobile hero exposes 3D journey without preloading WebGL",beforeHero.cta&&!beforeHero.loading,{beforeHero});
- await evalJS('document.querySelector("[data-v64-tour-launch]").click()');
+ const beforeScene=await evalJS('(()=>({loading:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),removedCTA:!document.querySelector("[data-v64-tour-launch]"),stage:!!document.querySelector(".v5-city-stage")}))()');
+ check("Mobile hero has no duplicate 3D CTA or offscreen GPU preload",beforeScene.removedCTA&&!beforeScene.loading&&beforeScene.stage,{beforeScene});
  await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
- const heroTour=await waitUntil("hero launches GLB cinematic experience",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3&&p?.tourActive?p:null})()'),18000);
- check("One-click hero activates all GLBs and guided 3D tour",heroTour.glbLoaded===3&&heroTour.tourActive,
-  {models:heroTour.glbLoaded,beat:heroTour.tourBeat});
- await screenshot("mobile-v64-hero-3d-site-integration.png");
+ const readyScene=await waitUntil("scrolled mobile section loads three real GLBs",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3&&p?.domCanvas===1?p:null})()'),18000);
+ check("Mobile 3D auto-start survives editorial removal",readyScene.glbLoaded===3&&readyScene.domCanvas===1,{models:readyScene.glbLoaded});
+ await evalJS('document.querySelector(".v63-tour").click()');
+ const guidedScene=await waitUntil("3D guided tour starts from real section button",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.tourActive?p:null})()'),6000);
+ check("One section control starts guided GLB tour",guidedScene.tourActive,{models:guidedScene.glbLoaded,beat:guidedScene.tourBeat});
+ await screenshot("mobile-v64-section-3d-site-integration.png");
 
  // Tablet breakpoint audit: 431–800px uses a landscape WebGL layout,
  // with cheaper shaders but the same three original GLBs in frame.
