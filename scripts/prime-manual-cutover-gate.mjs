@@ -32,7 +32,8 @@ export function validateReleaseIntent({repository,ref,event,expectedSha,checkout
 export function validateCloudflareSnapshot({projectResponse,domainsResponse,previousId,expectedAccount,actualAccount}){
  const fail=[];const req=(v,s)=>mark(fail,v,s);
  const p=projectResponse?.result??projectResponse,d=domainsResponse?.result??domainsResponse;
- const deployment=p?.latest_deployment;
+ // canonical_deployment is the production serving target; latest may be a preview.
+ const deployment=p?.canonical_deployment;
  req(projectResponse?.success!==false && domainsResponse?.success!==false,'Cloudflare API failed');
  req(typeof expectedAccount==='string'&&/^[a-f0-9]{32}$/.test(expectedAccount)&&expectedAccount===actualAccount,'Wrong account ID');
  req(p?.name==='desset-institucional'&&p?.production_branch==='release-approved','Wrong Pages project or production branch');

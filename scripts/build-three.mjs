@@ -3,6 +3,8 @@ import {build} from "esbuild";
 import {stat,writeFile,mkdir} from "node:fs/promises";
 import {gzipSync} from "node:zlib";
 import {readFileSync} from "node:fs";
+// Geometry floating-point output changes with V8; preserve reviewed GLB hashes.
+if(process.versions.node!=="22.16.0")throw Error("Reproducible build requires Node 22.16.0; use nvm use before building");
 await import("./build-glb-models.mjs");
 const output="assets/v6-three.bundle.js";
 const result=await build({
