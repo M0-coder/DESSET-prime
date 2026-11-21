@@ -51,7 +51,7 @@ test("Removal preserves real visual service, mobile imagery, GPU scene, honest a
     'data-service-access','data-app-links hidden',
     'DESSET todavía no realiza pedidos ni entregas comerciales',
   ])assert.ok(html.includes(required),"Functional element removed: "+required);
-  assert.equal((html.match(/data-channel-basis="owner-attested"/g)||[]).length,3);
+  assert.equal((html.match(/data-channel-basis="owner-attested"/g)||[]).length,5);
   assert.match(cinematic,/activationObserver\.observe\(stage\)/);
   assert.doesNotMatch(cinematic,/data-v64-tour-launch/);
   assert.doesNotMatch(motion,/\.section-head|\.statement-side/);
