@@ -28,10 +28,10 @@ function simulate(source=control){
 }
 test("V6.9 describes services as a lasting institutional identity, not as a startup pitch",()=>{
  assert.match(html,/DESSET reúne comercio, tecnología y logística en un ecosistema de servicios/);
- assert.match(html,/UN ECOSISTEMA, TRES PILARES/);
- for(const phrase of ["Comercio conectado","Logística de última milla","Tecnología DESSET",
- "Pedidos y","Paquetería y transporte","Comercio y servicios",
- "Elegir, preparar","APLICACIONES DESSET"])
+ assert.doesNotMatch(html,/UN ECOSISTEMA, TRES PILARES/);
+ assert.match(html,/class="business-pitch"/);
+ for(const phrase of ["Pedidos y","Paquetería y transporte","Comercio y servicios",
+ "ELEGIR","PREPARAR","ENTREGAR","APLICACIONES DESSET"])
   assert.ok(html.includes(phrase),"Missing institutional service facet "+phrase);
  assert.doesNotMatch(html,/Proyecto en desarrollo|En construcción|En desarrollo: una plataforma|Horizonte futuro|antes del lanzamiento|validar necesidades con comercios|estamos construyendo un sistema/i);
  assert.equal((html.match(/<section\b/g)||[]).length,6);
