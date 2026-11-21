@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "DESSET Prime experimental Three.js WebGL diorama: no production deployment",
+  "description": "DESSET Prime definitive institutional website: cinematic editorial experience; offline QA only until authorized release",
   "scripts": {
     "build:3d": "node scripts/build-three.mjs",
     "test": "node --test tests/*.test.mjs",
