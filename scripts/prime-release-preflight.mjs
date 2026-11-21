@@ -75,6 +75,7 @@ export function prepareReleaseEvidence({dist, sourceSha, gitSha, previousDeploym
       original_files:a.report.original_files, staged_files:a.report.staged_files,
       staged_total_bytes:a.report.staged_total_bytes,
       artifacts_sha256:sha256(Buffer.from(JSON.stringify(a.report.assets))),
+      files:a.report.assets, // independent third-party verifier can now check every byte
       repeated_packaging_identical:true, // two PACKAGE copies, NOT two source compilations
       independently_compiled_twice:false,
       previous_deployment_id:previousDeploymentId,
