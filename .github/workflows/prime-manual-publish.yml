@@ -171,7 +171,6 @@ jobs:
           npm run build:site
           npm run verify:site
           node scripts/prime-rights-license-audit.mjs "$GITHUB_WORKSPACE/dist"
-          node scripts/prime-channel-readiness.mjs "$GITHUB_WORKSPACE/dist/index.html" "$GITHUB_WORKSPACE/dist/scripts/service-state.js" "" --require-verified
           node --test tests/*.test.mjs
           node scripts/static-gate.mjs
           node scripts/v54-http-security.mjs
@@ -179,6 +178,11 @@ jobs:
           DESSET_PRIME_WEB_ROOT=dist node scripts/v54-http-security.mjs
           DESSET_PRIME_WEB_ROOT=dist node scripts/v6-gpu-browser-audit.mjs
           test -z "$(git diff --name-only)"
+      - name: Check private platform-admin review for this release
+        env:
+          DESSET_CHANNEL_ADMIN_REVIEW: ${{ secrets.DESSET_CHANNEL_ADMIN_REVIEW }}
+        run: |
+          node scripts/prime-channel-readiness.mjs "$GITHUB_WORKSPACE/dist/index.html" "$GITHUB_WORKSPACE/dist/scripts/service-state.js" "" --require-verified
       - name: Generate indexed or noindex production-shaped site, still offline
         env:
           RELEASE_SHA: ${{ inputs.release_sha }}

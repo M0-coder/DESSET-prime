@@ -98,3 +98,29 @@ test('Manual production gate cannot treat owner attestation as independent platf
  assert.equal(out.status,2,'manual release must fail closed until independent proof exists');
  assert.match(out.stderr,/independent platform ownership verification is required/);
 });
+
+test('protected release CLI binds private review to the exact release and each declared profile',()=>{
+ const sha='1'.repeat(40);
+ const review={schema:'desset-prime-channel-admin-review-v1',repository:'M0-coder/DESSET-prime',
+  source_sha:sha,reviewer:'test reviewer',reviewed_at:'2020-01-01T00:00:00Z',
+  channels:owner.exact_channels.map(({platform,url})=>({platform,url,
+   method:'authenticated-admin-control-observed',evidence_sha256:'a'.repeat(64)}))};
+ const run=(value,mode='--require-verified')=>spawnSync(process.execPath,
+  [join(root,'scripts/prime-channel-readiness.mjs'),join(root,'index.html'),
+   join(root,'scripts/service-state.js'),'',...(mode?[mode]:[])],
+  {encoding:'utf8',env:{...process.env,GITHUB_SHA:sha,DESSET_CHANNEL_ADMIN_REVIEW:JSON.stringify(value)}});
+ const pass=run(review);
+ assert.equal(pass.status,0,pass.stderr);
+ assert.equal(JSON.parse(pass.stdout).channels_status,'ADMIN_REVIEW_VERIFIED');
+ assert.equal(JSON.parse(pass.stdout).release_authorized,false);
+ assert.equal(JSON.parse(run(review,'').stdout).technical_platform_admin_access_tested,false);
+ for(const change of [
+  r=>{r.source_sha='2'.repeat(40)},r=>{r.repository='other/repo'},r=>{r.channels.pop()},
+  r=>{r.channels[0]=r.channels[1]},r=>{r.channels[0].url+='other'},
+  r=>{r.channels[0].evidence_sha256=''},r=>{r.channels[0].method='owner-attested'},
+  r=>{r.reviewed_at='invalid'},r=>{r.reviewer=''}
+ ]){
+  const changed=deep(review);change(changed);assert.equal(run(changed).status,2);
+ }
+ assert.equal(run(review,'--require-verifed').status,2);
+});
