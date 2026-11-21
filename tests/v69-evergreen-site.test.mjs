@@ -45,7 +45,7 @@ test("V6.9 keeps website informational, operations gated to apps, no invented la
  assert.match(html,/data-service-status role="status" aria-live="polite">Acceso público no habilitado/);
  assert.match(html,/data-app-links hidden/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
- assert.equal((html.match(/data-channel-review="pending"/g)||[]).length,3);
+ assert.equal((html.match(/data-channel-review="verified" data-channel-basis="owner-attested"/g)||[]).length,3);
  assert.doesNotMatch(html,/<form\b|<iframe\b|href="https?:\/\/(?:play\.google\.com|apps\.apple\.com|wa\.me)/i);
  assert.match(control,/applicationDistribution:"not_published"/);
  assert.match(control,/verified:false/);
