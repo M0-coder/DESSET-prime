@@ -147,7 +147,9 @@ jobs:
             "$GITHUB_WORKSPACE/dist" "$RELEASE_SHA" "$SEO_POLICY" \
             "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof"
           node scripts/verify-prime-manual-package.mjs "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof/prime-manual-release-package.json" "$RELEASE_SHA" "$SEO_POLICY"
-          test "$(find "$RUNNER_TEMP/prime-manual-public" -type f | wc -l)" -eq 33
+          grep -Fq "three 0.187.0 (MIT)" "$RUNNER_TEMP/prime-manual-public/THIRD-PARTY-NOTICES.txt"
+          grep -Fq "esbuild 0.28.2 (MIT)" "$RUNNER_TEMP/prime-manual-public/THIRD-PARTY-NOTICES.txt"
+          test "$(find "$RUNNER_TEMP/prime-manual-public" -type f | wc -l)" -eq 34
           test ! -f "$RUNNER_TEMP/prime-manual-public/site-manifest.json"
           test -f "$RUNNER_TEMP/prime-manual-public/_headers"
       - name: Prepare and audit exact Wrangler version without credentials
@@ -235,7 +237,7 @@ jobs:
           else
             grep -Fq 'name="robots" content="noindex,nofollow"' "$RUNNER_TEMP/prime-live.html"
           fi
-          for file in robots.txt sitemap.xml styles.css styles-v5.css styles-system.css styles-hero-photo.css styles-visual02.css scripts/app.js scripts/motion.js scripts/v5-cinematic.js scripts/service-state.js assets/deliver-assets-mark.png assets/scene-move.webp assets/v62-courier.glb; do
+          for file in THIRD-PARTY-NOTICES.txt robots.txt sitemap.xml styles.css styles-v5.css styles-system.css styles-hero-photo.css styles-visual02.css scripts/app.js scripts/motion.js scripts/v5-cinematic.js scripts/service-state.js assets/deliver-assets-mark.png assets/scene-move.webp assets/v62-courier.glb; do
             mkdir -p "$RUNNER_TEMP/live/$(dirname "$file")"
             curl --retry 4 --retry-delay 3 --fail-with-body -fsSL "https://desset.lat/$file" -o "$RUNNER_TEMP/live/$file"
             cmp -s "$RUNNER_TEMP/prime-manual-public/$file" "$RUNNER_TEMP/live/$file"
