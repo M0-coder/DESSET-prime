@@ -1,0 +1,31 @@
+{
+  "schema": "desset-prime-social-owner-attestation-v1",
+  "source_repository": "M0-coder/DESSET-prime",
+  "assertion": {
+    "statement": "Todos los perfiles en redes sociales enlazados desde DESSET Prime son de DESSET.",
+    "recorded_from": "direct declaration of project owner in conversation",
+    "recorded_on": "2026-11-20",
+    "evidence_level": "owner-attested",
+    "technical_platform_admin_access_tested": false,
+    "independently_verified_by_platform": false
+  },
+  "exact_channels": [
+    {
+      "platform": "Instagram",
+      "url": "https://www.instagram.com/deliver_assets/",
+      "status": "owner-attested"
+    },
+    {
+      "platform": "X",
+      "url": "https://x.com/deliver_assets",
+      "status": "owner-attested"
+    },
+    {
+      "platform": "Facebook",
+      "url": "https://www.facebook.com/share/1EtpsZNFwQ/",
+      "status": "owner-attested"
+    }
+  ],
+  "release_authorized": false,
+  "notes": "Records source owner confirmation only; does not attest to independent platform authentication or authorize publication."
+}

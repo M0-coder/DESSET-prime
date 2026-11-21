@@ -1,0 +1,59 @@
+{
+  "schema": "desset-prime-v55-readonly-production-preflight-v1",
+  "captured_at_local": "2026-11-19",
+  "mode": "READ_ONLY_SNAPSHOT_NO_DEPLOY",
+  "prime": {
+    "repository": "M0-coder/DESSET-prime",
+    "pull_request": 2,
+    "branch": "design/v5-cinematic-experience-no-deploy",
+    "approval": "pending"
+  },
+  "official": {
+    "repository": "M0-coder/DESSET",
+    "observed_cloudflare": {
+      "project": "desset-institucional",
+      "production_branch": "release-approved",
+      "deployment_id": "b107eff2-6511-4e04-a780-fbd28e93e4e9",
+      "commit": "9f48d62cdadb43135fc9c2072cdc9e31f695c9ab",
+      "created_on": "2026-11-18T05:56:27.060132Z",
+      "domains": [
+        "desset.lat",
+        "www.desset.lat"
+      ],
+      "domains_status": "active"
+    },
+    "visual_approval": {
+      "manifest_path": "config/visual-baseline-approved.json",
+      "baseline_id": "DESSET-V12-CONTACT-2026-11-17",
+      "approval_evidence": "https://github.com/M0-coder/DESSET/issues/58#issuecomment-6968083138",
+      "known_asset_blob_sha1": {
+        "assets/deliver-assets-mark.png": "fa6cb4ea5c5331c4cf47dfd157214e972f809356",
+        "assets/roles-geometry-v2.svg": "71401c4d0f93eeefcde393f18e82e165e50d8f90"
+      }
+    },
+    "production_requirements": {
+      "release_file_count_baseline": 13,
+      "manual_workflow": ".github/workflows/cloudflare-pages-production.yml",
+      "trigger": "workflow_dispatch",
+      "main_only": true,
+      "owner_design_approval_required": true,
+      "release_package_gate": true,
+      "codeql_and_ci_review": true,
+      "backup_and_rollback_required": true
+    }
+  },
+  "blocked_by": [
+    "figma_master_review_rate_limit",
+    "human_design_and_accessibility_approval",
+    "real_devices_and_field_web_vitals",
+    "brand_and_asset_rights",
+    "production_packaging_and_manifest_rework",
+    "official_repo_authorized_promotion_by_exact_sha",
+    "domain_release_separate_approval"
+  ],
+  "notes": [
+    "Snapshot reflects a read-only observation, not a permanent production authority.",
+    "A successful Prime CI cannot by itself authorize production.",
+    "Official release has a deliberate gate requiring an owner comment with a design SHA-256."
+  ]
+}

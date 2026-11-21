@@ -1,0 +1,20 @@
+{
+  "name": "desset-prime-3d-preview",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "DESSET Prime definitive institutional website: cinematic editorial experience; offline QA only until authorized release",
+  "scripts": {
+    "build:3d": "node scripts/build-three.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "build:site": "npm run build:3d && node scripts/build-site.mjs",
+    "pack:site": "node scripts/build-site.mjs",
+    "verify:site": "node scripts/verify-site-package.mjs"
+  },
+  "dependencies": {
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

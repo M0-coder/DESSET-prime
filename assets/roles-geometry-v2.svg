@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" role="img" aria-labelledby="t d">
+  <title id="t">Cuatro roles de DESSET</title>
+  <desc id="d">Customer solicita, Business prepara, Rider mueve y Control supervisa. Cuatro piezas convergen en un centro común.</desc>
+  <rect x="0" y="0" width="720" height="380" rx="14" fill="#F0EEEA"/>
+  <path d="M18 102H235L327 190L235 278H18Z" fill="#1551D8"/>
+  <path d="M702 102H485L393 190L485 278H702Z" fill="#FF3328"/>
+  <path d="M272 12H448V86L360 168L272 86Z" fill="#FFC62F"/>
+  <path d="M272 368H448V294L360 212L272 294Z" fill="#111111"/>
+  <text x="40" y="188" fill="#FFFFFF" font-size="17" font-weight="700" font-family="Arial,sans-serif">CUSTOMER</text>
+  <text x="40" y="208" fill="#FFFFFF" font-size="10" font-family="Arial,sans-serif" letter-spacing="2">SOLICITA</text>
+  <text x="535" y="188" fill="#111111" font-size="17" font-weight="700" font-family="Arial,sans-serif">CONTROL</text>
+  <text x="535" y="208" fill="#111111" font-size="10" font-family="Arial,sans-serif" letter-spacing="2">SUPERVISA</text>
+  <text x="360" y="45" text-anchor="middle" fill="#111111" font-size="17" font-weight="700" font-family="Arial,sans-serif">BUSINESS</text>
+  <text x="360" y="62" text-anchor="middle" fill="#111111" font-size="10" font-family="Arial,sans-serif" letter-spacing="2">PREPARA</text>
+  <text x="360" y="326" text-anchor="middle" fill="#FFFFFF" font-size="17" font-weight="700" font-family="Arial,sans-serif">RIDER</text>
+  <text x="360" y="343" text-anchor="middle" fill="#FFFFFF" font-size="10" font-family="Arial,sans-serif" letter-spacing="2">MUEVE</text>
+  <path d="M360 173L377 190L360 207L343 190Z" stroke="#222222" stroke-width="1.5" fill="#F0EEEA"/>
+</svg>

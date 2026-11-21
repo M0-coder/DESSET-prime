@@ -1,0 +1,147 @@
+name: DESSET Prime V6.9 — presentación institucional permanente y aplicaciones controladas, sin despliegue
+on:
+  push:
+    branches: [design/**]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  source-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22.16.0'
+      - name: Install pinned Three.js + esbuild and compile self-hosted bundle
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build:3d
+          npm run pack:site
+          npm run verify:site
+      - name: JavaScript syntax
+        run: |
+          node --check scripts/app.js
+          node --check scripts/motion.js
+          node --check scripts/v5-cinematic.js
+          node --check scripts/browser-audit.mjs
+          node --check scripts/local-preview.mjs
+          node --check scripts/lighthouse-summary.mjs
+          node --check scripts/mutation-smoke.mjs
+          node --check scripts/static-gate.mjs
+          node --check scripts/v54-http-security.mjs
+          node --check scripts/v55-integration-preflight.mjs
+          node --check scripts/v6-three.src.mjs
+          node --check scripts/build-three.mjs
+          node --check scripts/build-glb-models.mjs
+          node --check scripts/v62-glb-loader.src.mjs
+          node --check scripts/v63-storyboard.mjs
+          node --check scripts/build-site.mjs
+          node --check scripts/verify-site-package.mjs
+          node --check tests/v65-whole-site-audit.test.mjs
+          node --check tests/v66-punctuation-radius.test.mjs
+          node --check tests/v67-visual-system.test.mjs
+          node --check tests/v68-deep-audit.test.mjs
+          node --check tests/v69-evergreen-site.test.mjs
+          node --check scripts/service-state.js
+          node --check scripts/v6-gpu-browser-audit.mjs
+          node --check assets/v6-three.bundle.js
+          test -s assets/v62-commerce.glb
+          test -s assets/v62-courier.glb
+          test -s assets/v62-destination.glb
+      - name: Static source security and integrity gate
+        run: node scripts/static-gate.mjs
+      - name: Migration integration source gate (read-only and NO-GO)
+        run: node scripts/v55-integration-preflight.mjs
+      - name: Unit and source contracts
+        run: node --test tests/*.test.mjs
+      - name: HTTP security audit on loopback only
+        run: node scripts/v54-http-security.mjs
+      - name: Node execution coverage (scope limited, no certified global coverage)
+        run: |
+          mkdir -p reports/quality
+          node --experimental-test-coverage --test tests/*.test.mjs > reports/quality/node-coverage.txt
+          tail -n 23 reports/quality/node-coverage.txt
+      - name: Targeted mutation smoke
+        run: node scripts/mutation-smoke.mjs
+      - name: Browser QA and screenshots
+        run: node scripts/browser-audit.mjs
+      - name: True WebGL2 GPU scene and mobile opt-in (SwiftShader CI)
+        run: node scripts/v6-gpu-browser-audit.mjs
+      - name: HTTP security of the packaged website
+        run: DESSET_PRIME_WEB_ROOT=dist node scripts/v54-http-security.mjs
+      - name: Browser WebGL2 proof against packaged dist website
+        run: DESSET_PRIME_WEB_ROOT=dist node scripts/v6-gpu-browser-audit.mjs
+      - name: Preserve QA evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: desset-prime-v69-institutional-ux-qa
+          path: |
+            reports/browser/
+            reports/quality/
+            reports/gpu/
+            assets/v6-three.bundle.js
+            assets/v62-*.glb
+            dist/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: No deployment mechanisms
+        run: |
+          test ! -f wrangler.toml
+          test ! -f _worker.js
+          test ! -d functions
+
+  lighthouse-local-lab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22.16.0'
+      - name: Build Three.js WebGL2 in isolated Lighthouse preview
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build:3d
+          npm run pack:site
+          npm run verify:site
+      - name: Start loopback-only preview
+        run: |
+          mkdir -p reports/lighthouse
+          DESSET_PRIME_WEB_ROOT=dist node scripts/local-preview.mjs > reports/lighthouse/preview-server.log 2>&1 &
+          echo $! > reports/lighthouse/preview-server.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/ -o /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat reports/lighthouse/preview-server.log
+          exit 1
+      - name: Lighthouse mobile and desktop (laboratory, not field CWV)
+        env:
+          npm_config_ignore_scripts: 'true'
+        run: |
+          npm exec --yes --package=lighthouse@12.8.2 -- lighthouse http://127.0.0.1:4173/ --chrome-flags="--headless=new --no-sandbox --disable-dev-shm-usage" --output=json --output-path=reports/lighthouse/mobile.json --only-categories=performance,accessibility,best-practices --quiet
+          npm exec --yes --package=lighthouse@12.8.2 -- lighthouse http://127.0.0.1:4173/ --chrome-flags="--headless=new --no-sandbox --disable-dev-shm-usage" --preset=desktop --output=json --output-path=reports/lighthouse/desktop.json --only-categories=performance,accessibility,best-practices --quiet
+      - name: Summarize observed lab scores
+        if: always()
+        run: node scripts/lighthouse-summary.mjs
+      - name: Preserve Lighthouse evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: desset-prime-v69-lighthouse-built-site
+          path: reports/lighthouse/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Stop local server
+        if: always()
+        run: |
+          if test -f reports/lighthouse/preview-server.pid; then
+            kill "$(cat reports/lighthouse/preview-server.pid)" || true
+          fi

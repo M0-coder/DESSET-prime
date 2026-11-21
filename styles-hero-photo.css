@@ -1,0 +1,80 @@
+/* HERO-PHOTO-01: original DESSET logo, approved photo, editorial cinema.
+   Do not modify the opt-in 3D engine or the remaining institutional sections. */
+#inicio.hero[data-variant="v4"]{background:#f7f5ee;color:#111827;min-height:auto;padding:clamp(24px,3vw,45px) var(--edge) 0;overflow:hidden}
+#inicio.hero[data-variant="v4"]::before{display:none}
+#inicio .v4-hero-composition{width:100%;max-width:1530px;margin:0 auto;padding:clamp(18px,2.3vw,34px) 0 clamp(24px,3vw,44px);display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:clamp(24px,3.6vw,62px);align-items:center;min-height:clamp(510px,43vw,690px)}
+#inicio .v4-hero-type{min-width:0;z-index:1}
+#inicio .v4-hero-declaration{display:flex;align-items:center;gap:10px;border:0;margin:0 0 23px;padding:0;color:#1551d8;font-size:clamp(10px,.9vw,12px);font-weight:850;letter-spacing:.16em}
+#inicio .v4-hero-declaration::before{content:"";display:block;width:23px;height:3px;background:#ff3328;flex:none}
+#inicio .motion-headline{font-size:clamp(46px,5.5vw,100px);font-weight:950;letter-spacing:-.082em;line-height:.94;margin:0 0 22px}
+#inicio .v4-headline-a{color:#111827}
+#inicio .v4-headline-b{color:#1551d8}
+#inicio .motion-line{padding-bottom:.11em}
+#inicio .v4-hero-bottom{display:flex;flex-direction:column;align-items:flex-start;border:0;gap:24px;padding:0;margin:0;width:100%}
+#inicio .hero-lead{color:#3e4b5b;font-size:clamp(15px,1.25vw,19px);line-height:1.65;max-width:48ch;margin:0}
+#inicio .hero-actions{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:10px 24px;margin:0}
+#inicio .hero-cta{background:#ffc62f;color:#111827;min-height:54px;border-radius:12px;padding:16px 20px;font-size:13px;box-shadow:0 4px 0 rgba(178,127,0,.75)}
+#inicio .hero-cta:hover{background:#ffe184}
+#inicio .hero-secondary{color:#111827;border-bottom:2px solid #ff3328;padding:10px 0;font-size:13px}
+#inicio .hero-secondary:hover{color:#1551d8}
+#inicio .prime-photo-surface{width:100%;max-width:none;min-width:0;margin:0;height:auto;aspect-ratio:1.61;border-radius:22px;background:#111827;box-shadow:0 26px 58px rgba(14,25,47,.19);transform:none;overflow:hidden;isolation:isolate}
+#inicio .prime-photo-surface::before{content:"";position:absolute;inset:57% 0 0;z-index:1;background:linear-gradient(180deg,transparent,rgba(13,21,35,.67));pointer-events:none}
+#inicio .prime-photo-surface::after{display:none}
+#inicio .prime-photo-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 50%;max-width:none;display:block}
+#inicio .prime-photo-caption{position:absolute;z-index:2;bottom:15px;left:19px;right:18px;color:#fff;font-size:clamp(10px,.85vw,12px);font-weight:650;line-height:1.45;letter-spacing:.012em;text-shadow:0 1px 5px rgba(0,0,0,.55)}
+/* Old "IDEAS EN ACCIÓN" and notebook-style layer are neither shown nor announced. */
+#inicio .prime-photo-surface .v4-shape,#inicio .prime-photo-surface .v4-canvas-stamp,#inicio .prime-photo-surface .v5-hero-refraction,#inicio .prime-photo-surface .motion-brand-thread{display:none!important}
+#inicio .v4-hero-rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;justify-items:center;align-items:center;margin:0 calc(-1 * var(--edge));padding:17px var(--edge);border-top:1px solid #d8dbe0;border-bottom:1px solid #d8dbe0;background:#f7f5ee;color:#27354c;font-size:clamp(11px,1.1vw,14px);letter-spacing:.055em}
+#inicio .v4-hero-rail b{display:none}
+@media(prefers-reduced-motion:no-preference){#inicio .prime-photo-surface{animation:prime-photo-hero-enter .9s cubic-bezier(.17,.75,.22,1) .15s both}}
+@keyframes prime-photo-hero-enter{from{opacity:.74;transform:translate3d(0,14px,0) scale(.988)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@media(max-width:1180px){#inicio .v4-hero-composition{grid-template-columns:minmax(0,.98fr) minmax(0,1.02fr);gap:clamp(20px,2.7vw,36px);min-height:490px}#inicio .motion-headline{font-size:clamp(39px,5.2vw,71px)}#inicio .hero-lead{font-size:15px}#inicio .prime-photo-surface{aspect-ratio:1.38}}
+@media(max-width:860px){#inicio.hero[data-variant="v4"]{padding-top:28px}#inicio .v4-hero-composition{grid-template-columns:minmax(0,1fr);min-height:0;gap:26px;padding:15px 0 28px}#inicio .motion-headline{font-size:clamp(44px,8.7vw,78px)}#inicio .prime-photo-surface{aspect-ratio:1.62}#inicio .hero-lead{max-width:680px}}
+@media(max-width:700px){#inicio.hero[data-variant="v4"]{padding-top:22px}#inicio .v4-hero-composition{gap:24px;padding:13px 0 25px}#inicio .v4-hero-declaration{margin-bottom:19px;font-size:10px;letter-spacing:.085em}#inicio .motion-headline{font-size:clamp(34px,9.2vw,63px);line-height:.96}#inicio .v4-hero-bottom{gap:20px}#inicio .hero-lead{font-size:15px;line-height:1.55}#inicio .hero-actions{align-items:flex-start;gap:8px 20px}#inicio .hero-cta{min-height:52px;padding:14px 17px}#inicio .prime-photo-surface{aspect-ratio:1.5;border-radius:16px}#inicio .prime-photo-caption{left:12px;right:11px;bottom:10px;font-size:10px}#inicio .v4-hero-rail{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:12px;padding:15px var(--edge)}}
+@media(max-width:360px){#inicio .motion-headline{font-size:clamp(32px,9.2vw,36px)}#inicio .hero-actions{display:flex;flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){#inicio .prime-photo-surface{animation:none!important;opacity:1!important;transform:none!important}}
+
+/* Mobile crop must keep both real-world mirrors visible; never crop the motorcycle's right edge. */
+@media(max-width:700px){#inicio .prime-photo-image{object-position:100% 50%}}
+
+/* One visually identical, smaller resource is selected on phones to protect LCP. */
+#inicio .prime-photo-picture{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* ANIM-02: a finite photographic opening and three editorial chapters.
+   Source image, position, crop, logo, captions and CTA stay untouched. */
+@media(prefers-reduced-motion:no-preference){
+ #inicio .v4-hero-declaration{animation:anim02-enter .72s cubic-bezier(.18,.78,.24,1) .08s both}
+ #inicio .v4-headline-a .motion-line__inner{animation:anim02-type .95s cubic-bezier(.16,.8,.22,1) .17s both}
+ #inicio .v4-headline-b .motion-line__inner{animation:anim02-type 1.04s cubic-bezier(.16,.8,.22,1) .32s both}
+ #inicio .hero-lead{animation:anim02-enter .8s cubic-bezier(.2,.78,.22,1) .54s both}
+ #inicio .hero-actions{animation:anim02-enter .8s cubic-bezier(.2,.78,.22,1) .70s both}
+ #inicio .prime-photo-surface{animation:anim02-frame 1.35s cubic-bezier(.17,.8,.21,1) .10s both}
+ #inicio .prime-photo-image{animation:anim02-focus 2.05s cubic-bezier(.19,.7,.23,1) .10s both}
+ .statement h2.motion-active,.solutions .section-head.motion-active,
+ .ecosystem .section-head.motion-active,.audiences .section-head.motion-active{
+  animation:anim02-chapter .95s cubic-bezier(.16,.74,.21,1) both
+ }
+ .statement-side.motion-active,.solutions-grid .service--main.motion-active,
+ .business-pitch.motion-active,.audience-grid--compact .audience.motion-active,
+ .contact-bottom--rc.motion-active,.motion-story-unit.motion-active{
+  animation:anim02-panel .86s cubic-bezier(.17,.76,.25,1) both
+ }
+ .motion-story-unit--organize.motion-active{animation-delay:.11s}
+ .motion-story-unit--move.motion-active{animation-delay:.22s}
+}
+@keyframes anim02-enter{from{opacity:.55;transform:translate3d(0,18px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes anim02-type{from{opacity:.35;transform:translate3d(0,32px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes anim02-frame{from{opacity:.75;transform:translate3d(0,14px,0) scale(.99);clip-path:inset(0 0 12% 0)}to{opacity:1;transform:none;clip-path:inset(0)}}
+@keyframes anim02-focus{from{filter:brightness(.86) saturate(.94);transform:scale(1.025)}to{filter:none;transform:scale(1)}}
+@keyframes anim02-chapter{from{opacity:.8;transform:translate3d(0,34px,0)}to{opacity:1;transform:none}}
+@keyframes anim02-panel{from{opacity:.89;transform:translate3d(0,19px,0)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+ #inicio .v4-hero-declaration,#inicio .motion-line__inner,#inicio .hero-lead,
+ #inicio .hero-actions,#inicio .prime-photo-surface,#inicio .prime-photo-image,
+ .statement h2,.solutions .section-head,.ecosystem .section-head,.audiences .section-head,
+ .statement-side,.solutions-grid .service--main,.business-pitch,
+ .audience-grid--compact .audience,.contact-bottom--rc,.motion-story-unit{
+  animation:none!important;transform:none!important;clip-path:none!important;
+  filter:none!important;opacity:1!important
+ }
+}
