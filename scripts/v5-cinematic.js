@@ -40,11 +40,9 @@
   root.classList.add("v5-motion-ready");
   root.dataset.v5Mode="ready";
 
-  // Real 3D is deliberately lazy: no 3D package request on mobile until explicit opt-in.
-  // Desktop receives the script only when the scene intersects the viewport.
+  // Automatically load the actual 3D scene shortly before entering the viewport.
   const threeStart=stage.querySelector(".v6-enable-webgl");
-  // The original cinematic WebP remains the default visual on ALL devices.
-  // WebGL is only fetched after the user's explicit click (hero or stage).
+  // WebP is only a temporary loading/failure fallback, not the main visual.
   if(threeStart)threeStart.hidden=false;
   const loadStatus=stage.querySelector(".v65-load-status");
   let webglRequested=false;
@@ -61,6 +59,7 @@
     runRequestedTour();
   });
   stage.addEventListener("desset:v6-unavailable",()=>{
+    stage.dataset.v6Autostart="manual";
     stage.dataset.v64Requested="";
     webglRequested=false;
     if(loadStatus)loadStatus.hidden=true;
@@ -86,11 +85,29 @@
       stage.dataset.v6State="fallback";
       stage.dataset.v64Requested="";
       if(loadStatus)loadStatus.hidden=true;
+      stage.dataset.v6Autostart="manual";
       if(threeStart)threeStart.hidden=false;
     };
     document.head.appendChild(script);
   };
   threeStart?.addEventListener("click",loadThree);
+  // Intersection-triggered, once-only GPU activation. Nothing heavy on initial page load.
+  const canAutoStart=()=>{
+    if(navigator.connection?.saveData===true)return false;
+    if(typeof navigator.deviceMemory==="number"&&navigator.deviceMemory<4)return false;
+    try{return !!document.createElement("canvas").getContext("webgl2")}
+    catch{return false}
+  };
+  const auto3D=canAutoStart();
+  stage.dataset.v6Autostart=auto3D?"enabled":"manual";
+  if(auto3D){
+    const activationObserver=new window.IntersectionObserver((entries,self)=>{
+      if(!entries.some(entry=>entry.isIntersecting))return;
+      self.disconnect();
+      loadThree();
+    },{rootMargin:"140px 0px",threshold:0.01});
+    activationObserver.observe(stage);
+  }
 
   // Primary-site integration: one intentional hero click opens the ecosystem
   // section and requests the actual GLB tour. Same explicit click is mobile

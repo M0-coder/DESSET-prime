@@ -1,0 +1,30 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const read=p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
+const html=read("index.html"),loader=read("scripts/v5-cinematic.js"),css=read("styles-v5.css"),gpu=read("scripts/v6-gpu-browser-audit.mjs");
+test("SCENE3D-01 automatic scene uses viewport intersection, not page-start download",()=>{
+ assert.match(loader,/const auto3D=canAutoStart\(\)/);
+ assert.match(loader,/rootMargin:"140px 0px",threshold:0\.01/);
+ assert.match(loader,/activationObserver\.observe\(stage\)/);
+ assert.match(loader,/self\.disconnect\(\)/);
+ assert.match(loader,/navigator\.connection\?\.saveData===true/);
+ assert.match(loader,/navigator\.deviceMemory<4/);
+ assert.match(loader,/getContext\("webgl2"\)/);
+ assert.match(loader,/if\(reduced \|\| typeof window\.IntersectionObserver/);
+ assert.match(loader,/stage\.dataset\.v6State="loading"/);
+ assert.match(loader,/script\.onerror=/);
+});
+test("SCENE3D-01 hides redundant controls and retains functional route/pause/fallback",()=>{
+ assert.equal((html.match(/<button type="button" hidden data-v6-camera=/g)||[]).length,4);
+ assert.match(html,/class="v6-poster" type="button" hidden/);
+ assert.match(html,/class="v63-tour" type="button"/);
+ assert.match(html,/class="v6-pause" type="button"/);
+ assert.match(css,/\.v6-three-controls \[data-v6-camera\]/);
+ assert.match(css,/\.v5-city-stage\[data-v6-autostart="enabled"\] \.v6-enable-webgl/);
+ assert.match(html,/class="v5-stage-render"/);
+ assert.match(html,/todavía no realiza pedidos ni entregas comerciales/);
+ assert.match(gpu,/Desktop loads WebGL without a user click/);
+ assert.match(gpu,/Mobile loads WebGL automatically when compatible/);
+ assert.match(gpu,/Tablet scene loads automatically/);
+});
