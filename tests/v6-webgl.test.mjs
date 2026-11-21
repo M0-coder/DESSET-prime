@@ -59,7 +59,7 @@ test("V6 has real input controls, opt-in mobile loading and permanent poster fal
  assert.match(gpu,/cancelAnimationFrame\(raf\)/);
 });
 test("V6 does not falsify service status or introduce external transport or deployment",()=>{
- assert.match(html,/todavía no realiza pedidos ni entregas comerciales/);
+ assert.match(html,/Representación conceptual · No corresponde a operaciones activas de DESSET/);
  assert.match(html,/no procesa pedidos ni pagos/);
  assert.match(html,/noindex,nofollow/);
  assert.doesNotMatch(gpu,/fetch\s*\(|\bXMLHttpRequest\b|sendBeacon|localStorage|sessionStorage|WebSocket/);
