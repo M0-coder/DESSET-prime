@@ -113,14 +113,14 @@ async function viewport(width,height,reduce=false){
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
   if(diag.disclosures.technical!==false||diag.disclosures.future!==false)fails.push("Freshly navigated page must start with both native disclosures CLOSED: "+JSON.stringify(diag.disclosures));
-  const expectedLime="rgb(205, 252, 138)",expected3d="rgb(255, 198, 47)";
+  const expectedLime="rgb(205, 252, 138)",expectedOriginal="rgb(255, 198, 47)";
   const palette=diag.palette;
-  if(palette.rootYellow!=="#CDFC8A"||palette.stageYellow!=="#FFC62F"||
+  if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
-   palette.heroCTA!==expectedLime||palette.businessCTA!==expectedLime||
-   palette.statementAccent!==expectedLime||palette.stageSummaryArrow!==expected3d||
-   palette.threeTourButton!==expected3d)
-   fails.push("PRIME-COLOR-01: institutional lime or 3D gold isolation failed: "+JSON.stringify(palette));
+   palette.heroCTA!==expectedLime||palette.businessCTA!==expectedOriginal||
+   palette.statementAccent!==expectedOriginal||palette.stageSummaryArrow!==expectedOriginal||
+   palette.threeTourButton!==expectedOriginal)
+   fails.push("PRIME-COLOR-02: only the hero CTA may be lime; original palette and 3D must remain yellow: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));

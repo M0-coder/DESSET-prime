@@ -131,31 +131,6 @@
  #vision .statement-journey .motion-story-unit h3{font-size:26px}
 }
 
-/* PRIME-COLOR-01 — Owner-requested institutional accent #CDFC8A.
- * Keep legacy Three.js exhibit (#ecosistema) on its original #FFC62F.
- * No edits to 3D controls, geometries, textures or brand imagery. */
-:root{
- --ds-institutional-lime:#CDFC8A;
- --yellow:var(--ds-institutional-lime);
- --ds-10-gold:var(--ds-institutional-lime);
- --v02-gold:var(--ds-institutional-lime);
-}
-#ecosistema{
- --yellow:#FFC62F;
- --ds-10-gold:#FFC62F;
- --v02-gold:#FFC62F;
-}
-/* The photographic hero CTA and editorial canvas had literal yellow values. */
-#inicio .hero-cta{
- background:var(--ds-institutional-lime);
- box-shadow:0 4px 0 rgba(75,112,20,.45);
-}
-#inicio .hero-cta:hover{background:#E7FFC4}
-#inicio .v4-motion-canvas{
- box-shadow:0 22px 55px rgba(1,9,28,.27),7px 8px 0 rgba(205,252,138,.88);
-}
-@media(max-width:700px){
- #inicio .v4-motion-canvas{
-  box-shadow:0 17px 32px rgba(1,9,28,.25),5px 5px 0 rgba(205,252,138,.82);
- }
-}
+/* PRIME-COLOR-02 — the ONLY lime element approved is the main hero CTA.
+ * Preserve the previous exact institutional palette and the 3D exhibit. */
+#inicio .hero-cta,#inicio .hero-cta:hover{background:#CDFC8A}
