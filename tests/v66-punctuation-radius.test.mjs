@@ -17,7 +17,8 @@ test("V6.6 all presentation headings and standalone labels omit terminal ornamen
   assert.ok(!/[.]$/.test(heading.text),"Ornamental full stop remains in "+heading.tag+": "+heading.text);
  assert.match(html,/aria-label="Recorrido visual: elegir, preparar y entregar"/);
  assert.doesNotMatch(html,/id="ecosystem-title"/);
- assert.match(html,/>COMERCIO · TECNOLOGÍA · LOGÍSTICA<\/p>/);
+ assert.doesNotMatch(html,/>COMERCIO · TECNOLOGÍA · LOGÍSTICA<\/p>/);
+ assert.match(html,/id="hero-title"/);
  assert.match(html,/>UNA CONEXIÓN \/ TRES MOMENTOS</);
  for(const action of ["ELEGIR","PREPARAR","ENTREGAR"])
   assert.ok(html.includes("<h3>"+action+"</h3>"),"Missing clean action "+action);
