@@ -292,3 +292,15 @@
  .service,.v5-city-stage{border-radius:16px;}
  .v4-canvas-stamp{border-radius:10px;}
 }
+
+/* SCENE3D-01 — 3D main viewport experience with WebP fallback preserved. */
+.v6-three-controls [data-v6-camera],
+.v6-three-controls .v6-poster,
+.v6-three-controls button[hidden] {display:none!important}
+.v5-city-stage[data-v6-autostart="enabled"] .v6-enable-webgl {display:none!important}
+.v6-three-controls {display:flex;flex-wrap:wrap;gap:10px}
+.v6-three-controls .v63-tour,.v6-three-controls .v6-pause {flex:0 1 auto}
+@media(max-width:800px){
+ .v6-three-controls {display:flex;flex-wrap:wrap}
+ .v6-three-controls .v63-tour,.v6-three-controls .v6-pause{width:auto;min-width:145px;flex:1 1 145px}
+}
