@@ -1,22 +1,16 @@
-# DESSET Prime — PERF-01: carga crítica y prioridades de imágenes
+# DESSET Prime — PERF-01 · Diagnóstico de rendimiento y prioridad segura de imágenes
 
-**Base SHA:** `fcac31dafa51c80b6d03ab8569cb7cef211c3719`, PR #11. **Solo cambios de prioridades de descarga**, sin alterar ninguna imagen, uniforme, CTA, texto, CSS, JS de animación, WebGL, GLB ni dominio.
+**Base:** `fcac31dafa51c80b6d03ab8569cb7cef211c3719`, PR #11. Solo experimento en PR DRAFT; no publicación.
 
-## Hallazgo
-La portada tenía `loading=eager` / `fetchpriority=high` y su WebP móvil responsive, pero los recursos LCP se descubrían en la sección del hero, después de los estilos. Las tres fotografías del recorrido ya eran lazy, pero no tenían prioridad de red explícita.
+## Alcance inicial, resultados y decisiones
+1. **Precarga responsive para el LCP:** se ensayaron dos `link rel=preload` mutuamente excluyentes. A pesar de CI técnico PASS, Lighthouse móvil cayó **98→97** y LCP pasó de **2328,89 ms a 2407,87 ms**. No se acreditó mejora. **DESCARTADO Y RETIRADO DEL CÓDIGO.**
+2. **Diferir el póster 3D conceptual:** Lighthouse mantuvo ~98 con LCP **2329–2332 ms**, pero el control WebGL2 detectó que el póster visual no estaba disponible antes del opt-in. **NO-GO; REVERTIDO a eager.** No se relaja el contrato de recuperación del póster.
+3. **Priorizar correctamente las tres fotografías secundarias:** se conserva `picture` WebP independiente + SVG de respaldo + `loading=lazy`, con **`fetchpriority=low`** explícito en los tres `img`. No afecta CSS, escala, aspecto, imagen, texto ni interfaz. La portada mantiene alta prioridad y el póster 3D sus garantías preexistentes.
 
-## Cambio
-- Dos hints `rel=preload as=image` dentro del head, **excluyentes por media query**, apuntando exactamente a los dos WebP originales de portada. Móvil <=700px precarga su WebP 960px; desktop >=701px precarga el WebP de 1671px. Mantener sus MIME y URL sin query strings; no añadir imágenes nuevas ni duplicar descargas por usar URLs diferentes.
-- Las tres tarjetas WebP conservan su `picture` + SVG de respaldo + `loading=lazy`, y añaden `fetchpriority=low` a sus `img` de fallback efectivos.
-- El póster conceptual WebP bajo el hero pasa de `loading=eager` a `loading=lazy`, conservando `fetchpriority=low`. Su imagen y alt no cambian, y el motor 3D sigue estrictamente opt-in. La carga del póster cuando aparece en viewport se verifica en Chrome mediante sus dimensiones naturales.
-- Nada cambia en composición, resolución, calidad o tamaño de archivos, código 3D ni contenido institucional.
+## Aceptación
+- No se afirmará aceleración de LCP porque las mediciones de laboratorio no acreditaron ninguna.
+- Pruebas de contrato + Chromium confirman imagen responsive real, hero high/eager, **póster eager/low** y tres imágenes lazy/low. Control WebGL2 no puede fallar. Valores de LCP son laboratorio, no Core Web Vitals de campo.
+- Suite Node, análisis estático, carga 3 GLB WebGL2 fuente y `dist`, seguridad HTTP, compilación reproducible con hashes, cobertura instrumentada acotada, mutaciones dirigidas y Lighthouse.
+- Toda regresión visible, en tests, o en funcionalidad es NO-GO.
 
-## Pruebas y criterios
-- Unit tests: exactamente 2 pistas excluyentes delante de hojas CSS, rango idéntico al `picture`, 3 SVG/WebP intactos y prioridades correctamente declaradas.
-- Chrome instrumentado desktop, tablet, móvil y modo reducido: exactamente **una pista activa por viewport**, `currentSrc` correspondiente, hero alta prioridad y 3 tarjetas lazy/low.
-- Build `dist/` determinista con SHA-256, static gate, seguridad HTTP, 3 GLB y WebGL2, CI completa, Lighthouse móvil/escritorio comparado con **baseline PR11** (móvil laboratorio 98, LCP 2328,89 ms, CLS0; escritorio 100, LCP 725,67 ms). No reclamar aceleración real sin medición comparable.
-- Primera iteración (solo preload + tarjetas low) fue técnicamente PASS pero **no mejoró** el laboratorio: móvil 97 / LCP 2407,87 ms, escritorio 100 / LCP 726,76 ms. Por ello se añade la carga diferida del póster 3D e instrumentación real de su recuperación al hacer scroll. Un segundo PASS sin mejora demostrable no autoriza integración.
-- Si hay duplicación de solicitudes, peor puntuación o regresión visual, corregir o descartar antes de integrar.
-- Mutation smoke dirigido, cobertura instrumentada de alcance declarado, reproducibilidad y deuda técnica documentados. Lighthouse local no implica rendimiento real en teléfonos físicos.
-
-**Control:** PR DRAFT / NO MERGE / NO DEPLOY / NO RELEASE / NO DNS / NO CLOUDFLARE. Ningún cambio a `desset.lat`. Incorporar solo por autorización futura de SHA.
+**GOBIERNO:** DRAFT / NO MERGE / NO AUTO-MERGE / NO DEPLOY / NO RELEASE / NO DNS / NO CLOUDFLARE. Los binarios de las imágenes, el motor 3D, el logotipo, la portada y `desset.lat` permanecen intactos.
