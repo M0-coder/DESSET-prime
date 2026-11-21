@@ -64,6 +64,25 @@ jobs:
           node --check scripts/prime-manual-cutover-package.mjs
           node --test tests/prime-manual-cutover-gate.test.mjs tests/prime-manual-cutover-package.test.mjs tests/prime-manual-release-workflow.test.mjs tests/verify-prime-manual-package.test.mjs
           test -z "$(git diff --name-only)"
+      - name: Rebuild Prime independently in two fresh source trees (NO DEPLOY)
+        run: |
+          set -euo pipefail
+          for n in A B; do
+            work="$RUNNER_TEMP/prime-repro-$n"
+            mkdir -p "$work"
+            git archive --format=tar HEAD | tar -xf - -C "$work"
+            (
+              cd "$work"
+              npm ci --ignore-scripts --no-audit --no-fund
+              npm run build:site
+              npm run verify:site
+              node scripts/prime-rights-license-audit.mjs "$work/dist"
+            )
+          done
+          cmp "$RUNNER_TEMP/prime-repro-A/dist/site-manifest.json" "$RUNNER_TEMP/prime-repro-B/dist/site-manifest.json"
+          cmp "$GITHUB_WORKSPACE/dist/site-manifest.json" "$RUNNER_TEMP/prime-repro-A/dist/site-manifest.json"
+          echo "sha256: $(sha256sum "$RUNNER_TEMP/prime-repro-A/dist/site-manifest.json" | cut -d' ' -f1)" > "$RUNNER_TEMP/prime-two-independent-builds.txt"
+          printf 'base_commit: %s\nsource_trees: 2\nclean_installations: 2\ncompilations: 2\ncomparison: byte-identical source manifests\nstatus: PASS\nrelease_authorized: false\n' "$(git rev-parse HEAD)" >> "$RUNNER_TEMP/prime-two-independent-builds.txt"
       - name: Archive offline ownership, license and SPDX evidence (NO release authority)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -72,6 +91,7 @@ jobs:
             ${{ runner.temp }}/prime-rights-and-sbom.json
             ${{ runner.temp }}/prime-npm-sbom.spdx.json
             ${{ runner.temp }}/prime-channel-readiness.json
+            ${{ runner.temp }}/prime-two-independent-builds.txt
           if-no-files-found: error
           retention-days: 14
 
