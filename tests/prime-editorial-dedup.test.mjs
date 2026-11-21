@@ -4,7 +4,7 @@ import {readFileSync} from "node:fs";
 
 const read=(name)=>readFileSync(new URL("../"+name,import.meta.url),"utf8");
 const html=read("index.html");
-const css=["styles.css","styles-system.css","styles-visual02.css"].map(read).join("\n");
+const css=["styles.css","styles-system.css","styles-hero-photo.css","styles-visual02.css"].map(read).join("\n");
 const cinematic=read("scripts/v5-cinematic.js");
 const motion=read("scripts/motion.js");
 
@@ -58,8 +58,8 @@ test("Removal preserves real visual service, mobile imagery, GPU scene, honest a
 });
 
 test("Dead styles were deleted rather than turned into display:none",()=>{
-  for(const file of ["index.html","styles.css","styles-system.css","styles-visual02.css"])
-    assert.doesNotMatch(read(file),/\.(?:trust-ledger(?:-[\w-]+)?|statement-side|statement-symbol|text-cta|section-head|ecosystem-footnote)\b/);
+  for(const file of ["index.html","styles.css","styles-system.css","styles-hero-photo.css","styles-visual02.css"])
+    assert.doesNotMatch(read(file),/\.(?:trust-ledger(?:-[\w-]+)?|statement-side|statement-symbol|text-cta|section-head|ecosystem-footnote|hero-secondary)\b/);
   assert.match(css,/\.statement-body\{display:grid;grid-template-columns:minmax\(0,1fr\)/);
   assert.doesNotMatch(css,/\.trust-ledger[^\n]*display:none/);
 });
