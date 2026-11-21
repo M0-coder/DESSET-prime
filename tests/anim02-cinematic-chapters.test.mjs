@@ -26,7 +26,8 @@ test("ANIM-02 filmed entrance stages typography and approved photographic frame 
  assert.doesNotMatch(css,/@import\b|url\(\s*['"]?https?:/i);
 });
 test("ANIM-02 chapters use progressive one-time observers without timers or auto WebGL",()=>{
- assert.match(motion,/\.statement-side, \.solutions-grid \.service--main, \.business-pitch,/);
+ assert.match(motion,/\.solutions-grid \.service--main, \.business-pitch,/);
+ assert.doesNotMatch(motion,/\.statement-side|\.section-head/);
  assert.match(motion,/instance\.unobserve\(entry\.target\)/);
  assert.match(motion,/root\.dataset\.anim02="cinematic-chapters"/);
  assert.match(motion,/root\.dataset\.motionDirection="editorial-cinematic-v1"/);
