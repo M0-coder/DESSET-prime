@@ -17,7 +17,7 @@ test("V6.5 page opens with original high-quality WebP on all devices",()=>{
  assert.match(css,/\[data-v6-state="active"\] \.v6-three-mount/);
  assert.match(entry,/if\(threeStart\)threeStart.hidden=false/);
  assert.doesNotMatch(entry,/trigger3D\.observe/);
- assert.match(gpu,/Desktop keeps cinematic render until explicit Three\.js opt-in/);
+ assert.match(gpu,/Desktop loads WebGL without a user click/);
 });
 test("V6.5 GLB boot is transactional and scene becomes visible only after a GPU frame",()=>{
  assert.match(glb,/Promise\.allSettled\(tasks\)/);
