@@ -95,11 +95,32 @@ async function viewport(width,height,reduce=false){
   serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
   storyTitle:parseFloat(getComputedStyle(document.querySelector(".motion-story-unit h3")).fontSize)
  };
- return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+
+  const style=selector=>getComputedStyle(document.querySelector(selector));
+  const palette={
+   rootYellow:style(":root").getPropertyValue("--yellow").trim().toUpperCase(),
+   stageYellow:style("#ecosistema").getPropertyValue("--yellow").trim().toUpperCase(),
+   stageDesignGold:style("#ecosistema").getPropertyValue("--ds-10-gold").trim().toUpperCase(),
+   stageVisualGold:style("#ecosistema").getPropertyValue("--v02-gold").trim().toUpperCase(),
+   heroCTA:style("#inicio .hero-cta").backgroundColor,
+   businessCTA:style("#negocios .business-pitch-cta").backgroundColor,
+   statementAccent:style("#vision h2 span").color,
+   stageSummaryArrow:style("#ecosistema .v4-architecture-details summary span").color,
+   threeTourButton:style("#ecosistema .v63-tour").backgroundColor
+  };
+ return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,palette,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
   if(diag.disclosures.technical!==false||diag.disclosures.future!==false)fails.push("Freshly navigated page must start with both native disclosures CLOSED: "+JSON.stringify(diag.disclosures));
+  const expectedLime="rgb(205, 252, 138)",expected3d="rgb(255, 198, 47)";
+  const palette=diag.palette;
+  if(palette.rootYellow!=="#CDFC8A"||palette.stageYellow!=="#FFC62F"||
+   palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
+   palette.heroCTA!==expectedLime||palette.businessCTA!==expectedLime||
+   palette.statementAccent!==expectedLime||palette.stageSummaryArrow!==expected3d||
+   palette.threeTourButton!==expected3d)
+   fails.push("PRIME-COLOR-01: institutional lime or 3D gold isolation failed: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
