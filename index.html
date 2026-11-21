@@ -101,27 +101,19 @@
       <div class="ecosystem-board v4-flow-board">
         <figure class="v5-city-stage" aria-label="Renderización gráfica conceptual de DESSET">
           <div class="v5-stage-world">
-            <picture class="v5-responsive-art">
-              <source media="(max-width: 430px)" type="image/webp" srcset="./assets/v5-cinematic-mobile.webp" width="1024" height="1536">
-              <source media="(max-width: 430px)" type="image/svg+xml" srcset="./assets/v5-logistics-mobile.svg" width="390" height="560">
-              <source media="(min-width: 431px)" type="image/webp" srcset="./assets/v5-cinematic-desktop.webp" width="1752" height="897">
-              <img class="v5-stage-render" src="./assets/v5-logistics-scene.svg" width="1200" height="560" decoding="async" loading="eager" fetchpriority="low" alt="Escena conceptual tridimensional: un comercio, un paquete y un repartidor conectados con un destino mediante una ruta iluminada. Es una representación artística, no una operación real.">
-            </picture>
+            <div class="v6-static-fallback" aria-label="Recorrido conceptual de DESSET sin visualización WebGL">
+              <span class="v6-static-fallback__eyebrow">ECOSISTEMA DESSET</span>
+              <strong class="v6-static-fallback__headline">COMERCIO · REPARTO · DESTINO</strong>
+              <p class="v6-static-fallback__note">Representación conceptual de una conexión logística. No corresponde a pedidos ni entregas activas.</p>
+            </div>
             <div class="v6-three-mount" aria-hidden="true"></div>
-            <span class="v5-stage-scan" aria-hidden="true"></span>
-            <span class="v5-stage-legend">UNA CONEXIÓN / TRES MOMENTOS</span>
           </div>
           <div class="v6-three-toolbar">
             <span class="v65-load-status" role="status" aria-live="polite" aria-atomic="true" hidden>Preparando escena tridimensional…</span>
             <button class="v6-enable-webgl" type="button" hidden>Explorar escena 3D interactiva</button>
             <div class="v6-three-controls" role="group" aria-label="Acciones del recorrido tridimensional" hidden>
-              <button type="button" hidden data-v6-camera="overview" aria-pressed="true">Vista general</button>
-              <button type="button" hidden data-v6-camera="commerce" aria-pressed="false">Comercio</button>
-              <button type="button" hidden data-v6-camera="courier" aria-pressed="false">Repartidor</button>
-              <button type="button" hidden data-v6-camera="destination" aria-pressed="false">Destino</button>
               <button class="v63-tour" type="button" aria-pressed="false">Ver recorrido 3D</button>
               <button class="v6-pause" type="button">Pausar movimiento</button>
-              <button class="v6-poster" type="button" hidden>Volver a imagen</button>
             </div>
             <div class="v63-story" role="status" aria-live="polite" aria-atomic="true" hidden>
               <strong class="v63-story-title">Recorrido conceptual de DESSET</strong>

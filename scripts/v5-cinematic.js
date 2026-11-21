@@ -15,7 +15,7 @@
   }
   if(reduced || typeof window.IntersectionObserver!=="function"){
     root.dataset.v5Mode=reduced?"reduced":"static";
-    // Static poster remains accessible when reduced motion or IntersectionObserver is unavailable.
+    // Text-only fallback remains readable without motion, JavaScript, or IntersectionObserver.
     return;
   }
 
@@ -34,7 +34,7 @@
 
   // Automatically load the actual 3D scene shortly before entering the viewport.
   const threeStart=stage.querySelector(".v6-enable-webgl");
-  // WebP is only a temporary loading/failure fallback, not the main visual.
+  // Accessible image-free text stays visible while WebGL loads or when it is unsupported.
   if(threeStart)threeStart.hidden=false;
   const loadStatus=stage.querySelector(".v65-load-status");
   let webglRequested=false;
@@ -84,7 +84,7 @@
   };
   threeStart?.addEventListener("click",loadThree);
   // No GPU probe on initial paint and no scroll listeners; observer fires when
-  // the section is actually visible. Lower-end devices keep a useful still.
+  // the section is actually visible. Lower-end devices retain accessible static text.
   const canAutoStart=()=>navigator.connection?.saveData!==true&&
     (typeof navigator.deviceMemory!=="number"||navigator.deviceMemory>=4);
   const auto3D=canAutoStart();

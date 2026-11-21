@@ -30,7 +30,7 @@ export function checkAssetRightsAndLicenses({
    !register.assets.some(a=>a.path===register.excluded_generated_asset),
    'Three.js bundle is mixed proprietary/third-party code, not a solely owned visual asset');
  const expected=new Map();
- requireSafe(Array.isArray(register.assets)&&register.assets.length===18,'original media count changed');
+ requireSafe(Array.isArray(register.assets)&&register.assets.length===14,'original media count changed');
  for(const a of register.assets){
   requireSafe(isMedia(a.path)&&/^[a-f0-9]{64}$/.test(a.sha256)&&a.claim==='owner-declared'&&
     !expected.has(a.path),'invalid or duplicated declared media');
@@ -47,7 +47,7 @@ export function checkAssetRightsAndLicenses({
   requireSafe(bytes.length===entry.bytes&&hash(bytes)===entry.sha256,'modified original media bytes: '+entry.path);
   verified.push({path:entry.path,bytes:entry.bytes,sha256:entry.sha256,claim:'owner-declared'});
  }
- requireSafe(verified.length===18&&verified.every(x=>expected.has(x.path)),'incomplete ownership registry');
+ requireSafe(verified.length===14&&verified.every(x=>expected.has(x.path)),'incomplete ownership registry');
  // SPDX/license metadata is derived from the reproducible npm lock, not from the owner assertion.
  requireSafe(lock.lockfileVersion===3&&pkg.dependencies?.three==='0.187.0'&&
    pkg.devDependencies?.esbuild==='0.28.2','unreviewed package versions');

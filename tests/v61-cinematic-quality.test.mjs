@@ -38,8 +38,8 @@ test("V6.1 motion and disposal remain finite and progressively enhanced",()=>{
 test("CI proves actual triangle rendering, expensive features desktop-only and poster recovery",()=>{
  for(const name of ["V6.1 real GPU shadows and painted sign textures","V6.1 desktop geometry and draw call budgets",
   "Mobile suppresses expensive shadow maps but keeps 3D materials","Pause stops the WebGL animation loop",
-  "Poster frees GPU canvas and restores accessible fallback",
-  "WebGL scene reopens cleanly without duplicate canvas"]){
+  "Removed hidden manual camera buttons",
+  "WebGL retains one canvas after pause/resume"]){
   assert.ok(gpu.includes(name),"Missing GPU browser check: "+name);
  }
  assert.match(ci,/node scripts\/v6-gpu-browser-audit\.mjs/);

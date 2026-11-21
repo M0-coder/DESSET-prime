@@ -2,9 +2,9 @@
   "schema": "desset-prime-original-assets-v1",
   "source_repository": "M0-coder/DESSET-prime",
   "assertion": {
-    "scope": "original visual brand materials only",
+    "scope": "original visual brand materials actually included in Prime's current production candidate",
     "status": "owner-declared",
-    "statement": "El responsable del proyecto declara que todos los activos originales de DESSET Prime pertenecen a su proyecto.",
+    "statement": "El responsable del proyecto declara que los activos originales actualmente utilizados por DESSET Prime pertenecen al proyecto. Los cuatro antiguos pósteres V5 se excluyeron por no formar parte del diseño 3D.",
     "as_of": "2026-11-20",
     "external_chain_of_title": "not_attached",
     "legal_entity_transfer": "not_established_by_this_register",
@@ -76,30 +76,6 @@
     {
       "path": "assets/scene-prepare.webp",
       "sha256": "df910bf70b1c1ee10eb359e5eea61d42c91d3d00312c70150ba85a828648189c",
-      "claim": "owner-declared",
-      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
-    },
-    {
-      "path": "assets/v5-cinematic-desktop.webp",
-      "sha256": "474f755562617e230f864306d91ed641f96d3bcf58c7757618209c5dd584ec39",
-      "claim": "owner-declared",
-      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
-    },
-    {
-      "path": "assets/v5-cinematic-mobile.webp",
-      "sha256": "4acb78bf2e97f6ee3647cc8b54368d80d6cf5ee730ad1e976c8be77da7fcb5cc",
-      "claim": "owner-declared",
-      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
-    },
-    {
-      "path": "assets/v5-logistics-mobile.svg",
-      "sha256": "39dc7c6c1e7ddced67b883a0b77d7b0fb832b5a2394c50b5c5cbd63a9f50748a",
-      "claim": "owner-declared",
-      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
-    },
-    {
-      "path": "assets/v5-logistics-scene.svg",
-      "sha256": "ddcdf14df019216548d1d00594bda5a3e8222dabeee76e5409f98a8e2b13de47",
       "claim": "owner-declared",
       "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
     },

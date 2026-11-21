@@ -635,8 +635,6 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
 }
 
 /* ANIM-01: game-like scan/glint suppressed; documentary/editorial composition retained. */
-.v5-hero-refraction .v5-glint,.v5-city-stage .v5-stage-scan{display:none}
-.v5-hero-refraction{transform:none!important;transition:none!important}
 
 /* The five owner-declared networks share ONE action rail, not a privileged Instagram tile. */
 #contacto .contact-bottom--rc {display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:stretch;}

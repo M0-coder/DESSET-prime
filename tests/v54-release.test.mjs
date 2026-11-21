@@ -29,7 +29,7 @@ test("V5.4 local HTTP DAST smoke is restricted and cannot become a public server
  assert.match(audit,/const host="http:\/\/127\.0\.0\.1:4173"/);
  assert.match(server,/const host="127\.0\.0\.1"/);
  for(const expected of ["x-robots-tag","content-security-policy","x-content-type-options",
-    "forbidden route","post rejected","head webp asset"])assert.ok(audit.toLowerCase().includes(expected));
+    "forbidden route","post rejected","head original 3d glb asset"])assert.ok(audit.toLowerCase().includes(expected));
  assert.match(audit,/reports\/quality/);
  assert.match(audit,/if\(failures\.length\)/);
  assert.doesNotMatch(audit,/http:\/\/(?:0\.0\.0\.0|localhost\.localdomain)|https:\/\/desset\.lat/);

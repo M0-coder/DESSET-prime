@@ -18,13 +18,13 @@ test("SCENE3D-01 automatic scene uses viewport intersection, not page-start down
  assert.match(loader,/script\.onerror=/);
 });
 test("SCENE3D-01 hides redundant controls and retains functional route/pause/fallback",()=>{
- assert.equal((html.match(/<button type="button" hidden data-v6-camera=/g)||[]).length,4);
- assert.match(html,/class="v6-poster" type="button" hidden/);
+ assert.doesNotMatch(html,/data-v6-camera=/);
+ assert.doesNotMatch(html,/class="v6-poster"/);
  assert.match(html,/class="v63-tour" type="button"/);
  assert.match(html,/class="v6-pause" type="button"/);
- assert.match(css,/\.v6-three-controls \[data-v6-camera\]/);
+ assert.doesNotMatch(css,/\.v6-three-controls \[data-v6-camera/);
  assert.match(css,/\.v5-city-stage\[data-v6-autostart="enabled"\] \.v6-enable-webgl/);
- assert.match(html,/class="v5-stage-render"/);
+ assert.match(html,/class="v6-static-fallback"/);
  assert.match(html,/aria-label="Renderización gráfica conceptual de DESSET"/);
  assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
  assert.doesNotMatch(html,/v5-stage-caption|motion-story-bridge/);

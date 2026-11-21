@@ -15,12 +15,13 @@ function copyDist(t){
  const temp=mkdtempSync(join(tmpdir(),'prime-asset-audit-test-'));t.after(()=>rmSync(temp,{recursive:true,force:true}));
  const copy=join(temp,'dist');cpSync(dist,copy,{recursive:true});return copy;
 }
-test('18 owner-declared original media are individually SHA-256 verified',()=>{
+test('14 owner-declared active original media are individually SHA-256 verified',()=>{
  const r=checkAssetRightsAndLicenses(opts);
- assert.equal(r.outcome,'PASS');assert.equal(r.assets_checked,18);
+ assert.equal(r.outcome,'PASS');assert.equal(r.assets_checked,14);
  assert.equal(r.legal_title_independently_verified,false);
  assert.equal(r.publication_authorized,false);assert.equal(r.release_decision,'NO-GO');
  assert.ok(r.assets.every(a=>a.claim==='owner-declared'&&a.sha256.length===64));
+ assert.ok(!r.assets.some(a=>/v5-(?:cinematic|logistics)/.test(a.path)),'Orphan 2D poster must not be part of release assets');
 });
 test('licenses preserve the distinction between original DESSET media and third party',()=>{
  const r=checkAssetRightsAndLicenses(opts);

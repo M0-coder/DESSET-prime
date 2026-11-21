@@ -2,7 +2,6 @@
 import {readFileSync,existsSync,statSync,mkdirSync,writeFileSync} from "node:fs";
 import {resolve} from "node:path";
 import {fileURLToPath} from "node:url";
-import {createHash} from "node:crypto";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const read=p=>readFileSync(resolve(root,p),"utf8");
 const html=read("index.html");
@@ -38,22 +37,17 @@ for(const [i,s] of js.entries()){
 }
 assert(styles.every(s=>!/@import\b|url\(\s*['"]?https?:/i.test(s)),"Remote CSS dependency");
 assert(!/\b(?:pages:\s*write|id-token:\s*write)\b/.test(read(".github/workflows/preview-checks.yml")),"CI write token permission");
-const budget={html_bytes:35000,v5_css_bytes:16000,system_css_bytes:9000,hero_css_bytes:9500,visual02_css_bytes:5200,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000,desktop_webp_bytes:220000,mobile_webp_bytes:270000};
+const budget={html_bytes:35000,v5_css_bytes:16000,system_css_bytes:9000,hero_css_bytes:9500,visual02_css_bytes:5200,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000};
 const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
  v5_css_bytes:statSync(resolve(root,"styles-v5.css")).size,
  system_css_bytes:statSync(resolve(root,"styles-system.css")).size,
  hero_css_bytes:statSync(resolve(root,"styles-hero-photo.css")).size,
  visual02_css_bytes:statSync(resolve(root,"styles-visual02.css")).size,
  hero_webp_bytes:statSync(resolve(root,"assets/desset-hero-entrega-dos-espejos.webp")).size,
- mobile_hero_webp_bytes:statSync(resolve(root,"assets/desset-hero-entrega-mobile.webp")).size,
- desktop_webp_bytes:statSync(resolve(root,"assets/v5-cinematic-desktop.webp")).size,
- mobile_webp_bytes:statSync(resolve(root,"assets/v5-cinematic-mobile.webp")).size};
+ mobile_hero_webp_bytes:statSync(resolve(root,"assets/desset-hero-entrega-mobile.webp")).size};
 for(const [name,size]of Object.entries(sizes))assert(size<=budget[name],name+" exceeds budget");
-const hashes=Object.fromEntries(["assets/v5-cinematic-desktop.webp","assets/v5-cinematic-mobile.webp"]
- .map(x=>[x,createHash("sha256").update(readFileSync(resolve(root,x))).digest("hex")]));
-if(sizes.desktop_webp_bytes+sizes.mobile_webp_bytes>480000)warnings.push("Combined render payload exceeds 480 KB");
 const report={schema:"desset-v5.3-static-gate-v1",checks:"resource allowlist; CSP; no external JS/CSS; noindex; anchors; no deploy; byte budgets",
- assets_checked:[...localSet].sort(),sizes,hashes,warnings,issues,
+ assets_checked:[...localSet].sort(),sizes,warnings,issues,
  limitations:"Source scanner only; not a replacement for SAST, SCA, penetration testing or HTTP production validation."};
 mkdirSync(resolve(root,"reports/quality"),{recursive:true});
 writeFileSync(resolve(root,"reports/quality/static.json"),JSON.stringify(report,null,2)+"\n");

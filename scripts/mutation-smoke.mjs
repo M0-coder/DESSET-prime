@@ -7,14 +7,12 @@ import {fileURLToPath} from "node:url";
 import {spawnSync} from "node:child_process";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const files=[
- "index.html","styles-v5.css","scripts/v5-cinematic.js",
- "assets/v5-logistics-scene.svg","assets/v5-logistics-mobile.svg",
- "assets/v5-cinematic-desktop.webp","assets/v5-cinematic-mobile.webp",
+ "index.html","styles-v5.css","scripts/v5-cinematic.js","scripts/v6-three.src.mjs",
  ".github/workflows/preview-checks.yml","tests/v5-cinematic.test.mjs"];
 const mutants=[
  {name:"noindex removed",file:"index.html",before:'<meta name="robots" content="noindex,nofollow">',after:'<meta name="robots" content="index,follow">'},
- {name:"mobile render source removed",file:"index.html",before:'srcset="./assets/v5-cinematic-mobile.webp"',after:'srcset="./assets/v5-absent-mobile.webp"'},
- {name:"reduced motion disabled",file:"styles-v5.css",before:'@media(prefers-reduced-motion:reduce) {\n .v5-hero-refraction',after:'@media(prefers-reduced-motion:none) {\n .v5-hero-refraction'},
+ {name:"image-free fallback removed",file:"index.html",before:'class="v6-static-fallback"',after:'class="v6-static-fallback-removed"'},
+ {name:"reduced motion disabled",file:"styles-v5.css",before:'@media(prefers-reduced-motion:reduce) {\n .v5-contact-light',after:'@media(prefers-reduced-motion:none) {\n .v5-contact-light'},
  {name:"remote script injected",file:"index.html",before:'</head>',after:'<script src="https://untrusted.example/remote.js"></script></head>'}
 ];
 const temp=mkdtempSync(join(tmpdir(),"desset-v53-mutation-"));

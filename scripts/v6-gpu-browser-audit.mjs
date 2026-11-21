@@ -85,13 +85,13 @@ try{
  await send("Page.enable");await send("Runtime.enable");
  await viewport(1440,900);
  await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
- const desktopInitial=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),poster:document.querySelector(".v5-stage-render")?.complete,trigger:document.querySelector(".v6-enable-webgl")?.hidden}))()');
- check("Desktop keeps WebP while the real scene is preparing",desktopInitial.poster,{desktopInitial});
+ const desktopInitial=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),fallback:!!document.querySelector(".v6-static-fallback"),trigger:document.querySelector(".v6-enable-webgl")?.hidden}))()');
+ check("Desktop provides accessible image-free fallback before GPU initialization",desktopInitial.fallback,{desktopInitial});
   const autoDesktop=await waitUntil("desktop automatic WebGL request",async()=>evalJS('!![...document.scripts].find(s=>s.src.includes("v6-three.bundle"))'),8000);
   check("Desktop loads WebGL without a user click",autoDesktop);
- const desktopEarly=await evalJS('(()=>{const e=document.querySelector(".v5-city-stage"),p=window.__dessetV6Probe?.();return {state:e.dataset.v6State,glbLoaded:p?.glbLoaded||0,posterOpacity:getComputedStyle(e.querySelector(".v5-responsive-art")).opacity}})()');
+ const desktopEarly=await evalJS('(()=>{const e=document.querySelector(".v5-city-stage"),p=window.__dessetV6Probe?.(),fallback=e.querySelector(".v6-static-fallback");return {state:e.dataset.v6State,glbLoaded:p?.glbLoaded||0,fallbackVisible:getComputedStyle(fallback).visibility!=="hidden"}})()');
  check("No premature WebGL reveal before all three GLBs load",
-   desktopEarly.state!=="active"?(desktopEarly.posterOpacity!=="0"):desktopEarly.glbLoaded===3,
+   desktopEarly.state!=="active"?desktopEarly.fallbackVisible:desktopEarly.glbLoaded===3,
    {desktopEarly});
  const desktop=await waitUntil("desktop real GPU",async()=>evalJS('(()=>{const e=document.querySelector(".v5-city-stage"),p=window.__dessetV6Probe?.();return e.dataset.v6State==="active"&&p?.triangles>0&&p?.frames>2?p:null})()'),15000);
  check("Desktop WebGL2 real draw calls",desktop.webgl&&desktop.triangles>100&&desktop.drawCalls>0,{desktop});
@@ -102,12 +102,7 @@ try{
  check("V6.1 real GPU shadows and painted sign textures",desktop.shadows===true&&desktop.textureCount>=2&&desktop.cinematic==="v6.2",{shadows:desktop.shadows,textures:desktop.textureCount,cinematic:desktop.cinematic});
  check("V6.1 desktop geometry and draw call budgets",desktop.geometryCount>35&&desktop.geometryCount<180&&desktop.drawCalls<160,{geometryCount:desktop.geometryCount,drawCalls:desktop.drawCalls});
  await screenshot("desktop-three-webgl.png");
- await evalJS('document.querySelector("[data-v6-camera=commerce]").click()');
- const commerce=await waitUntil("desktop commerce camera",async()=>evalJS('window.__dessetV6Probe?.().currentView==="commerce"'));
- check("Camera views are interactive",Boolean(commerce));
- await evalJS('document.querySelector("[data-v6-camera=destination]").click()');
- const destination=await waitUntil("desktop destination camera",async()=>evalJS('window.__dessetV6Probe?.().currentView==="destination"'));
- check("Camera destination works",Boolean(destination));
+ check("Removed hidden manual camera buttons",!(await evalJS('!!document.querySelector("[data-v6-camera], .v6-poster")')));
 
  // V6.3: validate the real browser interaction, not only the storyboard source.
  await evalJS('document.querySelector(".v63-tour").click()');
@@ -126,11 +121,9 @@ try{
  await evalJS('document.querySelector(".v6-pause").click()');
  const resumed=await waitUntil("tour resumes",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.tourSeconds>'+String(frozen+.07)+'?p:null})()'),5000);
  check("V6.3 tour resumes without restarting from zero",resumed.tourSeconds>frozen,{resumed:resumed.tourSeconds});
- await evalJS('document.querySelector("[data-v6-camera=courier]").click()');
- const manualCourier=await evalJS('(()=>({p:window.__dessetV6Probe?.(),hidden:document.querySelector(".v63-story").hidden,pressed:document.querySelector(".v63-tour").getAttribute("aria-pressed")}))()');
- check("V6.3 manual rider camera cancels autoplay and hides story",
-   manualCourier.p.currentView==="courier"&&!manualCourier.p.tourActive&&manualCourier.hidden&&manualCourier.pressed==="false",
-   {camera:manualCourier.p.currentView,active:manualCourier.p.tourActive});
+ await evalJS('document.querySelector(".v63-tour").click()');
+ const stoppedTour=await evalJS('(()=>({p:window.__dessetV6Probe?.(),hidden:document.querySelector(".v63-story").hidden,pressed:document.querySelector(".v63-tour").getAttribute("aria-pressed")}))()');
+ check("V6.3 tour button cancels autoplay and restores overview",stoppedTour.p.currentView==="overview"&&!stoppedTour.p.tourActive&&stoppedTour.hidden&&stoppedTour.pressed==="false",{camera:stoppedTour.p.currentView});
  
  await viewport(390,844);
  const initialMobile=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),button:document.querySelector(".v6-enable-webgl")?.hidden,state:document.querySelector(".v5-city-stage").dataset.v6State}))()');
@@ -164,12 +157,7 @@ try{
  await evalJS('document.querySelector(".v6-pause").click()');
  await waitUntil("WebGL resumes",async()=>evalJS('window.__dessetV6Probe?.().frames > '+pausedAfter),5000);
  check("Resume restarts WebGL frame delivery",true);
- await evalJS('document.querySelector(".v6-poster").click()');
- const poster=await evalJS('(()=>{const e=document.querySelector(".v5-city-stage");return {state:e.dataset.v6State,canvases:e.querySelectorAll(".v6-three-mount canvas").length,reopen:!e.querySelector(".v6-enable-webgl").hidden,controls:e.querySelector(".v6-three-controls").hidden}})()');
- check("Poster frees GPU canvas and restores accessible fallback",poster.state==="poster"&&poster.canvases===0&&poster.reopen&&poster.controls,{poster});
- await evalJS('document.querySelector(".v6-enable-webgl").click()');
- const reopened=await waitUntil("WebGL reopened after poster",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.triangles>100&&p?.domCanvas===1?p:null})()'),15000);
- check("WebGL scene reopens cleanly without duplicate canvas",reopened.domCanvas===1&&reopened.triangles>100,{reopened});
+ check("WebGL retains one canvas after pause/resume",(await evalJS('document.querySelectorAll(".v6-three-mount canvas").length'))===1);
 
  // The duplicate hero 3D CTA was deleted; the real section auto-starts
  // WebGL2 on viewport entry and keeps an explicit guided-tour control.
@@ -188,8 +176,8 @@ try{
  // with cheaper shaders but the same three original GLBs in frame.
  await viewport(768,1024);
  await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
- const tabletPoster=await evalJS('(()=>({stage:document.querySelector(".v5-city-stage"),trigger:document.querySelector(".v6-enable-webgl").hidden,script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle"))}))()');
- check("Tablet retains fallback until automatic 3D loads",!!tabletPoster.stage,{tabletPoster});
+ const tabletFallback=await evalJS('(()=>({stage:document.querySelector(".v5-city-stage"),staticText:!!document.querySelector(".v6-static-fallback"),script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle"))}))()');
+ check("Tablet keeps accessible text while GPU loads",!!tabletFallback.stage&&tabletFallback.staticText,{tabletFallback});
   const autoTablet=await waitUntil("tablet automatic WebGL request",async()=>evalJS('!![...document.scripts].find(s=>s.src.includes("v6-three.bundle"))'),8000);
   check("Tablet scene loads automatically",autoTablet);
  const tablet=await waitUntil("three GLB models render in 768px layout",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3&&p.frames>2?p:null})()'),17000);
@@ -198,14 +186,14 @@ try{
  check("Tablet camera fits all three GLB models within the landscape frame",tabletFramed,{bounds:tablet.objectBounds});
  await screenshot("tablet-768-three-webgl.png");
  await send("Emulation.setDeviceMetricsOverride",{width:1024,height:800,deviceScaleFactor:1,mobile:false});
- await waitUntil("responsive breakpoint restores poster",async()=>evalJS('document.querySelector(".v5-city-stage")?.dataset.v6State==="poster"'),4000);
+ await waitUntil("responsive breakpoint restores text fallback",async()=>evalJS('document.querySelector(".v5-city-stage")?.dataset.v6State==="fallback"'),4000);
  const rotated=await evalJS('(()=>{const stage=document.querySelector(".v5-city-stage");return {canvas:stage.querySelectorAll(".v6-three-mount canvas").length,trigger:stage.querySelector(".v6-enable-webgl").hidden}})()');
  check("Resize across quality breakpoint frees GPU and offers safe reopen",rotated.canvas===0&&rotated.trigger===false,{rotated});
 
  await viewport(390,844,true);
- const reduced=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),button:document.querySelector(".v6-enable-webgl")?.hidden,poster:!!document.querySelector(".v5-stage-render")}))()');
- check("Reduced-motion remains static and never loads WebGL",!reduced.script&&reduced.button===true&&reduced.poster,{reduced});
- await screenshot("mobile-reduced-poster.png");
+ const reduced=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),button:document.querySelector(".v6-enable-webgl")?.hidden,staticText:!!document.querySelector(".v6-static-fallback"),image:!!document.querySelector(".v5-responsive-art")}))()');
+ check("Reduced-motion uses accessible text, never deleted image",!reduced.script&&reduced.button===true&&reduced.staticText&&!reduced.image,{reduced});
+ await screenshot("mobile-reduced-static.png");
 }catch(e){failures.push(String(e.stack||e))}
 finally{
  server.kill("SIGTERM");

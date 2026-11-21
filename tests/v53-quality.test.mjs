@@ -37,7 +37,7 @@ test("V5.3 local Lighthouse is mandatory and failures trip conservative lab budg
  assert.match(lh,/not CrUX, field CWV/);
 });
 test("V5.3 mutation and static source controls declare constrained scope",()=>{
- for(const word of ["noindex removed","mobile render source removed","reduced motion disabled","remote script injected"])assert.ok(mutation.includes(word));
+ for(const word of ["noindex removed","image-free fallback removed","reduced motion disabled","remote script injected"])assert.ok(mutation.includes(word));
  assert.match(mutation,/Baseline V5 contract tests fail/);
  assert.match(mutation,/Only four deliberately selected V5 source mutations/);
  assert.match(staticGate,/Nonlocal DOM resource/);

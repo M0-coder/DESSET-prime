@@ -40,11 +40,10 @@ test("V6 remains self-hosted, reproducibly pinned and within byte budgets",()=>{
 test("V6 has real input controls, opt-in mobile loading and permanent poster fallback",()=>{
  assert.match(html,/class="v6-three-mount" aria-hidden="true"/);
  assert.match(html,/class="v6-three-controls" role="group"/);
- for(const view of ["overview","commerce","destination"])
-  assert.match(html,new RegExp('data-v6-camera="'+view+'"'));
+ assert.doesNotMatch(html,/data-v6-camera=/);
  assert.match(html,/class="v6-enable-webgl" type="button" hidden/);
  assert.match(html,/class="v6-pause"/);
- assert.match(html,/class="v6-poster"/);
+ assert.doesNotMatch(html,/class="v6-poster"/);
  assert.match(loader,/document\.createElement\("script"\)/);
  assert.match(loader,/\.\/assets\/v6-three\.bundle\.js/);
  assert.match(loader,/threeStart\?\.addEventListener\("click",loadThree\)/);
@@ -53,7 +52,7 @@ test("V6 has real input controls, opt-in mobile loading and permanent poster fal
  assert.match(gpu,/getContext\("webgl2"\)/);
  assert.match(gpu,/stage\.dataset\.v6State="active"/);
  assert.match(gpu,/stage\.dataset\.v6State=reason/);
- assert.match(css,/\.v5-city-stage\[data-v6-state="active"\] \.v5-responsive-art/);
+ assert.match(css,/\.v5-city-stage\[data-v6-state="active"\] \.v6-static-fallback/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
  assert.match(gpu,/document\.hidden\|\|!onscreen\|\|paused/);
  assert.match(gpu,/cancelAnimationFrame\(raf\)/);

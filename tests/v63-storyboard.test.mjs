@@ -58,7 +58,7 @@ test("V6.3 users control storyboard without tracking, CDNs or background timers"
  assert.match(app,/cancelTour\("complete"\)/);
  assert.match(app,/tourActive:storyActive/);
  assert.match(html,/class="v63-tour" type="button" aria-pressed="false"/);
- assert.match(html,/data-v6-camera="courier"/);
+ assert.match(app,/courier:\{pos:/);
  assert.match(html,/class="v63-story" role="status" aria-live="polite"/);
  assert.match(html,/class="v63-story-progress" max="100" value="0"/);
  assert.match(css,/\.v63-story\[hidden\]\{display:none!important;\}/);

@@ -37,7 +37,7 @@ require("Five DESSET social URLs match owner attestation",
  channels.unconfirmed_count===0&&channels.real_world_account_ownership_verified===false&&
  channels.technical_platform_admin_access_tested===false);
 require("Release deployment remains absent from Prime workflow",!/(?:wrangler\s+pages\s+deploy|\bvercel\s+deploy\b|\bpages:\s*write\b)/.test(text(".github/workflows/preview-checks.yml")));
-require("Current Prime is larger than historical packaging baseline",Object.keys(a).length===2&&statSync(resolve(root,"assets/v5-cinematic-desktop.webp")).size>0&&statSync(resolve(root,"assets/v5-cinematic-mobile.webp")).size>0);
+require("Prime source has no obsolete V5 poster assets",Object.keys(a).length===2&&html.includes('class="v6-static-fallback"')&&!html.includes("v5-cinematic-")&&statSync(resolve(root,"assets/desset-hero-entrega-dos-espejos.webp")).size>0);
 const report={schema:"desset-prime-v55-integration-parity-v1",snapshot_at_local:snap.captured_at_local,
 checks:test,failures:fails,source_scope:"Prime working branch, OFFLINE; official production data is a historic snapshot",
 unchanged_common_assets:Object.keys(a),official_deployment_snapshot:snap.official.observed_cloudflare,

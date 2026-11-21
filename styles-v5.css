@@ -2,32 +2,6 @@
    Source-preserving additive layer. No remote assets, layout traps or infinite loops. */
 :root { --v5-electric:#5F94FF; --v5-gold:#FFC62F; --v5-fire:#FF3328; }
 .hero[data-variant="v4"] .v4-motion-canvas { isolation:isolate; }
-.v5-hero-refraction {
-  position:absolute; inset:0; z-index:4; pointer-events:none;
-  overflow:hidden; transform:translate3d(var(--v5-x,0px),var(--v5-y,0px),0);
-  transition:transform .32s cubic-bezier(.19,.7,.3,1);
-}
-.v5-hero-refraction .v5-lens {
-  position:absolute; display:block; width:78%; aspect-ratio:1; border-radius:50%;
-  right:-30%; top:-30%; border:1px solid rgba(255,255,255,.35);
-  box-shadow:0 0 0 24px rgba(255,255,255,.03),0 0 60px rgba(255,198,47,.25) inset;
-  transform:rotate(-29deg) scaleX(.62);
-}
-.v5-hero-refraction .v5-lens--inner {
-  width:54%;right:-19%;top:-13%;border-color:rgba(255,198,47,.56);
-  box-shadow:0 0 0 12px rgba(255,198,47,.025),0 0 65px rgba(255,198,47,.13) inset;
-}
-.v5-hero-refraction .v5-glint {
-  position:absolute; top:0; left:8%; width:24%; height:165%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),rgba(255,255,255,.32),transparent);
-  transform:translate3d(-220%,-12%,0) rotate(22deg);
-  mix-blend-mode:screen;
-}
-.v5-hero-refraction .v5-depth-line {
-  position:absolute; left:10%;right:20%;bottom:20%;height:2px;
-  background:linear-gradient(90deg,transparent,#FFF7BE,transparent);
-  transform-origin:left;opacity:.72;
-}
 .v5-city-stage {
   position:relative; display:block; isolation:isolate; overflow:hidden;
   margin:8px 0 18px; width:100%; border:1px solid rgba(230,239,255,.28);
@@ -45,30 +19,15 @@
  transform-origin:left;opacity:.8;
 }
 .v5-stage-world { position:relative; aspect-ratio:1752/897; min-height:265px; overflow:hidden; }
-.v5-responsive-art {display:block;width:100%;height:100%;}
-.v5-stage-render {position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain;object-position:center;filter:saturate(1.06) contrast(1.035);}
-.v5-stage-scan {
- position:absolute;inset:-40% 0 auto 0;z-index:2;pointer-events:none;
- height:45%;background:linear-gradient(180deg,transparent,rgba(95,148,255,.11),transparent);
- transform:translate3d(0,-150%,0) skewY(-9deg);
-}
-.v5-stage-legend {
- position:absolute;left:clamp(14px,2.4vw,29px);bottom:clamp(11px,2vw,24px);
- z-index:5;display:inline-flex;align-items:center;gap:10px;
- padding:10px 13px;border:1px solid rgba(247,245,238,.31);
- background:rgba(11,14,25,.77);color:#F7F5EE;
- font-size:clamp(10px,.9vw,13px);font-weight:750;letter-spacing:.04em;
- backdrop-filter:blur(8px);
-}
-.v5-stage-legend:before {content:"";width:9px;height:9px;background:#FFC62F;transform:rotate(45deg);flex:none;}
+/* This image-free, accessible fallback is visible without WebGL or with reduced motion.
+   WebGL hides it only after a verified GPU frame has been drawn. */
+.v6-static-fallback{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.7vw,18px);padding:clamp(18px,4vw,46px);text-align:center;background:radial-gradient(ellipse at 55% 35%,rgba(21,81,216,.33),transparent 58%),#0b1024;color:#f7f5ee}
+.v6-static-fallback__eyebrow{color:#ffc62f;font-size:clamp(10px,1vw,14px);font-weight:800;letter-spacing:.14em}
+.v6-static-fallback__headline{font-size:clamp(20px,3.1vw,48px);line-height:1.1;letter-spacing:-.025em;max-width:850px}
+.v6-static-fallback__note{margin:0;max-width:550px;color:#e4eaf8;font-size:clamp(12px,1.3vw,16px);line-height:1.5}
+
 /* Higher specificity than legacy .ecosystem-board img (max-width:900/max-height:420).
    Prevent letterboxing: render must occupy the intended responsive frame. */
-.v5-city-stage .v5-stage-render {
- margin:0;max-width:none;max-height:none;width:100%;height:100%;
- position:absolute;inset:0;display:block;
- object-fit:contain;object-position:center;
- transform:translate3d(0,0,0) scale(1);transform-origin:center center;
-}
 .contact {position:relative;isolation:isolate;}
 .v5-contact-light {
  position:absolute;z-index:0;left:18%;top:4%;width:62%;height:70%;
@@ -79,40 +38,24 @@
 }
 .contact > :not(.v5-contact-light) {position:relative;z-index:1;}
 @media (prefers-reduced-motion:no-preference) {
- .v5-hero-refraction .v5-glint {animation:v5-hero-light 1.45s cubic-bezier(.15,.65,.25,1) 1.45s both;}
- .v5-hero-refraction .v5-depth-line {animation:v5-line-awaken 1.1s cubic-bezier(.12,.8,.2,1) 1.05s both;}
- .v5-motion-ready .v5-city-stage.v5-visible .v5-stage-scan {animation:v5-scan-once 1.3s ease-out .1s both;}
- .v5-motion-ready .v5-city-stage.v5-visible .v5-stage-render {animation:v5-camera-arrive 1.6s cubic-bezier(.15,.78,.2,1) both;}
  .v5-motion-ready .v5-city-stage.v5-visible::after {animation:v52-edge-light 1.25s cubic-bezier(.18,.82,.21,1) both;}
  .v5-motion-ready .contact.v5-visible .v5-contact-light {animation:v5-contact-arrive 1.6s ease-out both;}
 }
-@keyframes v5-hero-light {0%{transform:translate3d(-220%,-12%,0) rotate(22deg);opacity:0}22%{opacity:.8}100%{transform:translate3d(600%,-12%,0) rotate(22deg);opacity:0}}
-@keyframes v5-line-awaken {from{transform:scaleX(.1);opacity:0}to{transform:scaleX(1);opacity:.72}}
-@keyframes v5-scan-once {from{transform:translate3d(0,-150%,0) skewY(-9deg);opacity:0}35%{opacity:1}to{transform:translate3d(0,330%,0) skewY(-9deg);opacity:0}}
-@keyframes v5-camera-arrive {from{transform:translate3d(0,10px,0) scale(1.035);filter:brightness(.81)}to{transform:translate3d(0,0,0) scale(1);filter:brightness(1)}}
 @keyframes v52-edge-light {from{opacity:0;transform:scaleX(0)}to{opacity:.8;transform:scaleX(1)}}
 @keyframes v5-contact-arrive {from{opacity:0;transform:translate3d(-8%,10%,0) rotate(-10deg)}to{opacity:.58;transform:translate3d(-2%,2%,0) rotate(-7deg)}}
 @media(max-width:800px) {
  .v5-stage-world {aspect-ratio:1.9;min-height:245px;}
- .v5-stage-render {object-position:center;}
- .v5-stage-legend {bottom:12px;}
  .v5-city-stage {margin-bottom:18px;}
 }
 @media(max-width:430px){
  /* A dedicated vertical render keeps all stages in frame instead of cropping the destination. */
  .v5-stage-world {aspect-ratio:2 / 3;min-height:0;}
- .v5-stage-render {object-fit:contain;object-position:center;}
- .v5-stage-legend {display:none;} /* Mobile image remains described by the stage's accessible name and image alt. */
  .v5-contact-light {left:14%;width:72%;}
 }
 @media(prefers-reduced-motion:reduce) {
- .v5-hero-refraction,.v5-hero-refraction *,.v5-stage-render,
- .v5-stage-scan,.v5-contact-light {
+ .v5-contact-light {
    animation:none!important;transition:none!important;
  }
- .v5-hero-refraction {transform:none!important;}
- .v5-hero-refraction .v5-glint,.v5-stage-scan {display:none;}
- .v5-stage-render {filter:none!important;transform:none!important;}
  .v5-contact-light {opacity:.43!important;transform:none!important;}
 }
 
@@ -133,9 +76,7 @@
 }
 .v6-three-mount .v6-three-canvas {display:block!important;width:100%!important;height:100%!important;}
 .v5-city-stage[data-v6-state="active"] .v6-three-mount {opacity:1;pointer-events:auto;}
-.v5-city-stage[data-v6-state="active"] .v5-responsive-art {opacity:0;pointer-events:none;}
-.v5-city-stage[data-v6-state="active"] .v5-stage-legend,
-.v5-city-stage[data-v6-state="active"] .v5-stage-scan {display:none;}
+.v5-city-stage[data-v6-state="active"] .v6-static-fallback {opacity:0;pointer-events:none;visibility:hidden;}
 .v6-three-toolbar {
  position:relative;z-index:7;background:#0d1525;color:#f7f5ee;
  border-top:1px solid rgba(247,245,238,.16);padding:10px clamp(12px,2vw,22px);
@@ -252,8 +193,7 @@
  }
  .v6-three-controls button:first-child{grid-column:auto;}
  .v6-three-controls .v63-tour{grid-column:1 / -1;order:-1;}
- .v6-three-controls .v6-pause,
- .v6-three-controls .v6-poster{grid-column:span 2;}
+ .v6-three-controls .v6-pause{grid-column:span 2;}
 }
 @media(prefers-reduced-motion:reduce){
  .v5-city-stage[data-v6-state="active"] .v6-three-mount{transition:none;}
@@ -271,7 +211,6 @@
 .skip-link{border-radius:var(--prime-radius-sm);}
 .service,.business-pitch,.ecosystem-board{border-radius:var(--prime-radius-lg);}
 .v5-city-stage{border-radius:22px;}
-.v5-stage-legend{border-radius:999px;}
 .v4-architecture-inner{border-radius:var(--prime-radius-md);}
 .v6-three-controls button,.v6-enable-webgl{border-radius:var(--prime-radius-sm);}
 .v63-story,.v65-load-status{border-radius:var(--prime-radius-sm);}
@@ -283,8 +222,6 @@
 }
 
 /* SCENE3D-01 — 3D main viewport experience with WebP fallback preserved. */
-.v6-three-controls [data-v6-camera],
-.v6-three-controls .v6-poster,
 .v6-three-controls button[hidden] {display:none!important}
 .v5-city-stage[data-v6-autostart="enabled"] .v6-enable-webgl {display:none!important}
 .v6-three-controls {display:flex;flex-wrap:wrap;gap:10px}

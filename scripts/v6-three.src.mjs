@@ -1,6 +1,6 @@
 /* DESSET PRIME V6 — actual Three.js / WebGL2, no static-image masquerade.
  * All geometry is procedural, no external textures, fetch, tracking or WebGPU.
- * The V5 WebP image remains the functional fallback and accessible context. */
+ * Image-free text remains readable when GPU rendering is unavailable. */
 import * as THREE from "three";
 import {hydrateGLBModels} from "./v62-glb-loader.src.mjs";
 import {STORY_BEATS,STORY_DURATION,storyAtTime,routeProgress} from "./v63-storyboard.mjs";
@@ -278,7 +278,7 @@ if(!stage||!mount||!controls||reduced){
   storyActive=false;stage.dataset.v63Tour="stopped";
   if(storyPanel)storyPanel.hidden=true;
   if(storyButton){storyButton.textContent="Ver recorrido 3D";storyButton.setAttribute("aria-pressed","false")}
-  controls.hidden=true;stage.dataset.v6View="poster";
+   controls.hidden=true;stage.dataset.v6View="fallback";
   ro?.disconnect();observer?.disconnect();
   if(onMove)mount.removeEventListener("pointermove",onMove);
   if(onLeave)mount.removeEventListener("pointerleave",onLeave);
@@ -318,8 +318,8 @@ if(!stage||!mount||!controls||reduced){
   if(!(view in presets))return;
   if(!preserveStory)cancelTour("manual");
   cameraPreset=view;stage.dataset.v6View=view;
-  for(const button of controls.querySelectorAll("[data-v6-camera]"))
-   button.setAttribute("aria-pressed",String(button.dataset.v6Camera===view));
+
+
   paused=false;
   const pause=controls.querySelector(".v6-pause");
   if(pause)pause.textContent="Pausar movimiento";
@@ -385,8 +385,8 @@ if(!stage||!mount||!controls||reduced){
   if(!renderer||alive||paused||document.hidden||!onscreen||stage.dataset.v6State!=="active")return;
   alive=true;last=0;lastRender=0;raf=requestAnimationFrame(render);
  }
- // Render one complete frame while the original poster still covers the canvas.
- // Reveal the WebGL layer only when the detailed GLBs or fallback are ready.
+  // Render a complete GPU frame while the image-free fallback is visible.
+  // Reveal WebGL only after model loading and one valid draw call.
  const revealReady=()=>{
   if(!renderer||stage.dataset.v6State!=="preparing")return;
   renderer.render(scene,camera);
@@ -407,7 +407,7 @@ if(!stage||!mount||!controls||reduced){
    if(trigger)trigger.hidden=true;
    onControls=e=>{
     const button=e.target.closest("button");if(!button)return;
-    if(button.dataset.v6Camera){applyView(button.dataset.v6Camera);return}
+
     if(button.classList.contains("v63-tour")){
      if(storyActive){cancelTour("manual");applyView("overview")}
      else beginTour();
@@ -416,7 +416,7 @@ if(!stage||!mount||!controls||reduced){
     if(button.classList.contains("v6-pause")){
       paused=!paused;button.textContent=paused?"Reanudar movimiento":"Pausar movimiento";
       if(paused)stop();else wake();
-    }else if(button.classList.contains("v6-poster")){fail("poster")}
+     }
    };
    controls.addEventListener("click",onControls);
    onMove=e=>{
@@ -429,10 +429,10 @@ if(!stage||!mount||!controls||reduced){
    onResize=()=>{
     if(!renderer)return;
     // Avoid stretched geometry and high-cost mobile shaders after rotation:
-    // re-enter through the poster if the page crosses a layout/quality breakpoint.
+     // restore the text fallback if geometry quality breakpoints change.
     const isVertical=window.matchMedia("(max-width: 430px)").matches;
     const isCoarse=window.matchMedia("(max-width: 800px)").matches;
-    if(isVertical!==vertical||isCoarse!==coarse){fail("poster");return}
+     if(isVertical!==vertical||isCoarse!==coarse){fail("fallback");return}
     resize(Math.max(mount.clientWidth,1),Math.max(mount.clientHeight,1));
    };
    mount.addEventListener("pointermove",onMove,{passive:true});
@@ -480,7 +480,7 @@ if(!stage||!mount||!controls||reduced){
       tourBeat:STORY_BEATS[storyBeat]?.id||null,tourDuration:STORY_DURATION,
       tourProgress:storyProgress?.value||0,
       objectBounds:objectBounds()});
-   // Keep the cinematic WebP poster on screen until all GLB models load and
+  // Keep the accessible static description visible until the GLBs finish loading.
    // one true GPU frame has been rendered. Prevents empty canvas and model pop.
    void hydrateGLBModels({
     scene,coarse,stage,sign,ownedTextures,

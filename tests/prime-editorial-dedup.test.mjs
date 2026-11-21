@@ -47,7 +47,6 @@ test("Removal preserves real visual service, mobile imagery, GPU scene, honest a
     'class="v5-city-stage"','class="v6-three-mount"',
     'class="v63-tour"','class="v6-pause"',
     'scene-choose.webp','scene-prepare.webp','scene-move.webp',
-    'v5-cinematic-desktop.webp','v5-cinematic-mobile.webp',
     'data-service-access','data-app-links hidden',
     'Representación conceptual · No corresponde a operaciones activas de DESSET',
   ])assert.ok(html.includes(required),"Functional element removed: "+required);
@@ -82,7 +81,7 @@ test("EDITORIAL-09 actually deletes the two marked desktop ornaments without hid
   assert.doesNotMatch(cssSource,/@keyframes (?:prime-bridge-draw|v45-declaration-in|v45-route-point)\b/);
  }
  assert.match(html,/<figure class="v5-city-stage" aria-label="Renderización gráfica conceptual de DESSET">/);
- assert.match(html,/alt="Escena conceptual tridimensional:/);
+ assert.match(html,/class="v6-static-fallback"/);
  assert.match(html,/class="v6-three-mount"/);
  assert.match(html,/class="v63-tour"/);
  assert.equal((html.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,3);
