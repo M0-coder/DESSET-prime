@@ -11,7 +11,8 @@ test("V4: portada comercial editorial con mensaje legible, CTA reales y sin oper
  assert.match(head,/SE MUEVE/);
  for(const keyword of ["COMERCIO","LOGÍSTICA","CONEXIÓN","TECNOLOGÍA","FUTURO","SE MUEVE"])assert.match(head,new RegExp(keyword));
  assert.match(head,/href="#contacto"/);
- assert.match(head,/href="#ecosistema"/);
+ assert.doesNotMatch(head,/href="#ecosistema"/);
+ assert.match(html,/id="ecosistema" aria-label="Recorrido visual:/);
  assert.match(head,/v4-motion-canvas/);
  assert.doesNotMatch(head,/roles-geometry-v2\.svg|system-illustration|Cuatro funciones conectadas/);
  assert.doesNotMatch(head,/Huacho|clientes activos|seguimiento en tiempo real|descarga la app|operación en vivo/i);
