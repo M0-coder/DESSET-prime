@@ -7,3 +7,5 @@ Base exacta: PR #11 `fcac31dafa51c80b6d03ab8569cb7cef211c3719`. NO MERGE / NO DE
 * El trabajo se limita a HTML, CSS, controlador, auditoría GPU, test contrato y documentación. Ejecutar CI Node, browser, GPU fuente + dist, seguridad, reproducibilidad, mutación dirigida y Lighthouse. No constituye aprobación de producción.
 
 Rendimiento revisado: la primera iteración autocomprobaba WebGL2 en la carga inicial y Lighthouse móvil descendió de 98 a 90 por TBT 337ms (LCP 2330ms). La corrección pospone incluso la detección sincrónica GPU hasta el scroll real (scrollY >= 120) y entrada del viewport. Este resultado deberá medirse nuevamente; no se acepta degradación material.
+
+Corrección contractual: se descarta el listener de scroll. Solo se usa IntersectionObserver con umbral de visibilidad 12 %, sin rootMargin, y la sonda WebGL se ejecuta dentro de ese callback. Compatible con las reglas V5 de ausencia de scroll listeners.

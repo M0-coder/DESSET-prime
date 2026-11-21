@@ -5,14 +5,13 @@ const read=p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 const html=read("index.html"),loader=read("scripts/v5-cinematic.js"),css=read("styles-v5.css"),gpu=read("scripts/v6-gpu-browser-audit.mjs");
 test("SCENE3D-01 automatic scene uses viewport intersection, not page-start download",()=>{
  assert.match(loader,/const auto3D=canAutoStart\(\)/);
- assert.match(loader,/rootMargin:"140px 0px",threshold:0\.01/);
+ assert.match(loader,/rootMargin:"0px",threshold:0\.12/);
  assert.match(loader,/activationObserver\.observe\(stage\)/);
  assert.match(loader,/self\.disconnect\(\)/);
  assert.match(loader,/navigator\.connection\?\.saveData===true/);
  assert.match(loader,/navigator\.deviceMemory>=4/);
- assert.match(loader,/window\.scrollY<120/);
- assert.match(loader,/window\.addEventListener\("scroll",startOnArrival/);
- assert.match(loader,/activationObserver\.disconnect\(\)/);
+ assert.match(loader,/entry\.intersectionRatio>=0\.12/);
+ assert.doesNotMatch(loader,/addEventListener\("scroll"/);
  assert.match(loader,/getContext\("webgl2"\)/);
  assert.match(loader,/if\(reduced \|\| typeof window\.IntersectionObserver/);
  assert.match(loader,/stage\.dataset\.v6State="loading"/);

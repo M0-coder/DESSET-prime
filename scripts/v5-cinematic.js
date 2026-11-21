@@ -91,19 +91,16 @@
     document.head.appendChild(script);
   };
   threeStart?.addEventListener("click",loadThree);
-  // The synchronous WebGL capability probe is expensive on throttled mobile CPUs:
-  // run it only after a visitor really scrolls towards this section, never on initial paint.
+  // No GPU probe on initial paint and no scroll listeners; observer fires when
+  // the section is actually visible. Lower-end devices keep a useful still.
   const canAutoStart=()=>navigator.connection?.saveData!==true&&
     (typeof navigator.deviceMemory!=="number"||navigator.deviceMemory>=4);
   const auto3D=canAutoStart();
   stage.dataset.v6Autostart=auto3D?"enabled":"manual";
   if(auto3D){
-    let stageNear=false,finished=false;
-    const startOnArrival=()=>{
-      if(finished||!stageNear||window.scrollY<120)return;
-      finished=true;
-      activationObserver.disconnect();
-      window.removeEventListener("scroll",startOnArrival);
+    const activationObserver=new window.IntersectionObserver((entries,self)=>{
+      if(!entries.some(entry=>entry.isIntersecting&&entry.intersectionRatio>=0.12))return;
+      self.disconnect();
       try{
         if(!document.createElement("canvas").getContext("webgl2")){
           stage.dataset.v6Autostart="unsupported";
@@ -116,14 +113,8 @@
         return;
       }
       loadThree();
-    };
-    const activationObserver=new window.IntersectionObserver((entries,self)=>{
-      stageNear=entries.some(entry=>entry.isIntersecting);
-      if(stageNear&&window.scrollY>=120)self.disconnect();
-      startOnArrival();
-    },{rootMargin:"140px 0px",threshold:0.01});
+    },{rootMargin:"0px",threshold:0.12});
     activationObserver.observe(stage);
-    window.addEventListener("scroll",startOnArrival,{passive:true});
   }
 
   // Primary-site integration: one intentional hero click opens the ecosystem
