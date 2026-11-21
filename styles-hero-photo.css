@@ -4,8 +4,6 @@
 #inicio.hero[data-variant="v4"]::before{display:none}
 #inicio .v4-hero-composition{width:100%;max-width:1530px;margin:0 auto;padding:clamp(18px,2.3vw,34px) 0 clamp(24px,3vw,44px);display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:clamp(24px,3.6vw,62px);align-items:center;min-height:clamp(510px,43vw,690px)}
 #inicio .v4-hero-type{min-width:0;z-index:1}
-#inicio .v4-hero-declaration{display:flex;align-items:center;gap:10px;border:0;margin:0 0 23px;padding:0;color:#1551d8;font-size:clamp(10px,.9vw,12px);font-weight:850;letter-spacing:.16em}
-#inicio .v4-hero-declaration::before{content:"";display:block;width:23px;height:3px;background:#ff3328;flex:none}
 #inicio .motion-headline{font-size:clamp(46px,5.5vw,100px);font-weight:950;letter-spacing:-.082em;line-height:.94;margin:0 0 22px}
 #inicio .v4-headline-a{color:#111827}
 #inicio .v4-headline-b{color:#1551d8}
@@ -30,7 +28,7 @@
 @keyframes prime-photo-hero-enter{from{opacity:.74;transform:translate3d(0,14px,0) scale(.988)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
 @media(max-width:1180px){#inicio .v4-hero-composition{grid-template-columns:minmax(0,.98fr) minmax(0,1.02fr);gap:clamp(20px,2.7vw,36px);min-height:490px}#inicio .motion-headline{font-size:clamp(39px,5.2vw,71px)}#inicio .hero-lead{font-size:15px}#inicio .prime-photo-surface{aspect-ratio:1.38}}
 @media(max-width:860px){#inicio.hero[data-variant="v4"]{padding-top:28px}#inicio .v4-hero-composition{grid-template-columns:minmax(0,1fr);min-height:0;gap:26px;padding:15px 0 28px}#inicio .motion-headline{font-size:clamp(44px,8.7vw,78px)}#inicio .prime-photo-surface{aspect-ratio:1.62}#inicio .hero-lead{max-width:680px}}
-@media(max-width:700px){#inicio.hero[data-variant="v4"]{padding-top:22px}#inicio .v4-hero-composition{gap:24px;padding:13px 0 25px}#inicio .v4-hero-declaration{margin-bottom:19px;font-size:10px;letter-spacing:.085em}#inicio .motion-headline{font-size:clamp(34px,9.2vw,63px);line-height:.96}#inicio .v4-hero-bottom{gap:20px}#inicio .hero-lead{font-size:15px;line-height:1.55}#inicio .hero-actions{align-items:flex-start;gap:8px 20px}#inicio .hero-cta{min-height:52px;padding:14px 17px}#inicio .prime-photo-surface{aspect-ratio:1.5;border-radius:16px}#inicio .prime-photo-caption{left:12px;right:11px;bottom:10px;font-size:10px}#inicio .v4-hero-rail{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:12px;padding:15px var(--edge)}}
+@media(max-width:700px){#inicio.hero[data-variant="v4"]{padding-top:22px}#inicio .v4-hero-composition{gap:24px;padding:13px 0 25px}#inicio .motion-headline{font-size:clamp(34px,9.2vw,63px);line-height:.96}#inicio .v4-hero-bottom{gap:20px}#inicio .hero-lead{font-size:15px;line-height:1.55}#inicio .hero-actions{align-items:flex-start;gap:8px 20px}#inicio .hero-cta{min-height:52px;padding:14px 17px}#inicio .prime-photo-surface{aspect-ratio:1.5;border-radius:16px}#inicio .prime-photo-caption{left:12px;right:11px;bottom:10px;font-size:10px}#inicio .v4-hero-rail{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:12px;padding:15px var(--edge)}}
 @media(max-width:360px){#inicio .motion-headline{font-size:clamp(32px,9.2vw,36px)}#inicio .hero-actions{display:flex;flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){#inicio .prime-photo-surface{animation:none!important;opacity:1!important;transform:none!important}}
 
@@ -43,7 +41,6 @@
 /* ANIM-02: a finite photographic opening and three editorial chapters.
    Source image, position, crop, logo, captions and CTA stay untouched. */
 @media(prefers-reduced-motion:no-preference){
- #inicio .v4-hero-declaration{animation:anim02-enter .72s cubic-bezier(.18,.78,.24,1) .08s both}
  #inicio .v4-headline-a .motion-line__inner{animation:anim02-type .95s cubic-bezier(.16,.8,.22,1) .17s both}
  #inicio .v4-headline-b .motion-line__inner{animation:anim02-type 1.04s cubic-bezier(.16,.8,.22,1) .32s both}
  #inicio .hero-lead{animation:anim02-enter .8s cubic-bezier(.2,.78,.22,1) .54s both}
@@ -68,7 +65,7 @@
 @keyframes anim02-chapter{from{opacity:.8;transform:translate3d(0,34px,0)}to{opacity:1;transform:none}}
 @keyframes anim02-panel{from{opacity:.89;transform:translate3d(0,19px,0)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){
- #inicio .v4-hero-declaration,#inicio .motion-line__inner,#inicio .hero-lead,
+ #inicio .motion-line__inner,#inicio .hero-lead,
  #inicio .hero-actions,#inicio .prime-photo-surface,#inicio .prime-photo-image,
  .statement h2,.solutions-grid .service--main,.business-pitch,
  .audience-grid--compact .audience,.contact-bottom--rc,.motion-story-unit{
