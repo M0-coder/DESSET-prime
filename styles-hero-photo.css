@@ -15,8 +15,8 @@
 #inicio .hero-actions{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:10px 24px;margin:0}
 #inicio .hero-cta{background:#ffc62f;color:#111827;min-height:54px;border-radius:12px;padding:16px 20px;font-size:13px;box-shadow:0 4px 0 rgba(178,127,0,.75)}
 #inicio .hero-cta:hover{background:#ffe184}
-#inicio .hero-secondary{color:#111827;border-bottom:2px solid #ff3328;padding:10px 0;font-size:13px}
-#inicio .hero-secondary:hover{color:#1551d8}
+
+
 #inicio .prime-photo-surface{width:100%;max-width:none;min-width:0;margin:0;height:auto;aspect-ratio:1.61;border-radius:22px;background:#111827;box-shadow:0 26px 58px rgba(14,25,47,.19);transform:none;overflow:hidden;isolation:isolate}
 #inicio .prime-photo-surface::before{content:"";position:absolute;inset:57% 0 0;z-index:1;background:linear-gradient(180deg,transparent,rgba(13,21,35,.67));pointer-events:none}
 #inicio .prime-photo-surface::after{display:none}
