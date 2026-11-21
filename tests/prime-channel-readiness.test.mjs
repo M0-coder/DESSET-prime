@@ -1,7 +1,8 @@
 import {spawnSync} from 'node:child_process';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,mkdtempSync,writeFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
 import {join,resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {inspectInstitutionalChannels} from '../scripts/prime-channel-readiness.mjs';
@@ -123,4 +124,27 @@ test('protected release CLI binds private review to the exact release and each d
   const changed=deep(review);change(changed);assert.equal(run(changed).status,2);
  }
  assert.equal(run(review,'--require-verifed').status,2);
+});
+
+test('release accepts exact owner-declared links without claiming admin access or granting publication',()=>{
+ const sha='a'.repeat(40);
+ const check=(overrides={},source=join(root,'index.html'))=>spawnSync(process.execPath,[
+  join(root,'scripts/prime-channel-readiness.mjs'),source,join(root,'scripts/service-state.js'),
+  '','--accept-owner-declaration'],{encoding:'utf8',env:{...process.env,
+   RELEASE_SHA:sha,GITHUB_SHA:sha,CONTACT_APPROVED:'true',...overrides}});
+ const ok=check();
+ assert.equal(ok.status,0,ok.stderr);
+ const report=JSON.parse(ok.stdout);
+ assert.equal(report.channels_status,'OWNER_ATTESTED');
+ assert.equal(report.technical_platform_admin_access_tested,false);
+ assert.equal(report.release_authorized,false);
+ for(const env of [{CONTACT_APPROVED:'false'},{GITHUB_SHA:'b'.repeat(40)},{RELEASE_SHA:''}]){
+  assert.equal(check(env).status,2);
+ }
+ const directory=mkdtempSync(join(tmpdir(),'desset-channel-test-'));
+ try{
+  const unknown=join(directory,'index.html');
+  writeFileSync(unknown,html.replace('</body>','<a href="https://example.org/">otro</a></body>'));
+  assert.equal(check({},unknown).status,2);
+ }finally{rmSync(directory,{recursive:true,force:true});}
 });

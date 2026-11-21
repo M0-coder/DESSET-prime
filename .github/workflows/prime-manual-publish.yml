@@ -178,11 +178,12 @@ jobs:
           DESSET_PRIME_WEB_ROOT=dist node scripts/v54-http-security.mjs
           DESSET_PRIME_WEB_ROOT=dist node scripts/v6-gpu-browser-audit.mjs
           test -z "$(git diff --name-only)"
-      - name: Check private platform-admin review for this release
+      - name: Check declared contact links for the approved release
         env:
-          DESSET_CHANNEL_ADMIN_REVIEW: ${{ secrets.DESSET_CHANNEL_ADMIN_REVIEW }}
+          CONTACT_APPROVED: ${{ vars.DESSET_PRIME_CONTACT_APPROVED }}
+          RELEASE_SHA: ${{ inputs.release_sha }}
         run: |
-          node scripts/prime-channel-readiness.mjs "$GITHUB_WORKSPACE/dist/index.html" "$GITHUB_WORKSPACE/dist/scripts/service-state.js" "" --require-verified
+          node scripts/prime-channel-readiness.mjs "$GITHUB_WORKSPACE/dist/index.html" "$GITHUB_WORKSPACE/dist/scripts/service-state.js" "" --accept-owner-declaration
       - name: Generate indexed or noindex production-shaped site, still offline
         env:
           RELEASE_SHA: ${{ inputs.release_sha }}

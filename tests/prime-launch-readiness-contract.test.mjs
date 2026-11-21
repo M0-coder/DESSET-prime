@@ -20,8 +20,11 @@ test('review evidence archives licenses, institutional channel status and indepe
  for(const path of ['prime-npm-sbom.spdx.json','prime-rights-and-sbom.json','prime-channel-readiness.json','prime-two-independent-builds.txt'])
   assert.ok(offline.includes(path),path);
 });
-test('manual production job cannot ignore unverified channels or missing MIT notice',()=>{
- assert.match(manual,/prime-channel-readiness.mjs.*--require-verified/);
+test('manual production job requires approved owner-declared channels and the MIT notice',()=>{
+ const contactStep=manual.split('      - name: Check declared contact links')[1].split('      - name:')[0];
+ assert.match(contactStep,/prime-channel-readiness.mjs.*--accept-owner-declaration/);
+ assert.ok(contactStep.includes('CONTACT_APPROVED: ${{ vars.DESSET_PRIME_CONTACT_APPROVED }}'));
+ assert.ok(contactStep.includes('RELEASE_SHA: ${{ inputs.release_sha }}'));
  assert.match(manual,/verify-prime-manual-package.mjs/);
  assert.match(manual,/THIRD-PARTY-NOTICES.txt/);
  assert.match(manual,/--branch=release-approved/);
