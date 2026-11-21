@@ -28,7 +28,13 @@ for(const entry of manifest.files){
 check(total===manifest.totalBytes,"package size mismatch");
 const html=await readFile(resolve(dist,"index.html"),"utf8");
 const loader=await readFile(resolve(dist,"scripts/v5-cinematic.js"),"utf8");
-check(html.includes('id="ecosistema"')&&html.includes('aria-label="Recorrido visual: elegir, preparar y entregar"')&&
+const vision=html.split('<section class="statement" id="vision"')[1]?.split("</section>")[0]||"";
+const scene=html.split('<section class="ecosystem" id="ecosistema"')[1]?.split("</section>")[0]||"";
+check(vision.includes('class="v4-flow motion-story statement-journey"')&&
+ (vision.match(/class="motion-story-unit motion-story-unit--/g)||[]).length===3&&
+ !scene.includes("motion-story-unit")&&scene.includes('class="v6-three-mount"'),
+ "PRIME-LAYOUT-01 relocate three photos without duplicating or damaging 3D scene");
+check(html.includes('id="ecosistema"')&&html.includes('aria-label="Escena tridimensional conceptual de DESSET"')&&
  !html.includes('data-v64-tour-launch'),"3D section landmark or duplicate hero CTA regression");
 check(html.includes('class="v63-tour"')&&html.includes('class="v6-three-mount"'),"3D tour not mounted in ecosystem");
 check(html.includes('name="robots" content="noindex,nofollow"'),"noindex absent");
