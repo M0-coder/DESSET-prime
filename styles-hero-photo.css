@@ -73,9 +73,11 @@
  }
 }
 
-/* PRIME-PERF-01: shorten ONLY the finite mobile hero-photo entrance.
- * Same photo, composition, keyframes, desktop motion and reduced-motion bypass.
- * Shorter frame AND image-focus animations during mobile LCP; final frames are unchanged. */
+/* PRIME-PERF-01: mobile only — low-cost photographic entrance with identical final frame.
+ * Desktop retains the original cinematic clip/focus; reduced motion still bypasses all motion.
+ * Omit animated clip-path/filter/scale on mobile to protect LCP and low-end GPUs. */
+@keyframes prime-mobile-photo-enter{from{opacity:.90;transform:translate3d(0,6px,0)}to{opacity:1;transform:none}}
 @media (max-width:700px) and (prefers-reduced-motion:no-preference){
- #inicio .prime-photo-surface,#inicio .prime-photo-image{animation-duration:.65s;animation-delay:0s}
+ #inicio .prime-photo-surface{animation:prime-mobile-photo-enter .38s ease-out both}
+ #inicio .prime-photo-image{animation:none}
 }
