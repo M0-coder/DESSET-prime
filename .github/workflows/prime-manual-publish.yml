@@ -57,7 +57,7 @@ jobs:
           node scripts/prime-rights-license-audit.mjs "$GITHUB_WORKSPACE/dist" "$RUNNER_TEMP/prime-rights-and-sbom.json"
           npm sbom --package-lock-only --sbom-format=spdx > "$RUNNER_TEMP/prime-npm-sbom.spdx.json"
           node -e 'const s=require(process.env.RUNNER_TEMP+"/prime-npm-sbom.spdx.json");if(!s.spdxVersion||!Array.isArray(s.packages)||s.packages.length<2)process.exit(1)'
-          node --test tests/prime-rights-license-audit.test.mjs tests/prime-third-party-notices.test.mjs tests/prime-channel-readiness.test.mjs
+          node --test tests/prime-rights-license-audit.test.mjs tests/prime-third-party-notices.test.mjs tests/prime-channel-readiness.test.mjs tests/prime-launch-readiness-contract.test.mjs
           node scripts/prime-channel-readiness.mjs "$GITHUB_WORKSPACE/dist/index.html" "$GITHUB_WORKSPACE/dist/scripts/service-state.js" "$RUNNER_TEMP/prime-channel-readiness.json"
           node --check scripts/prime-manual-cutover-gate.mjs
           node --check scripts/prime-third-party-notices.mjs
