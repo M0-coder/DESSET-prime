@@ -78,3 +78,6 @@
 @media (max-width:700px) and (prefers-reduced-motion:no-preference){
  #inicio .prime-photo-surface,#inicio .prime-photo-image{animation-duration:.65s;animation-delay:0s}
 }
+/* HERO-TIME-VALUE-01: fit the owner's longer approved two-line headline without clipping. */
+@media (min-width:861px){#inicio .motion-headline{font-size:clamp(35px,4.25vw,68px)}}
+@media (max-width:360px){#inicio .motion-headline{font-size:clamp(29px,8.6vw,32px)}}
