@@ -316,6 +316,10 @@ try{
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1920,1080],[1180,820],[1100,850],[1024,768],[861,900],[860,900],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
+  if(w===1920||w===1024){
+   await sleep(1450);
+   await capture(w===1920?"desktop-1920-hero-fit.png":"desktop-1024-hero-fit.png");
+  }
   if(w===390||w===320){
    // Simulate a script-unavailable page in the loaded DOM. This exercises
    // the exact no-JS CSS selector without needing a second browser session.
