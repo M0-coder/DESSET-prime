@@ -1,0 +1,73 @@
+name: DESSET Prime - Cloudflare credential check (READ ONLY)
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: desset-prime-cloudflare-credential-check
+  cancel-in-progress: false
+
+jobs:
+  verify-cloudflare-credential:
+    name: Verify environment token against Pages API (GET ONLY, NO DEPLOY)
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      github.repository == 'M0-coder/DESSET-prime' &&
+      github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment:
+      name: desset-prime-production
+    steps:
+      - name: Verify Cloudflare Pages access and two active domains - no mutation
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.DESSET_CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo "::error::CLOUDFLARE_API_TOKEN is empty in desset-prime-production"
+            exit 1
+          fi
+          if [[ "$CLOUDFLARE_ACCOUNT_ID" != "5a1fbee5f06b8dcec986caa4e080c8d9" ]]; then
+            echo "::error::Unexpected Cloudflare account ID"
+            exit 1
+          fi
+
+          project_status="$(curl --silent --show-error --proto '=https' --tlsv1.2 \
+            --connect-timeout 10 --max-time 30 --request GET \
+            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            --output "$RUNNER_TEMP/desset-pages-project.json" --write-out '%{http_code}' \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional")"
+          if [[ "$project_status" != "200" ]]; then
+            echo "::error::Cloudflare Pages project GET returned HTTP $project_status"
+            exit 1
+          fi
+          if ! jq -e '.success == true and .result.name == "desset-institucional" and .result.production_branch == "release-approved"' \
+            "$RUNNER_TEMP/desset-pages-project.json" >/dev/null; then
+            echo "::error::Cloudflare Pages project API response failed structural validation"
+            exit 1
+          fi
+
+          domains_status="$(curl --silent --show-error --proto '=https' --tlsv1.2 \
+            --connect-timeout 10 --max-time 30 --request GET \
+            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            --output "$RUNNER_TEMP/desset-pages-domains.json" --write-out '%{http_code}' \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional/domains")"
+          if [[ "$domains_status" != "200" ]]; then
+            echo "::error::Cloudflare Pages domains GET returned HTTP $domains_status"
+            exit 1
+          fi
+          if ! jq -e '
+            .success == true and
+            (.result | type == "array") and
+            any(.result[]; .name == "desset.lat" and .status == "active") and
+            any(.result[]; .name == "www.desset.lat" and .status == "active")
+          ' "$RUNNER_TEMP/desset-pages-domains.json" >/dev/null; then
+            echo "::error::Cloudflare Pages custom-domain validation failed"
+            exit 1
+          fi
+
+          echo "::notice::DESSET_CLOUDFLARE_AUTH_READONLY_PASS: HTTP 200 for project and domains; two active custom domains; no deployment invoked"
