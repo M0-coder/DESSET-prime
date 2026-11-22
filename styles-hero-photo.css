@@ -84,8 +84,13 @@
 #inicio .v4-hero-type{container-type:inline-size}
 @media (min-width:1101px){
  #inicio .v4-hero-composition{max-width:1700px}
- #inicio .v4-hero-type{padding-inline-start:clamp(0px,1.1vw,22px)}
- #inicio .motion-headline{font-size:clamp(43px,9.5cqw,79px)}
+ /* Owner-marked desktop area: begin inside the left editorial panel, not
+    in the panel center; preserve a fixed gutter before the photograph. */
+ #inicio .v4-hero-type{
+   padding-inline-start:clamp(44px,4vw,72px);
+   padding-inline-end:clamp(12px,1.3vw,20px)
+ }
+ #inicio .motion-headline{font-size:clamp(38px,10.5cqw,78px)}
 }
 @media (min-width:861px) and (max-width:1100px){
  #inicio .v4-hero-composition{grid-template-columns:minmax(0,1fr);gap:28px;min-height:0}
