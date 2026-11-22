@@ -147,7 +147,7 @@ try{
  if(motionMode!=="ready")report.failures.push("Intersection motion system unavailable: "+String(motionMode));
  report.tests.push({name:"Progressive motion system active",mode:motionMode});
  const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),flow:!!document.querySelector(".v4-flow-board"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
- if(!heroQuality.headline?.includes("EL COMERCIO")||!heroQuality.headline?.includes("SE MUEVE")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
+ if(!heroQuality.headline?.includes("AUMENTA EL VALOR")||!heroQuality.headline?.includes("A TU TIEMPO")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
  report.tests.push({name:"V4 motion/design contract",heroQuality});
  const heroPhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");const f=document.querySelector("#inicio .prime-photo-surface");return {loaded:!!x?.complete&&x.naturalWidth===1671&&x.naturalHeight===941,src:x?.getAttribute("src"),logo:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),oldText:document.querySelector("#inicio")?.textContent?.includes("IDEAS EN ACCIÓN"),ratio:f?.getBoundingClientRect().width/f?.getBoundingClientRect().height}})()');
  if(!heroPhoto.loaded||!heroPhoto.src?.endsWith("desset-hero-entrega-dos-espejos.webp")||
@@ -398,7 +398,7 @@ try{
  const reducedMode=await js("document.documentElement.dataset.motionSystem");
  if(reducedMode!=="reduced")report.failures.push("Motion fallback failed for reduced preference: "+String(reducedMode));
  const reducedAnimations=await js('(()=>({headline:document.querySelector(".motion-headline").textContent.trim(),cta:document.querySelector(".hero-cta").getAttribute("href"),closing:document.querySelector("#contact-title").textContent.trim(),noDecor:!document.querySelector("#inicio .v4-shape, #inicio .v4-canvas-stamp, #inicio .v5-hero-refraction, #inicio .motion-brand-thread")}))()');
- if(!reducedAnimations.noDecor||!reducedAnimations.headline.includes("EL COMERCIO")||reducedAnimations.cta!=="#contacto"||!reducedAnimations.closing.includes("CONEXIONES"))report.failures.push("V4.5 reduced motion/essential information failed: "+JSON.stringify(reducedAnimations));
+ if(!reducedAnimations.noDecor||!reducedAnimations.headline.includes("AUMENTA EL VALOR")||reducedAnimations.cta!=="#contacto"||!reducedAnimations.closing.includes("CONEXIONES"))report.failures.push("V4.5 reduced motion/essential information failed: "+JSON.stringify(reducedAnimations));
  report.tests.push({name:"V4.5 full-fidelity reduced motion fallback",reducedAnimations});
  const anim02Reduced=await js('(()=>({photo:getComputedStyle(document.querySelector("#inicio .prime-photo-surface")).animationName,focus:getComputedStyle(document.querySelector("#inicio .prime-photo-image")).animationName,title:getComputedStyle(document.querySelector("#inicio .v4-headline-a .motion-line__inner")).animationName,cta:document.querySelector("#inicio .hero-cta")?.getAttribute("href"),captionAbsent:!document.querySelector("#inicio .prime-photo-caption")}))()');
  if(anim02Reduced.photo!=="none"||anim02Reduced.focus!=="none"||anim02Reduced.title!=="none"||anim02Reduced.cta!=="#contacto"||!anim02Reduced.captionAbsent)
@@ -450,7 +450,7 @@ try{
  const nodes=tree.result?.nodes||[];
  const headings=nodes.filter(n=>!n.ignored&&n.role?.value==="heading").map(n=>String(n.name?.value||"").trim());
  const accessible={nodeCount:nodes.length,headingCount:headings.length,
-   hasHero:headings.some(n=>n.includes("EL COMERCIO")),hasContact:headings.some(n=>n.includes("CONEXIONES"))};
+   hasHero:headings.some(n=>n.includes("AUMENTA EL VALOR")),hasContact:headings.some(n=>n.includes("CONEXIONES"))};
  if(!accessible.hasHero||!accessible.hasContact||accessible.headingCount<6)
   report.failures.push("V5.4 accessibility tree missing landmarks or headlines: "+JSON.stringify(accessible));
  report.tests.push({name:"V5.4 Chromium accessibility tree structural smoke",accessible});

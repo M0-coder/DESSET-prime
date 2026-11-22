@@ -6,7 +6,8 @@ const html=readFileSync(new URL("../index.html",import.meta.url),"utf8");
 const css=readFileSync(new URL("../styles.css",import.meta.url),"utf8");
 
 test("institutional statement retains business direction without fictitious operations or registration",()=>{
- assert.match(html,/EL COMERCIO/);
+ assert.match(html,/AUMENTA EL VALOR/);
+ assert.match(html,/A TU TIEMPO/);
  assert.match(html,/NO ES SOLO/);
  assert.match(html,/ES CONECTAR/);
  assert.match(html,/DESSET reúne comercio, tecnología y logística en un ecosistema de servicios/);

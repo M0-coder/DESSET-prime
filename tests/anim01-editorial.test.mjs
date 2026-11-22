@@ -6,7 +6,7 @@ const css=read("styles.css"),system=read("styles-system.css"),motion=read("scrip
  cinematic=read("scripts/v5-cinematic.js"),browser=read("scripts/browser-audit.mjs"),html=read("index.html"),photoCss=read("styles-hero-photo.css");
 test("ANIM-01 original hero, corporate CTA, logo and 3D semantics preserved",()=>{
  assert.match(html,/<a class="hero-cta" href="#contacto">Hablemos de tu negocio/);
- assert.match(html,/EL COMERCIO/);assert.match(html,/SE MUEVE/);
+ assert.match(html,/class="motion-line v4-headline-a"><span class="motion-line__inner">AUMENTA EL VALOR<\/span>/);assert.match(html,/class="motion-line v4-headline-b"><span class="motion-line__inner">A TU TIEMPO<\/span>/);
  assert.doesNotMatch(html,/data-v64-tour-launch/);assert.match(html,/class="v6-three-mount"/);assert.match(html,/class="v63-tour"/);assert.match(html,/assets\/deliver-assets-mark\.png/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
