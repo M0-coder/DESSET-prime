@@ -130,11 +130,16 @@ async function viewport(width,height,reduce=false){
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
   if(diag.disclosures.technical!==false||diag.disclosures.future!==false)fails.push("Freshly navigated page must start with both native disclosures CLOSED: "+JSON.stringify(diag.disclosures));
-  const expectedLime="rgb(205, 252, 138)",expectedOriginal="rgb(255, 198, 47)";
+  const expectedOriginal="rgb(255, 198, 47)";
   const palette=diag.palette;
+  // During the finite entrance Chromium may serialize the exact lime channels as
+  // rgba(..., 0.996). The displayed color is unchanged; fail on different RGB.
+  const limeChannels=palette.heroCTA.match(/^rgba?\(205,\s*252,\s*138(?:,\s*([\d.]+))?\)$/);
+  const exactLime=!!limeChannels&&(limeChannels[1]===undefined||
+   (Number(limeChannels[1])>=.99&&Number(limeChannels[1])<=1));
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
-   (palette.heroCTA!==expectedLime&&palette.heroCTA!=="rgba(205, 252, 138, 1)")||palette.businessCTA!==expectedOriginal||
+   !exactLime||palette.businessCTA!==expectedOriginal||
    palette.statementAccent!==expectedOriginal||palette.stageSummaryArrow!==expectedOriginal||
    palette.threeTourButton!==expectedOriginal)
    fails.push("PRIME-COLOR-02: only the hero CTA may be lime; original palette and 3D must remain yellow: "+JSON.stringify(palette));
