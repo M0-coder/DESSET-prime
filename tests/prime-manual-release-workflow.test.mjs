@@ -14,18 +14,18 @@ test('no push/schedule automatic release; PR has offline-only job',()=>{
  assert.doesNotMatch(doc,/\n  push:\n|\n  schedule:\n/);
  assert.match(doc,/if: github.event_name == 'pull_request'/);
 });
-test('manual publishing requires exact sha, main, confirmation, and disabled-by-default flag',()=>{
- for(const part of ["github.event_name == 'workflow_dispatch'",
-   "github.repository == 'M0-coder/DESSET-prime'",
-   "github.ref == 'refs/heads/main'",
-   "inputs.confirmation == 'PUBLICAR_PRIME_DESSET'",
-   "vars.DESSET_PRIME_RELEASE_ENABLED == 'true'",
-   "vars.DESSET_PRIME_VISUAL_APPROVED_SHA == inputs.release_sha",
-   "vars.DESSET_PRIME_RIGHTS_APPROVED == 'true'",
-   "vars.DESSET_PRIME_CONTACT_APPROVED == 'true'",
-   "vars.DESSET_PRIME_SECURITY_APPROVED == 'true'",
-   "vars.DESSET_PRIME_ROLLBACK_BACKUP_APPROVED == 'true'"])
-   assert.ok(job.includes(part),part);
+test('manual publishing requires exact sha, main, confirmation and fail-closed approval variables',()=>{
+ const requirements=["github.event_name == 'workflow_dispatch'",
+  "github.repository == 'M0-coder/DESSET-prime'",
+  "github.ref == 'refs/heads/main'",
+  'RELEASE_SHA: $'+'{{ inputs.release_sha }}',
+  'CONFIRM: $'+'{{ inputs.confirmation }}',
+  'PREVIOUS_DEPLOYMENT_ID: $'+'{{ inputs.expected_previous_deployment }}'];
+ for(const part of requirements)assert.ok(job.includes(part),part);
+ for(const field of ['RELEASE_ENABLED','VISUAL_APPROVED_SHA','RIGHTS_APPROVED','CONTACT_APPROVED',
+  'SECURITY_APPROVED','ROLLBACK_BACKUP_APPROVED','INDEX_APPROVED'])
+  assert.ok(job.includes(field+': $'+'{{ vars.DESSET_PRIME_'+field+' }}'),field);
+ assert.ok(job.includes('node scripts/prime-manual-cutover-gate.mjs request'));
 });
 test('manual job starts on main and checks approvals INSIDE protected runner with diagnostics',()=>{
  const start=job.indexOf('    if: >-');
@@ -76,7 +76,47 @@ test('release checks both domains and static security/rollback handling',()=>{
  assert.match(job,/https:\/\/www\.desset\.lat\//);
  assert.match(job,/content-security-policy:/);
  assert.match(job,/NO automatic rollback/);
- assert.match(job,/vars\.DESSET_PRIME_INDEX_APPROVED == 'true'/);
+ assert.ok(job.includes('INDEX_APPROVED: 
+});
+
+test('every GitHub expression has both braces and no malformed delimiters',()=>{
+ const expressions=[...doc.matchAll(/\$\{\{([^}]+)\}\}/g)];
+ assert.ok(expressions.length>=20,'Expected many GitHub expressions in workflow');
+ assert.ok(!/\$\{\{[^}\n]+\}(?!\})/.test(doc),'Missing second closing brace in expression');
+ assert.ok(!/GH\{/.test(doc),'Unresolved authoring placeholder');
+});
+
+test('curl invocations use a single HTTP failure mode supported by the release runner',async(t)=>{
+ const commands=job.replace(/\\\n\s*/g,' ').split('\n').filter(line=>/\bcurl\s/.test(line));
+ assert.ok(commands.length>0);
+ const combinations=new Set();
+ for(const line of commands){
+  const flags=line.slice(line.indexOf('curl ')+5).trim().split(/\s+/);
+  const fail=flags.includes('--fail')||flags.some(flag=>/^-[A-Za-z]+$/.test(flag)&&flag.includes('f'));
+  assert.ok(!(fail&&flags.includes('--fail-with-body')),line);
+  if(flags.includes('--fail-with-body')){
+   const prefix=flags.slice(0,flags.findIndex(flag=>flag==='-H'||flag.includes('https://')));
+   combinations.add(prefix.join(' '));
+  }
+  if(!line.includes("'%{http_code}'"))assert.ok(fail||flags.includes('--fail-with-body'),line);
+ }
+ assert.ok(combinations.size>0);
+ const server=createServer((req,res)=>{
+  res.writeHead(req.url==='/ok'?200:404);
+  res.end('probe');
+ });
+ await new Promise((resolve,reject)=>server.once('error',reject).listen(0,'127.0.0.1',resolve));
+ t.after(()=>new Promise(resolve=>server.close(resolve)));
+ const run=promisify(execFile);
+ const base='http://127.0.0.1:'+server.address().port;
+ for(const prefix of combinations){
+  const args=['--noproxy','*',...prefix.split(' ')];
+  assert.equal((await run('curl',[...args,base+'/ok'])).stdout,'probe');
+  await assert.rejects(run('curl',[...args,base+'/missing']),{code:22,stdout:'probe'});
+ }
+
+});
++'{{ vars.DESSET_PRIME_INDEX_APPROVED }}'));
 });
 
 test('every GitHub expression has both braces and no malformed delimiters',()=>{
