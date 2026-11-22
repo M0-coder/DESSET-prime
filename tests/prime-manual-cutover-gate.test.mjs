@@ -25,10 +25,29 @@ test('PR and push events always fail closed',()=>{
  for(const event of ['pull_request','push','schedule'])assert.equal(validateReleaseIntent({...valid,event}).result,'NO-GO');
  assert.equal(validateReleaseIntent({...valid,ref:'refs/heads/feature'}).result,'NO-GO');
 });
-test('SHA, confirmation and expected rollback ID are mandatory',()=>{
- for(const opts of [{checkoutSha:'b'.repeat(40)},{expectedSha:'b'.repeat(40)},{confirm:'PUBLICAR_DESSET'}, {previousId:'b'.repeat(8)+'-0000-0000-0000-000000000000'}])
+test('SHA, confirmation and expected CURRENT deployment UUID are mandatory',()=>{
+ for(const opts of [{checkoutSha:'b'.repeat(40)},{expectedSha:'b'.repeat(40)},{confirm:'PUBLICAR_DESSET'}, {previousId:'invalid-current-id'}])
   assert.equal(validateReleaseIntent({...valid,...opts}).result,'NO-GO');
 });
+
+test('SECOND production cutover permits a new CURRENT deployment while keeping old recovery ID immutable',()=>{
+ const current='0effd29b-f675-4529-bca9-2df86211983e';
+ assert.notEqual(current,target.recovery_deployment_id);
+ assert.equal(target.recovery_deployment_id,'b107eff2-6511-4e04-a780-fbd28e93e4e9');
+ const request=validateReleaseIntent({...valid,previousId:current});
+ assert.equal(request.result,'READY-FOR-LIVE-PREFLIGHT',JSON.stringify(request.failures));
+ const currentProject={success:true,result:{...project.result,
+  canonical_deployment:{...project.result.canonical_deployment,id:current}}};
+ const fresh={...p,previousId:current,projectResponse:currentProject};
+ assert.equal(validateCloudflareSnapshot(fresh).result,'READY-FOR-MANUAL-DEPLOY');
+ assert.equal(validateCloudflareSnapshot({...fresh,previousId:target.recovery_deployment_id}).result,'NO-GO');
+ assert.equal(validateCloudflareSnapshot({...fresh,projectResponse:project}).result,'NO-GO');
+});
+test('invalid recovery metadata and a missing expected live ID fail before any Cloudflare credential',()=>{
+ assert.equal(validateReleaseIntent({...valid,previousId:''}).result,'NO-GO');
+ assert.equal(validateReleaseIntent({...valid,target:{...target,recovery_deployment_id:'invalid'}}).result,'NO-GO');
+});
+
 test('feature flag and signed visual exact SHA are mandatory',()=>{
  assert.equal(validateReleaseIntent({...valid,flags:{...valid.flags,enabled:'false'}}).result,'NO-GO');
  assert.equal(validateReleaseIntent({...valid,flags:{...valid.flags,visualApprovedSha:'b'.repeat(40)}}).result,'NO-GO');
