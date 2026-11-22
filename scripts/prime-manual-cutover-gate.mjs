@@ -15,7 +15,10 @@ export function validateReleaseIntent({repository,ref,event,expectedSha,checkout
  mark(err,event==='workflow_dispatch','Must be manually dispatched');
  mark(err,ref==='refs/heads/main','Only main may publish; PR branches forbidden');
  mark(err,HEX40.test(expectedSha)&&checkoutSha===expectedSha,'SHA mismatch with exact checkout');
- mark(err,UUID.test(previousId)&&previousId===target?.recovery_deployment_id,'Rollback baseline different from reviewed ID');
+ // The caller supplies the CURRENT production ID, checked against Cloudflare twice.
+ // target.recovery_deployment_id is a HISTORICAL fallback, not the expected current ID.
+ mark(err,UUID.test(previousId),'Expected CURRENT production deployment ID is not a valid UUID');
+ mark(err,UUID.test(target?.recovery_deployment_id),'Historical recovery deployment ID is invalid');
  mark(err,confirm===CONFIRM,'Missing exact publication confirmation');
  mark(err,seoPolicy==='NOINDEX'||seoPolicy==='INDEX','SEO policy not explicit');
  mark(err,target?.schema==='desset-prime-release-target-v1'&&target?.production_deploy_enabled===false&&target?.requires_fresh_owner_approval===true,'Repository release target policy unexpectedly changed');
