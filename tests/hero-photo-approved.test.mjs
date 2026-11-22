@@ -44,5 +44,5 @@ test('HERO-PHOTO-01 real site build, local browser proof, security gate include 
  assert.match(verify,/Approved photographic render is not packaged/);
  assert.match(gate,/hero_webp_bytes:210000/);
  assert.match(read('scripts/browser-audit.mjs'),/HERO-PHOTO-01 exact local render, original logo, conceptual disclosure/);
- assert.match(html,/href="\.\/styles-hero-photo\.css"/);
+ assert.match(html,/href="\.\/styles-hero-photo\.css\?v=hero-fit-03"/);
 });
