@@ -1,10 +1,10 @@
-# DESSET Prime — web comercial definitiva (desarrollo aislado)
+# DESSET Prime — web institucional oficial
 
-> **Estado:** repositorio de diseño y desarrollo. **NO es producción**, no recibe pedidos ni pagos y no debe desplegarse por inferencia.
+> **Estado:** código fuente de la web institucional DESSET publicada en Cloudflare Pages `desset-institucional`. Los cambios en GitHub NO se publican automáticamente; cualquier nuevo despliegue exige autorización por SHA exacto y ejecución manual protegida. La web no recibe pedidos ni pagos.
 
 ## Fuentes de verdad
 
-- **Única base del producto web definitivo:** este repositorio, [M0-coder/DESSET-prime](https://github.com/M0-coder/DESSET-prime). El otro repositorio, `M0-coder/DESSET`, contiene una web experimental actualmente servida en el dominio; no es la fuente de código, diseño ni empaquetado de Prime. Se conserva temporalmente la referencia de su despliegue para rollback.
+- **Única fuente del sitio institucional:** este repositorio, [M0-coder/DESSET-prime](https://github.com/M0-coder/DESSET-prime). El repositorio experimental anterior no forma parte del código ni del despliegue de Prime. Cloudflare determina qué SHA se sirve realmente al público; `main` por sí solo no prueba publicación.
 - **Diseño original:** [DELIVER ASSETS — Editorial AI Concept (Figma)](https://www.figma.com/design/cUGTTGlTB05xiKLL8NGcwG). Revisar especialmente Design System Production, Website Final, Website Responsive Final, Asset Library y Production Handoff; identificar versión aprobada antes de importar.
 - **Legado gráfico:** repositorios DELIVER-ASESSET-prime y DELIVER-ASESSET-pro; reutilizar solo recursos verificables, con procedencia y derechos confirmados.
 - **Gobierno empresarial:** expediente DELIVER ASSETS / DESSET en Notion y Google Drive. Ante una contradicción, distinguir visión, prototipo y servicio operativo acreditado.
@@ -19,7 +19,7 @@ Construir la experiencia institucional-comercial definitiva de **DESSET**, recon
 2. **No fingir operaciones.** Sin testimonios, clientes, flota, tiempos, cobertura, precios, reservas o descargas inventados.
 3. **Reutilizar identidad propia.** Logo y assets aprobados, tokens originales, arte Rider/Business y patrones de movimiento útiles; no importar CSS experimental ni monolitos por comodidad.
 4. **Diseño responsive y accesible.** La composición editorial y cinematográfica de Prime prevalece sobre el Bento experimental antiguo. No ocultar contenido ni prohibir scroll por imitar ese prototipo.
-5. **Separación total de producción.** No DNS, no Cloudflare, no cambios en la página pública experimental, no releases, no auto-merge, no publicación automática ni eliminación de ramas sin autorización específica.
+5. **Producción protegida.** Sin DNS, releases, auto-merge, publicación automática ni eliminación de ramas sin autorización específica. Los despliegues al proyecto Pages existente son operaciones manuales, por SHA aprobado y con verificación del estado actual de Cloudflare.
 
 ## Arquitectura inicial de información
 

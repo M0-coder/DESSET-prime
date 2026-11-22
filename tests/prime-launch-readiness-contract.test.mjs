@@ -30,9 +30,14 @@ test('manual production job requires approved owner-declared channels and the MI
  assert.match(manual,/--branch=release-approved/);
 });
 test('pull request stage never publishes or receives Cloudflare credentials',()=>{
- assert.doesNotMatch(offline,/secrets\./);
+ assert.doesNotMatch(offline,/secrets\\./);
  assert.doesNotMatch(offline,/pages deploy|CLOUDFLARE_API_TOKEN/);
  assert.match(yml,/if: github.event_name == 'pull_request'/);
  assert.match(yml,/github.event_name == 'workflow_dispatch'/);
- assert.match(yml,/vars.DESSET_PRIME_RELEASE_ENABLED == 'true'/);
+ const dollar=String.fromCharCode(36);
+ assert.ok(manual.includes('RELEASE_ENABLED: '+dollar+'{{ vars.DESSET_PRIME_RELEASE_ENABLED }}'));
+ const gate=manual.slice(manual.indexOf('    if: >-'),manual.indexOf('    runs-on:'));
+ assert.ok(!gate.includes('vars.'),'Protected environment approval must be evaluated in the runner');
+ assert.ok(manual.indexOf('node scripts/prime-manual-cutover-gate.mjs request') <
+  manual.indexOf('CLOUDFLARE_API_TOKEN: '+dollar+'{{ secrets.CLOUDFLARE_API_TOKEN }}'));
 });

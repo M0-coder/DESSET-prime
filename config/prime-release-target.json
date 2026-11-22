@@ -7,6 +7,6 @@
   "recovery_deployment_id": "b107eff2-6511-4e04-a780-fbd28e93e4e9",
   "requires_fresh_owner_approval": true,
   "production_deploy_enabled": false,
-  "note": "Historical recovery reference only. Must be observed again live before any release. NO authorization.",
+  "note": "Historical recovery deployment only (immutable fallback), NOT the current deployment being replaced. The operator must supply expected_previous_deployment from fresh live Cloudflare canonical_deployment.id; check it twice before publication. This file grants NO release authorization.",
   "cloudflare_account_id": "5a1fbee5f06b8dcec986caa4e080c8d9"
 }

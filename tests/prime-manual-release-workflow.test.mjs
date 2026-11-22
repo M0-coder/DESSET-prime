@@ -14,18 +14,41 @@ test('no push/schedule automatic release; PR has offline-only job',()=>{
  assert.doesNotMatch(doc,/\n  push:\n|\n  schedule:\n/);
  assert.match(doc,/if: github.event_name == 'pull_request'/);
 });
-test('manual publishing requires exact sha, main, confirmation, and disabled-by-default flag',()=>{
- for(const part of ["github.event_name == 'workflow_dispatch'",
-   "github.repository == 'M0-coder/DESSET-prime'",
-   "github.ref == 'refs/heads/main'",
-   "inputs.confirmation == 'PUBLICAR_PRIME_DESSET'",
-   "vars.DESSET_PRIME_RELEASE_ENABLED == 'true'",
-   "vars.DESSET_PRIME_VISUAL_APPROVED_SHA == inputs.release_sha",
-   "vars.DESSET_PRIME_RIGHTS_APPROVED == 'true'",
-   "vars.DESSET_PRIME_CONTACT_APPROVED == 'true'",
-   "vars.DESSET_PRIME_SECURITY_APPROVED == 'true'",
-   "vars.DESSET_PRIME_ROLLBACK_BACKUP_APPROVED == 'true'"])
-   assert.ok(job.includes(part),part);
+test('manual publishing requires exact sha, main, confirmation and fail-closed approval variables',()=>{
+ for(const required of ["github.event_name == 'workflow_dispatch'",
+  "github.repository == 'M0-coder/DESSET-prime'",
+  "github.ref == 'refs/heads/main'"])assert.ok(job.includes(required),required);
+ const dollar=String.fromCharCode(36);
+ for(const input of ['RELEASE_SHA: '+dollar+'{{ inputs.release_sha }}',
+  'CONFIRM: '+dollar+'{{ inputs.confirmation }}',
+  'PREVIOUS_DEPLOYMENT_ID: '+dollar+'{{ inputs.expected_previous_deployment }}'])
+  assert.ok(job.includes(input),input);
+ for(const field of ['RELEASE_ENABLED','VISUAL_APPROVED_SHA','RIGHTS_APPROVED','CONTACT_APPROVED',
+  'SECURITY_APPROVED','ROLLBACK_BACKUP_APPROVED','INDEX_APPROVED'])
+  assert.ok(job.includes(field+': '+dollar+'{{ vars.DESSET_PRIME_'+field+' }}'),field);
+ assert.ok(job.includes('node scripts/prime-manual-cutover-gate.mjs request'));
+});
+test('business approvals execute inside the protected job before any Cloudflare credentials',()=>{
+ const a=job.indexOf('    if: >-'),b=job.indexOf('    runs-on:',a);
+ assert.ok(a>=0&&b>a);
+ const guard=job.slice(a,b);
+ for(const keyword of ['workflow_dispatch','M0-coder/DESSET-prime','refs/heads/main'])
+  assert.ok(guard.includes(keyword));
+ for(const forbidden of ['vars.','secrets.','inputs.confirmation','inputs.seo_policy'])
+  assert.ok(!guard.includes(forbidden),forbidden);
+ const dollar=String.fromCharCode(36);
+ const preflight=job.indexOf('node scripts/prime-manual-cutover-gate.mjs request');
+ const token=job.indexOf('CLOUDFLARE_API_TOKEN: '+dollar+'{{ secrets.CLOUDFLARE_API_TOKEN }}');
+ assert.ok(preflight>=0&&token>preflight);
+ assert.match(job,/environment:/);
+ assert.match(job,/desset-prime-production/);
+});
+test('fresh live deployment AND domains are checked twice before one Pages mutation',()=>{
+ const before=job.split('      - name: PUBLISH — only mutation')[0];
+ assert.equal(before.split('pages/projects/desset-institucional/domains').length-1,2);
+ assert.equal(before.split('node scripts/prime-manual-cutover-gate.mjs cloudflare').length-1,2);
+ assert.ok(doc.includes('concurrency:'));
+ assert.ok(doc.includes('cancel-in-progress: false'));
 });
 test('environment approval and secrets apply ONLY to manual job',()=>{
  assert.match(job,/environment:\n      name: desset-prime-production/);
@@ -48,7 +71,7 @@ test('release checks both domains and static security/rollback handling',()=>{
  assert.match(job,/https:\/\/www\.desset\.lat\//);
  assert.match(job,/content-security-policy:/);
  assert.match(job,/NO automatic rollback/);
- assert.match(job,/vars\.DESSET_PRIME_INDEX_APPROVED == 'true'/);
+ assert.ok(job.includes('INDEX_APPROVED: '+String.fromCharCode(36)+'{{ vars.DESSET_PRIME_INDEX_APPROVED }}'));
 });
 
 test('every GitHub expression has both braces and no malformed delimiters',()=>{
