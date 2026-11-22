@@ -78,6 +78,19 @@
 @media (max-width:700px) and (prefers-reduced-motion:no-preference){
  #inicio .prime-photo-surface,#inicio .prime-photo-image{animation-duration:.65s;animation-delay:0s}
 }
-/* HERO-TIME-VALUE-01: fit the owner's longer approved two-line headline without clipping. */
-@media (min-width:861px){#inicio .motion-headline{font-size:clamp(35px,4.25vw,68px)}}
-@media (max-width:360px){#inicio .motion-headline{font-size:clamp(29px,8.6vw,32px)}}
+/* HERO-FIT-02: the two approved headline lines are sized by their own text
+ * column, not by viewport width. The desktop composition uses the available
+ * horizontal space marked by the owner, while the photograph keeps its crop. */
+#inicio .v4-hero-type{container-type:inline-size}
+@media (min-width:1101px){
+ #inicio .v4-hero-composition{max-width:1700px}
+ #inicio .v4-hero-type{padding-inline-start:clamp(0px,1.1vw,22px)}
+ #inicio .motion-headline{font-size:clamp(43px,9.5cqw,79px)}
+}
+@media (min-width:861px) and (max-width:1100px){
+ #inicio .v4-hero-composition{grid-template-columns:minmax(0,1fr);gap:28px;min-height:0}
+ #inicio .motion-headline{font-size:clamp(38px,9.5cqw,80px)}
+}
+@media (max-width:860px){
+ #inicio .motion-headline{font-size:clamp(22px,9.5cqw,75px)}
+}

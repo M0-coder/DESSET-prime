@@ -69,6 +69,7 @@ async function viewport(width,height,reduce=false){
  await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:reduce?"reduce":"no-preference"}]});
  await call("Page.navigate",{url:URL});
  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.hero--motion')"),"page render");
+ await js('document.fonts.ready');
  await sleep(130);
  const diag=await js(`(()=>{
  const viewport=document.documentElement.clientWidth;
@@ -84,6 +85,22 @@ async function viewport(width,height,reduce=false){
   const s=getComputedStyle(el),r=el.getBoundingClientRect();
   return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.left < -2 || (s.display!=='none'&&s.visibility!=='hidden'&&r.right>viewport+2&&r.width>0);
  }).slice(0,12).map(el=>({tag:el.tagName,className:typeof el.className==='string'?el.className.slice(0,70):'',right:Math.round(el.getBoundingClientRect().right),left:Math.round(el.getBoundingClientRect().left)}));
+ const composition=document.querySelector("#inicio .v4-hero-composition").getBoundingClientRect();
+ const type=document.querySelector("#inicio .v4-hero-type").getBoundingClientRect();
+ const photo=document.querySelector("#inicio .prime-photo-surface").getBoundingClientRect();
+ const heroFit={
+  compositionLeft:Math.round(composition.left),
+  typeLeft:Math.round(type.left),typeRight:Math.round(type.right),
+  photoLeft:Math.round(photo.left),
+  fontSize:parseFloat(getComputedStyle(document.querySelector("#inicio .motion-headline")).fontSize),
+  rows:[...document.querySelectorAll("#inicio .motion-line__inner")].map(el=>{
+   const range=document.createRange();range.selectNodeContents(el);
+   const content=range.getBoundingClientRect(),line=el.closest(".motion-line").getBoundingClientRect();
+   return {text:el.textContent.trim(),contentLeft:Math.round(content.left),
+    contentRight:Math.round(content.right),lineLeft:Math.round(line.left),
+    lineRight:Math.round(line.right)};
+  })
+ };
  const rail=document.querySelector(".v4-hero-rail");
  const railBox=rail.getBoundingClientRect();
  const railWords=[...rail.querySelectorAll("span")].map(el=>{
@@ -108,20 +125,32 @@ async function viewport(width,height,reduce=false){
    stageSummaryArrow:style("#ecosistema .v4-architecture-details summary span").color,
    threeTourButton:style("#ecosistema .v63-tour").backgroundColor
   };
- return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,offscreen:nodes,railWords,typeSizes,palette,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railWords,typeSizes,palette,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
   if(diag.disclosures.technical!==false||diag.disclosures.future!==false)fails.push("Freshly navigated page must start with both native disclosures CLOSED: "+JSON.stringify(diag.disclosures));
-  const expectedLime="rgb(205, 252, 138)",expectedOriginal="rgb(255, 198, 47)";
+  const expectedOriginal="rgb(255, 198, 47)";
   const palette=diag.palette;
+  // During the finite entrance Chromium may serialize the exact lime channels as
+  // rgba(..., 0.996). The displayed color is unchanged; fail on different RGB.
+  const limeChannels=palette.heroCTA.match(/^rgba?\(205,\s*252,\s*138(?:,\s*([\d.]+))?\)$/);
+  const exactLime=!!limeChannels&&(limeChannels[1]===undefined||
+   (Number(limeChannels[1])>=.99&&Number(limeChannels[1])<=1));
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
-   palette.heroCTA!==expectedLime||palette.businessCTA!==expectedOriginal||
+   !exactLime||palette.businessCTA!==expectedOriginal||
    palette.statementAccent!==expectedOriginal||palette.stageSummaryArrow!==expectedOriginal||
    palette.threeTourButton!==expectedOriginal)
    fails.push("PRIME-COLOR-02: only the hero CTA may be lime; original palette and 3D must remain yellow: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
+ if(diag.heroFit.typeLeft<diag.heroFit.compositionLeft-2 ||
+    diag.heroFit.rows.length!==2 ||
+    diag.heroFit.rows.some(line=>line.contentLeft<line.lineLeft-2||
+     line.contentRight>line.lineRight+2||line.contentRight>diag.heroFit.typeRight+2) ||
+    (diag.heroFit.photoLeft>diag.heroFit.typeRight+3 &&
+     diag.heroFit.rows.some(line=>line.contentRight>diag.heroFit.photoLeft-18)))
+   fails.push("HERO-FIT-02: approved headline escaped text column or entered photo: "+JSON.stringify(diag.heroFit));
  if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
@@ -183,7 +212,7 @@ try{
    report.failures.push("V6.9 web wrongly claims live app availability: "+JSON.stringify(appAccess));
  report.tests.push({name:"V6.9 enterprise services remain permanent, app availability remains truthful",appAccess});
  const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),photoLoaded:document.querySelector("#inicio .prime-photo-image")?.complete}))()');
- if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<60||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png")||!kineticIntro.photoLoaded)report.failures.push("V4.5 visible hero/photo and original brand failed: "+JSON.stringify(kineticIntro));
+ if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<50||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png")||!kineticIntro.photoLoaded)report.failures.push("V4.5 visible hero/photo and original brand failed: "+JSON.stringify(kineticIntro));
  report.tests.push({name:"V4.5 visible headline, photograph and original mark",kineticIntro});
  const anim01=await js('(()=>({noScan:!document.querySelector(".v5-stage-scan"),noDecor:!document.querySelector("#inicio .v4-shape, #inicio .v4-canvas-stamp, #inicio .v5-hero-refraction, #inicio .motion-brand-thread"),direction:document.documentElement.dataset.motionDirection}))()');
  if(!anim01.noScan||!anim01.noDecor||anim01.direction!=="editorial-cinematic-v1")
@@ -290,8 +319,12 @@ try{
    report.tests.push({name:"PRIME-LAYOUT-01 desktop: editorial statement with three original photographs",leanDesktop});
   await capture("desktop-lean-statement.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
- for(const [w,h] of [[1024,768],[768,900],[390,844],[320,700]]){
+ for(const [w,h] of [[1920,1080],[1180,820],[1100,850],[1024,768],[861,900],[860,900],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
+  if(w===1920||w===1024){
+   await sleep(1450);
+   await capture(w===1920?"desktop-1920-hero-fit.png":"desktop-1024-hero-fit.png");
+  }
   if(w===390||w===320){
    // Simulate a script-unavailable page in the loaded DOM. This exercises
    // the exact no-JS CSS selector without needing a second browser session.
