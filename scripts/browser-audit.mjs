@@ -134,7 +134,7 @@ async function viewport(width,height,reduce=false){
   const palette=diag.palette;
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
-   palette.heroCTA!==expectedLime||palette.businessCTA!==expectedOriginal||
+   (palette.heroCTA!==expectedLime&&palette.heroCTA!=="rgba(205, 252, 138, 1)")||palette.businessCTA!==expectedOriginal||
    palette.statementAccent!==expectedOriginal||palette.stageSummaryArrow!==expectedOriginal||
    palette.threeTourButton!==expectedOriginal)
    fails.push("PRIME-COLOR-02: only the hero CTA may be lime; original palette and 3D must remain yellow: "+JSON.stringify(palette));
