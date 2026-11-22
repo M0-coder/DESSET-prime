@@ -34,5 +34,13 @@ test('pull request stage never publishes or receives Cloudflare credentials',()=
  assert.doesNotMatch(offline,/pages deploy|CLOUDFLARE_API_TOKEN/);
  assert.match(yml,/if: github.event_name == 'pull_request'/);
  assert.match(yml,/github.event_name == 'workflow_dispatch'/);
- assert.match(yml,/vars.DESSET_PRIME_RELEASE_ENABLED == 'true'/);
+ assert.ok(manual.includes('RELEASE_ENABLED: 
+});
++'{{ vars.DESSET_PRIME_RELEASE_ENABLED }}'));
+ const gate=manual.slice(manual.indexOf('    if: >-'),manual.indexOf('    runs-on:'));
+ assert.ok(!gate.includes('vars.'),'A protected environment flag cannot be evaluated before runner startup');
+ assert.ok(manual.indexOf('node scripts/prime-manual-cutover-gate.mjs request') <
+  manual.indexOf('CLOUDFLARE_API_TOKEN: 
+});
++'{{ secrets.CLOUDFLARE_API_TOKEN }}'));
 });
