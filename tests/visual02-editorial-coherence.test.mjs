@@ -32,7 +32,10 @@ test("VISUAL-02 concentrates editorial retouching below hero, no image, typeface
  assert.ok(statSync(new URL("styles-visual02.css",root)).size<=8200);
 });
 test("VISUAL-02 ships a single budgeted local stylesheet in source and packaged dist",()=>{
- assert.match(html,/href="\.\/styles-hero-photo\.css">\s*<link rel="stylesheet" href="\.\/styles-visual02\.css"/);
+  const heroStyle='<link rel="stylesheet" href="./styles-hero-photo.css?v=hero-fit-03">';
+  const visualStyle='<link rel="stylesheet" href="./styles-visual02.css">';
+  assert.ok(html.includes(heroStyle)&&html.includes(visualStyle)&&html.indexOf(heroStyle)<html.indexOf(visualStyle),
+    "Versioned hero CSS must load before VISUAL-02 without inserting any duplicate");
  assert.match(build,/"styles-hero-photo\.css","styles-visual02\.css"/);
  assert.match(build,/hero-photo\|-visual02/);
  assert.match(gate,/visual02_css_bytes:8200/);
