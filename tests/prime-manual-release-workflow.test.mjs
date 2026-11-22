@@ -35,23 +35,24 @@ test('manual job starts on main and checks approvals INSIDE protected runner wit
  for(const required of ["github.event_name == 'workflow_dispatch'",
   "github.repository == 'M0-coder/DESSET-prime'",
   "github.ref == 'refs/heads/main'"])assert.ok(condition.includes(required),required);
- assert.doesNotMatch(condition,/\\bvars\\.|\\bsecrets\\.|inputs\\.confirmation|inputs\\.seo_policy/,
-  'Environment variables and business approvals cannot be tested before the protected runner starts');
+ for(const forbidden of ['vars.','secrets.','inputs.confirmation','inputs.seo_policy'])
+  assert.ok(!condition.includes(forbidden),'Approvals must execute on protected runner: '+forbidden);
  const preflight=job.indexOf('node scripts/prime-manual-cutover-gate.mjs request');
- const token=job.indexOf('CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}');
- assert.ok(preflight>=0&&token>preflight,'All approvals must fail CLOSED before exposing Cloudflare credentials');
+ const token=job.indexOf('CLOUDFLARE_API_TOKEN: $'+'{{ secrets.CLOUDFLARE_API_TOKEN }}');
+ assert.ok(preflight>=0&&token>preflight,'All approvals must fail CLOSED before Cloudflare credentials');
  for(const field of ['RELEASE_ENABLED','VISUAL_APPROVED_SHA','RIGHTS_APPROVED','CONTACT_APPROVED',
   'SECURITY_APPROVED','ROLLBACK_BACKUP_APPROVED','INDEX_APPROVED'])
-  assert.match(job,new RegExp('\\\\b'+field+': \\\\$\\\\{\\\\{ vars\\\\.DESSET_PRIME_'),
-   'Protected runner must receive the release authorization variable '+field);
- assert.match(job,/PREVIOUS_DEPLOYMENT_ID: \\$\\{\\{ inputs\\.expected_previous_deployment \\}\\}/);
- assert.match(job,/CONFIRM: \\$\\{\\{ inputs\\.confirmation \\}\\}/);
+  assert.ok(job.includes(field+': $'+'{{ vars.DESSET_PRIME_'+field+' }}'),
+   'Protected runner must receive authorization variable '+field);
+ for(const entry of ['PREVIOUS_DEPLOYMENT_ID: $'+'{{ inputs.expected_previous_deployment }}',
+  'CONFIRM: $'+'{{ inputs.confirmation }}','RELEASE_SHA: $'+'{{ inputs.release_sha }}'])
+  assert.ok(job.includes(entry),'Missing manual input in runner preflight: '+entry);
 });
 test('fresh Cloudflare project AND domains snapshots are taken TWICE before the only mutation',()=>{
  const beforeDeploy=job.split('      - name: PUBLISH — only mutation')[0];
- assert.equal((beforeDeploy.match(/pages\\/projects\\/desset-institucional\\/domains/g)||[]).length,2);
- assert.equal((beforeDeploy.match(/node scripts\\/prime-manual-cutover-gate\\.mjs cloudflare/g)||[]).length,2);
- assert.match(doc,/concurrency:\\n  group: desset-prime-cloudflare-manual-cutover\\n  cancel-in-progress: false/);
+ assert.equal(beforeDeploy.split('pages/projects/desset-institucional/domains').length-1,2);
+ assert.equal(beforeDeploy.split('node scripts/prime-manual-cutover-gate.mjs cloudflare').length-1,2);
+ assert.ok(doc.includes('concurrency:\n  group: desset-prime-cloudflare-manual-cutover\n  cancel-in-progress: false'));
 });
 
 test('environment approval and secrets apply ONLY to manual job',()=>{
