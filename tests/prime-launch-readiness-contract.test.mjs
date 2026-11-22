@@ -23,7 +23,7 @@ test('review evidence archives licenses, institutional channel status and indepe
 test('manual production job requires approved owner-declared channels and the MIT notice',()=>{
  const contactStep=manual.split('      - name: Check declared contact links')[1].split('      - name:')[0];
  assert.match(contactStep,/prime-channel-readiness.mjs.*--accept-owner-declaration/);
- assert.ok(contactStep.includes('CONTACT_APPROVED: ${{ vars.DESSET_PRIME_CONTACT_APPROVED }}'));
+ assert.ok(!contactStep.includes('CONTACT_APPROVED:'),'Channel validation remains automatic; no second approval');
  assert.ok(contactStep.includes('RELEASE_SHA: ${{ inputs.release_sha }}'));
  assert.match(manual,/verify-prime-manual-package.mjs/);
  assert.match(manual,/THIRD-PARTY-NOTICES.txt/);
@@ -35,7 +35,9 @@ test('pull request stage never publishes or receives Cloudflare credentials',()=
  assert.match(yml,/if: github.event_name == 'pull_request'/);
  assert.match(yml,/github.event_name == 'workflow_dispatch'/);
  const dollar=String.fromCharCode(36);
- assert.ok(manual.includes('RELEASE_ENABLED: '+dollar+'{{ vars.DESSET_PRIME_RELEASE_ENABLED }}'));
+ assert.ok(!manual.includes('RELEASE_ENABLED:'),'Manual enable flag replaced by protected review');
+ assert.ok(manual.includes('SEO_POLICY: NOINDEX'));
+ assert.ok(manual.includes('environment:\n      name: desset-prime-production'));
  const gate=manual.slice(manual.indexOf('    if: >-'),manual.indexOf('    runs-on:'));
  assert.ok(!gate.includes('vars.'),'Protected environment approval must be evaluated in the runner');
  assert.ok(manual.indexOf('node scripts/prime-manual-cutover-gate.mjs request') <

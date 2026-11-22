@@ -131,14 +131,14 @@ test('release accepts exact owner-declared links without claiming admin access o
  const check=(overrides={},source=join(root,'index.html'))=>spawnSync(process.execPath,[
   join(root,'scripts/prime-channel-readiness.mjs'),source,join(root,'scripts/service-state.js'),
   '','--accept-owner-declaration'],{encoding:'utf8',env:{...process.env,
-   RELEASE_SHA:sha,GITHUB_SHA:sha,CONTACT_APPROVED:'true',...overrides}});
+   RELEASE_SHA:sha,GITHUB_SHA:sha,...overrides}});
  const ok=check();
  assert.equal(ok.status,0,ok.stderr);
  const report=JSON.parse(ok.stdout);
  assert.equal(report.channels_status,'OWNER_ATTESTED');
  assert.equal(report.technical_platform_admin_access_tested,false);
  assert.equal(report.release_authorized,false);
- for(const env of [{CONTACT_APPROVED:'false'},{GITHUB_SHA:'b'.repeat(40)},{RELEASE_SHA:''}]){
+ for(const env of [{GITHUB_SHA:'b'.repeat(40)},{RELEASE_SHA:'b'.repeat(40)},{RELEASE_SHA:''}]){
   assert.equal(check(env).status,2);
  }
  const directory=mkdtempSync(join(tmpdir(),'desset-channel-test-'));

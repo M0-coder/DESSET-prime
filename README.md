@@ -2,6 +2,10 @@
 
 > **Estado:** código fuente de la web institucional DESSET publicada en Cloudflare Pages `desset-institucional`. Los cambios en GitHub NO se publican automáticamente; cualquier nuevo despliegue exige autorización por SHA exacto y ejecución manual protegida. La web no recibe pedidos ni pagos.
 
+## Publicación manual (una sola aprobación)
+
+Para publicar cambios en el sitio institucional, se utiliza exclusivamente `.github/workflows/prime-manual-publish.yml` desde `main`. El formulario pide el SHA exacto y el despliegue actual de Cloudflare. **La única autorización humana es la revisión del entorno protegido `desset-prime-production`**. Los controles técnicos de SHA, seguridad, derechos/recursos, canales, despliegue y doble verificación de Cloudflare siguen automatizados. El SEO permanece fijo en `NOINDEX`. Ver [procedimiento actual de una sola aprobación](docs/PRIME-SINGLE-APPROVAL-PUBLISH-01.md).
+
 ## Fuentes de verdad
 
 - **Única fuente del sitio institucional:** este repositorio, [M0-coder/DESSET-prime](https://github.com/M0-coder/DESSET-prime). El repositorio experimental anterior no forma parte del código ni del despliegue de Prime. Cloudflare determina qué SHA se sirve realmente al público; `main` por sí solo no prueba publicación.

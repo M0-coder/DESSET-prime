@@ -7,9 +7,8 @@ import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const targetPath=resolve(dirname(fileURLToPath(import.meta.url)),'../config/prime-release-target.json');
 const HEX40=/^[a-f0-9]{40}$/,UUID=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/;
-export const CONFIRM='PUBLICAR_PRIME_DESSET';
 const mark=(errors,condition,message)=>{if(!condition)errors.push(message)};
-export function validateReleaseIntent({repository,ref,event,expectedSha,checkoutSha,previousId,confirm,seoPolicy,flags,target}){
+export function validateReleaseIntent({repository,ref,event,expectedSha,checkoutSha,previousId,seoPolicy,target}){
  const err=[];
  mark(err,repository===target?.repository,'Wrong GitHub repository');
  mark(err,event==='workflow_dispatch','Must be manually dispatched');
@@ -19,17 +18,13 @@ export function validateReleaseIntent({repository,ref,event,expectedSha,checkout
  // target.recovery_deployment_id is a HISTORICAL fallback, not the expected current ID.
  mark(err,UUID.test(previousId),'Expected CURRENT production deployment ID is not a valid UUID');
  mark(err,UUID.test(target?.recovery_deployment_id),'Historical recovery deployment ID is invalid');
- mark(err,confirm===CONFIRM,'Missing exact publication confirmation');
- mark(err,seoPolicy==='NOINDEX'||seoPolicy==='INDEX','SEO policy not explicit');
+ // INDEX is intentionally outside this single-approval workflow. Any future
+ // indexation policy requires a separately reviewed code change.
+ mark(err,seoPolicy==='NOINDEX','Only explicit NOINDEX publishing is permitted');
  mark(err,target?.schema==='desset-prime-release-target-v1'&&target?.production_deploy_enabled===false&&target?.requires_fresh_owner_approval===true,'Repository release target policy unexpectedly changed');
  mark(err,target?.cloudflare_project==='desset-institucional'&&target?.production_branch==='release-approved'&&target?.domain==='desset.lat','Wrong destination');
- mark(err,flags?.enabled==='true','Default-disabled release variable not enabled');
- mark(err,flags?.visualApprovedSha===expectedSha,'Visual approval does not cover this exact SHA');
- mark(err,flags?.rightsApproved==='true','Brand and imagery rights not approved');
- mark(err,flags?.contactApproved==='true','Institutional contact not approved');
- mark(err,flags?.securityApproved==='true','Security and physical-device gate not approved');
- mark(err,flags?.rollbackBackupApproved==='true','Rollback snapshot and access not verified');
- if(seoPolicy==='INDEX')mark(err,flags?.indexApproved==='true','Search engine indexation not approved');
+ // Human authorization is the required-reviewer decision on the protected
+ // GitHub environment. Never infer approval from repository variables.
  return {result:err.length?'NO-GO':'READY-FOR-LIVE-PREFLIGHT',failures:err,release_authorized:false,requires_fresh_cloudflare_check:true};
 }
 export function validateCloudflareSnapshot({projectResponse,domainsResponse,previousId,expectedAccount,actualAccount}){
@@ -55,10 +50,7 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    const e=process.env;
    const out=validateReleaseIntent({repository:e.GITHUB_REPOSITORY,ref:e.GITHUB_REF,event:e.GITHUB_EVENT_NAME,
      expectedSha:e.RELEASE_SHA,checkoutSha:e.GITHUB_SHA,previousId:e.PREVIOUS_DEPLOYMENT_ID,
-     confirm:e.CONFIRM,seoPolicy:e.SEO_POLICY,target,
-     flags:{enabled:e.RELEASE_ENABLED,visualApprovedSha:e.VISUAL_APPROVED_SHA,
-       rightsApproved:e.RIGHTS_APPROVED,contactApproved:e.CONTACT_APPROVED,
-       securityApproved:e.SECURITY_APPROVED,rollbackBackupApproved:e.ROLLBACK_BACKUP_APPROVED,indexApproved:e.INDEX_APPROVED}});
+     seoPolicy:e.SEO_POLICY,target});
    console.log(JSON.stringify(out));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
   }else if(task==='cloudflare'){
    const [projectPath,domainPath]=process.argv.slice(3);

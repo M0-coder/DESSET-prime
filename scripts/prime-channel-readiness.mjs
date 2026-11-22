@@ -113,9 +113,11 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   strict(htmlPath&&statePath&&isAbsolute(htmlPath)&&isAbsolute(statePath),'absolute source paths required');
   let report=inspectInstitutionalChannels({html:readFileSync(htmlPath,'utf8'),serviceState:readFileSync(statePath,'utf8')});
   if(mode==='--accept-owner-declaration'){
-   const {CONTACT_APPROVED,RELEASE_SHA,GITHUB_SHA}=process.env;
-   strict(CONTACT_APPROVED==='true'&&/^[a-f0-9]{40}$/.test(RELEASE_SHA??'')&&RELEASE_SHA===GITHUB_SHA,
-    'contact approval must apply to the running release SHA');
+   const {RELEASE_SHA,GITHUB_SHA}=process.env;
+   // Human authorization already occurred in GitHub's protected environment.
+   // This remains a technical assertion only: exact checked-out release SHA.
+   strict(/^[a-f0-9]{40}$/.test(RELEASE_SHA??'')&&RELEASE_SHA===GITHUB_SHA,
+    'institutional channel check must apply to the running release SHA');
    strict(report.channels_status==='OWNER_ATTESTED'&&report.unconfirmed_count===0&&report.owner_attested_count===5,
     'every public channel must match the owner declaration');
   }else if(mode!==undefined){
