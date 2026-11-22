@@ -61,7 +61,7 @@ for(const file of ["LICENSE-Inter-OFL.txt","LICENSE-Plus-Jakarta-Sans-OFL.txt"])
 }
 check(html.includes('rel="preload" href="./fonts/inter-latin-variable.woff2"')&&html.includes('rel="preload" href="./fonts/plus-jakarta-sans-latin-variable.woff2"'),"Local font preload missing");
 check(expected.has("styles-system.css")&&html.includes('href="./styles-system.css"'),"60/30/10 design CSS not packaged");
-check(expected.has("styles-hero-photo.css")&&html.includes('href="./styles-hero-photo.css"'),"Photographic stylesheet missing");
+check(expected.has("styles-hero-photo.css")&&html.includes('href="./styles-hero-photo.css?v=hero-fit-03"'),"Photographic stylesheet missing");
 check(expected.has("styles-visual02.css")&&html.includes('href="./styles-visual02.css"'),"VISUAL-02 editorial stylesheet missing");
 check(expected.has("assets/desset-hero-entrega-dos-espejos.webp")&&html.includes('src="./assets/desset-hero-entrega-dos-espejos.webp"'),"Approved photographic render is not packaged");
 check(expected.has("assets/desset-hero-entrega-mobile.webp")&&html.includes('srcset="./assets/desset-hero-entrega-mobile.webp"'),"Mobile photographic LCP asset missing");
