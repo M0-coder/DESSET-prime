@@ -207,7 +207,7 @@ try{
    report.failures.push("V6.9 web wrongly claims live app availability: "+JSON.stringify(appAccess));
  report.tests.push({name:"V6.9 enterprise services remain permanent, app availability remains truthful",appAccess});
  const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),photoLoaded:document.querySelector("#inicio .prime-photo-image")?.complete}))()');
- if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<38||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png")||!kineticIntro.photoLoaded)report.failures.push("V4.5 visible hero/photo and original brand failed: "+JSON.stringify(kineticIntro));
+ if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<50||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png")||!kineticIntro.photoLoaded)report.failures.push("V4.5 visible hero/photo and original brand failed: "+JSON.stringify(kineticIntro));
  report.tests.push({name:"V4.5 visible headline, photograph and original mark",kineticIntro});
  const anim01=await js('(()=>({noScan:!document.querySelector(".v5-stage-scan"),noDecor:!document.querySelector("#inicio .v4-shape, #inicio .v4-canvas-stamp, #inicio .v5-hero-refraction, #inicio .motion-brand-thread"),direction:document.documentElement.dataset.motionDirection}))()');
  if(!anim01.noScan||!anim01.noDecor||anim01.direction!=="editorial-cinematic-v1")
