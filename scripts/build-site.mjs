@@ -58,7 +58,11 @@ for(const path of files){
 const refs=[...original.matchAll(/\b(?:src|srcset|href)="(\.\/[^"]+)"/g)]
  .map(m=>m[1].slice(2).split(/\s+/)[0]);
 for(const href of refs){
- if(href.includes("..")||!files.includes(href))
+ // One exact cache-busted local CSS URL is allowed. No arbitrary query
+ // parameters, external URLs or other asset aliases may enter the package.
+ const localAsset=href==="styles-hero-photo.css?v=hero-fit-03"
+  ?"styles-hero-photo.css":href;
+ if(href.includes("..")||!files.includes(localAsset))
   throw Error("HTML references absent or disallowed website file: "+href);
 }
 const pattern=/\.\/assets\/v62-(?:commerce|courier|destination)\.glb/g;
