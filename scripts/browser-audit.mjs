@@ -70,6 +70,15 @@ async function viewport(width,height,reduce=false){
  await call("Page.navigate",{url:URL});
  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.hero--motion')"),"page render");
  await js('document.fonts.ready');
+ // PRIME-COLOR-02 must sample the final opaque CTA, not a partial CSS
+ // background transition. Fail closed if it never becomes fully opaque.
+ await until(async()=>await js(`(()=>{
+   const el=document.querySelector("#inicio .hero-cta");
+   if(!el)return false;
+   const color=getComputedStyle(el).backgroundColor;
+   const match=color.match(/^rgba\\(\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*([\\d.]+)\\s*\\)$/);
+   return !match||Number(match[1])>=0.9999;
+ })()`),"fully opaque hero CTA background after its CSS transition");
  await sleep(130);
  const diag=await js(`(()=>{
  const viewport=document.documentElement.clientWidth;
@@ -132,11 +141,11 @@ async function viewport(width,height,reduce=false){
   if(diag.disclosures.technical!==false||diag.disclosures.future!==false)fails.push("Freshly navigated page must start with both native disclosures CLOSED: "+JSON.stringify(diag.disclosures));
   const expectedOriginal="rgb(255, 198, 47)";
   const palette=diag.palette;
-  // During the finite entrance Chromium may serialize the exact lime channels as
-  // rgba(..., 0.996). The displayed color is unchanged; fail on different RGB.
+  // The final computed color is checked only after the background settles.
+  // Never accept a semi-transparent or differently colored CTA as a PASS.
   const limeChannels=palette.heroCTA.match(/^rgba?\(205,\s*252,\s*138(?:,\s*([\d.]+))?\)$/);
   const exactLime=!!limeChannels&&(limeChannels[1]===undefined||
-   (Number(limeChannels[1])>=.99&&Number(limeChannels[1])<=1));
+   (Number(limeChannels[1])>=.9999&&Number(limeChannels[1])<=1));
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
    !exactLime||palette.businessCTA!==expectedOriginal||

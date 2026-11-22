@@ -51,3 +51,13 @@ test("Browser QA enforces gold on other elements, green only in hero, and reprod
  for(const path of ["styles-visual02.css","assets/v62-commerce.glb","assets/v62-courier.glb","assets/v62-destination.glb"])
   assert.ok(manifest.files.some(e=>e.path===path),"Source/dist integrity required for "+path);
 });
+
+test("Browser QA waits for the final opaque CTA instead of accepting a transient alpha",()=>{
+ const settle=audit.indexOf("fully opaque hero CTA background after its CSS transition");
+ const sample=audit.indexOf("const palette={");
+ assert.ok(settle>0&&sample>settle,"Color must settle BEFORE browser palette sampling");
+ assert.match(audit,/return !match\|\|Number\(match\[1\]\)>=0\.9999/);
+ assert.match(audit,/Number\(limeChannels\[1\]\)>=\.9999/);
+ assert.doesNotMatch(audit,/Number\(limeChannels\[1\]\)>=\.99&&/,"Do not weaken final alpha threshold");
+ assert.match(audit,/PRIME-COLOR-02: only the hero CTA may be lime/);
+});
