@@ -160,6 +160,11 @@ async function viewport(width,height,reduce=false){
     (diag.heroFit.photoLeft>diag.heroFit.typeRight+3 &&
      diag.heroFit.rows.some(line=>line.contentRight>diag.heroFit.photoLeft-18)))
    fails.push("HERO-FIT-02: approved headline escaped text column or entered photo: "+JSON.stringify(diag.heroFit));
+ if(width>=1300 && (
+   diag.heroFit.fontSize<49 ||
+   diag.heroFit.rows[0].contentLeft<diag.heroFit.typeLeft+40 ||
+   diag.heroFit.rows[0].contentRight>diag.heroFit.photoLeft-28
+ ))fails.push("HERO-REGION-03: headline must remain inside owner's inset desktop text area, not invade photograph: "+JSON.stringify(diag.heroFit));
  if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
@@ -328,11 +333,11 @@ try{
    report.tests.push({name:"PRIME-LAYOUT-01 desktop: editorial statement with three original photographs",leanDesktop});
   await capture("desktop-lean-statement.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
- for(const [w,h] of [[1920,1080],[1180,820],[1100,850],[1024,768],[861,900],[860,900],[768,900],[390,844],[320,700]]){
+ for(const [w,h] of [[1920,1080],[1650,927],[1180,820],[1100,850],[1024,768],[861,900],[860,900],[768,900],[390,844],[320,700]]){
   await viewport(w,h);
-  if(w===1920||w===1024){
+  if(w===1920||w===1650||w===1024){
    await sleep(1450);
-   await capture(w===1920?"desktop-1920-hero-fit.png":"desktop-1024-hero-fit.png");
+   await capture(w===1920?"desktop-1920-hero-fit.png":w===1650?"desktop-1650-hero-fit.png":"desktop-1024-hero-fit.png");
   }
   if(w===390||w===320){
    // Simulate a script-unavailable page in the loaded DOM. This exercises
