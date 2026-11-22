@@ -40,7 +40,9 @@ test('HERO-PHOTO-01 two-column mockup, responsive, reduced motion and real 3D re
  assert.ok(statSync(new URL('styles-hero-photo.css',root)).size<=9500);
 });
 test('HERO-PHOTO-01 real site build, local browser proof, security gate include asset',()=>{
- assert.match(build,/styles-hero-photo\.css/);
+ assert.match(build,/styles-hero-photo\\.css/);
+ assert.ok(build.includes('href==="styles-hero-photo.css?v=hero-fit-03"'),"Only the exact cache version is approved");
+ assert.ok(build.includes('files.includes(localAsset)'),"Cache-busted URL must still pass strict package allowlist");
  assert.match(verify,/Approved photographic render is not packaged/);
  assert.match(gate,/hero_webp_bytes:210000/);
  assert.match(read('scripts/browser-audit.mjs'),/HERO-PHOTO-01 exact local render, original logo, conceptual disclosure/);
