@@ -115,18 +115,13 @@ jobs:
 
   publish-only-after-independent-authorization:
     name: Manual verified cutover to existing Pages project
+    # Keep the pre-run guard structural only: environment-scoped variables are
+    # unavailable until this protected job starts. ALL business approvals are
+    # verified by the fail-closed request preflight before any Cloudflare token.
     if: >-
       github.event_name == 'workflow_dispatch' &&
       github.repository == 'M0-coder/DESSET-prime' &&
-      github.ref == 'refs/heads/main' &&
-      inputs.confirmation == 'PUBLICAR_PRIME_DESSET' &&
-      vars.DESSET_PRIME_RELEASE_ENABLED == 'true' &&
-      vars.DESSET_PRIME_VISUAL_APPROVED_SHA == inputs.release_sha &&
-      vars.DESSET_PRIME_RIGHTS_APPROVED == 'true' &&
-      vars.DESSET_PRIME_CONTACT_APPROVED == 'true' &&
-      vars.DESSET_PRIME_SECURITY_APPROVED == 'true' &&
-      vars.DESSET_PRIME_ROLLBACK_BACKUP_APPROVED == 'true' &&
-      (inputs.seo_policy == 'NOINDEX' || vars.DESSET_PRIME_INDEX_APPROVED == 'true')
+      github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     environment:
@@ -233,6 +228,9 @@ jobs:
           curl --fail-with-body -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional" \
             -o "$RUNNER_TEMP/prime-current-project.json"
+          curl --fail-with-body -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/desset-institucional/domains" \
+            -o "$RUNNER_TEMP/prime-current-domains.json"
           node scripts/prime-manual-cutover-gate.mjs cloudflare \
             "$RUNNER_TEMP/prime-current-project.json" "$RUNNER_TEMP/prime-current-domains.json"
       - name: PUBLISH — only mutation, requires manual dispatch, all gates and protected environment
