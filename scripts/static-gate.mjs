@@ -17,9 +17,13 @@ for(const tag of html.match(/<(?:script|link|img|source)\b[^>]*>/g)||[]){
   if(!val.startsWith("./")){issues.push("Nonlocal DOM resource "+val);continue}
   const filename=val.slice(2);
   if(filename.includes("..")||filename.startsWith("/")){issues.push("Unsafe asset path "+filename);continue}
-  const full=resolve(root,filename);
+  // Match the single exact, explicitly approved local cache-version alias.
+  // Reject any other query string without weakening the file allowlist.
+  const localFile=filename==="styles-hero-photo.css?v=hero-fit-03"?"styles-hero-photo.css":filename;
+  if(localFile.includes("?")){issues.push("Disallowed resource query: "+filename);continue}
+  const full=resolve(root,localFile);
   assert(existsSync(full),"Referenced asset missing: "+filename);
-  if(existsSync(full))localSet.add(filename);
+  if(existsSync(full))localSet.add(localFile);
  }
 }
 for(const url of [...html.matchAll(/href="(#[^"]+)"/g)].map(m=>m[1].slice(1)))
