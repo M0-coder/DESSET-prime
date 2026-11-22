@@ -84,12 +84,13 @@
 #inicio .v4-hero-type{container-type:inline-size}
 @media (min-width:1101px){
  #inicio .v4-hero-composition{max-width:1700px}
- #inicio .motion-headline{font-size:clamp(35px,7.55cqw,62px)}
+ #inicio .v4-hero-type{padding-inline-start:clamp(0px,1.1vw,22px)}
+ #inicio .motion-headline{font-size:clamp(43px,9.5cqw,79px)}
 }
 @media (min-width:861px) and (max-width:1100px){
  #inicio .v4-hero-composition{grid-template-columns:minmax(0,1fr);gap:28px;min-height:0}
- #inicio .motion-headline{font-size:clamp(38px,7.55cqw,68px)}
+ #inicio .motion-headline{font-size:clamp(38px,9.5cqw,80px)}
 }
 @media (max-width:860px){
- #inicio .motion-headline{font-size:clamp(22px,7.55cqw,62px)}
+ #inicio .motion-headline{font-size:clamp(22px,9.5cqw,75px)}
 }
