@@ -35,7 +35,7 @@ test("navegación, accesibilidad y seguridad de vista previa",()=>{
 });
 test("sin dependencia de hojas duplicadas, marca ficticia ni imágenes de stock",()=>{
  const stylesheets=[...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map(match=>match[1]);
- assert.deepEqual(stylesheets,["./styles.css","./styles-v5.css","./styles-system.css","./styles-hero-photo.css","./styles-visual02.css","./styles-typography.css"],"Only the six exact, audited, local stylesheets are permitted, including separately licensed typography");
+ assert.deepEqual(stylesheets,["./styles.css","./styles-v5.css","./styles-system.css","./styles-hero-photo.css?v=hero-fit-03","./styles-visual02.css","./styles-typography.css"],"Only the six exact, audited, local stylesheets are permitted, including separately licensed typography");
  assert.doesNotMatch(css,/\.art-center\{|\.hero-art\{|@keyframes arrive/);
  assert.doesNotMatch(html,/https?:\/\/images\./);
 });
