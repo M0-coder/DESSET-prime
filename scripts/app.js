@@ -4,7 +4,7 @@ const nav=document.querySelector(".main-nav");
 if(menu&&nav){
  const setOpen=(open)=>{
   menu.setAttribute("aria-expanded",String(open));
-  menu.setAttribute("aria-label",open?"Cerrar navegación":"Abrir navegación");
+  menu.setAttribute("aria-label",open?"Menú — cerrar navegación":"Menú — abrir navegación");
   nav.dataset.open=String(open);
  };
  menu.addEventListener("click",()=>setOpen(menu.getAttribute("aria-expanded")!=="true"));
