@@ -5,6 +5,7 @@ const read=path=>readFileSync(new URL("../"+path,import.meta.url),"utf8");
 const scene=read("scripts/v6-three.src.mjs");
 const gpu=read("scripts/v6-gpu-browser-audit.mjs");
 const html=read("index.html");
+const css=read("styles-v5.css");
 const original=JSON.parse(read("config/prime-original-assets.json"));
 
 test("PRIME-3D-03 adds genuine architectural depth without replacing the three registered GLBs",()=>{
@@ -32,4 +33,6 @@ test("PRIME-3D-03 preserves presentation controls, fallback and no false live tr
  assert.doesNotMatch(scene,/fetch\s*\(|XMLHttpRequest|WebSocket|localStorage|sendBeacon/);
  assert.match(gpu,/PRIME-3D-03 real premium infrastructure and four conceptual dock beacons/);
  assert.match(gpu,/PRIME-3D-03 premium hub survives mobile GLB hydration/);
+ assert.match(css,/\.logistics-hud__card--docks\{left:4%;top:auto;bottom:8%;width:180px\}/);
+ assert.match(scene,/grid\.material\.opacity=coarse\?\.19:\.14/);
 });
