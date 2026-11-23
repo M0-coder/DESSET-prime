@@ -7,7 +7,7 @@ const source=readFileSync(new URL("../scripts/app.js",import.meta.url),"utf8");
 
 function createHarness(script=source,withElements=true){
  const handlers={menu:{},nav:{},document:{}};
- const attrs={"aria-expanded":"false","aria-label":"Abrir navegación"};
+ const attrs={"aria-expanded":"false","aria-label":"Menú — abrir navegación"};
  let focused=0;
  const rootClasses=new Set();
  const menu={
@@ -43,7 +43,7 @@ function contract(script=source){
  assert.ok(h.rootClasses.has("js-enabled"),"Progressive navigation is activated after handlers are registered");
  h.clickMenu();
  assert.equal(h.attrs["aria-expanded"],"true");
- assert.equal(h.attrs["aria-label"],"Cerrar navegación");
+ assert.equal(h.attrs["aria-label"],"Menú — cerrar navegación");
  assert.equal(h.nav.dataset.open,"true");
 
  h.keydown("Tab");
@@ -51,7 +51,7 @@ function contract(script=source){
  h.keydown("Escape");
  assert.equal(h.attrs["aria-expanded"],"false","Escape must close menu");
  assert.equal(h.nav.dataset.open,"false");
- assert.equal(h.attrs["aria-label"],"Abrir navegación");
+ assert.equal(h.attrs["aria-label"],"Menú — abrir navegación");
  assert.equal(h.focusCount,1,"Focus must return to trigger after Escape");
 
  h.clickMenu();
