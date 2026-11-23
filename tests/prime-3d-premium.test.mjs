@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 const read=path=>readFileSync(new URL("../"+path,import.meta.url),"utf8");
 const scene=read("scripts/v6-three.src.mjs");
+const loader=read("scripts/v62-glb-loader.src.mjs");
 const gpu=read("scripts/v6-gpu-browser-audit.mjs");
 const html=read("index.html");
 const css=read("styles-v5.css");
@@ -65,4 +66,15 @@ test("PRIME-3D-04 truck geometry aligns to actual dock gate positions and moves 
  assert.match(scene,/new THREE\.HemisphereLight\(0xffffff,0x6b90c5,1\.8\)/);
  assert.match(scene,/new THREE\.DirectionalLight\(0xf5faff,2\.8\)/);
  assert.match(scene,/size=vertical\?8\.0:coarse\?6\.35:6\.55/);
+});
+
+test("PRIME-3D-05 warehouse sign reads DESSET Prime in GLB and procedural fallback",()=>{
+ assert.match(scene,/sign\(g,"DESSET Prime",0,2\.72,1\.89,2\.60,\.27\)/);
+ assert.match(loader,/sign\(parent,"DESSET Prime",0,2\.72,1\.91,2\.60,\.29\)/);
+ assert.doesNotMatch(scene,/sign\(g,"DESSET",0,2\.72,1\.89/);
+ assert.doesNotMatch(loader,/sign\(parent,"DESSET",0,2\.72,1\.91/);
+ // Vehicle DESSET branding and the independent MUELLES/PATIO signs are unchanged.
+ assert.match(loader,/sign\(parent,"DESSET",0,1\.84,\.77,\.90,\.21\)/);
+ assert.match(loader,/sign\(parent,"MUELLES"/);
+ assert.match(loader,/sign\(parent,"PATIO"/);
 });
