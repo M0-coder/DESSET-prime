@@ -27,19 +27,19 @@ if(!stage||!mount||!controls||reduced){
  let pointer={x:0,y:0},last=0,lastRender=0;
  let onMove,onLeave,onResize,onVisibility,onControls;
  const ownedTextures=[];
- const PAL={blue:0x1551d8,gold:0xffc62f,red:0xff3328,night:0x0b1024};
+ const PAL={blue:0x1551d8,gold:0xffc62f,red:0xff3328,night:0xe8f0fa};
  const makeMat=(color,metalness=0.2,roughness=0.48,emissive=0x000000,intensity=0)=>
    new THREE.MeshStandardMaterial({color,metalness,roughness,emissive,emissiveIntensity:intensity});
  const mats={
   blue:makeMat(PAL.blue,.21,.29),cyan:makeMat(0x5f94ff,.26,.32),
   gold:makeMat(PAL.gold,.22,.36,0xe39505,.13),
   red:makeMat(PAL.red,.24,.38),dark:makeMat(0x172443,.28,.60),
-  side:makeMat(0x263e73,.20,.60),cream:makeMat(0xf9f0d3,.08,.61),
+  side:makeMat(0x9bbce0,.18,.65),cream:makeMat(0xf7fbff,.08,.61),
   glass:makeMat(0x73d7f7,.40,.13,0x1c68bb,.47),
   route:makeMat(PAL.gold,.12,.30,0xffb725,1.4),
-  road:makeMat(0x122142,.14,.78),
+  road:makeMat(0xdce8f7,.08,.86),
   trim:makeMat(0x1a3e83,.55,.28),
-  chrome:makeMat(0xc5d6f6,.75,.22),
+  chrome:makeMat(0xc7d8ec,.35,.48),
   windowLight:makeMat(0x82d7f3,.10,.20,0x4b9de8,.70),
   headlight:makeMat(0xfef4cb,.14,.25,0xffc62f,1.6)
  };
@@ -104,71 +104,62 @@ if(!stage||!mount||!controls||reduced){
   box(parent,w,.23,d,0,-.12,0,mats.side);
   box(parent,w*.86,.04,d*.85,0,.025,0,mats.road);
  };
+ // LOGISTICS-3D-01: new provisional meshes for the same warehouse GLB loading slots.
+ // Former storefront, motorcycle and red house are fully replaced.
  function storefront(){
   const g=new THREE.Group();g.name="commerce";g.position.set(vertical?-.7:-5,0,vertical?-4.7:0);scene.add(g);
-  plinth(g,4.1,3.1);
-  box(g,2.7,2.3,1.95,0,1.22,-.2,mats.blue);
-  box(g,3.1,.27,2.25,0,2.47,-.22,mats.cyan);
-  for(const x of [-.91,.91])box(g,.65,1.03,.035,x,1.22,.796,mats.glass);
-  box(g,.6,1.53,.055,0,1.01,.80,mats.dark);
-  box(g,3.22,.2,1.15,0,1.96,1.12,mats.gold);
-  for(let i=0;i<7;i++)box(g,.43,.10,.79,-1.35+i*.45,1.79,1.26,i%2?mats.cream:mats.red);
-  box(g,1.24,.27,.05,0,2.08,.935,mats.dark);
-  box(g,1.11,.27,.07,0,2.10,.974,mats.trim);
-  sign(g,"DESSET",0,2.10,1.017,.95,.18);
-  for(const x of [-1.04,1.04])cylinder(g,.13,.7,x,.39,1.5,mats.gold);
-  for(const x of [-.91,.91])box(g,.055,1.1,.07,x,1.22,.831,mats.chrome);
-  box(g,2.76,.065,.18,0,.19,.88,mats.chrome);
-  box(g,.75,.08,.50,0,.17,1.01,mats.gold);
-  sphere(g,.064,.20,1.0,.852,mats.headlight);
- }
- function destination(){
-  const g=new THREE.Group();g.name="destination";g.position.set(vertical?.7:5.03,0,vertical?4.7:-.35);scene.add(g);
-  plinth(g,3.65,3.15);
-  box(g,2.65,2.12,2.18,0,1.12,0,mats.red);
-  const roof=new THREE.Mesh(new THREE.ConeGeometry(2.14,1.28,4,1),mats.cream);
-  roof.position.set(0,2.75,0);
-  roof.rotation.y=Math.PI/4;g.add(roof);
-  box(g,.83,1.48,.058,.36,.76,1.122,mats.dark);
-  box(g,.62,.6,.065,-.81,1.30,1.123,mats.glass);
-  box(g,.52,.62,.062,1.333,1.31,-.34,mats.windowLight);
-  sphere(g,.075,.80,.72,1.17,mats.gold);
-  box(g,1.02,.09,.42,.36,.17,1.33,mats.cream);
-  box(g,2.84,.13,.20,0,2.15,1.03,mats.chrome);
-  sign(g,"DESTINO",0,2.17,1.145,1.35,.17);
-  box(g,.05,.67,.09,-.81,1.32,1.166,mats.chrome);
+  plinth(g,5.85,4.55);
+  box(g,5.54,2.64,3.48,0,1.40,-.25,mats.cream);
+  box(g,5.72,.25,3.83,0,2.83,-.25,mats.chrome);
+  for(let i=0;i<9;i++)box(g,.03,.035,3.72,-2.5+i*.625,3.02,-.25,mats.cyan);
+  for(const px of [-1.87,0,1.87]){
+   box(g,1.53,1.68,.09,px,1.05,1.53,mats.dark);
+   box(g,1.27,1.35,.1,px,.96,1.59,mats.chrome);
+   for(let y=.42;y<1.51;y+=.16)box(g,1.27,.018,.11,px,y,1.65,mats.cream);
+   box(g,1.56,.15,.20,px,1.91,1.61,mats.blue);
+   box(g,1.52,.15,.63,px,.13,1.83,mats.side);
+  }
+  sign(g,"DESSET",0,2.28,1.61,1.12,.23);
+  for(const px of [-2.15,2.15])box(g,.75,.30,.65,px,3.17,-1.00,mats.chrome);
+  return g;
  }
  function courier(){
   const g=new THREE.Group();g.name="courier";g.position.set(vertical?0:.98,.13,vertical?0:1.18);scene.add(g);
-  plinth(g,3.9,2.65);
-  for(const x of [-.92,.91]){
-   const tyre=new THREE.Mesh(new THREE.TorusGeometry(.39,.115,8,18),mats.dark);
-   tyre.position.set(x,.50,.54);g.add(tyre);
-   const hub=new THREE.Mesh(new THREE.CircleGeometry(.17,16),mats.cyan);
-   hub.position.copy(tyre.position);hub.position.z+=.03;g.add(hub);
+  plinth(g,3.95,3.10);
+  for(let n=0;n<2;n++){
+   const ox=n===0?-1.04:1.08,z=n===0?-.42:.55;
+   box(g,.92,.88,1.70,ox,1.0,z,mats.cream);
+   box(g,.94,.09,1.72,ox,1.49,z,mats.chrome);
+   box(g,.77,.69,.68,ox,.90,z+1.07,mats.blue);
+   box(g,.65,.32,.04,ox,1.05,z+1.43,mats.glass);
+   box(g,.78,.09,.11,ox,.61,z+1.43,mats.chrome);
+   for(const side of [-.49,.49])for(const wz of [z-.60,z+.63,z+1.04]){
+    const tire=new THREE.Mesh(new THREE.CylinderGeometry(.19,.19,.16,12),mats.dark);
+    tire.rotation.z=Math.PI/2;tire.position.set(ox+side,.41,wz);g.add(tire);
+   }
+   for(const side of [-.36,.36])box(g,.13,.1,.06,ox+side,.76,z+1.46,mats.headlight);
   }
-  box(g,1.77,.19,.58,0,.68,.39,mats.red);
-  box(g,.92,.47,.88,.05,1.04,.02,mats.blue);
-  cylinder(g,.21,.72,-.16,1.60,.05,mats.cream);
-  const helmet=sphere(g,.33,-.12,2.12,.05,mats.gold);
-  helmet.scale.set(1, .84,1);
-  const visor=box(g,.40,.16,.07,-.02,2.15,.336,mats.dark);
-  visor.rotation.z=-.1;
-  const trunk=box(g,1.15,.96,.9,.83,1.55,-.15,mats.gold);
-  trunk.rotation.y=.06;
-  box(g,.75,.08,.92,.82,2.04,-.15,mats.red);
-  box(g,.45,.24,.06,.82,1.52,.33,mats.dark);
-  sphere(g,.11,-1.22,.92,.48,mats.headlight);
-  box(g,.18,.25,.65,-1.12,.59,.50,mats.chrome);
-  box(g,1.85,.045,.65,0,.47,.43,mats.dark);
-  box(g,.43,.11,.06,-.16,1.33,.38,mats.gold);
-  box(g,.45,.07,.07,.82,1.24,.365,mats.chrome);
+  return g;
+ }
+ function destination(){
+  const g=new THREE.Group();g.name="destination";g.position.set(vertical?.7:5.03,0,vertical?4.7:-.35);scene.add(g);
+  plinth(g,3.85,3.26);
+  box(g,3.38,2.35,2.5,0,1.2,-.29,mats.cream);
+  box(g,3.66,.22,2.78,0,2.51,-.29,mats.chrome);
+  for(const px of [-1.08,1.08]){
+   box(g,1.27,1.52,.07,px,.92,1.03,mats.dark);
+   box(g,1.08,1.28,.08,px,.85,1.09,mats.chrome);
+   for(let j=0;j<7;j++)box(g,1.07,.02,.10,px,.38+j*.16,1.13,mats.cream);
+   box(g,1.42,.14,.62,px,.13,1.34,mats.side);
+  }
+  for(let i=0;i<4;i++)box(g,.55,.47,.55,-1.2+i*.8,.24,2.04,i%2?mats.chrome:mats.cream);
+  sign(g,"MUELLES",0,2.22,1.02,1.1,.17);
   return g;
  }
  function decorate(){
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(22,14),mats.road);
   ground.rotation.x=-Math.PI/2;ground.position.y=-.32;scene.add(ground);
-  const grid=new THREE.GridHelper(20,20,0x314977,0x1b2d4b);
+  const grid=new THREE.GridHelper(20,20,0x8aace0,0xa7c4e9);
   grid.position.y=-.297;grid.material.transparent=true;grid.material.opacity=.35;scene.add(grid);
   for(const [x,z,color] of [[-5,-2,0x1551d8],[0,-2.7,0xffc62f],[5,-2,0xff3328]]){
    const disc=new THREE.Mesh(new THREE.CircleGeometry(2.2,34),
@@ -217,19 +208,19 @@ if(!stage||!mount||!controls||reduced){
  function setup(){
   scene=new THREE.Scene();
   scene.background=new THREE.Color(PAL.night);
-  scene.fog=new THREE.FogExp2(PAL.night,.018);
-  scene.add(new THREE.HemisphereLight(0xbad6ff,0x071020,1.85));
+  scene.fog=new THREE.FogExp2(PAL.night,.010);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x6b90c5,2.15));
   const sun=new THREE.DirectionalLight(0xf5faff,3.25);
   sun.position.set(-3,11,7);sun.castShadow=!coarse;
   sun.shadow.mapSize.set(1024,1024);
   Object.assign(sun.shadow.camera,{left:-13,right:13,top:11,bottom:-11,near:.5,far:40});
   sun.shadow.bias=-.0007;sun.shadow.normalBias=.025;
   sun.shadow.camera.updateProjectionMatrix();scene.add(sun);
-  const fill=new THREE.PointLight(0xffc62f,17,17);
+  const fill=new THREE.PointLight(0xb5d4ff,12,17);
   fill.position.set(0,5.2,4.2);scene.add(fill);
   const rim=new THREE.PointLight(0x4c80ff,8.5,15);
   rim.position.set(5.5,4,-4);scene.add(rim);
-  const neon=new THREE.PointLight(0xff3328,4,9);
+  const neon=new THREE.PointLight(0x62a5ff,4,9);
   neon.position.set(5,3,1);scene.add(neon);
   storefront();courier();destination();decorate();
   const key=new THREE.OrthographicCamera(-9,9,5,-5,.1,150);
