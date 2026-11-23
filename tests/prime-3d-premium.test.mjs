@@ -33,6 +33,26 @@ test("PRIME-3D-03 preserves presentation controls, fallback and no false live tr
  assert.doesNotMatch(scene,/fetch\s*\(|XMLHttpRequest|WebSocket|localStorage|sendBeacon/);
  assert.match(gpu,/PRIME-3D-03 real premium infrastructure and four conceptual dock beacons/);
  assert.match(gpu,/PRIME-3D-03 premium hub survives mobile GLB hydration/);
- assert.match(css,/\.logistics-hud__card--docks\{left:4%;top:auto;bottom:8%;width:180px\}/);
- assert.match(scene,/grid\.material\.opacity=coarse\?\.19:\.14/);
+ assert.match(css,/\.logistics-hud__card--docks\{right:4%;left:auto;top:30%/);
+ assert.match(css,/\.logistics-hud__card--notice\{display:none\}/);
+ assert.match(scene,/grid\.material\.opacity=coarse\?\.095:\.075/);
+});
+
+test("PRIME-3D-04 truck geometry aligns to actual dock gate positions and moves independently",()=>{
+ assert.match(scene,/function buildOperationalFleet\(\)/);
+ assert.match(scene,/function updateOperationalFleet\(seconds,isTour\)/);
+ assert.match(scene,/const gates=\[-2.72,-.91,.91,2.72\]\.map\(x=>hubX\+x\)/);
+ assert.match(scene,/const dockZ=hubZ\+3\.42/);
+ assert.match(scene,/archivedFleet\.visible=false/);
+ assert.match(scene,/fleetBatches\.push\(\{mesh,offsets\}\)/);
+ assert.match(scene,/updateOperationalFleet\(storyElapsed,storyActive\)/);
+ assert.match(scene,/easeTraffic\(\(seconds-\.85\)\/2\.25\)/);
+ assert.match(scene,/easeTraffic\(\(seconds-5\.65\)\/2\.55\)/);
+ assert.match(gpu,/PRIME-3D-04 five spatially independent vehicles aligned to four real docks/);
+ assert.match(gpu,/PRIME-3D-04 mobile fleet retains aligned truck gates/);
+ for(const status of ["Puerta 01","Puerta 02","Puerta 03","Puerta 04"])
+  assert.match(html,new RegExp(status));
+ assert.match(html,/Puerta 02<\/span><b>En carga/);
+ assert.match(scene,/Loading gate 02 is physically open/);
+ assert.match(scene,/overview:\{pos:\[6,10\.8,19\.5\],look:\[0,1,0\]\}/);
 });
