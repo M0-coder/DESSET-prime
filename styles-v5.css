@@ -1,6 +1,11 @@
 /* DESSET PRIME V5.2 | cinematic depth on top of the unreleased V4.5 candidate.
    Source-preserving additive layer. No remote assets, layout traps or infinite loops. */
 :root { --v5-electric:#5F94FF; --v5-gold:#FFC62F; --v5-fire:#FF3328; }
+/* DESSET PRIME: institutional 3D chapter heading, visible with or without WebGL. */
+#ecosistema .prime-3d-heading{max-width:980px;margin:0 0 clamp(22px,3vw,40px)}
+#ecosistema .prime-3d-heading h2{margin:0;color:#1551d8;font-family:var(--ds-type-display);font-weight:800;font-size:clamp(36px,5.6vw,74px);line-height:1.07;letter-spacing:-.055em}
+#ecosistema .prime-3d-heading p{margin:12px 0 0;color:#111827;font-family:var(--ds-type-body);font-size:clamp(15px,1.4vw,19px);line-height:1.5}
+#ecosistema .prime-3d-heading p strong{display:block;color:#111827;font-size:clamp(18px,1.7vw,24px);font-weight:800;letter-spacing:-.025em}
 .hero[data-variant="v4"] .v4-motion-canvas { isolation:isolate; }
 .v5-city-stage {
   position:relative; display:block; isolation:isolate; overflow:hidden;
