@@ -218,7 +218,7 @@ if(!stage||!mount||!controls||reduced){
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(22,14),mats.road);
   ground.rotation.x=-Math.PI/2;ground.position.y=-.32;scene.add(ground);
   const grid=new THREE.GridHelper(20,20,0x8aace0,0xa7c4e9);
-  grid.position.y=-.297;grid.material.transparent=true;grid.material.opacity=.35;scene.add(grid);
+  grid.position.y=-.297;grid.material.transparent=true;grid.material.opacity=coarse?.19:.14;scene.add(grid);
   // Green and orange occupancy rings — conceptual, not live tracking.
   for(const [x,z,color] of [[-.50,2.35,0x16bd94],[2.42,.18,0xff9739],[5.85,1.00,0x16bd94]]){
    const disc=new THREE.Mesh(new THREE.CircleGeometry(.63,32),
