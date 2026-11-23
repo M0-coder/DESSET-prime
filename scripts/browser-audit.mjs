@@ -421,7 +421,7 @@ try{
    
    await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
    await sleep(250);
-    const v5Narrow=await js('(()=>{const e=document.querySelector(".v5-city-stage"),t=e.querySelector(".v6-static-fallback"),b=e.getBoundingClientRect(),v=document.documentElement.clientWidth,w=e.querySelector(".v5-stage-world").getBoundingClientRect();return {inside:b.left>=-2&&b.right<=v+2,ratio:+(w.height/w.width).toFixed(2),fallback:!!t&&t.textContent.includes("DESTINO"),noImage:!e.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan")}})()');
+    const v5Narrow=await js('(()=>{const e=document.querySelector(".v5-city-stage"),t=e.querySelector(".v6-static-fallback"),b=e.getBoundingClientRect(),v=document.documentElement.clientWidth,w=e.querySelector(".v5-stage-world").getBoundingClientRect();return {inside:b.left>=-2&&b.right<=v+2,ratio:+(w.height/w.width).toFixed(2),fallback:!!t&&t.textContent.includes("MUELLES"),noImage:!e.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan")}})()');
     if(!v5Narrow.inside||v5Narrow.ratio<1.4||!v5Narrow.fallback||!v5Narrow.noImage)report.failures.push("V5 mobile 320 text fallback failed: "+JSON.stringify(v5Narrow));
     report.tests.push({name:"V5 mobile 320 image-free fallback",v5Narrow});
    await capture("mobile-320-v5-scene.png");
