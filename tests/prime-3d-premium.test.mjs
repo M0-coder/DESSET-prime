@@ -34,6 +34,8 @@ test("PRIME-3D-03 preserves presentation controls, fallback and no false live tr
  assert.match(gpu,/PRIME-3D-03 real premium infrastructure and four conceptual dock beacons/);
  assert.match(gpu,/PRIME-3D-03 premium hub survives mobile GLB hydration/);
  assert.match(css,/\.logistics-hud__card--docks\{right:4%;left:auto;top:30%/);
+ assert.match(css,/\.logistics-hud__brand\{position:absolute;top:4\.6%;right:4\.2%/);
+ assert.match(css,/\.logistics-hud__brand\{top:2%;left:5%;right:auto;/);
  assert.match(css,/\.logistics-hud__card--notice\{display:none\}/);
  assert.match(scene,/grid\.material\.opacity=coarse\?\.095:\.075/);
 });
