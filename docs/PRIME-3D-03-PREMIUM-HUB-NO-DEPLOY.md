@@ -1,27 +1,30 @@
-# PRIME-3D-03 — Refinamiento arquitectónico de DESSET Prime
+# PRIME-3D-03 / 04 — Corrección espacial y operativa del centro 3D
 
-**Alcance:** diseño del centro logístico 3D en `M0-coder/DESSET-prime`, sin merge, despliegue, DNS, indexación, cambios del hero ni activación de servicios.
+**Estado:** propuesta en PR #43; sin autorización para fusionar, publicar, alterar DNS, SEO o la portada.
 
-## Fundamentación
+## Diagnóstico reproducible
 
-La referencia entregada por el titular muestra una nave isométrica, camiones de carga y paneles de simulación. La implementación anterior ya tiene un hub, cinco camiones, muelles y tarjetas descriptivas. El problema no es la ausencia de Three.js: es la diferenciación arquitectónica y la lectura visual.
+La primera revisión del PR #43 mejoró detalles arquitectónicos, pero no resolvió el problema principal. Las cuatro puertas del almacén están en x locales `[-2.72,-.91,.91,2.72]`, con nave posicionada en x=-5 para escritorio; la flota anterior se renderizaba en x≈0.98 y sus camiones no podían acoplarse de manera correcta. Además, la tarjeta `Estado de muelles` tapaba parte del edificio y en móvil otra tarjeta ocupaba parte del patio. CI 5/5 de aquella versión no certificaba calidad compositiva.
 
-## Intervención de bajo riesgo
+## Arquitectura correctiva
 
-- Añadir **tres lucernarios con marcos metálicos** y una banda frontal azul al edificio existente.
-- Marcar los **cuatro muelles** con marquesinas, protección lateral, líneas de detención y cuatro balizas conceptuales de estado.
-- Marcar carriles en la zona de flota y salidas del patio con geometría 3D real, no una imagen superpuesta.
-- Usar `THREE.InstancedMesh` para las piezas repetidas y limitar las draw calls; aprovechar el ciclo actual de animación para la pulsación discreta de las balizas.
-- Conservar los **tres GLB originales y sus hashes** en `config/prime-original-assets.json`. Los detalles son independientes de los grupos vaciados por `hydrateGLBModels`, de modo que sobreviven a la hidratación.
-- Mantener intactos los modelos de flota, el número de camiones, el póster de fallback, la activación gradual, la reducción de movimiento y el controlador del recorrido.
-- Las balizas y tarjetas son **simulaciones**; no representan muelles reales ni telemetría.
+- Se conservan byte a byte los tres GLB registrados y sus hashes. **El GLB combinado de flota sigue cargando para mantener el contrato legado, pero permanece oculto**. Esto es deuda técnica explícita que habrá que resolver al migrar formalmente el asset de flota. **No se simula que esté reemplazado en el inventario.**
+- La flota visible se genera con 16 lotes `THREE.InstancedMesh` de geometría original. Cada camión tiene su propia matriz de posición, permitiendo llegadas y salidas de verdad sin multiplicar las draw calls por cinco.
+- Las puertas tienen centros locales x = -2.72, -0.91, 0.91 y 2.72. Los cuatro vehículos de muelle están alineados horizontalmente con esas posiciones y se estacionan con el extremo del remolque junto al nivelador, aproximadamente z local 2.1.
+- Fases de simulación: llegada a la puerta 01, carga en la puerta 02, salida desde la puerta 03, disponibilidad en puerta 04; la quinta unidad permanece en patio. Una apertura visual en puerta 02 evita que el panel diga «En carga» frente a una persiana completamente cerrada.
+- La animación del arribo y de la salida se integra en el recorrido guiado existente; no se descargan nuevos recursos externos ni se agregan temporizadores o telemetría. La pausa y la suspensión fuera de pantalla suspenden el movimiento.
+- El panel de muelles queda al costado de la escena en escritorio, mientras que los dos paneles se ocultan bajo 1000 px para dar prioridad al modelo. La píldora DEMO permanece visible cuando WebGL está activo. El encuadre móvil se reduce en ángulo cenital, y la cuadrícula queda atenuada.
+- Los añadidos arquitectónicos anteriores (lucernarios, marquesinas y señalización) permanecen y se alinean con los cuatro muelles físicos.
 
-## Criterios de aceptación
+## Riesgos y limitaciones
 
-1. Compilación fijada en Node 22.16.0, Three.js 0.187.0 y esbuild 0.28.2; límites existentes de JS gzip, GLB y tamaño del sitio.
-2. Pruebas unitarias, contratos de assets, análisis estático, cobertura instrumentada de alcance limitado, smoke de mutación, seguridad HTTP, política noindex y reproducibilidad.
-3. Browser QA de escritorio y móvil: WebGL2 real, escena con 3 GLB, `premiumInfrastructure=true`, `dockBeacons=4`, capturas GPU y controles de pausa/recorrido.
-4. Comparar capturas con la rama base; no presentar mejora estética subjetiva como resultado medido. Dispositivos físicos y Web Vitals de campo siguen pendientes.
-5. PR sin merge automático; publicación separada y protegida por SHA exacto.
+1. El modelo sigue siendo una maqueta de geometría procedural; no implica operación real de DESSET Prime, GPS, despacho, flota activa ni capacidades habilitadas.
+2. El GLB legado de flota supone tráfico de red innecesario mientras se mantiene el contrato de tres GLB; una migración posterior debe rehacer el asset, actualizar hashes e inventario con autorización y prueba de reproducibilidad.
+3. La prueba GPU usa SwiftShader de Chrome, **no prueba teléfonos físicos, batería ni Web Vitals de campo**.
+4. Las pruebas deben verificar alineaciones, 5 vehículos visibles, 4 puertas, escena de carga abierta, fallback, contenido de simulación, encuadre y presupuestos GPU. El aspecto estético requiere además revisar las capturas PNG.
 
-**Doctrina de alcance:** arquitectura, compilación, pruebas unitarias e instrumentadas, cobertura, análisis estático, calidad de CI, seguridad, reproducibilidad, mutation testing, deuda técnica y evidencia de ejecución.
+## Alcance de calidad
+
+Arquitectura, compilación (Node 22.16.0, Three.js 0.187.0 y esbuild 0.28.2), unitarias/instrumentadas, cobertura limitada, análisis estático, CI 5/5, seguridad HTTP y SCA, reproducibilidad, mutation smoke, deuda técnica y evidencias. La calidad del frontend no se declara **PASS** hasta comparar capturas GPU de escritorio, tablet y móvil y verificar que los vehículos no ocultan los muelles.
+
+No merge, no releases, no publicación automática, no modificación de Cloudflare.
