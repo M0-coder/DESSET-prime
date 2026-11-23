@@ -142,7 +142,11 @@ async function viewport(width,height,reduce=false){
    navContactBackground:style(".main-nav .nav-contact").backgroundColor,
    primeHeadingColor:style("#desset-prime-heading").color,
    primeSubtitleColor:style("#ecosistema .prime-3d-heading p").color,
-   primeKickerColor:style("#ecosistema .prime-3d-heading p strong").color
+   primeKickerColor:style("#ecosistema .prime-3d-heading p strong").color,
+   institutionalInk:style(":root").getPropertyValue("--ds-30-ink").trim().toLowerCase(),
+   heroHeadingColor:style("#inicio .v4-headline-a").color,
+   heroCtaInk:style("#inicio .hero-cta").color,
+   heroPhotoFallbackBg:style("#inicio .prime-photo-surface").backgroundColor
   };
  return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railWords,typeSizes,palette,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
@@ -165,8 +169,12 @@ async function viewport(width,height,reduce=false){
    palette.stageFrame!==paleBlue||palette.stageToolbar!==paleBlue||
    palette.ecosystemBoard!==pureWhite||palette.statementBackground!==paleBlue||
    palette.footerBackground!==pureWhite||palette.navContactBackground!==pureWhite||
-   palette.primeHeadingColor!==brandBlue||palette.primeSubtitleColor!=="rgb(17, 24, 39)"||
-   palette.primeKickerColor!=="rgb(17, 24, 39)")
+   palette.primeHeadingColor!==brandBlue||palette.primeSubtitleColor!=="rgb(33, 69, 121)"||
+   palette.primeKickerColor!=="rgb(33, 69, 121)"||
+   palette.institutionalInk!=="#214579"||
+   palette.heroHeadingColor!=="rgb(33, 69, 121)"||
+   palette.heroCtaInk!=="rgb(33, 69, 121)"||
+   palette.heroPhotoFallbackBg!==paleBlue)
    fails.push("PRIME-COLOR-02: only the hero CTA may be lime; brand yellow preserved, page surfaces pale and 3D controls white: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.heroFit.typeLeft<diag.heroFit.compositionLeft-2 ||

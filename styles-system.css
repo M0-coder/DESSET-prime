@@ -8,7 +8,7 @@
 :root {
  --ds-60-paper:#F7F5EE;
  --ds-60-surface:#FFFDF8;
- --ds-30-ink:#111827;
+ --ds-30-ink:#214579;
  --ds-30-blue:#1551D8;
  --ds-10-gold:#FFC62F;
  --ds-10-signal:#FF3328;
@@ -35,7 +35,7 @@ body {background:var(--ds-60-paper);color:var(--ds-copy);}
 .service:not(.service--main) {background:var(--ds-60-surface);}.audience p,.service:not(.service--main) .service-body p {color:var(--ds-muted);}
 .business-pitch {
  border-radius:var(--ds-radius-feature);
- box-shadow:0 20px 50px rgba(17,24,39,.18),5px 7px 0 rgba(255,198,47,.85);
+ box-shadow:0 20px 50px rgba(21,81,216,.13),5px 7px 0 rgba(255,198,47,.85);
 }
 .hero[data-variant="v4"] .v4-motion-canvas {
  border-radius:var(--ds-radius-feature);
@@ -96,7 +96,7 @@ h1,h2,h3,h4 {text-wrap:balance;}
  .service,.business-pitch,.ecosystem-board {border-radius:var(--ds-radius-surface);}
  .v5-city-stage {border-radius:16px;}
  .business-pitch {
-  box-shadow:0 15px 32px rgba(17,24,39,.18),4px 5px 0 rgba(255,198,47,.85);
+  box-shadow:0 15px 32px rgba(21,81,216,.13),4px 5px 0 rgba(255,198,47,.85);
  }
  .hero[data-variant="v4"] .v4-motion-canvas {
   box-shadow:0 17px 32px rgba(1,9,28,.25),5px 5px 0 rgba(255,198,47,.82);
