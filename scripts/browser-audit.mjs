@@ -123,7 +123,8 @@ async function viewport(width,height,reduce=false){
  });
  const railDisplay={background:getComputedStyle(rail).backgroundColor,
   columns:getComputedStyle(rail).gridTemplateColumns.trim().split(/\\s+/).length,
-  role:rail.getAttribute("role"),ariaHidden:rail.getAttribute("aria-hidden")};
+  role:rail.getAttribute("role"),ariaHidden:rail.getAttribute("aria-hidden"),
+  left:Math.round(railBox.left),right:Math.round(railBox.right),viewportRight:document.documentElement.clientWidth};
  const typeSizes={
   heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
   serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
@@ -151,12 +152,15 @@ async function viewport(width,height,reduce=false){
    primeHeadingColor:style("#desset-prime-heading").color,
    primeSubtitleColor:style("#ecosistema .prime-3d-heading p").color,
    primeKickerColor:style("#ecosistema .prime-3d-heading p strong").color,
+   brandNameInk:style(".site-header .brand-name").color,
+   footerMetaInk:style(".site-footer>span").color,
+   footerCopyInk:style(".site-footer>p").color,
    institutionalInk:style(":root").getPropertyValue("--ds-30-ink").trim().toLowerCase(),
    heroHeadingColor:style("#inicio .v4-headline-a").color,
    heroCtaInk:style("#inicio .hero-cta").color,
    heroPhotoFallbackBg:style("#inicio .prime-photo-surface").backgroundColor
   };
- return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
@@ -177,12 +181,14 @@ async function viewport(width,height,reduce=false){
    palette.stageFrame!==paleBlue||palette.stageToolbar!==paleBlue||
    palette.ecosystemBoard!==pureWhite||palette.statementBackground!==paleBlue||
    palette.footerBackground!==pureWhite||palette.navContactBackground!==pureWhite||
-   palette.primeHeadingColor!==brandBlue||palette.primeSubtitleColor!=="rgb(33, 69, 121)"||
-   palette.primeKickerColor!=="rgb(33, 69, 121)"||
-   palette.institutionalInk!=="#214579"||
-   palette.heroHeadingColor!=="rgb(33, 69, 121)"||
-   palette.heroCtaInk!=="rgb(33, 69, 121)"||
-   palette.heroPhotoFallbackBg!==paleBlue)
+   palette.primeHeadingColor!==brandBlue||palette.primeSubtitleColor!=="rgb(17, 17, 17)"||
+   palette.primeKickerColor!=="rgb(17, 17, 17)"||
+   palette.institutionalInk!=="#111111"||
+   palette.heroHeadingColor!=="rgb(17, 17, 17)"||
+   palette.heroCtaInk!=="rgb(17, 17, 17)"||
+   palette.heroPhotoFallbackBg!==paleBlue||
+   palette.brandNameInk!=="rgb(17, 17, 17)"||
+   palette.footerMetaInk!=="rgb(52, 52, 52)"||palette.footerCopyInk!=="rgb(52, 52, 52)")
    fails.push("PRIME-COLOR-02: only the hero CTA may be lime; brand yellow preserved, page surfaces pale and 3D controls white: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.heroFit.typeLeft<diag.heroFit.compositionLeft-2 ||
@@ -197,9 +203,11 @@ async function viewport(width,height,reduce=false){
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
  if(diag.railItems.length!==4||diag.railItems.some(i=>!i.visible||!i.inside||!i.textFits||!i.icon||i.fontPx<12)||
     diag.railDisplay.background!==brandBlue||diag.railDisplay.role!=="list"||diag.railDisplay.ariaHidden!==null||
-    diag.railDisplay.columns!==(width<=860?2:4))
+    diag.railDisplay.columns!==(width<=860?2:4)||
+   diag.railDisplay.left>2||diag.railDisplay.right<diag.railDisplay.viewportRight-2)
    fails.push("HERO-SERVICE-01: accessible service strip clips content or has wrong layout: "+JSON.stringify({items:diag.railItems,layout:diag.railDisplay}));
  if(width<=700){
+  if(!diag.menuLabel?.startsWith("Menú"))fails.push("Mobile menu accessible name must include visible Menú label: "+diag.menuLabel);
   if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
  report.viewports.push({width,height,reduce,...diag,failures:fails});
