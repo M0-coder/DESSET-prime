@@ -13,7 +13,7 @@ test("PRIME-3D-03 adds genuine architectural depth without replacing the three r
  for(const name of ["prime-premium-hub-details","prime-fleet-wayfinding","prime-yard-wayfinding"])
   assert.ok(scene.includes(name),"Missing independent infrastructure layer: "+name);
  for(const token of ["const skylights=\[-1.95,0,1.95\]","const gates=\[-2.72,-.91,.91,2.72\]","dockBeacons.push\(beacon\)"])
-  assert.match(scene,new RegExp(token));
+  assert.ok(scene.includes(token),"Missing premium detail contract: "+token);
  assert.match(scene,/premiumInfrastructure\(\);/);
  assert.match(scene,/hydrateGLBModels\(/);
  assert.equal(original.assets.filter(x=>/^assets\/v62-.*\.glb$/.test(x.path)).length,3);
