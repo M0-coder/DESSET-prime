@@ -20,7 +20,7 @@ test("LOGISTICS-PAPER-01: desktop and mobile share the same pale WebGL canvas an
 
 test("LOGISTICS-PAPER-01: open desktop framing while keeping the proven mobile fit",()=>{
  assert.match(scene,/overview:\{pos:\[12,13\.5,19\.5\],look:\[0,1,0\]\}/);
- assert.match(scene,/const ratio=w\/Math\.max\(1,h\),size=vertical\?8\.0:7\.2;/);
+ assert.match(scene,/const ratio=w\/Math\.max\(1,h\),size=vertical\?8\.0:coarse\?6\.35:6\.55;/);
  assert.match(scene,/const vertical=window\.matchMedia\?\.\("\(max-width: 430px\)"\)/);
  assert.match(scene,/hydrateGLBModels\(/);
  assert.match(css,/\.v5-city-stage\[data-v6-state="active"\] \.logistics-hud\{opacity:1;visibility:visible\}/);
