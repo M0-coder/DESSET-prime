@@ -48,7 +48,7 @@ test("PRIME-3D-04 truck geometry aligns to actual dock gate positions and moves 
  assert.match(scene,/updateOperationalFleet\(storyElapsed,storyActive\)/);
  assert.match(scene,/easeTraffic\(\(seconds-\.85\)\/2\.25\)/);
  assert.match(scene,/easeTraffic\(\(seconds-5\.65\)\/2\.55\)/);
- assert.match(gpu,/PRIME-3D-04 five spatially independent vehicles aligned to four real docks/);
+ assert.match(gpu,/PRIME-3D-04 four independent dock tractors aligned to four gates and original fifth yard unit/);
  assert.match(gpu,/PRIME-3D-04 mobile fleet retains aligned truck gates/);
  for(const status of ["Puerta 01","Puerta 02","Puerta 03","Puerta 04"])
   assert.match(html,new RegExp(status));
