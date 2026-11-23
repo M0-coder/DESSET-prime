@@ -20,8 +20,15 @@
 #inicio .prime-photo-surface::after{display:none}
 #inicio .prime-photo-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 50%;max-width:none;display:block}
 /* The formerly hidden ornaments are absent from the DOM; no display:none override. */
-#inicio .v4-hero-rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;justify-items:center;align-items:center;margin:0 calc(-1 * var(--edge));padding:17px var(--edge);border-top:1px solid #d8dbe0;border-bottom:1px solid #d8dbe0;background:#f7f5ee;color:#27354c;font-size:clamp(11px,1.1vw,14px);letter-spacing:.055em}
-#inicio .v4-hero-rail b{display:none}
+/* Accessible DESSET service pillars. */
+#inicio .v4-hero-rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;align-items:stretch;justify-items:stretch;margin:0 calc(-1 * var(--edge));padding:20px var(--edge);border:0;background:#1551d8;color:#fff;white-space:normal;letter-spacing:normal;overflow:visible;text-align:left}
+#inicio .v4-rail-item{display:flex;gap:11px;align-items:flex-start;min-width:0;padding:7px 15px;border-right:1px solid rgba(255,255,255,.27)}
+#inicio .v4-rail-item:last-child{border-right:0}
+#inicio .v4-rail-item svg{flex:none;width:30px;height:30px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none}
+#inicio .v4-rail-item strong{display:block;color:#fff;font-size:13px;font-weight:850;line-height:1.25;letter-spacing:.05em}
+#inicio .v4-rail-item p{margin:5px 0 0;color:#e2ebff;font-size:12px;line-height:1.45;font-weight:500}
+@media(max-width:860px){#inicio .v4-hero-rail{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:13px}#inicio .v4-rail-item:nth-child(2){border-right:0}}
+@media(max-width:520px){#inicio .v4-rail-item{display:block;padding:6px 11px}#inicio .v4-rail-item svg{width:26px;height:26px;margin-bottom:6px}}
 @media(prefers-reduced-motion:no-preference){#inicio .prime-photo-surface{animation:prime-photo-hero-enter .9s cubic-bezier(.17,.75,.22,1) .15s both}}
 @keyframes prime-photo-hero-enter{from{opacity:.74;transform:translate3d(0,14px,0) scale(.988)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
 @media(max-width:1180px){#inicio .v4-hero-composition{grid-template-columns:minmax(0,.98fr) minmax(0,1.02fr);gap:clamp(20px,2.7vw,36px);min-height:490px}#inicio .motion-headline{font-size:clamp(39px,5.2vw,71px)}#inicio .hero-lead{font-size:15px}#inicio .prime-photo-surface{aspect-ratio:1.38}}
