@@ -222,7 +222,8 @@ if(!stage||!mount||!controls||reduced){
  }
 
  // PRIME-3D-04: vehicles share instanced parts, but each truck has a separate
- // transform aligned to a real loading gate. Original three GLBs remain hashed
+ // transform aligned to a real loading gate. The fifth compact yard truck remains
+ // in the original destination GLB; no duplicate sixth vehicle. GLBs remain hashed
  // and loaded; the obsolete combined fleet is hidden until an asset migration.
  function buildOperationalFleet(){
   const hubX=vertical?-.7:-5;
@@ -233,9 +234,7 @@ if(!stage||!mount||!controls||reduced){
    {id:"approach",x:gates[0],z:hubZ+5.35,dockX:gates[0],dockZ,phase:"arrival"},
    {id:"loading",x:gates[1],z:dockZ,dockX:gates[1],dockZ,phase:"loading"},
    {id:"outbound",x:gates[2],z:dockZ,dockX:gates[2],dockZ,phase:"departure"},
-   {id:"ready",x:gates[3],z:dockZ,dockX:gates[3],dockZ,phase:"ready"},
-   {id:"yard",x:vertical?2.6:2.0,z:vertical?2.45:5.38,
-    dockX:null,dockZ:null,phase:"yard"}
+   {id:"ready",x:gates[3],z:dockZ,dockX:gates[3],dockZ,phase:"ready"}
   );
   const fleetRoot=new THREE.Group();
   fleetRoot.name="prime-independent-trailer-fleet";
