@@ -68,7 +68,7 @@ if(!stage||!mount||!controls||reduced){
   const canvas=document.createElement("canvas");
   canvas.width=512;canvas.height=128;
   const ctx=canvas.getContext("2d");if(!ctx)return;
-  ctx.clearRect(0,0,512,128);ctx.fillStyle="#FFF8E4";
+  ctx.clearRect(0,0,512,128);ctx.fillStyle="#1551D8";
   ctx.textAlign="center";ctx.textBaseline="middle";
   ctx.font="900 62px system-ui,Arial,sans-serif";ctx.fillText(label,256,67,490);
   const texture=new THREE.CanvasTexture(canvas);
@@ -383,18 +383,18 @@ if(!stage||!mount||!controls||reduced){
   scene=new THREE.Scene();
   scene.background=new THREE.Color(PAL.night);
   scene.fog=new THREE.FogExp2(PAL.night,.010);
-  scene.add(new THREE.HemisphereLight(0xffffff,0x6b90c5,2.15));
-  const sun=new THREE.DirectionalLight(0xf5faff,3.25);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x6b90c5,1.8));
+  const sun=new THREE.DirectionalLight(0xf5faff,2.8);
   sun.position.set(-3,11,7);sun.castShadow=!coarse;
   sun.shadow.mapSize.set(1024,1024);
   Object.assign(sun.shadow.camera,{left:-13,right:13,top:11,bottom:-11,near:.5,far:40});
   sun.shadow.bias=-.0007;sun.shadow.normalBias=.025;
   sun.shadow.camera.updateProjectionMatrix();scene.add(sun);
-  const fill=new THREE.PointLight(0xb5d4ff,12,17);
+  const fill=new THREE.PointLight(0xb5d4ff,8.5,17);
   fill.position.set(0,5.2,4.2);scene.add(fill);
-  const rim=new THREE.PointLight(0x4c80ff,8.5,15);
+  const rim=new THREE.PointLight(0x4c80ff,6.2,15);
   rim.position.set(5.5,4,-4);scene.add(rim);
-  const neon=new THREE.PointLight(0x62a5ff,4,9);
+  const neon=new THREE.PointLight(0x62a5ff,3.2,9);
   neon.position.set(5,3,1);scene.add(neon);
   storefront();
   const archivedFleet=courier();
@@ -407,7 +407,7 @@ if(!stage||!mount||!controls||reduced){
   renderer.shadowMap.enabled=!coarse;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.12;
+  renderer.toneMappingExposure=1.10;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,coarse?1:1.4));
   const canvas=renderer.domElement;
   canvas.setAttribute("aria-hidden","true");canvas.tabIndex=-1;
@@ -432,7 +432,7 @@ if(!stage||!mount||!controls||reduced){
  const tmp=new THREE.Vector3(),desiredLook=new THREE.Vector3();
  function resize(w,h){
   if(!renderer||!camera)return;
-  const ratio=w/Math.max(1,h),size=vertical?8.0:7.2;
+  const ratio=w/Math.max(1,h),size=vertical?8.0:coarse?6.35:6.55;
   camera.left=-size*ratio;camera.right=size*ratio;
   camera.top=size;camera.bottom=-size;
   camera.updateProjectionMatrix();renderer.setSize(w,h,false);
