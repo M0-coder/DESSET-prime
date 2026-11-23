@@ -236,7 +236,7 @@
  * HTML overlays keep small data labels legible without costly GPU text textures.
  * Never imply real fleet tracking or production orders. */
 .logistics-hud{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;visibility:hidden;color:#162943}
-.v5-city-stage[data-v6-state="active"] .logistics-hud{opacity:1;visibility:visible;transition:opacity .45s ease-out}
+.v5-city-stage[data-v6-state="active"] .logistics-hud{opacity:1;visibility:visible}
 .logistics-hud__brand{position:absolute;top:4.6%;left:4.2%;display:flex;gap:8px;align-items:center;
  font:800 clamp(9px,.92vw,13px)/1.2 "Plus Jakarta Sans",system-ui,sans-serif;letter-spacing:.11em;color:#214579;
  background:rgba(255,255,255,.72);border:1px solid rgba(98,145,205,.25);
@@ -282,7 +282,7 @@
  .logistics-hud__brand{top:2%;left:5%;gap:6px;padding:7px 9px;max-width:90%}
  .logistics-hud__card--docks{display:none}
  .logistics-hud__card--notice{top:auto;right:5%;bottom:3.2%;width:66%;max-width:240px;
-  padding:11px;transform:none}
+  padding:11px;transform:none;background:#fff}
  .logistics-hud__card--notice strong{font-size:13px}
  .logistics-hud__card--notice p{font-size:10px}
 }
