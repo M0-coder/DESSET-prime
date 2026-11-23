@@ -27,7 +27,7 @@ function simulate(source=control){
  return {panel,status,links};
 }
 test("V6.9 describes services as a lasting institutional identity, not as a startup pitch",()=>{
- assert.match(html,/DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla y una estrategia de expansión hacia soluciones logísticas de mayor alcance\./);
+ assert.match(html,/<p class="hero-lead">DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla\.<\/p>/);
  assert.doesNotMatch(html,/UN ECOSISTEMA, TRES PILARES/);
  assert.match(html,/class="business-pitch"/);
  for(const phrase of ["Pedidos y","Paquetería y transporte","Comercio y servicios",
