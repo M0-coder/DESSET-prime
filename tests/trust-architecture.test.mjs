@@ -10,8 +10,8 @@ test("institutional statement retains business direction without fictitious oper
  assert.match(html,/A TU TIEMPO/);
  assert.match(html,/NO ES SOLO/);
  assert.match(html,/ES CONECTAR/);
- assert.match(html,/DESSET reúne comercio, tecnología y logística en un ecosistema de servicios/);
- assert.match(html,/orientado a la última milla/);
+ assert.match(html,/DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla/);
+ assert.match(html,/una estrategia de expansión hacia soluciones logísticas de mayor alcance/);
  assert.doesNotMatch(html,/somos líderes|miles de clientes|servicios disponibles hoy|empresa registrada|RUC:\s*\d+|seguimiento en tiempo real/i);
  assert.doesNotMatch(html,/Comercio, tecnología y distribución se integran en una misma arquitectura/);
  assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET/);
