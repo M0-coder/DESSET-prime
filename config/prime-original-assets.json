@@ -4,8 +4,8 @@
   "assertion": {
     "scope": "original visual brand materials actually included in Prime's current production candidate",
     "status": "owner-declared",
-    "statement": "El responsable del proyecto declara que los activos originales actualmente utilizados por DESSET Prime pertenecen al proyecto. Los cuatro antiguos pósteres V5 se excluyeron por no formar parte del diseño 3D.",
-    "as_of": "2026-11-20",
+    "statement": "El responsable del proyecto declara los activos originales de DESSET Prime. Los tres antiguos modelos tienda/motocicleta/vivienda fueron sustituidos por geometría original de almacén/flota/muelles a solicitud del propietario; los pósteres V5 retirados siguen excluidos. La autoría y cesiones no están verificadas jurídicamente.",
+    "as_of": "2026-11-22",
     "external_chain_of_title": "not_attached",
     "legal_entity_transfer": "not_established_by_this_register",
     "independent_legal_verification": false
@@ -81,21 +81,21 @@
     },
     {
       "path": "assets/v62-commerce.glb",
-      "sha256": "dba0705979c8e96f14501ba0efe54b3e752fa32fb9799b068733f16927cf68e0",
+      "sha256": "adb2fede4ddfef42f2332d40d0bdc3019d05fc50f3cdd103c6dc0e55ac5ce82c",
       "claim": "owner-declared",
-      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+      "evidence": "New owner-requested original warehouse/fleet/loading-dock model generated with pinned Node 22.16.0 and GLTFExporter; SHA256 from GitHub CI run 45101606964 artifact 14785886606. Authorship/assignment independently unverified."
     },
     {
       "path": "assets/v62-courier.glb",
-      "sha256": "eb6002db4c419a66d6b1935df379a7e28c224f9fb94fae3403e3db7926fc48ab",
+      "sha256": "7347718708067877419c327c1fc791abbe64ffe4e45b1efeb50f08f0fdac57fc",
       "claim": "owner-declared",
-      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+      "evidence": "New owner-requested original warehouse/fleet/loading-dock model generated with pinned Node 22.16.0 and GLTFExporter; SHA256 from GitHub CI run 45101606964 artifact 14785886606. Authorship/assignment independently unverified."
     },
     {
       "path": "assets/v62-destination.glb",
-      "sha256": "f0a746d55023f85e2393abfedfecef16010db7c8917f532e68662aeb3644c0c2",
+      "sha256": "1bae3332ae3b45d209a0cf637659062460922e8e56be37720546655355b480f7",
       "claim": "owner-declared",
-      "evidence": "source SHA256 in original GitHub CI artifact; additional authorship/assignment documents not attached"
+      "evidence": "New owner-requested original warehouse/fleet/loading-dock model generated with pinned Node 22.16.0 and GLTFExporter; SHA256 from GitHub CI run 45101606964 artifact 14785886606. Authorship/assignment independently unverified."
     }
   ]
 }
