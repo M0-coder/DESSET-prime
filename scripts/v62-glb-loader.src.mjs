@@ -11,9 +11,9 @@ const sources=Object.freeze({
  destination:"./assets/v62-destination.glb"
 });
 const patternByScene={
- commerce:{royal:"metal",gold:"woven",cream:"woven",royalDark:"ribbed"},
- courier:{royal:"woven",gold:"woven",rubber:"rubber"},
- destination:{red:"stucco",cream:"tile",royalDark:"ribbed"}
+ commerce:{royal:"metal",cream:"metal",royalDark:"ribbed",steel:"metal"},
+ courier:{royal:"metal",cream:"metal",rubber:"rubber"},
+ destination:{cream:"metal",steel:"metal",rubber:"rubber"}
 };
 function makeLocalTexture(pattern,registry){
  const canvas=document.createElement("canvas");
@@ -163,14 +163,17 @@ export async function hydrateGLBModels({scene,coarse,stage,sign,ownedTextures,is
     node.material.needsUpdate=true;
    }
   });
-  // Keep all scene positions and camera framing unchanged while replacing basic
+  // Keep scene positions unchanged while replacing procedural warehouse placeholders
   // models with the authored, geometrically detailed glTF roots.
   parent.traverse(node=>{if(node.isMesh)node.geometry?.dispose()});
   parent.clear();
   parent.add(row.gltf.scene);
-  if(row.name==="commerce")sign(parent,"DESSET",0,2.11,1.021,1.13,.24);
-  if(row.name==="destination")sign(parent,"DESTINO",0,2.21,1.251,1.02,.18);
-  if(row.name==="courier")sign(parent,"DESSET",.84,1.61,.218,.48,.21);
+  if(row.name==="commerce"){
+   sign(parent,"DESSET",0,2.72,1.91,1.9,.29);
+   sign(parent,"MUELLES",0,2.38,1.91,1.11,.18);
+  }
+  if(row.name==="destination")sign(parent,"PATIO",0,1.22,1.69,.86,.22);
+  if(row.name==="courier")sign(parent,"DESSET",0,1.84,.77,.90,.21);
   details.push({name:row.name,meshes:row.meshes,triangles:Math.round(row.triangles),
    path:row.url,texturedMaterials:maps.size});
  }

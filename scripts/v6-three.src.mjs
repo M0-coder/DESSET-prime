@@ -17,6 +17,7 @@ if(!stage||!mount||!controls||reduced){
 }else{
  let renderer,scene,camera,ro,observer,raf=0,alive=false,onscreen=true,paused=false;
  let cameraPreset="overview",frame=0,particle,parcel,routeHalo;
+  const logisticsSensors=[];
  let modelStats={ready:false,models:[]};
  let storyActive=false,storyElapsed=0,storyBeat=-1;
  const storyPanel=stage.querySelector(".v63-story");
@@ -27,19 +28,19 @@ if(!stage||!mount||!controls||reduced){
  let pointer={x:0,y:0},last=0,lastRender=0;
  let onMove,onLeave,onResize,onVisibility,onControls;
  const ownedTextures=[];
- const PAL={blue:0x1551d8,gold:0xffc62f,red:0xff3328,night:0x0b1024};
+ const PAL={blue:0x1551d8,gold:0xffc62f,red:0xff3328,night:0xf4f8fe};
  const makeMat=(color,metalness=0.2,roughness=0.48,emissive=0x000000,intensity=0)=>
    new THREE.MeshStandardMaterial({color,metalness,roughness,emissive,emissiveIntensity:intensity});
  const mats={
   blue:makeMat(PAL.blue,.21,.29),cyan:makeMat(0x5f94ff,.26,.32),
   gold:makeMat(PAL.gold,.22,.36,0xe39505,.13),
   red:makeMat(PAL.red,.24,.38),dark:makeMat(0x172443,.28,.60),
-  side:makeMat(0x263e73,.20,.60),cream:makeMat(0xf9f0d3,.08,.61),
+  side:makeMat(0x9bbce0,.18,.65),cream:makeMat(0xf7fbff,.08,.61),
   glass:makeMat(0x73d7f7,.40,.13,0x1c68bb,.47),
   route:makeMat(PAL.gold,.12,.30,0xffb725,1.4),
-  road:makeMat(0x122142,.14,.78),
+  road:makeMat(0xdce8f7,.08,.86),
   trim:makeMat(0x1a3e83,.55,.28),
-  chrome:makeMat(0xc5d6f6,.75,.22),
+  chrome:makeMat(0xc7d8ec,.35,.48),
   windowLight:makeMat(0x82d7f3,.10,.20,0x4b9de8,.70),
   headlight:makeMat(0xfef4cb,.14,.25,0xffc62f,1.6)
  };
@@ -104,76 +105,75 @@ if(!stage||!mount||!controls||reduced){
   box(parent,w,.23,d,0,-.12,0,mats.side);
   box(parent,w*.86,.04,d*.85,0,.025,0,mats.road);
  };
+ // LOGISTICS-3D-01: new provisional meshes for the same warehouse GLB loading slots.
+ // Former storefront, motorcycle and red house are fully replaced.
+ // LOGISTICS-3D-02: same original hub, trucks and open yard while GLB loads.
  function storefront(){
   const g=new THREE.Group();g.name="commerce";g.position.set(vertical?-.7:-5,0,vertical?-4.7:0);scene.add(g);
-  plinth(g,4.1,3.1);
-  box(g,2.7,2.3,1.95,0,1.22,-.2,mats.blue);
-  box(g,3.1,.27,2.25,0,2.47,-.22,mats.cyan);
-  for(const x of [-.91,.91])box(g,.65,1.03,.035,x,1.22,.796,mats.glass);
-  box(g,.6,1.53,.055,0,1.01,.80,mats.dark);
-  box(g,3.22,.2,1.15,0,1.96,1.12,mats.gold);
-  for(let i=0;i<7;i++)box(g,.43,.10,.79,-1.35+i*.45,1.79,1.26,i%2?mats.cream:mats.red);
-  box(g,1.24,.27,.05,0,2.08,.935,mats.dark);
-  box(g,1.11,.27,.07,0,2.10,.974,mats.trim);
-  sign(g,"DESSET",0,2.10,1.017,.95,.18);
-  for(const x of [-1.04,1.04])cylinder(g,.13,.7,x,.39,1.5,mats.gold);
-  for(const x of [-.91,.91])box(g,.055,1.1,.07,x,1.22,.831,mats.chrome);
-  box(g,2.76,.065,.18,0,.19,.88,mats.chrome);
-  box(g,.75,.08,.50,0,.17,1.01,mats.gold);
-  sphere(g,.064,.20,1.0,.852,mats.headlight);
+  plinth(g,7.60,5.25);
+  box(g,7.23,3.02,4.2,0,1.61,-.44,mats.cream);
+  box(g,7.43,.25,4.46,0,3.17,-.44,mats.chrome);
+  box(g,7.27,.10,4.34,0,3.33,-.44,mats.cream);
+  for(let i=0;i<13;i++)box(g,.025,.032,4.30,-3.45+i*.575,3.40,-.44,mats.side);
+  for(const px of [-2.72,-.91,.91,2.72]){
+   box(g,1.54,1.88,.12,px,1.17,1.74,mats.dark);
+   box(g,1.27,1.60,.09,px,1.06,1.82,mats.chrome);
+   for(let k=0;k<10;k++)box(g,1.27,.021,.11,px,.37+k*.157,1.89,mats.cream);
+   box(g,1.66,.17,.38,px,2.19,1.88,mats.blue);
+   box(g,1.65,.15,.80,px,.10,2.12,mats.side);
+  }
+  sign(g,"DESSET",0,2.72,1.89,1.96,.27);
+  sign(g,"MUELLES",0,2.36,1.89,1.10,.18);
+  for(const px of [-2.3,2.3])box(g,.82,.30,.75,px,3.61,-1.2,mats.chrome);
+  return g;
  }
- function destination(){
-  const g=new THREE.Group();g.name="destination";g.position.set(vertical?.7:5.03,0,vertical?4.7:-.35);scene.add(g);
-  plinth(g,3.65,3.15);
-  box(g,2.65,2.12,2.18,0,1.12,0,mats.red);
-  const roof=new THREE.Mesh(new THREE.ConeGeometry(2.14,1.28,4,1),mats.cream);
-  roof.position.set(0,2.75,0);
-  roof.rotation.y=Math.PI/4;g.add(roof);
-  box(g,.83,1.48,.058,.36,.76,1.122,mats.dark);
-  box(g,.62,.6,.065,-.81,1.30,1.123,mats.glass);
-  box(g,.52,.62,.062,1.333,1.31,-.34,mats.windowLight);
-  sphere(g,.075,.80,.72,1.17,mats.gold);
-  box(g,1.02,.09,.42,.36,.17,1.33,mats.cream);
-  box(g,2.84,.13,.20,0,2.15,1.03,mats.chrome);
-  sign(g,"DESTINO",0,2.17,1.145,1.35,.17);
-  box(g,.05,.67,.09,-.81,1.32,1.166,mats.chrome);
+ function previewTruck(g,x,z,scale=1,index=0){
+  const B=(w,h,d,px,y,pz,mat)=>box(g,w*scale,h*scale,d*scale,x+px*scale,y*scale,z+pz*scale,mat);
+  B(.84,1,1.73,0,1.08,-.37,mats.cream);
+  B(.91,.12,1.76,0,1.65,-.37,mats.chrome);
+  B(.78,.80,.73,0,.91,1,index%2?mats.cream:mats.blue);
+  B(.68,.30,.055,0,1.08,1.38,mats.glass);
+  B(.66,.12,.10,0,.63,1.41,mats.chrome);
+  for(const side of [-.48,.48])for(const wz of [-.90,.12,1.07]){
+   const tire=new THREE.Mesh(new THREE.CylinderGeometry(.17*scale,.17*scale,.13*scale,10),mats.dark);
+   tire.rotation.z=Math.PI/2;tire.position.set(x+side*scale,.36*scale,z+wz*scale);g.add(tire);
+  }
  }
  function courier(){
   const g=new THREE.Group();g.name="courier";g.position.set(vertical?0:.98,.13,vertical?0:1.18);scene.add(g);
-  plinth(g,3.9,2.65);
-  for(const x of [-.92,.91]){
-   const tyre=new THREE.Mesh(new THREE.TorusGeometry(.39,.115,8,18),mats.dark);
-   tyre.position.set(x,.50,.54);g.add(tyre);
-   const hub=new THREE.Mesh(new THREE.CircleGeometry(.17,16),mats.cyan);
-   hub.position.copy(tyre.position);hub.position.z+=.03;g.add(hub);
+  box(g,6.06,.064,4.35,0,-.04,.12,mats.road);
+  for(const [i,x,z] of [[0,-1.55,-.83],[1,.03,-.92],[2,1.61,-.74],[3,.35,1.09]])
+   previewTruck(g,x,z,i===3?.84:.94,i);
+  return g;
+ }
+ function destination(){
+  const g=new THREE.Group();g.name="destination";g.position.set(vertical?.7:5.03,0,vertical?4.7:-.35);scene.add(g);
+  plinth(g,4.12,3.55);
+  for(let i=0;i<7;i++){
+   const x=-1.67+(i%4)*1.10,z=-1+Math.floor(i/4)*1.04;
+   box(g,.74,.44,.60,x,.34,z,i%2?mats.cream:mats.chrome);
+   box(g,.76,.05,.63,x,.61,z,mats.side);
   }
-  box(g,1.77,.19,.58,0,.68,.39,mats.red);
-  box(g,.92,.47,.88,.05,1.04,.02,mats.blue);
-  cylinder(g,.21,.72,-.16,1.60,.05,mats.cream);
-  const helmet=sphere(g,.33,-.12,2.12,.05,mats.gold);
-  helmet.scale.set(1, .84,1);
-  const visor=box(g,.40,.16,.07,-.02,2.15,.336,mats.dark);
-  visor.rotation.z=-.1;
-  const trunk=box(g,1.15,.96,.9,.83,1.55,-.15,mats.gold);
-  trunk.rotation.y=.06;
-  box(g,.75,.08,.92,.82,2.04,-.15,mats.red);
-  box(g,.45,.24,.06,.82,1.52,.33,mats.dark);
-  sphere(g,.11,-1.22,.92,.48,mats.headlight);
-  box(g,.18,.25,.65,-1.12,.59,.50,mats.chrome);
-  box(g,1.85,.045,.65,0,.47,.43,mats.dark);
-  box(g,.43,.11,.06,-.16,1.33,.38,mats.gold);
-  box(g,.45,.07,.07,.82,1.24,.365,mats.chrome);
+  previewTruck(g,1.08,.82,.60,1);
+  for(const [px,pz] of [[-1.87,1.19],[-1.87,.63]])cylinder(g,.15,.45,px,.23,pz,mats.cyan);
   return g;
  }
  function decorate(){
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(22,14),mats.road);
   ground.rotation.x=-Math.PI/2;ground.position.y=-.32;scene.add(ground);
-  const grid=new THREE.GridHelper(20,20,0x314977,0x1b2d4b);
+  const grid=new THREE.GridHelper(20,20,0x8aace0,0xa7c4e9);
   grid.position.y=-.297;grid.material.transparent=true;grid.material.opacity=.35;scene.add(grid);
-  for(const [x,z,color] of [[-5,-2,0x1551d8],[0,-2.7,0xffc62f],[5,-2,0xff3328]]){
-   const disc=new THREE.Mesh(new THREE.CircleGeometry(2.2,34),
-    new THREE.MeshBasicMaterial({color,transparent:true,opacity:.15,depthWrite:false}));
-   disc.rotation.x=-Math.PI/2;disc.position.set(x,-.288,z);scene.add(disc);
+  // Green and orange occupancy rings — conceptual, not live tracking.
+  for(const [x,z,color] of [[-.50,2.35,0x16bd94],[2.42,.18,0xff9739],[5.85,1.00,0x16bd94]]){
+   const disc=new THREE.Mesh(new THREE.CircleGeometry(.63,32),
+    new THREE.MeshBasicMaterial({color,transparent:true,opacity:.085,depthWrite:false}));
+   disc.rotation.x=-Math.PI/2;disc.position.set(x,-.274,z);scene.add(disc);
+   for(const [index,r] of [.60,.78,.98].entries()){
+    const mat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:.54-index*.13,depthWrite:false,side:THREE.DoubleSide});
+    const ring=new THREE.Mesh(new THREE.RingGeometry(r,r+.025,40),mat);
+    ring.rotation.x=-Math.PI/2;ring.position.set(x,-.263+index*.004,z);
+    ring.userData.sensorIndex=index;scene.add(ring);logisticsSensors.push(ring);
+   }
   }
   for(const [x,z] of [[-8,2],[-2.7,3],[3.3,3],[8,2]]){
    cylinder(scene,.055,1.55,x,.70,z,mats.side);
@@ -217,19 +217,19 @@ if(!stage||!mount||!controls||reduced){
  function setup(){
   scene=new THREE.Scene();
   scene.background=new THREE.Color(PAL.night);
-  scene.fog=new THREE.FogExp2(PAL.night,.018);
-  scene.add(new THREE.HemisphereLight(0xbad6ff,0x071020,1.85));
+  scene.fog=new THREE.FogExp2(PAL.night,.010);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x6b90c5,2.15));
   const sun=new THREE.DirectionalLight(0xf5faff,3.25);
   sun.position.set(-3,11,7);sun.castShadow=!coarse;
   sun.shadow.mapSize.set(1024,1024);
   Object.assign(sun.shadow.camera,{left:-13,right:13,top:11,bottom:-11,near:.5,far:40});
   sun.shadow.bias=-.0007;sun.shadow.normalBias=.025;
   sun.shadow.camera.updateProjectionMatrix();scene.add(sun);
-  const fill=new THREE.PointLight(0xffc62f,17,17);
+  const fill=new THREE.PointLight(0xb5d4ff,12,17);
   fill.position.set(0,5.2,4.2);scene.add(fill);
   const rim=new THREE.PointLight(0x4c80ff,8.5,15);
   rim.position.set(5.5,4,-4);scene.add(rim);
-  const neon=new THREE.PointLight(0xff3328,4,9);
+  const neon=new THREE.PointLight(0x62a5ff,4,9);
   neon.position.set(5,3,1);scene.add(neon);
   storefront();courier();destination();decorate();
   const key=new THREE.OrthographicCamera(-9,9,5,-5,.1,150);
@@ -264,7 +264,7 @@ if(!stage||!mount||!controls||reduced){
  const tmp=new THREE.Vector3(),desiredLook=new THREE.Vector3();
  function resize(w,h){
   if(!renderer||!camera)return;
-  const ratio=w/Math.max(1,h),size=vertical?6.6:5.8;
+  const ratio=w/Math.max(1,h),size=vertical?8.0:5.8;
   camera.left=-size*ratio;camera.right=size*ratio;
   camera.top=size;camera.bottom=-size;
   camera.updateProjectionMatrix();renderer.setSize(w,h,false);
@@ -274,7 +274,7 @@ if(!stage||!mount||!controls||reduced){
   if(raf){cancelAnimationFrame(raf);raf=0}
  }
  function fail(reason){
-  stop();stage.dataset.v6State=reason;
+  stop();stage.dataset.v6State=reason;stage.dataset.v6Paused="false";
   storyActive=false;stage.dataset.v63Tour="stopped";
   if(storyPanel)storyPanel.hidden=true;
   if(storyButton){storyButton.textContent="Ver recorrido 3D";storyButton.setAttribute("aria-pressed","false")}
@@ -310,7 +310,7 @@ if(!stage||!mount||!controls||reduced){
   }
   if(reason==="complete"&&storyPanel){
    storyTitle.textContent="RECORRIDO FINALIZADO";
-   storyDetail.textContent="Visión conceptual de comercio, reparto y destino; no es una entrega real.";
+   storyDetail.textContent="Visión conceptual del centro logístico, su flota y sus muelles; no es una entrega real.";
    storyProgress.value=100;
   }else if(storyPanel){storyPanel.hidden=true;storyProgress.value=0}
  };
@@ -320,7 +320,7 @@ if(!stage||!mount||!controls||reduced){
   cameraPreset=view;stage.dataset.v6View=view;
 
 
-  paused=false;
+  paused=false;stage.dataset.v6Paused="false";
   const pause=controls.querySelector(".v6-pause");
   if(pause)pause.textContent="Pausar movimiento";
   wake();
@@ -373,7 +373,12 @@ if(!stage||!mount||!controls||reduced){
     parcel.rotation.y=Math.sin(frame*.48)*.09;
    }
   }
-  if(routeHalo)routeHalo.material.opacity=.12+Math.sin(frame*1.4)*.025;
+  if(routeHalo)routeHalo.material.opacity=.09+Math.sin(frame*.9)*.018;
+   for(const ring of logisticsSensors){
+    ring.material.opacity=.28+.16*Math.sin(frame*1.4-ring.userData.sensorIndex*.8);
+    const k=1+Math.sin(frame*.75-ring.userData.sensorIndex*.64)*.045;
+    ring.scale.set(k,k,1);
+   }
   if(particle){
    const p=particle.userData.curve.getPointAt((frame*.082)%1);
    particle.position.copy(p);
@@ -414,7 +419,8 @@ if(!stage||!mount||!controls||reduced){
      return;
     }
     if(button.classList.contains("v6-pause")){
-      paused=!paused;button.textContent=paused?"Reanudar movimiento":"Pausar movimiento";
+      paused=!paused;stage.dataset.v6Paused=String(paused);
+      button.textContent=paused?"Reanudar movimiento":"Pausar movimiento";
       if(paused)stop();else wake();
      }
    };

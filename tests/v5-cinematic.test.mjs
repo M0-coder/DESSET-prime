@@ -22,7 +22,7 @@ test("Prime 3D has no hidden static WebP/SVG illustration or permanently hidden 
 });
 test("Image-free 3D fallback is truthful, visually styled and accessible",()=>{
  assert.match(html,/ECOSISTEMA DESSET/);
- assert.match(html,/COMERCIO · REPARTO · DESTINO/);
+ assert.match(html,/CENTRO · FLOTA · MUELLES/);
  assert.match(html,/No corresponde a pedidos ni entregas activas/);
  assert.match(html,/aria-label="Renderización gráfica conceptual de DESSET"/);
  assert.match(css,/\.v6-static-fallback\{/);
