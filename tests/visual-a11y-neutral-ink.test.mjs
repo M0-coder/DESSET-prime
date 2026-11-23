@@ -20,6 +20,7 @@ test("VISUAL-A11Y-01 neutral black text does not replace brand blue",()=>{
 });
 test("VISUAL-A11Y-01 no cropped DESSET service band at wide viewports",()=>{
  assert.match(hero,/left:50%;width:100vw;transform:translateX\(-50%\);margin:0/);
+ assert.doesNotMatch(mainCss,/\.v4-hero-rail\{animation:v4-rail-enter/,"Banner must not be masked while loading");
  assert.match(audit,/diag\.railDisplay\.left< -16/);
  assert.match(audit,/diag\.railDisplay\.right<diag\.railDisplay\.viewportRight-2/);
  assert.match(audit,/diag\.railDisplay\.right>diag\.railDisplay\.viewportRight\+16/);
