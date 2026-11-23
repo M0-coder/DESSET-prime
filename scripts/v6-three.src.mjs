@@ -273,7 +273,7 @@ if(!stage||!mount||!controls||reduced){
   if(raf){cancelAnimationFrame(raf);raf=0}
  }
  function fail(reason){
-  stop();stage.dataset.v6State=reason;
+  stop();stage.dataset.v6State=reason;stage.dataset.v6Paused="false";
   storyActive=false;stage.dataset.v63Tour="stopped";
   if(storyPanel)storyPanel.hidden=true;
   if(storyButton){storyButton.textContent="Ver recorrido 3D";storyButton.setAttribute("aria-pressed","false")}
@@ -319,7 +319,7 @@ if(!stage||!mount||!controls||reduced){
   cameraPreset=view;stage.dataset.v6View=view;
 
 
-  paused=false;
+  paused=false;stage.dataset.v6Paused="false";
   const pause=controls.querySelector(".v6-pause");
   if(pause)pause.textContent="Pausar movimiento";
   wake();
@@ -418,7 +418,8 @@ if(!stage||!mount||!controls||reduced){
      return;
     }
     if(button.classList.contains("v6-pause")){
-      paused=!paused;button.textContent=paused?"Reanudar movimiento":"Pausar movimiento";
+      paused=!paused;stage.dataset.v6Paused=String(paused);
+      button.textContent=paused?"Reanudar movimiento":"Pausar movimiento";
       if(paused)stop();else wake();
      }
    };
