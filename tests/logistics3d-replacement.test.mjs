@@ -27,7 +27,7 @@ test("LOGISTICS-3D-01 keeps the existing real WebGL and accessible static fallba
  assert.match(viewer,/hydrateGLBModels\(/);
  assert.match(loader,/new GLTFLoader\(\)/);
  assert.match(html,/CENTRO · FLOTA · MUELLES/);
- assert.match(html,/simulaciones, no operaciones activas/);
+ assert.match(html,/No corresponde a pedidos ni entregas activas/);
  assert.match(html,/class="v6-static-fallback"/);
  assert.match(storyboard,/title:"CENTRO DE DISTRIBUCIÓN"/);
  assert.match(storyboard,/title:"FLOTA DE TRANSPORTE"/);
