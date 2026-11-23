@@ -101,6 +101,8 @@ try{
  check("V6.2 desktop three independently loaded GLB models",detailedDesktop.glbLoaded===3&&detailedDesktop.glbModels.every(x=>x.meshes>=5&&x.triangles>=250),{models:detailedDesktop.glbModels,status:detailedDesktop.glbStatus});
  check("V6.1 real GPU shadows and painted sign textures",desktop.shadows===true&&desktop.textureCount>=2&&desktop.cinematic==="v6.2",{shadows:desktop.shadows,textures:desktop.textureCount,cinematic:desktop.cinematic});
  check("V6.1 desktop geometry and draw call budgets",desktop.geometryCount>35&&desktop.geometryCount<180&&desktop.drawCalls<160,{geometryCount:desktop.geometryCount,drawCalls:desktop.drawCalls});
+ const demoHUD=await evalJS('(()=>{const h=document.querySelector(".logistics-hud");const c=h?.querySelectorAll(".logistics-hud__card");const style=h?getComputedStyle(h):null;return {opacity:Number(style?.opacity),visible:style?.visibility,panels:c?.length||0,marked:h?.textContent.includes("DEMO")&&h?.textContent.includes("SIMULACIÓN")}})()');
+ check("LOGISTICS V2 desktop dashboard panels are fully visible and explicitly simulated",demoHUD.opacity===1&&demoHUD.visible==="visible"&&demoHUD.panels===2&&demoHUD.marked,{demoHUD});
  await screenshot("desktop-three-webgl.png");
  check("Removed hidden manual camera buttons",!(await evalJS('!!document.querySelector("[data-v6-camera], .v6-poster")')));
 
@@ -139,6 +141,8 @@ try{
  const groups=Object.entries(detailedMobile.objectBounds||{});
  const fullyFramed=groups.length===3&&groups.every(([name,b])=>b.minX>=-1.02&&b.maxX<=1.02&&b.minY>=-1.02&&b.maxY<=1.02);
  check("Mobile 3D stations remain within camera frame",fullyFramed,{objectBounds:detailedMobile.objectBounds});
+ const mobileHUD=await evalJS('(()=>{const h=document.querySelector(".logistics-hud"),n=h?.querySelector(".logistics-hud__card--notice");const hs=h?getComputedStyle(h):null,ns=n?getComputedStyle(n):null;return {opacity:Number(hs?.opacity),visible:hs?.visibility,noticeVisible:ns?.display!=="none",background:ns?.backgroundColor,declaresDemo:n?.textContent.includes("SIMULADA")}})()');
+ check("LOGISTICS V2 mobile simulated notice remains fully opaque and readable",mobileHUD.opacity===1&&mobileHUD.visible==="visible"&&mobileHUD.noticeVisible&&mobileHUD.background==="rgb(255, 255, 255)"&&mobileHUD.declaresDemo,{mobileHUD});
  await screenshot("mobile-three-webgl-optin.png");
 
  await evalJS('document.querySelector(".v63-tour").click()');

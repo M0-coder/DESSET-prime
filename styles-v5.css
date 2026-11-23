@@ -230,3 +230,63 @@
  .v6-three-controls {display:flex;flex-wrap:wrap}
  .v6-three-controls .v63-tour,.v6-three-controls .v6-pause{width:auto;min-width:145px;flex:1 1 145px}
 }
+
+
+/* LOGISTICS-3D-02 / simulated digital-twin UI
+ * HTML overlays keep small data labels legible without costly GPU text textures.
+ * Never imply real fleet tracking or production orders. */
+.logistics-hud{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;visibility:hidden;color:#162943}
+.v5-city-stage[data-v6-state="active"] .logistics-hud{opacity:1;visibility:visible}
+.logistics-hud__brand{position:absolute;top:4.6%;left:4.2%;display:flex;gap:8px;align-items:center;
+ font:800 clamp(9px,.92vw,13px)/1.2 "Plus Jakarta Sans",system-ui,sans-serif;letter-spacing:.11em;color:#214579;
+ background:rgba(255,255,255,.72);border:1px solid rgba(98,145,205,.25);
+ border-radius:100px;padding:9px 13px;box-shadow:0 6px 25px rgba(23,48,85,.08)}
+.logistics-hud__demo{font:800 9px/1 system-ui,sans-serif;letter-spacing:.07em;background:#e9f7ff;
+ color:#1253a6;border-radius:7px;padding:5px 7px}
+.logistics-hud__beacon{width:7px;height:7px;border-radius:50%;background:#18bd91;box-shadow:0 0 0 4px rgba(24,189,145,.16)}
+.logistics-hud__card{position:absolute;box-sizing:border-box;width:clamp(160px,18vw,246px);
+ padding:clamp(11px,1.35vw,18px);display:grid;gap:7px;
+ border:1px solid rgba(255,255,255,.95);border-radius:15px;
+ background:rgba(255,255,255,.94);color:#1b314b;
+ box-shadow:0 20px 50px rgba(45,81,139,.15),0 2px 11px rgba(33,87,151,.06);
+ font:500 clamp(10px,.90vw,12px)/1.35 "Plus Jakarta Sans",system-ui,sans-serif;
+ transform:perspective(700px) rotateX(3deg) rotateY(-7deg)}
+.logistics-hud__card strong{font-weight:800;font-size:clamp(12px,1.1vw,15px);line-height:1.2;letter-spacing:-.025em}
+.logistics-hud__eyebrow{font-size:clamp(8px,.67vw,10px);font-weight:800;letter-spacing:.055em;color:#547391}
+.logistics-hud__card--docks{left:45%;top:18%;width:clamp(170px,17vw,235px)}
+.logistics-hud__card--notice{right:4.5%;top:11%;width:clamp(185px,19vw,260px);transform:perspective(700px) rotateX(3deg) rotateY(7deg)}
+.logistics-hud__status{display:grid;grid-template-columns:8px 1fr auto;align-items:center;gap:7px;border-top:1px solid #e8eff7;padding-top:6px}
+.logistics-hud__status b{font-weight:800;color:#295b88}
+.logistics-hud__dot{display:inline-block;width:7px;height:7px;flex:none;border-radius:50%;background:#1abd8e}
+.logistics-hud__dot--green{background:#17bb89}.logistics-hud__dot--blue{background:#448ad9}.logistics-hud__dot--orange{background:#ff9f39}
+.logistics-hud__card p{font-size:clamp(10px,.87vw,12px);line-height:1.5;margin:0;color:#5a7290}
+.logistics-hud__notice-footer{font-size:clamp(9px,.67vw,10px);color:#547391;border-top:1px solid #e8eff7;padding-top:7px}
+@media(prefers-reduced-motion:no-preference){
+ .v5-city-stage[data-v6-state="active"] .logistics-hud__card--docks{animation:logistics-card-float 7s ease-in-out infinite}
+ .v5-city-stage[data-v6-state="active"] .logistics-hud__card--notice{animation:logistics-card-float 8.2s ease-in-out -2s infinite}
+}
+@keyframes logistics-card-float{0%,100%{translate:0 0}50%{translate:0 -6px}}
+.v5-city-stage[data-v6-paused="true"] .logistics-hud__card{animation-play-state:paused!important}
+@media(max-width:1000px){
+ .logistics-hud__card--docks{left:39%;top:19%}
+ .logistics-hud__card--notice{right:3%;top:8%}
+}
+@media(max-width:800px){
+ .logistics-hud__brand{top:3.6%;left:4%;font-size:9px;padding:6px 9px}
+ .logistics-hud__card{font-size:10px;padding:10px;box-shadow:0 8px 24px rgba(42,79,139,.13)}
+ .logistics-hud__card--docks{left:38%;top:24%;width:180px}
+ .logistics-hud__card--notice{right:2%;top:9%;width:190px}
+ .logistics-hud__card .logistics-hud__eyebrow{font-size:8px}
+}
+@media(max-width:430px){
+ .logistics-hud__brand{top:2%;left:5%;gap:6px;padding:7px 9px;max-width:90%}
+ .logistics-hud__card--docks{display:none}
+ .logistics-hud__card--notice{top:auto;right:5%;bottom:3.2%;width:66%;max-width:240px;
+  padding:11px;transform:none;background:#fff}
+ .logistics-hud__card--notice strong{font-size:13px}
+ .logistics-hud__card--notice p{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+ .logistics-hud{display:none!important}
+ .logistics-hud__card{animation:none!important;transition:none!important}
+}
