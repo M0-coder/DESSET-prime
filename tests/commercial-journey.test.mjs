@@ -50,7 +50,7 @@ test("three locally illustrated business scenes use original semantics, not gene
 });
 
 test("no fake availability, brand replacement, remote imagery or public checkout",()=>{
- assert.match(html,/DESSET reúne comercio, tecnología y logística en un ecosistema de servicios/);
+ assert.match(html,/DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla/);
  assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
  assert.match(html,/assets\/deliver-assets-mark\.png/);
  assert.doesNotMatch(html,/<form\b|<input\b|<button[^>]*comprar|https?:\/\/images\./i);
