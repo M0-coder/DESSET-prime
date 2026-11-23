@@ -258,8 +258,8 @@
  transform:perspective(700px) rotateX(3deg) rotateY(-7deg)}
 .logistics-hud__card strong{font-weight:800;font-size:clamp(12px,1.1vw,15px);line-height:1.2;letter-spacing:-.025em}
 .logistics-hud__eyebrow{font-size:clamp(8px,.67vw,10px);font-weight:800;letter-spacing:.055em;color:#547391}
-.logistics-hud__card--docks{left:45%;top:18%;width:clamp(170px,17vw,235px)}
-.logistics-hud__card--notice{right:4.5%;top:11%;width:clamp(185px,19vw,260px);transform:perspective(700px) rotateX(3deg) rotateY(7deg)}
+.logistics-hud__card--docks{right:4%;left:auto;top:30%;width:clamp(170px,17vw,235px)}
+.logistics-hud__card--notice{display:none}
 .logistics-hud__status{display:grid;grid-template-columns:8px 1fr auto;align-items:center;gap:7px;border-top:1px solid #e8eff7;padding-top:6px}
 .logistics-hud__status b{font-weight:800;color:#295b88}
 .logistics-hud__dot{display:inline-block;width:7px;height:7px;flex:none;border-radius:50%;background:#1abd8e}
@@ -273,14 +273,12 @@
 @keyframes logistics-card-float{0%,100%{translate:0 0}50%{translate:0 -6px}}
 .v5-city-stage[data-v6-paused="true"] .logistics-hud__card{animation-play-state:paused!important}
 @media(max-width:1000px){
- .logistics-hud__card--docks{left:39%;top:19%}
- .logistics-hud__card--notice{right:3%;top:8%}
+ .logistics-hud__card--docks{display:none}
+ .logistics-hud__card--notice{display:none}
 }
 @media(max-width:800px){
  .logistics-hud__brand{top:3.6%;left:4%;font-size:9px;padding:6px 9px}
  .logistics-hud__card{font-size:10px;padding:10px;box-shadow:0 8px 24px rgba(42,79,139,.13)}
- .logistics-hud__card--docks{left:4%;top:auto;bottom:8%;width:180px}
- .logistics-hud__card--notice{right:2%;top:9%;width:190px}
  .logistics-hud__card .logistics-hud__eyebrow{font-size:8px}
 }
 @media(max-width:430px){
