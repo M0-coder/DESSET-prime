@@ -18,6 +18,10 @@ if(!stage||!mount||!controls||reduced){
  let renderer,scene,camera,ro,observer,raf=0,alive=false,onscreen=true,paused=false;
  let cameraPreset="overview",frame=0,particle,parcel,routeHalo;
   const logisticsSensors=[];
+  const dockBeacons=[];
+  const operationalFleet=[];
+  const fleetBatches=[];
+  const dockStatusLabels=[...stage.querySelectorAll(".logistics-hud__status b")];
  let modelStats={ready:false,models:[]};
  let storyActive=false,storyElapsed=0,storyBeat=-1;
  const storyPanel=stage.querySelector(".v63-story");
@@ -42,7 +46,9 @@ if(!stage||!mount||!controls||reduced){
   trim:makeMat(0x1a3e83,.55,.28),
   chrome:makeMat(0xc7d8ec,.35,.48),
   windowLight:makeMat(0x82d7f3,.10,.20,0x4b9de8,.70),
-  headlight:makeMat(0xfef4cb,.14,.25,0xffc62f,1.6)
+  headlight:makeMat(0xfef4cb,.14,.25,0xffc62f,1.6),
+  ready:makeMat(0x19af86,.18,.32,0x0d906c,.75),
+  attention:makeMat(0xffab3d,.18,.34,0xe88a13,.65)
  };
  const box=(parent,w,h,d,x,y,z,material)=>{
   const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
@@ -62,9 +68,11 @@ if(!stage||!mount||!controls||reduced){
   const canvas=document.createElement("canvas");
   canvas.width=512;canvas.height=128;
   const ctx=canvas.getContext("2d");if(!ctx)return;
-  ctx.clearRect(0,0,512,128);ctx.fillStyle="#FFF8E4";
+  ctx.clearRect(0,0,512,128);ctx.fillStyle="#1551D8";
   ctx.textAlign="center";ctx.textBaseline="middle";
-  ctx.font="900 62px system-ui,Arial,sans-serif";ctx.fillText(label,256,67,490);
+  ctx.font="900 62px system-ui,Arial,sans-serif";
+  if(label==="DESSET Prime")ctx.font="900 52px system-ui,Arial,sans-serif";
+  ctx.fillText(label,256,67,490);
   const texture=new THREE.CanvasTexture(canvas);
   texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=2;
   ownedTextures.push(texture);
@@ -122,7 +130,7 @@ if(!stage||!mount||!controls||reduced){
    box(g,1.66,.17,.38,px,2.19,1.88,mats.blue);
    box(g,1.65,.15,.80,px,.10,2.12,mats.side);
   }
-  sign(g,"DESSET",0,2.72,1.89,1.96,.27);
+  sign(g,"DESSET Prime",0,2.72,1.89,3.00,.27);
   sign(g,"MUELLES",0,2.36,1.89,1.10,.18);
   for(const px of [-2.3,2.3])box(g,.82,.30,.75,px,3.61,-1.2,mats.chrome);
   return g;
@@ -158,11 +166,170 @@ if(!stage||!mount||!controls||reduced){
   for(const [px,pz] of [[-1.87,1.19],[-1.87,.63]])cylinder(g,.15,.45,px,.23,pz,mats.cyan);
   return g;
  }
+
+ // PRIME-3D-03: original GLBs are immutable; independent overlays remain after hydration.
+ // Instance repeated hardware for bounded draw calls on desktop and mobile.
+ const instanceBoxes=(parent,w,h,d,material,positions)=>{
+  const mesh=new THREE.InstancedMesh(new THREE.BoxGeometry(w,h,d),material,positions.length);
+  const item=new THREE.Object3D();
+  for(let i=0;i<positions.length;i++){
+   item.position.set(...positions[i]);item.updateMatrix();mesh.setMatrixAt(i,item.matrix);
+  }
+  mesh.instanceMatrix.needsUpdate=true;
+  mesh.castShadow=!coarse;mesh.receiveShadow=!coarse;
+  parent.add(mesh);return mesh;
+ };
+ function premiumInfrastructure(){
+  const hub=new THREE.Group();hub.name="prime-premium-hub-details";
+  hub.position.set(vertical?-.7:-5,0,vertical?-4.7:0);scene.add(hub);
+  // Glass skylights, anodized roof frames and one continuous DESSET-blue front edge.
+  const skylights=[-1.95,0,1.95];
+  instanceBoxes(hub,.68,.025,2.88,mats.blue,skylights.map(x=>[x,3.433,-.55]));
+  instanceBoxes(hub,.54,.042,2.72,mats.glass,skylights.map(x=>[x,3.465,-.55]));
+  instanceBoxes(hub,.027,.067,2.78,mats.chrome,
+   skylights.flatMap(x=>[[x-.30,3.471,-.55],[x+.30,3.471,-.55]]));
+  box(hub,7.31,.09,.13,0,3.423,1.785,mats.blue);
+  // Four aligned docks: canopies, edge protection, staging lines, simulated signals.
+  const gates=[-2.72,-.91,.91,2.72];
+  instanceBoxes(hub,1.55,.095,.58,mats.cream,gates.map(x=>[x,2.345,2.09]));
+  instanceBoxes(hub,1.55,.055,.065,mats.blue,gates.map(x=>[x,2.304,2.392]));
+  instanceBoxes(hub,.09,.70,.09,mats.chrome,
+   gates.flatMap(x=>[[x-.78,.37,2.51],[x+.78,.37,2.51]]));
+  instanceBoxes(hub,.075,.021,.72,mats.gold,
+   gates.flatMap(x=>[[x-.72,.061,2.86],[x+.72,.061,2.86]]));
+  instanceBoxes(hub,1.24,.019,.052,mats.cream,
+   gates.flatMap(x=>[[x,.065,3.12],[x,.065,3.43]]));
+  // Loading gate 02 is physically open, matching the simulated dock state.
+  // Cover the GLB shutter with a shallow recessed dark bay and raised panel.
+  box(hub,1.23,1.54,.042,-.91,1.15,1.976,mats.dark);
+  box(hub,1.25,.31,.054,-.91,1.91,2.015,mats.chrome);
+  for(const [i,x] of gates.entries()){
+   const beacon=sphere(hub,.082,x,2.47,2.44,
+    [mats.attention,mats.cyan,mats.ready,mats.ready][i],10);
+   dockBeacons.push(beacon);
+  }
+  // Lane and outbound-yard markings: no extra trucks and no real-time data.
+  const fleet=new THREE.Group();fleet.name="prime-fleet-wayfinding";
+  fleet.position.set(vertical?-.7:-5,-.285,vertical?-4.7:0);scene.add(fleet);
+  const laneX=[-2.72,-.91,.91,2.72];
+  instanceBoxes(fleet,.040,.020,2.5,mats.cream,
+   laneX.flatMap(x=>[[x-.71,.013,4.36],[x+.71,.013,4.36]]));
+  instanceBoxes(fleet,.46,.018,.060,mats.blue,
+   laneX.map(x=>[x,.017,5.74]));
+  const yard=new THREE.Group();yard.name="prime-yard-wayfinding";
+  yard.position.set(vertical?.7:5.03,0,vertical?4.7:-.35);scene.add(yard);
+  instanceBoxes(yard,.055,.021,2.52,mats.blue,
+   [[-1.84,.051,-.18],[1.83,.051,-.18]]);
+  instanceBoxes(yard,.44,.024,.065,mats.cyan,
+   [-1.48,-.86,-.24,.38].map(x=>[x,.052,1.38]));
+ }
+
+ // PRIME-3D-04: vehicles share instanced parts, but each truck has a separate
+ // transform aligned to a real loading gate. The fifth compact yard truck remains
+ // in the original destination GLB; no duplicate sixth vehicle. GLBs remain hashed
+ // and loaded; the obsolete combined fleet is hidden until an asset migration.
+ function buildOperationalFleet(){
+  const hubX=vertical?-.7:-5;
+  const hubZ=vertical?-4.7:0;
+  const gates=[-2.72,-.91,.91,2.72].map(x=>hubX+x);
+  const dockZ=hubZ+3.42; // Trailer rear reaches the physical dock leveller at +2.11.
+  operationalFleet.push(
+   {id:"approach",x:gates[0],z:hubZ+5.35,dockX:gates[0],dockZ,phase:"arrival"},
+   {id:"loading",x:gates[1],z:dockZ,dockX:gates[1],dockZ,phase:"loading"},
+   {id:"outbound",x:gates[2],z:dockZ,dockX:gates[2],dockZ,phase:"departure"},
+   {id:"ready",x:gates[3],z:dockZ,dockX:gates[3],dockZ,phase:"ready"}
+  );
+  const fleetRoot=new THREE.Group();
+  fleetRoot.name="prime-independent-trailer-fleet";
+  scene.add(fleetRoot);
+  // Group box components by material, then instance their distinct dimensions
+  // via matrices: four tractors, seven box materials and two wheel draw batches.
+  const addPart=(geometry,material,offsets)=>{
+   const mesh=new THREE.InstancedMesh(geometry,material,operationalFleet.length*offsets.length);
+   mesh.castShadow=!coarse;mesh.receiveShadow=!coarse;
+   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+   fleetRoot.add(mesh);
+   fleetBatches.push({mesh,offsets});
+  };
+  const boxComponents=new Map();
+  const B=(w,h,d,mat,points)=>{
+   const list=boxComponents.get(mat)||[];
+   for(const p of points)list.push([p[0],p[1],p[2],0,0,w,h,d]);
+   boxComponents.set(mat,list);
+  };
+  B(.79,.15,2.53,mats.blue,[[0,.43,.04]]);
+  B(.93,1.01,1.83,mats.cream,[[0,1.13,-.39]]);
+  B(.96,.09,1.91,mats.chrome,[[0,1.68,-.39]]);
+  B(.82,.77,.75,mats.blue,[[0,.98,1.06]]);
+  B(.86,.10,.82,mats.cream,[[0,1.40,1.06]]);
+  B(.68,.28,.040,mats.glass,[[0,1.16,1.448]]);
+  B(.62,.15,.045,mats.dark,[[0,.82,1.449]]);
+  B(.73,.11,.085,mats.chrome,[[0,.58,1.49]]);
+  B(.12,.08,.05,mats.headlight,[[-.31,.77,1.489],[.31,.77,1.489]]);
+  B(.79,.70,.040,mats.chrome,[[0,1.10,-1.326]]);
+  B(.035,.17,1.52,mats.blue,[[-.484,1.37,-.39],[.484,1.37,-.39]]);
+  B(.11,.10,.055,mats.chrome,[[-.48,1.20,1.26],[.48,1.20,1.26]]);
+  const wheels=[-.96,.05,1.08].flatMap(z=>
+   [[-.515,.36,z,0,Math.PI/2],[.515,.36,z,0,Math.PI/2]]);
+  addPart(new THREE.CylinderGeometry(.18,.18,.13,10),mats.dark,wheels);
+  addPart(new THREE.CylinderGeometry(.08,.08,.139,10),mats.chrome,wheels);
+  B(.017,.82,.027,mats.side,
+   [-.484,.484].flatMap(x=>[-.87,-.30,.27].map(z=>[x,1.12,z])));
+  B(.81,.018,.035,mats.blue,[[0,1.60,-1.332]]);
+  for(const [material,offsets] of boxComponents)
+   addPart(new THREE.BoxGeometry(1,1,1),material,offsets);
+  updateOperationalFleet(0,false);
+ }
+ const easeTraffic=t=>{
+  const u=Math.max(0,Math.min(1,t));return u*u*(3-2*u);
+ };
+ function updateOperationalFleet(seconds,isTour){
+  if(!operationalFleet.length)return;
+  const first=operationalFleet[0],leaving=operationalFleet[2];
+  // The completed state holds the final vehicle positions instead of snapping
+  // the departing truck back to its dock as the finite tour ends.
+  const complete=!isTour&&stage.dataset.v63Tour==="complete";
+  first.z=first.dockZ+(isTour?
+   1.93*(1-easeTraffic((seconds-.85)/2.25)):
+   complete?0:1.93);
+  leaving.z=leaving.dockZ+(isTour?
+   2.65*easeTraffic((seconds-5.65)/2.55):
+   complete?2.65:0);
+  // Visible dashboard states follow the same conceptual timeline as the geometry.
+  // Nothing here claims telematics, orders or real assets.
+  if(dockStatusLabels.length===4){
+   const arriving=complete||(isTour&&seconds>=3.10)?"En muelle":"Arribo";
+   const outbound=complete||(isTour&&seconds>=8.20)?"En ruta":"Salida";
+   if(dockStatusLabels[0].textContent!==arriving)dockStatusLabels[0].textContent=arriving;
+   if(dockStatusLabels[2].textContent!==outbound)dockStatusLabels[2].textContent=outbound;
+  }
+  const root=new THREE.Object3D();
+  const part=new THREE.Object3D();
+  const composed=new THREE.Matrix4();
+  for(const {mesh,offsets} of fleetBatches){
+   let n=0;
+   for(const truck of operationalFleet){
+    root.position.set(truck.x,0,truck.z);
+    root.rotation.set(0,0,0);
+    root.updateMatrix();
+    for(const o of offsets){
+     part.position.set(o[0],o[1],o[2]);
+     part.rotation.set(0,o[3]||0,o[4]||0);
+     part.scale.set(o[5]??1,o[6]??1,o[7]??1);
+     part.updateMatrix();
+     composed.multiplyMatrices(root.matrix,part.matrix);
+     mesh.setMatrixAt(n++,composed);
+    }
+   }
+   mesh.instanceMatrix.needsUpdate=true;
+  }
+ }
  function decorate(){
+  premiumInfrastructure();
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(22,14),mats.road);
   ground.rotation.x=-Math.PI/2;ground.position.y=-.32;scene.add(ground);
   const grid=new THREE.GridHelper(20,20,0x8aace0,0xa7c4e9);
-  grid.position.y=-.297;grid.material.transparent=true;grid.material.opacity=.35;scene.add(grid);
+  grid.position.y=-.297;grid.material.transparent=true;grid.material.opacity=coarse?.095:.075;scene.add(grid);
   // Green and orange occupancy rings — conceptual, not live tracking.
   for(const [x,z,color] of [[-.50,2.35,0x16bd94],[2.42,.18,0xff9739],[5.85,1.00,0x16bd94]]){
    const disc=new THREE.Mesh(new THREE.CircleGeometry(.63,32),
@@ -218,20 +385,23 @@ if(!stage||!mount||!controls||reduced){
   scene=new THREE.Scene();
   scene.background=new THREE.Color(PAL.night);
   scene.fog=new THREE.FogExp2(PAL.night,.010);
-  scene.add(new THREE.HemisphereLight(0xffffff,0x6b90c5,2.15));
-  const sun=new THREE.DirectionalLight(0xf5faff,3.25);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x6b90c5,1.8));
+  const sun=new THREE.DirectionalLight(0xf5faff,2.8);
   sun.position.set(-3,11,7);sun.castShadow=!coarse;
   sun.shadow.mapSize.set(1024,1024);
   Object.assign(sun.shadow.camera,{left:-13,right:13,top:11,bottom:-11,near:.5,far:40});
   sun.shadow.bias=-.0007;sun.shadow.normalBias=.025;
   sun.shadow.camera.updateProjectionMatrix();scene.add(sun);
-  const fill=new THREE.PointLight(0xb5d4ff,12,17);
+  const fill=new THREE.PointLight(0xb5d4ff,8.5,17);
   fill.position.set(0,5.2,4.2);scene.add(fill);
-  const rim=new THREE.PointLight(0x4c80ff,8.5,15);
+  const rim=new THREE.PointLight(0x4c80ff,6.2,15);
   rim.position.set(5.5,4,-4);scene.add(rim);
-  const neon=new THREE.PointLight(0x62a5ff,4,9);
+  const neon=new THREE.PointLight(0x62a5ff,3.2,9);
   neon.position.set(5,3,1);scene.add(neon);
-  storefront();courier();destination();decorate();
+  storefront();
+  const archivedFleet=courier();
+  archivedFleet.visible=false; // Replaced by independently staged trucks, preserve existing GLB contract.
+  destination();decorate();buildOperationalFleet();
   const key=new THREE.OrthographicCamera(-9,9,5,-5,.1,150);
   camera=key;
   renderer=new THREE.WebGLRenderer({antialias:!coarse,alpha:false,powerPreference:"low-power",preserveDrawingBuffer:false});
@@ -239,7 +409,7 @@ if(!stage||!mount||!controls||reduced){
   renderer.shadowMap.enabled=!coarse;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.12;
+  renderer.toneMappingExposure=1.10;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,coarse?1:1.4));
   const canvas=renderer.domElement;
   canvas.setAttribute("aria-hidden","true");canvas.tabIndex=-1;
@@ -250,7 +420,7 @@ if(!stage||!mount||!controls||reduced){
   return renderer.info;
  }
  const presets=vertical?{
-  overview:{pos:[3.5,14.8,15.2],look:[0,1,0]},
+  overview:{pos:[6,10.8,19.5],look:[0,1,0]},
   commerce:{pos:[3.2,10.8,7.0],look:[-.7,1.1,-4.7]},
   courier:{pos:[3.4,9.3,9.7],look:[0,1.1,0]},
   destination:{pos:[4.8,10.8,14.5],look:[.7,1.1,4.7]}
@@ -264,7 +434,7 @@ if(!stage||!mount||!controls||reduced){
  const tmp=new THREE.Vector3(),desiredLook=new THREE.Vector3();
  function resize(w,h){
   if(!renderer||!camera)return;
-  const ratio=w/Math.max(1,h),size=vertical?8.0:7.2;
+  const ratio=w/Math.max(1,h),size=vertical?8.0:coarse?6.35:6.55;
   camera.left=-size*ratio;camera.right=size*ratio;
   camera.top=size;camera.bottom=-size;
   camera.updateProjectionMatrix();renderer.setSize(w,h,false);
@@ -374,6 +544,12 @@ if(!stage||!mount||!controls||reduced){
    }
   }
   if(routeHalo)routeHalo.material.opacity=.09+Math.sin(frame*.9)*.018;
+  updateOperationalFleet(storyElapsed,storyActive);
+  // Beacon motion follows the existing pause/visibility lifecycle.
+  for(let i=0;i<dockBeacons.length;i++){
+   const pulse=.91+Math.sin(frame*.85-i*.74)*.09;
+   dockBeacons[i].scale.setScalar(pulse);
+  }
    for(const ring of logisticsSensors){
     ring.material.opacity=.28+.16*Math.sin(frame*1.4-ring.userData.sensorIndex*.8);
     const k=1+Math.sin(frame*.75-ring.userData.sensorIndex*.64)*.045;
@@ -482,6 +658,11 @@ if(!stage||!mount||!controls||reduced){
       material:"PBR",colorSpace:"srgb",cinematic:"v6.2",
       glbLoaded:modelStats.ready?modelStats.models.length:0,
       glbModels:modelStats.models,glbStatus:stage.dataset.v62ModelsStatus||"not-started",
+      premiumInfrastructure:scene.getObjectByName("prime-premium-hub-details")!==undefined,
+      dockBeacons:dockBeacons.length,
+      operationalFleet:operationalFleet.map(t=>({id:t.id,x:t.x,z:t.z,dockX:t.dockX,dockZ:t.dockZ,phase:t.phase})),
+      independentFleetDrawBatches:fleetBatches.length,
+      archivedFleetHidden:scene.getObjectByName("courier")?.visible===false,
       tourActive:storyActive,tourSeconds:Number(storyElapsed.toFixed(3)),
       tourBeat:STORY_BEATS[storyBeat]?.id||null,tourDuration:STORY_DURATION,
       tourProgress:storyProgress?.value||0,

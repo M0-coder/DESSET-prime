@@ -99,6 +99,14 @@ try{
  check("Exactly one GPU canvas",desktop.domCanvas===1,{count:desktop.domCanvas});
  const detailedDesktop=await waitUntil("three real glTF binary models loaded in desktop",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3?p:null})()'),17000);
  check("V6.2 desktop three independently loaded GLB models",detailedDesktop.glbLoaded===3&&detailedDesktop.glbModels.every(x=>x.meshes>=5&&x.triangles>=250),{models:detailedDesktop.glbModels,status:detailedDesktop.glbStatus});
+ check("PRIME-3D-03 real premium infrastructure and four conceptual dock beacons",detailedDesktop.premiumInfrastructure===true&&detailedDesktop.dockBeacons===4,{premium:detailedDesktop.premiumInfrastructure,beacons:detailedDesktop.dockBeacons});
+ const dockFleet=detailedDesktop.operationalFleet||[];
+ const physicallyAligned=dockFleet.length===4&&dockFleet.filter(t=>t.dockX!==null).length===4&&
+  dockFleet.filter(t=>t.dockX!==null).every(t=>Math.abs(t.x-t.dockX)<.001)&&
+  dockFleet.some(t=>t.id==="loading"&&Math.abs(t.z-t.dockZ)<.001);
+ check("PRIME-3D-04 four independent dock tractors aligned to four gates and original fifth yard unit",
+  physicallyAligned&&detailedDesktop.independentFleetDrawBatches===9&&detailedDesktop.archivedFleetHidden,
+  {fleet:dockFleet,drawBatches:detailedDesktop.independentFleetDrawBatches,archivedFleetHidden:detailedDesktop.archivedFleetHidden});
  check("V6.1 real GPU shadows and painted sign textures",desktop.shadows===true&&desktop.textureCount>=2&&desktop.cinematic==="v6.2",{shadows:desktop.shadows,textures:desktop.textureCount,cinematic:desktop.cinematic});
  check("V6.1 desktop geometry and draw call budgets",desktop.geometryCount>35&&desktop.geometryCount<180&&desktop.drawCalls<160,{geometryCount:desktop.geometryCount,drawCalls:desktop.drawCalls});
  const demoHUD=await evalJS('(()=>{const h=document.querySelector(".logistics-hud");const c=h?.querySelectorAll(".logistics-hud__card");const style=h?getComputedStyle(h):null;return {opacity:Number(style?.opacity),visible:style?.visibility,panels:c?.length||0,marked:h?.textContent.includes("DEMO")&&h?.textContent.includes("SIMULACIÓN")}})()');
@@ -137,12 +145,19 @@ try{
  check("Mobile WebGL2 after explicit opt-in",mobile.webgl&&mobile.triangles>100,{mobile});
  const detailedMobile=await waitUntil("three GLB models after mobile user consent",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3?p:null})()'),17000);
  check("V6.2 mobile loads all 3 detailed GLB originals after explicit consent",detailedMobile.glbLoaded===3&&detailedMobile.glbModels.length===3,{models:detailedMobile.glbModels});
+ check("PRIME-3D-03 premium hub survives mobile GLB hydration",detailedMobile.premiumInfrastructure===true&&detailedMobile.dockBeacons===4,{premium:detailedMobile.premiumInfrastructure,beacons:detailedMobile.dockBeacons});
+ const mobileFleet=detailedMobile.operationalFleet||[];
+ check("PRIME-3D-04 mobile fleet retains aligned truck gates",
+  mobileFleet.length===4&&mobileFleet.filter(t=>t.dockX!==null).length===4&&
+  mobileFleet.filter(t=>t.dockX!==null).every(t=>Math.abs(t.x-t.dockX)<.001)&&
+  detailedMobile.archivedFleetHidden===true,
+  {fleet:mobileFleet,archivedFleetHidden:detailedMobile.archivedFleetHidden});
  check("Mobile suppresses expensive shadow maps but keeps 3D materials",mobile.shadows===false&&mobile.textureCount>=2,{shadows:mobile.shadows,textures:mobile.textureCount});
  const groups=Object.entries(detailedMobile.objectBounds||{});
  const fullyFramed=groups.length===3&&groups.every(([name,b])=>b.minX>=-1.02&&b.maxX<=1.02&&b.minY>=-1.02&&b.maxY<=1.02);
  check("Mobile 3D stations remain within camera frame",fullyFramed,{objectBounds:detailedMobile.objectBounds});
- const mobileHUD=await evalJS('(()=>{const h=document.querySelector(".logistics-hud"),n=h?.querySelector(".logistics-hud__card--notice");const hs=h?getComputedStyle(h):null,ns=n?getComputedStyle(n):null;return {opacity:Number(hs?.opacity),visible:hs?.visibility,noticeVisible:ns?.display!=="none",background:ns?.backgroundColor,declaresDemo:n?.textContent.includes("SIMULADA")}})()');
- check("LOGISTICS V2 mobile simulated notice remains fully opaque and readable",mobileHUD.opacity===1&&mobileHUD.visible==="visible"&&mobileHUD.noticeVisible&&mobileHUD.background==="rgb(255, 255, 255)"&&mobileHUD.declaresDemo,{mobileHUD});
+ const mobileHUD=await evalJS('(()=>{const h=document.querySelector(".logistics-hud"),n=h?.querySelector(".logistics-hud__card--notice"),d=h?.querySelector(".logistics-hud__card--docks"),badge=h?.querySelector(".logistics-hud__demo");const hs=h?getComputedStyle(h):null;return {opacity:Number(hs?.opacity),visible:hs?.visibility,noticeHidden:getComputedStyle(n).display==="none",docksHidden:getComputedStyle(d).display==="none",demoBadgeVisible:getComputedStyle(badge).display!=="none"&&badge.textContent==="DEMO",declaresSimulation:n?.textContent.includes("SIMULADA")}})()');
+ check("PRIME-3D-04 mobile retains DEMO disclosure without obstructing 3D with large cards",mobileHUD.opacity===1&&mobileHUD.visible==="visible"&&mobileHUD.noticeHidden&&mobileHUD.docksHidden&&mobileHUD.demoBadgeVisible&&mobileHUD.declaresSimulation,{mobileHUD});
  await screenshot("mobile-three-webgl-optin.png");
 
  await evalJS('document.querySelector(".v63-tour").click()');
