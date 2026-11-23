@@ -70,7 +70,9 @@ if(!stage||!mount||!controls||reduced){
   const ctx=canvas.getContext("2d");if(!ctx)return;
   ctx.clearRect(0,0,512,128);ctx.fillStyle="#1551D8";
   ctx.textAlign="center";ctx.textBaseline="middle";
-  ctx.font="900 62px system-ui,Arial,sans-serif";ctx.fillText(label,256,67,490);
+  ctx.font="900 62px system-ui,Arial,sans-serif";
+  if(label==="DESSET Prime")ctx.font="900 52px system-ui,Arial,sans-serif";
+  ctx.fillText(label,256,67,490);
   const texture=new THREE.CanvasTexture(canvas);
   texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=2;
   ownedTextures.push(texture);
@@ -128,7 +130,7 @@ if(!stage||!mount||!controls||reduced){
    box(g,1.66,.17,.38,px,2.19,1.88,mats.blue);
    box(g,1.65,.15,.80,px,.10,2.12,mats.side);
   }
-  sign(g,"DESSET Prime",0,2.72,1.89,2.60,.27);
+  sign(g,"DESSET Prime",0,2.72,1.89,3.00,.27);
   sign(g,"MUELLES",0,2.36,1.89,1.10,.18);
   for(const px of [-2.3,2.3])box(g,.82,.30,.75,px,3.61,-1.2,mats.chrome);
   return g;
