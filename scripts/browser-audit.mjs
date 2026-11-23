@@ -112,10 +112,18 @@ async function viewport(width,height,reduce=false){
  };
  const rail=document.querySelector(".v4-hero-rail");
  const railBox=rail.getBoundingClientRect();
- const railWords=[...rail.querySelectorAll("span")].map(el=>{
-  const r=el.getBoundingClientRect(),style=getComputedStyle(el);
-  return {text:el.textContent.trim(),visible:style.display!=="none"&&style.visibility!=="hidden",inside:r.left>=railBox.left-2&&r.right<=railBox.right+2,width:Math.round(r.width)};
+ const railItems=[...rail.querySelectorAll(".v4-rail-item")].map(el=>{
+  const r=el.getBoundingClientRect(),title=el.querySelector("strong"),copy=el.querySelector("p"),svg=el.querySelector("svg");
+  const style=getComputedStyle(el),copyStyle=copy&&getComputedStyle(copy);
+  return {title:title?.textContent.trim(),copy:copy?.textContent.trim(),
+   visible:style.display!=="none"&&style.visibility!=="hidden",
+   inside:r.left>=railBox.left-2&&r.right<=railBox.right+2,
+   textFits:!!title&&!!copy&&title.scrollWidth<=title.clientWidth+2&&copy.scrollWidth<=copy.clientWidth+2,
+   fontPx:parseFloat(copyStyle?.fontSize),icon:svg?.getAttribute("aria-hidden")==="true"};
  });
+ const railDisplay={background:getComputedStyle(rail).backgroundColor,
+  columns:getComputedStyle(rail).gridTemplateColumns.trim().split(/\\s+/).length,
+  role:rail.getAttribute("role"),ariaHidden:rail.getAttribute("aria-hidden")};
  const typeSizes={
   heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
   serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
@@ -148,7 +156,7 @@ async function viewport(width,height,reduce=false){
    heroCtaInk:style("#inicio .hero-cta").color,
    heroPhotoFallbackBg:style("#inicio .prime-photo-surface").backgroundColor
   };
- return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railWords,typeSizes,palette,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
@@ -187,8 +195,11 @@ async function viewport(width,height,reduce=false){
  if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
+ if(diag.railItems.length!==4||diag.railItems.some(i=>!i.visible||!i.inside||!i.textFits||!i.icon||i.fontPx<12)||
+    diag.railDisplay.background!==brandBlue||diag.railDisplay.role!=="list"||diag.railDisplay.ariaHidden!==null||
+    diag.railDisplay.columns!==(width<=860?2:4))
+   fails.push("HERO-SERVICE-01: accessible service strip clips content or has wrong layout: "+JSON.stringify({items:diag.railItems,layout:diag.railDisplay}));
  if(width<=700){
-  if(diag.railWords.length!==4||diag.railWords.some(w=>!w.visible||!w.inside||w.width<45))fails.push("mobile editorial keyword rail clips or hides a word: "+JSON.stringify(diag.railWords));
   if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
  report.viewports.push({width,height,reduce,...diag,failures:fails});
