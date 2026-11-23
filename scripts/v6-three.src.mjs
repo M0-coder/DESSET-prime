@@ -264,7 +264,7 @@ if(!stage||!mount||!controls||reduced){
  const tmp=new THREE.Vector3(),desiredLook=new THREE.Vector3();
  function resize(w,h){
   if(!renderer||!camera)return;
-  const ratio=w/Math.max(1,h),size=vertical?7.0:5.8;
+  const ratio=w/Math.max(1,h),size=vertical?8.0:5.8;
   camera.left=-size*ratio;camera.right=size*ratio;
   camera.top=size;camera.bottom=-size;
   camera.updateProjectionMatrix();renderer.setSize(w,h,false);
