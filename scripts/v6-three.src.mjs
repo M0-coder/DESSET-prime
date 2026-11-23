@@ -255,7 +255,7 @@ if(!stage||!mount||!controls||reduced){
  const tmp=new THREE.Vector3(),desiredLook=new THREE.Vector3();
  function resize(w,h){
   if(!renderer||!camera)return;
-  const ratio=w/Math.max(1,h),size=vertical?6.6:5.8;
+  const ratio=w/Math.max(1,h),size=vertical?7.0:5.8;
   camera.left=-size*ratio;camera.right=size*ratio;
   camera.top=size;camera.bottom=-size;
   camera.updateProjectionMatrix();renderer.setSize(w,h,false);
@@ -301,7 +301,7 @@ if(!stage||!mount||!controls||reduced){
   }
   if(reason==="complete"&&storyPanel){
    storyTitle.textContent="RECORRIDO FINALIZADO";
-   storyDetail.textContent="Visión conceptual de comercio, reparto y destino; no es una entrega real.";
+   storyDetail.textContent="Visión conceptual del centro logístico, su flota y sus muelles; no es una entrega real.";
    storyProgress.value=100;
   }else if(storyPanel){storyPanel.hidden=true;storyProgress.value=0}
  };
