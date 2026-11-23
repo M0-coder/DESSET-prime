@@ -29,7 +29,7 @@ test("V6.6 all presentation headings and standalone labels omit terminal ornamen
 });
 
 test("V6.6 punctuation stays in natural prose and legal availability disclosures",()=>{
- assert.match(html,/DESSET reúne comercio, tecnología y logística en un ecosistema de servicios/);
+ assert.match(html,/DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla/);
  assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET/);
  assert.match(html,/no procesa pedidos ni pagos\./);
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/);
