@@ -30,7 +30,7 @@ test("LOGISTICS-3D-02: visual fallback matches original 3D architecture and pres
  assert.match(render,/new THREE\.WebGLRenderer/);
  assert.match(render,/hydrateGLBModels/);
  assert.match(loader,/GLTFLoader/);
- assert.match(loader,/sign\(parent,"DESSET",0,2\.72,1\.91/);
+ assert.match(loader,/sign\(parent,"DESSET Prime",0,2\.72,1\.91,2\.60,\.29/);
 });
 test("LOGISTICS-3D-02: floating dashboard is simulation-only and invisible without verified GPU",()=>{
  assert.match(html,/class="logistics-hud" aria-hidden="true"/);
