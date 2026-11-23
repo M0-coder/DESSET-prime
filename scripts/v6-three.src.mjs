@@ -21,6 +21,7 @@ if(!stage||!mount||!controls||reduced){
   const dockBeacons=[];
   const operationalFleet=[];
   const fleetBatches=[];
+  const dockStatusLabels=[...stage.querySelectorAll(".logistics-hud__status b")];
  let modelStats={ready:false,models:[]};
  let storyActive=false,storyElapsed=0,storyBeat=-1;
  const storyPanel=stage.querySelector(".v63-story");
@@ -285,6 +286,14 @@ if(!stage||!mount||!controls||reduced){
   leaving.z=leaving.dockZ+(isTour?
    2.65*easeTraffic((seconds-5.65)/2.55):
    complete?2.65:0);
+  // Visible dashboard states follow the same conceptual timeline as the geometry.
+  // Nothing here claims telematics, orders or real assets.
+  if(dockStatusLabels.length===4){
+   const arriving=complete||(isTour&&seconds>=3.10)?"En muelle":"Arribo";
+   const outbound=complete||(isTour&&seconds>=8.20)?"En ruta":"Salida";
+   if(dockStatusLabels[0].textContent!==arriving)dockStatusLabels[0].textContent=arriving;
+   if(dockStatusLabels[2].textContent!==outbound)dockStatusLabels[2].textContent=outbound;
+  }
   const root=new THREE.Object3D();
   const part=new THREE.Object3D();
   const composed=new THREE.Matrix4();
