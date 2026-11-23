@@ -64,7 +64,7 @@
     if(threeStart)threeStart.hidden=true;
     if(loadStatus){loadStatus.textContent="Preparando los modelos 3D de DESSET…";loadStatus.hidden=false}
     const script=document.createElement("script");
-    script.src="./assets/v6-three.bundle.js";
+    script.src="./assets/v6-three.bundle.js?scene=paper-v1";
     script.async=true;
     // Three.js only signals READY after all three GLB models have been loaded
     // and an actual frame has been drawn. A script load alone is not ready.

@@ -255,7 +255,7 @@ if(!stage||!mount||!controls||reduced){
   courier:{pos:[3.4,9.3,9.7],look:[0,1.1,0]},
   destination:{pos:[4.8,10.8,14.5],look:[.7,1.1,4.7]}
  }:{
-  overview:{pos:[12,11,18],look:[0,1,0]},
+  overview:{pos:[12,13.5,19.5],look:[0,1,0]},
   commerce:{pos:[-.3,8.2,12],look:[-4.2,1.0,0]},
   courier:{pos:[7.8,8.1,11.3],look:[.98,1.1,1.18]},
   destination:{pos:[7.6,8.7,12],look:[4.1,1,.1]}
@@ -264,7 +264,7 @@ if(!stage||!mount||!controls||reduced){
  const tmp=new THREE.Vector3(),desiredLook=new THREE.Vector3();
  function resize(w,h){
   if(!renderer||!camera)return;
-  const ratio=w/Math.max(1,h),size=vertical?8.0:5.8;
+  const ratio=w/Math.max(1,h),size=vertical?8.0:7.2;
   camera.left=-size*ratio;camera.right=size*ratio;
   camera.top=size;camera.bottom=-size;
   camera.updateProjectionMatrix();renderer.setSize(w,h,false);

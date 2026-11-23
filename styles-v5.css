@@ -10,7 +10,7 @@
 }
 .v5-city-stage:before {
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(135deg,rgba(255,255,255,.11),transparent 37%,rgba(21,81,216,.09) 72%,rgba(0,0,0,.25));
+  background:linear-gradient(135deg,rgba(255,255,255,.11),transparent 37%,rgba(21,81,216,.09) 72%,rgba(21,81,216,.03));
 }
 /* A restrained highlight frames the finished image without covering the subject. */
 .v5-city-stage:after {
@@ -18,13 +18,13 @@
  pointer-events:none;background:linear-gradient(90deg,transparent,#FFC62F 38%,#5F94FF 75%,transparent);
  transform-origin:left;opacity:.8;
 }
-.v5-stage-world { position:relative; aspect-ratio:1752/897; min-height:265px; overflow:hidden; }
+.v5-stage-world { position:relative; aspect-ratio:1752/897; min-height:265px; overflow:hidden; background:#f4f8fe; }
 /* This image-free, accessible fallback is visible without WebGL or with reduced motion.
    WebGL hides it only after a verified GPU frame has been drawn. */
-.v6-static-fallback{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.7vw,18px);padding:clamp(18px,4vw,46px);text-align:center;background:radial-gradient(ellipse at 55% 35%,rgba(21,81,216,.33),transparent 58%),#0b1024;color:#f7f5ee}
-.v6-static-fallback__eyebrow{color:#ffc62f;font-size:clamp(10px,1vw,14px);font-weight:800;letter-spacing:.14em}
+.v6-static-fallback{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.7vw,18px);padding:clamp(18px,4vw,46px);text-align:center;background:radial-gradient(ellipse at 55% 35%,rgba(21,81,216,.08),transparent 58%),#f4f8fe;color:#162943}
+.v6-static-fallback__eyebrow{color:#1551d8;font-size:clamp(10px,1vw,14px);font-weight:800;letter-spacing:.14em}
 .v6-static-fallback__headline{font-size:clamp(20px,3.1vw,48px);line-height:1.1;letter-spacing:-.025em;max-width:850px}
-.v6-static-fallback__note{margin:0;max-width:550px;color:#e4eaf8;font-size:clamp(12px,1.3vw,16px);line-height:1.5}
+.v6-static-fallback__note{margin:0;max-width:550px;color:#445a77;font-size:clamp(12px,1.3vw,16px);line-height:1.5}
 
 /* Higher specificity than legacy .ecosystem-board img (max-width:900/max-height:420).
    Prevent letterboxing: render must occupy the intended responsive frame. */
@@ -72,7 +72,7 @@
 /* V6 REAL GPU STAGE — CSS is only shell/fallback, actual geometry is WebGL. */
 .v6-three-mount {
  position:absolute;inset:0;z-index:3;opacity:0;pointer-events:none;
- background:#0b1024;transition:opacity .35s ease;
+ background:#f4f8fe;transition:opacity .35s ease;
 }
 .v6-three-mount .v6-three-canvas {display:block!important;width:100%!important;height:100%!important;}
 .v5-city-stage[data-v6-state="active"] .v6-three-mount {opacity:1;pointer-events:auto;}
