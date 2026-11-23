@@ -20,7 +20,9 @@ test("VISUAL-A11Y-01 neutral black text does not replace brand blue",()=>{
 });
 test("VISUAL-A11Y-01 no cropped DESSET service band at wide viewports",()=>{
  assert.match(hero,/left:50%;width:100vw;transform:translateX\(-50%\);margin:0/);
- assert.match(audit,/diag\.railDisplay\.left>2\|\|diag\.railDisplay\.right<diag\.railDisplay\.viewportRight-2/);
+ assert.match(audit,/diag\.railDisplay\.left< -16/);
+ assert.match(audit,/diag\.railDisplay\.right<diag\.railDisplay\.viewportRight-2/);
+ assert.match(audit,/diag\.railDisplay\.right>diag\.railDisplay\.viewportRight\+16/);
  assert.match(html,/class="v4-hero-rail" role="list"/);
  assert.equal((html.match(/class="v4-rail-item" role="listitem"/g)||[]).length,4);
 });
