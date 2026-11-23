@@ -196,18 +196,23 @@ if(!stage||!mount||!controls||reduced){
    gates.flatMap(x=>[[x-.72,.061,2.86],[x+.72,.061,2.86]]));
   instanceBoxes(hub,1.24,.019,.052,mats.cream,
    gates.flatMap(x=>[[x,.065,3.12],[x,.065,3.43]]));
+  // Loading gate 02 is physically open, matching the simulated dock state.
+  // Cover the GLB shutter with a shallow recessed dark bay and raised panel.
+  box(hub,1.23,1.54,.042,-.91,1.15,1.976,mats.dark);
+  box(hub,1.25,.31,.054,-.91,1.91,2.015,mats.chrome);
   for(const [i,x] of gates.entries()){
    const beacon=sphere(hub,.082,x,2.47,2.44,
-    [mats.ready,mats.cyan,mats.attention,mats.cyan][i],10);
+    [mats.attention,mats.cyan,mats.ready,mats.ready][i],10);
    dockBeacons.push(beacon);
   }
   // Lane and outbound-yard markings: no extra trucks and no real-time data.
   const fleet=new THREE.Group();fleet.name="prime-fleet-wayfinding";
-  fleet.position.set(vertical?0:.98,.13,vertical?0:1.18);scene.add(fleet);
-  instanceBoxes(fleet,.042,.024,1.45,mats.cream,
-   [-2.36,-.80,.78,2.36].map(x=>[x,.014,.25]));
-  instanceBoxes(fleet,.40,.027,.070,mats.blue,
-   [-1.55,.03,1.61].map(x=>[x,.015,2.04]));
+  fleet.position.set(vertical?-.7:-5,-.285,vertical?-4.7:0);scene.add(fleet);
+  const laneX=[-2.72,-.91,.91,2.72];
+  instanceBoxes(fleet,.040,.020,2.5,mats.cream,
+   laneX.flatMap(x=>[[x-.71,.013,4.36],[x+.71,.013,4.36]]));
+  instanceBoxes(fleet,.46,.018,.060,mats.blue,
+   laneX.map(x=>[x,.017,5.74]));
   const yard=new THREE.Group();yard.name="prime-yard-wayfinding";
   yard.position.set(vertical?.7:5.03,0,vertical?4.7:-.35);scene.add(yard);
   instanceBoxes(yard,.055,.021,2.52,mats.blue,
@@ -304,7 +309,7 @@ if(!stage||!mount||!controls||reduced){
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(22,14),mats.road);
   ground.rotation.x=-Math.PI/2;ground.position.y=-.32;scene.add(ground);
   const grid=new THREE.GridHelper(20,20,0x8aace0,0xa7c4e9);
-  grid.position.y=-.297;grid.material.transparent=true;grid.material.opacity=coarse?.19:.14;scene.add(grid);
+  grid.position.y=-.297;grid.material.transparent=true;grid.material.opacity=coarse?.095:.075;scene.add(grid);
   // Green and orange occupancy rings — conceptual, not live tracking.
   for(const [x,z,color] of [[-.50,2.35,0x16bd94],[2.42,.18,0xff9739],[5.85,1.00,0x16bd94]]){
    const disc=new THREE.Mesh(new THREE.CircleGeometry(.63,32),
@@ -395,7 +400,7 @@ if(!stage||!mount||!controls||reduced){
   return renderer.info;
  }
  const presets=vertical?{
-  overview:{pos:[3.5,14.8,15.2],look:[0,1,0]},
+  overview:{pos:[6,10.8,19.5],look:[0,1,0]},
   commerce:{pos:[3.2,10.8,7.0],look:[-.7,1.1,-4.7]},
   courier:{pos:[3.4,9.3,9.7],look:[0,1.1,0]},
   destination:{pos:[4.8,10.8,14.5],look:[.7,1.1,4.7]}
