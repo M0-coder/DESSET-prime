@@ -276,13 +276,15 @@ if(!stage||!mount||!controls||reduced){
  function updateOperationalFleet(seconds,isTour){
   if(!operationalFleet.length)return;
   const first=operationalFleet[0],leaving=operationalFleet[2];
-  // Arriving and departing vehicles move through distinct loading lanes;
-  // no discontinuous teleporting loop and no fictitious live tracking.
+  // The completed state holds the final vehicle positions instead of snapping
+  // the departing truck back to its dock as the finite tour ends.
+  const complete=!isTour&&stage.dataset.v63Tour==="complete";
   first.z=first.dockZ+(isTour?
    1.93*(1-easeTraffic((seconds-.85)/2.25)):
-   1.70+.18*Math.sin(frame*.44));
+   complete?0:1.93);
   leaving.z=leaving.dockZ+(isTour?
-   2.65*easeTraffic((seconds-5.65)/2.55):0);
+   2.65*easeTraffic((seconds-5.65)/2.55):
+   complete?2.65:0);
   const root=new THREE.Object3D();
   const part=new THREE.Object3D();
   const composed=new THREE.Matrix4();
