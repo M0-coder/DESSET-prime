@@ -45,6 +45,8 @@ test("PRIME-3D-04 truck geometry aligns to actual dock gate positions and moves 
  assert.match(scene,/const dockZ=hubZ\+3\.42/);
  assert.match(scene,/archivedFleet\.visible=false/);
  assert.match(scene,/fleetBatches\.push\(\{mesh,offsets\}\)/);
+ assert.match(scene,/const boxComponents=new Map\(\)/);
+ assert.match(scene,/new THREE\.BoxGeometry\(1,1,1\),material,offsets/);
  assert.match(scene,/updateOperationalFleet\(storyElapsed,storyActive\)/);
  assert.match(scene,/easeTraffic\(\(seconds-\.85\)\/2\.25\)/);
  assert.match(scene,/easeTraffic\(\(seconds-5\.65\)\/2\.55\)/);
