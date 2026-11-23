@@ -1,4 +1,4 @@
-/* LOGISTICS-3D-01 — new warehouse/fleet/loading-bays authored as deterministic GLB geometry.
+/* LOGISTICS-3D-02 — central-hub/fleet/yard authored as deterministic GLB geometry.
  * The original design, meshes and parts are ours: no downloaded models, fonts or assets.
  * All three files are CI build outputs, not production assets. */
 import * as THREE from "three";
@@ -23,7 +23,7 @@ const P={
  gold:0xffc62f,goldDark:0xa96812,cream:0xf6f9ff,red:0xff3328,
  redDark:0x871f26,rubber:0x131928,steel:0xb4cce7,glass:0x8ddcff,
  asphalt:0xdfe9f6,teal:0x24a9a1,stone:0xc4d5e9,wood:0x805c47,
- brick:0xb83d35,leaf:0x447c5a,light:0xffe6a5
+ brick:0xb83d35,leaf:0x447c5a,light:0xfff8d3
 };
 const keyMat=new Map();
 const material=(name,color,metal=0.12,rough=.55)=>{
@@ -54,90 +54,127 @@ const create=(name)=>{
 /* LOGISTICS-3D-01 — new original, reference-guided warehouse, fleet and docks.
  * Replaces the former retail storefront, motorbike courier and red house.
  * Keep three GLB contract keys only as stable internal loader ABI identifiers. */
+/* LOGISTICS-3D-02: single dominant distribution hub and 5 independent
+ * delivery trucks across two GLB yard sectors. Reference-guided, original geometry.
+ * Each component remains batched by PBR material for modest mobile draw calls. */
+function buildTruck(m,x,z,scale=1,variant=0){
+ const {box,cyl}=m;
+ const B=(w,h,d,mat,px,py,pz)=>box(w*scale,h*scale,d*scale,mat,x+px*scale,py*scale,z+pz*scale);
+ const C=(r,mat,px,py,pz,n=10)=>cyl(r*scale,r*scale,.105*scale,mat,x+px*scale,py*scale,z+pz*scale,n,[0,0,Math.PI/2]);
+ // Axles, low chassis, insulated trailer, corrugated sidewalls and roof.
+ B(.78,.14,2.42,"royalDark",0,.39,.05);
+ B(.86,1.02,1.73,"cream",0,1.05,-.38);
+ B(.88,.11,1.76,"steel",0,1.62,-.38);
+ B(.80,.075,1.69,"cream",0,1.66,-.38);
+ for(const side of [-.444,.444]){
+  B(.020,.65,1.59,"steel",side,1.06,-.38);
+  B(.040,.14,1.58,"royalLight",side,1.43,-.38);
+  for(let stripe=0;stripe<3;stripe++)B(.025,.025,1.5,"steel",side,1.02+stripe*.2,-.38);
+ }
+ // Aerodynamic tractor cab, curved impression via layered angled fascia.
+ B(.80,.79,.71,variant%2?"cream":"royal",0,.88,1.0);
+ B(.84,.13,.79,"steel",0,1.34,1.0);
+ B(.69,.31,.04,"glass",0,1.08,1.369);
+ B(.60,.16,.045,"royalDark",0,.81,1.383);
+ B(.61,.095,.05,"steel",0,.62,1.382);
+ for(const side of [-.38,.38]){
+  B(.11,.075,.052,"light",side,.76,1.399);
+  B(.032,.24,.34,"glass",side*.96,1.10,1.03);
+  B(.09,.07,.045,"royalDark",side*1.22,1.18,1.20);
+  B(.035,.05,.31,"royalDark",side*1.2,1.14,1.08);
+  for(const wheelZ of [-.92,.08,1.06]){
+   C(.185,"rubber",side*1.18,.36,wheelZ,10);
+   C(.078,"steel",side*1.20,.36,wheelZ,10);
+  }
+ }
+ B(.46,.095,.12,"royalLight",0,1.41,-.39);
+ B(.60,.055,.10,"light",0,1.67,-.38);
+}
 function commerce(){
- const m=create("DESSET-Logistics-Warehouse");
- const {box,slab}=m;slab(5.85,4.55);
- // Low-poly industrial distribution hub, double-wall and stepped roof.
- box(5.58,2.62,3.48,"cream",0,1.40,-.24);
- box(5.76,.24,3.83,"steel",0,2.82,-.24);
- box(5.62,.115,3.72,"royalLight",0,2.96,-.24);
- for(let i=0;i<9;i++)box(.028,.025,3.70,"cream",-2.50+i*.625,3.03,-.24);
- for(const z of [-1.92,1.39])for(const px of [-2.70,2.70]){
-   box(.15,2.52,.14,"royalLight",px,1.37,z);
+ const m=create("DESSET-Logistics-Central-Hub");
+ const {box,cyl,slab}=m;slab(7.6,5.25);
+ // ONE dominant warehouse. No separate secondary building.
+ box(7.24,3.02,4.20,"cream",0,1.61,-.44);
+ box(7.44,.24,4.46,"steel",0,3.16,-.44);
+ box(7.27,.11,4.35,"cream",0,3.31,-.44);
+ box(7.47,.11,.12,"royalLight",0,3.22,1.79);
+ // Extremely subtle roof standing seams and plant units.
+ for(let i=0;i<13;i++)box(.024,.032,4.28,"steel",-3.45+i*.575,3.39,-.44);
+ for(const [px,pz] of [[-2.38,-1.47],[2.36,-1.33]]){
+  box(.82,.32,.71,"steel",px,3.62,pz);
+  box(.70,.07,.62,"cream",px,3.81,pz);
+  for(let i=0;i<4;i++)box(.035,.23,.66,"royalLight",px-.27+i*.18,3.62,pz);
  }
- // Loading shutters: three dock openings, lintels and blue frames.
- for(const px of [-1.87,0,1.87]){
-  box(1.53,1.68,.07,"royalDark",px,1.06,1.529);
-  box(1.27,1.35,.08,"steel",px,.96,1.580);
-  for(let y=.42;y<1.51;y+=.16)box(1.27,.018,.09,"cream",px,y,1.628);
-  box(1.56,.15,.22,"royal",px,1.91,1.592);
-  for(const side of [-.74,.74])box(.065,1.70,.12,"royal",px+side,1.10,1.594);
-  box(1.51,.14,.62,"stone",px,.14,1.83);
+ // Four loading gates; depth cavities, shadowed interiors and dock levellers.
+ for(const px of [-2.72,-.91,.91,2.72]){
+  box(1.54,1.89,.14,"royalDark",px,1.17,1.735);
+  box(1.26,1.63,.065,"steel",px,1.08,1.825);
+  for(let i=0;i<10;i++)box(1.25,.018,.076,"cream",px,.37+i*.157,1.871);
+  for(const side of [-.76,.76]){
+   box(.12,1.97,.25,"royalLight",px+side,1.21,1.80);
+   box(.10,.33,.33,"royalDark",px+side,.26,1.92);
+  }
+  box(1.68,.16,.41,"royal",px,2.19,1.90);
+  box(1.69,.16,.80,"stone",px,.10,2.11);
+  box(1.49,.023,.56,"royalDark",px,.20,2.28);
+  box(.18,.10,.08,"teal",px+.64,2.35,1.91);
  }
- for(let z=-1.65;z<1.40;z+=.42)box(.04,1.96,.035,"steel",2.84,1.20,z);
- box(1.61,.34,.08,"royalDark",0,2.28,1.552);
- box(1.48,.26,.09,"cream",0,2.28,1.609);
- // Loading signage, roof HVAC, parcel stacks.
- for(const [px,pz] of [[-2.28,-.95],[2.15,-1.10]]){
-  box(.82,.32,.70,"steel",px,3.20,pz);
-  for(let i=0;i<4;i++)box(.027,.20,.62,"royalLight",px-.28+i*.18,3.25,pz);
+ // Side wall ribs and loading-bay roof/structure.
+ for(let z=-2.34;z<1.58;z+=.43){
+  box(.035,2.76,.035,"steel",3.65,1.65,z);
+  box(.035,2.76,.035,"steel",-3.65,1.65,z);
  }
- for(let i=0;i<5;i++){
-  const px=-2.30+i*.76;
-  box(.47,.37,.42,i%2?"steel":"wood",px,.24,2.45);
-  box(.48,.04,.43,"cream",px,.46,2.45);
+ for(const px of [-3.58,3.58])for(const pz of [-2.5,1.65])
+  box(.15,2.92,.16,"royalLight",px,1.57,pz);
+ box(2.28,.38,.075,"royalDark",0,2.72,1.817);
+ box(2.18,.29,.083,"cream",0,2.72,1.862);
+ // Loading platforms, hazard-guidance and stacked goods.
+ for(let i=0;i<6;i++){
+  const px=-3.18+i*1.17;
+  box(.58,.32,.54,i%3?"cream":"steel",px,.26,3.04);
+  box(.60,.055,.59,"stone",px,.46,3.04);
+  if(i%2===0)box(.45,.24,.46,"steel",px,.64,3.04);
  }
+ for(let i=0;i<4;i++){
+  const px=-2.82+i*1.86;
+  box(.08,.015,1.28,"gold",px,.016,3.75);
+ }
+ // Industrial yard barrels.
+ for(const pz of [-1.78,-1.20,-.61])cyl(.17,.17,.43,"royalLight",3.94,.25,pz,12);
  return m.group;
 }
 function courier(){
- const m=create("DESSET-Logistics-Fleet");
- const {box,cyl,slab}=m;slab(3.96,3.10);
- // Two miniature tractor-trailer trucks replace the former motorbike.
- for(let n=0;n<2;n++){
-  const ox=n===0?-1.04:1.08,z=n===0?-.42:.55;
-  box(.92,.88,1.70,"cream",ox,1.00,z);
-  box(.95,.095,1.72,"steel",ox,1.49,z);
-  for(const side of [-.48,.48])box(.025,.70,1.66,"royalLight",ox+side,1.03,z);
-  box(.77,.69,.68,"royal",ox,.90,z+1.07);
-  box(.65,.32,.035,"glass",ox,1.05,z+1.428);
-  box(.78,.09,.07,"steel",ox,.61,z+1.432);
-  for(const side of [-.37,.37]){
-   box(.13,.09,.055,"light",ox+side,.74,z+1.46);
-   for(const zWheel of [z-.57,z+.65,z+1.06]){
-    cyl(.19,.19,.16,"rubber",ox+side*1.38,.41,zWheel,12,[0,0,Math.PI/2]);
-    cyl(.085,.085,.17,"steel",ox+side*1.38,.41,zWheel,12,[0,0,Math.PI/2]);
-   }
-  }
-  box(.44,.07,.14,"gold",ox,1.40,z+.12);
+ const m=create("DESSET-Logistics-Trailer-Fleet");
+ const {box}=m;
+ box(6.06,.064,4.35,"asphalt",0,-.04,.12);
+ // Four distinct freight trucks, no motorbike and no storefront.
+ for(const [i,x,z] of [[0,-1.55,-.83],[1,.03,-.92],[2,1.61,-.74],[3,.35,1.09]]){
+  buildTruck(m,x,z,i===3?.84:.94,i);
  }
- box(3.20,.05,.06,"teal",0,.045,1.46);
- for(let i=0;i<4;i++)box(.40,.035,.07,"cream",-1.25+i*.83,.048,1.57);
+ // Direction arrows and painted parking lanes.
+ for(const px of [-2.33,-.86,.77,2.36])
+  box(.042,.017,2.80,"steel",px,.013,.30);
+ for(let i=0;i<4;i++)box(.37,.018,.09,"teal",-1.76+i*1.04,.027,2.12);
  return m.group;
 }
 function destination(){
- const m=create("DESSET-Loading-Docks");
- const {box,cyl,slab}=m;slab(3.85,3.26);
- // Industrial annex, loading ramps, loading status markers and pallets.
- box(3.38,2.35,2.50,"cream",0,1.20,-.29);
- box(3.66,.22,2.78,"steel",0,2.51,-.29);
- box(3.58,.07,2.70,"royalLight",0,2.65,-.29);
- for(const px of [-1.08,1.08]){
-   box(1.26,1.52,.05,"royalDark",px,.92,1.01);
-   box(1.08,1.28,.075,"steel",px,.85,1.053);
-   for(let j=0;j<7;j++)box(1.07,.022,.08,"cream",px,.38+j*.16,1.103);
-   box(.10,1.54,.14,"royal",px-.65,.93,1.09);
-   box(.10,1.54,.14,"royal",px+.65,.93,1.09);
-   box(1.42,.15,.63,"stone",px,.13,1.34);
-   box(.10,.12,.09,"teal",px,1.86,1.12);
+ const m=create("DESSET-Logistics-Yard-Operations");
+ const {box,cyl,slab}=m;
+ // The third GLB is an OPEN YARD, never another warehouse or a house.
+ slab(4.12,3.55);
+ for(let i=0;i<7;i++){
+  const px=-1.67+(i%4)*1.10,pz=-1.0+Math.floor(i/4)*1.04;
+  box(.77,.07,.67,"stone",px,.10,pz);
+  box(.67,.46,.55,i%3===0?"steel":"cream",px,.38,pz);
+  box(.73,.04,.61,"royalLight",px,.64,pz);
  }
- for(let i=0;i<4;i++){
-  const px=-1.2+i*.80;
-  box(.54,.47,.52,"wood",px,.25,2.01);
-  box(.56,.055,.56,"cream",px,.51,2.01);
+ // Compact fifth truck near the far-side staging area.
+ buildTruck(m,1.08,.82,.60,1);
+ for(const [px,pz,mat] of [[-1.9,1.25,"teal"],[-1.9,.64,"gold"]]){
+  cyl(.15,.15,.42,mat,px,.22,pz,12);
+  box(.29,.05,.29,"steel",px,.46,pz);
  }
- for(const px of [-1.56,1.56])for(let j=0;j<4;j++)box(.055,.14,2.38,"royalLight",px,.50+j*.50,-.31);
- cyl(.12,.12,.44,"teal",-1.50,.23,1.73,14);
- cyl(.12,.12,.44,"gold",1.50,.23,1.73,14);
+ for(let i=0;i<5;i++)box(.10,.025,.66,"royalLight",-1.58+i*.59,.018,1.65);
  return m.group;
 }
 const models={commerce:commerce(),courier:courier(),destination:destination()};
