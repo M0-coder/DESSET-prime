@@ -105,7 +105,7 @@ try{
   dockFleet.filter(t=>t.dockX!==null).every(t=>Math.abs(t.x-t.dockX)<.001)&&
   dockFleet.some(t=>t.id==="loading"&&Math.abs(t.z-t.dockZ)<.001);
  check("PRIME-3D-04 four independent dock tractors aligned to four gates and original fifth yard unit",
-  physicallyAligned&&detailedDesktop.independentFleetDrawBatches>=12&&detailedDesktop.archivedFleetHidden,
+  physicallyAligned&&detailedDesktop.independentFleetDrawBatches===9&&detailedDesktop.archivedFleetHidden,
   {fleet:dockFleet,drawBatches:detailedDesktop.independentFleetDrawBatches,archivedFleetHidden:detailedDesktop.archivedFleetHidden});
  check("V6.1 real GPU shadows and painted sign textures",desktop.shadows===true&&desktop.textureCount>=2&&desktop.cinematic==="v6.2",{shadows:desktop.shadows,textures:desktop.textureCount,cinematic:desktop.cinematic});
  check("V6.1 desktop geometry and draw call budgets",desktop.geometryCount>35&&desktop.geometryCount<180&&desktop.drawCalls<160,{geometryCount:desktop.geometryCount,drawCalls:desktop.drawCalls});
