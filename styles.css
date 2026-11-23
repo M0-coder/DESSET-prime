@@ -205,7 +205,7 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
  .v4-canvas-type span:nth-child(2){animation:v4-type-rise .63s cubic-bezier(.2,.8,.2,1) 1.27s both}
  .v4-canvas-type span:nth-child(3){animation:v4-type-rise .63s cubic-bezier(.2,.8,.2,1) 1.52s both}
  .v4-hero-bottom{animation:v4-intro-fade .7s ease-out .85s both}
- .v4-hero-rail{animation:v4-rail-enter .95s ease-out 1s both}
+ /* Hero service strip is informational and never visually masked on entry. */
  
  
 }

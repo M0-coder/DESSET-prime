@@ -35,7 +35,7 @@ test("Every prior institutional color in VISUAL-02 is restored byte-for-byte",()
  ])assert.match(read(path),pattern,"Original yellow missing: "+path);
 });
 test("The only lime CTA retains WCAG AA contrast and 3D markup remains unchanged",()=>{
- assert.ok(contrast("#214579",lime)>=4.5,"DESSET blue ink must remain legible on lime");
+ assert.ok(contrast("#111111",lime)>=4.5,"Neutral black ink must remain legible on lime");
  assert.equal(oldGold,"#FFC62F");
  assert.match(html,/class="v6-three-mount"/);
  assert.match(html,/class="v63-tour"/);

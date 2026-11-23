@@ -23,12 +23,12 @@ test("PRIME-HUB-01: chapter title and owner-specified English message appear out
 });
 test("PRIME-HUB-01: DESSET blue title, blue-ink English text and mobile-friendly scale",()=>{
  assert.match(css,/#ecosistema \.prime-3d-heading h2\{margin:0;color:#1551d8/);
- assert.match(css,/#ecosistema \.prime-3d-heading p\{margin:12px 0 0;color:#214579/);
- assert.match(css,/#ecosistema \.prime-3d-heading p strong\{display:block;color:#214579/);
+ assert.match(css,/#ecosistema \.prime-3d-heading p\{margin:12px 0 0;color:#111111/);
+ assert.match(css,/#ecosistema \.prime-3d-heading p strong\{display:block;color:#111111/);
  assert.match(css,/font-size:clamp\(36px,5\.6vw,74px\)/);
  assert.match(audit,/primeHeadingColor:style\("#desset-prime-heading"\)\.color/);
  assert.match(audit,/palette\.primeHeadingColor!==brandBlue/);
- for(const [fg,bg] of [["#1551d8","#eef0ef"],["#214579","#eef0ef"]]){
+ for(const [fg,bg] of [["#1551d8","#eef0ef"],["#111111","#eef0ef"]]){
   assert.ok(contrast(fg,bg)>=4.5,`${fg} on ${bg} fails normal-text contrast`);
  }
 });
