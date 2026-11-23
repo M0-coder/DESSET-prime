@@ -18,6 +18,7 @@ if(!stage||!mount||!controls||reduced){
  let renderer,scene,camera,ro,observer,raf=0,alive=false,onscreen=true,paused=false;
  let cameraPreset="overview",frame=0,particle,parcel,routeHalo;
   const logisticsSensors=[];
+  const dockBeacons=[];
  let modelStats={ready:false,models:[]};
  let storyActive=false,storyElapsed=0,storyBeat=-1;
  const storyPanel=stage.querySelector(".v63-story");
@@ -42,7 +43,9 @@ if(!stage||!mount||!controls||reduced){
   trim:makeMat(0x1a3e83,.55,.28),
   chrome:makeMat(0xc7d8ec,.35,.48),
   windowLight:makeMat(0x82d7f3,.10,.20,0x4b9de8,.70),
-  headlight:makeMat(0xfef4cb,.14,.25,0xffc62f,1.6)
+  headlight:makeMat(0xfef4cb,.14,.25,0xffc62f,1.6),
+  ready:makeMat(0x19af86,.18,.32,0x0d906c,.75),
+  attention:makeMat(0xffab3d,.18,.34,0xe88a13,.65)
  };
  const box=(parent,w,h,d,x,y,z,material)=>{
   const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
@@ -158,7 +161,60 @@ if(!stage||!mount||!controls||reduced){
   for(const [px,pz] of [[-1.87,1.19],[-1.87,.63]])cylinder(g,.15,.45,px,.23,pz,mats.cyan);
   return g;
  }
+
+ // PRIME-3D-03: original GLBs are immutable; independent overlays remain after hydration.
+ // Instance repeated hardware for bounded draw calls on desktop and mobile.
+ const instanceBoxes=(parent,w,h,d,material,positions)=>{
+  const mesh=new THREE.InstancedMesh(new THREE.BoxGeometry(w,h,d),material,positions.length);
+  const item=new THREE.Object3D();
+  for(let i=0;i<positions.length;i++){
+   item.position.set(...positions[i]);item.updateMatrix();mesh.setMatrixAt(i,item.matrix);
+  }
+  mesh.instanceMatrix.needsUpdate=true;
+  mesh.castShadow=!coarse;mesh.receiveShadow=!coarse;
+  parent.add(mesh);return mesh;
+ };
+ function premiumInfrastructure(){
+  const hub=new THREE.Group();hub.name="prime-premium-hub-details";
+  hub.position.set(vertical?-.7:-5,0,vertical?-4.7:0);scene.add(hub);
+  // Glass skylights, anodized roof frames and one continuous DESSET-blue front edge.
+  const skylights=[-1.95,0,1.95];
+  instanceBoxes(hub,.68,.025,2.88,mats.blue,skylights.map(x=>[x,3.433,-.55]));
+  instanceBoxes(hub,.54,.042,2.72,mats.glass,skylights.map(x=>[x,3.465,-.55]));
+  instanceBoxes(hub,.027,.067,2.78,mats.chrome,
+   skylights.flatMap(x=>[[x-.30,3.471,-.55],[x+.30,3.471,-.55]]));
+  box(hub,7.31,.09,.13,0,3.423,1.785,mats.blue);
+  // Four aligned docks: canopies, edge protection, staging lines, simulated signals.
+  const gates=[-2.72,-.91,.91,2.72];
+  instanceBoxes(hub,1.55,.095,.58,mats.cream,gates.map(x=>[x,2.345,2.09]));
+  instanceBoxes(hub,1.55,.055,.065,mats.blue,gates.map(x=>[x,2.304,2.392]));
+  instanceBoxes(hub,.09,.70,.09,mats.chrome,
+   gates.flatMap(x=>[[x-.78,.37,2.51],[x+.78,.37,2.51]]));
+  instanceBoxes(hub,.075,.021,.72,mats.gold,
+   gates.flatMap(x=>[[x-.72,.061,2.86],[x+.72,.061,2.86]]));
+  instanceBoxes(hub,1.24,.019,.052,mats.cream,
+   gates.flatMap(x=>[[x,.065,3.12],[x,.065,3.43]]));
+  for(const [i,x] of gates.entries()){
+   const beacon=sphere(hub,.082,x,2.47,2.44,
+    [mats.ready,mats.cyan,mats.attention,mats.cyan][i],10);
+   dockBeacons.push(beacon);
+  }
+  // Lane and outbound-yard markings: no extra trucks and no real-time data.
+  const fleet=new THREE.Group();fleet.name="prime-fleet-wayfinding";
+  fleet.position.set(vertical?0:.98,.13,vertical?0:1.18);scene.add(fleet);
+  instanceBoxes(fleet,.042,.024,1.45,mats.cream,
+   [-2.36,-.80,.78,2.36].map(x=>[x,.014,.25]));
+  instanceBoxes(fleet,.40,.027,.070,mats.blue,
+   [-1.55,.03,1.61].map(x=>[x,.015,2.04]));
+  const yard=new THREE.Group();yard.name="prime-yard-wayfinding";
+  yard.position.set(vertical?.7:5.03,0,vertical?4.7:-.35);scene.add(yard);
+  instanceBoxes(yard,.055,.021,2.52,mats.blue,
+   [[-1.84,.051,-.18],[1.83,.051,-.18]]);
+  instanceBoxes(yard,.44,.024,.065,mats.cyan,
+   [-1.48,-.86,-.24,.38].map(x=>[x,.052,1.38]));
+ }
  function decorate(){
+  premiumInfrastructure();
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(22,14),mats.road);
   ground.rotation.x=-Math.PI/2;ground.position.y=-.32;scene.add(ground);
   const grid=new THREE.GridHelper(20,20,0x8aace0,0xa7c4e9);
@@ -374,6 +430,11 @@ if(!stage||!mount||!controls||reduced){
    }
   }
   if(routeHalo)routeHalo.material.opacity=.09+Math.sin(frame*.9)*.018;
+  // Beacon motion follows the existing pause/visibility lifecycle.
+  for(let i=0;i<dockBeacons.length;i++){
+   const pulse=.91+Math.sin(frame*.85-i*.74)*.09;
+   dockBeacons[i].scale.setScalar(pulse);
+  }
    for(const ring of logisticsSensors){
     ring.material.opacity=.28+.16*Math.sin(frame*1.4-ring.userData.sensorIndex*.8);
     const k=1+Math.sin(frame*.75-ring.userData.sensorIndex*.64)*.045;
@@ -482,6 +543,8 @@ if(!stage||!mount||!controls||reduced){
       material:"PBR",colorSpace:"srgb",cinematic:"v6.2",
       glbLoaded:modelStats.ready?modelStats.models.length:0,
       glbModels:modelStats.models,glbStatus:stage.dataset.v62ModelsStatus||"not-started",
+      premiumInfrastructure:scene.getObjectByName("prime-premium-hub-details")!==undefined,
+      dockBeacons:dockBeacons.length,
       tourActive:storyActive,tourSeconds:Number(storyElapsed.toFixed(3)),
       tourBeat:STORY_BEATS[storyBeat]?.id||null,tourDuration:STORY_DURATION,
       tourProgress:storyProgress?.value||0,
