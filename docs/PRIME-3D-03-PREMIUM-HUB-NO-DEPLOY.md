@@ -9,7 +9,7 @@ La primera revisión del PR #43 mejoró detalles arquitectónicos, pero no resol
 ## Arquitectura correctiva
 
 - Se conservan byte a byte los tres GLB registrados y sus hashes. **El GLB combinado de flota sigue cargando para mantener el contrato legado, pero permanece oculto**. Esto es deuda técnica explícita que habrá que resolver al migrar formalmente el asset de flota. **No se simula que esté reemplazado en el inventario.**
-- La flota visible se genera con 16 lotes `THREE.InstancedMesh` de geometría original. Cada camión tiene su propia matriz de posición, permitiendo llegadas y salidas de verdad sin multiplicar las draw calls por cinco.
+- Los cuatro camiones de muelle visibles se generan con 16 lotes `THREE.InstancedMesh` de geometría original. Cada camión tiene su propia matriz de posición, permitiendo llegadas y salidas sin multiplicar las draw calls por cuatro. El **quinto vehículo**, más compacto, ya existe en el GLB del patio; no se duplica.
 - Las puertas tienen centros locales x = -2.72, -0.91, 0.91 y 2.72. Los cuatro vehículos de muelle están alineados horizontalmente con esas posiciones y se estacionan con el extremo del remolque junto al nivelador, aproximadamente z local 2.1.
 - Fases de simulación: llegada a la puerta 01, carga en la puerta 02, salida desde la puerta 03, disponibilidad en puerta 04; la quinta unidad permanece en patio. Una apertura visual en puerta 02 evita que el panel diga «En carga» frente a una persiana completamente cerrada.
 - La animación del arribo y de la salida se integra en el recorrido guiado existente; no se descargan nuevos recursos externos ni se agregan temporizadores o telemetría. La pausa y la suspensión fuera de pantalla suspenden el movimiento.
@@ -21,7 +21,7 @@ La primera revisión del PR #43 mejoró detalles arquitectónicos, pero no resol
 1. El modelo sigue siendo una maqueta de geometría procedural; no implica operación real de DESSET Prime, GPS, despacho, flota activa ni capacidades habilitadas.
 2. El GLB legado de flota supone tráfico de red innecesario mientras se mantiene el contrato de tres GLB; una migración posterior debe rehacer el asset, actualizar hashes e inventario con autorización y prueba de reproducibilidad.
 3. La prueba GPU usa SwiftShader de Chrome, **no prueba teléfonos físicos, batería ni Web Vitals de campo**.
-4. Las pruebas deben verificar alineaciones, 5 vehículos visibles, 4 puertas, escena de carga abierta, fallback, contenido de simulación, encuadre y presupuestos GPU. El aspecto estético requiere además revisar las capturas PNG.
+4. Las pruebas deben verificar alineaciones, 5 vehículos visibles, 4 puertas, 4 tractores visibles y el vehículo auxiliar original del patio, escena de carga abierta, fallback, contenido de simulación, encuadre y presupuestos GPU. El aspecto estético requiere además revisar las capturas PNG.
 
 ## Alcance de calidad
 
