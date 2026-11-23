@@ -69,8 +69,9 @@ test("PRIME-3D-04 truck geometry aligns to actual dock gate positions and moves 
 });
 
 test("PRIME-3D-05 warehouse sign reads DESSET Prime in GLB and procedural fallback",()=>{
- assert.match(scene,/sign\(g,"DESSET Prime",0,2\.72,1\.89,2\.60,\.27\)/);
- assert.match(loader,/sign\(parent,"DESSET Prime",0,2\.72,1\.91,2\.60,\.29\)/);
+ assert.match(scene,/sign\(g,"DESSET Prime",0,2\.72,1\.89,3\.00,\.27\)/);
+ assert.match(loader,/sign\(parent,"DESSET Prime",0,2\.72,1\.91,3\.00,\.29\)/);
+ assert.match(scene,/if\(label==="DESSET Prime"\)ctx\.font="900 52px system-ui,Arial,sans-serif"/);
  assert.doesNotMatch(scene,/sign\(g,"DESSET",0,2\.72,1\.89/);
  assert.doesNotMatch(loader,/sign\(parent,"DESSET",0,2\.72,1\.91/);
  // Vehicle DESSET branding and the independent MUELLES/PATIO signs are unchanged.
