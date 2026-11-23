@@ -168,7 +168,10 @@ export async function hydrateGLBModels({scene,coarse,stage,sign,ownedTextures,is
   parent.traverse(node=>{if(node.isMesh)node.geometry?.dispose()});
   parent.clear();
   parent.add(row.gltf.scene);
-  if(row.name==="commerce")sign(parent,"DESSET",0,2.72,1.91,1.9,.29);
+  if(row.name==="commerce"){
+   sign(parent,"DESSET",0,2.72,1.91,1.9,.29);
+   sign(parent,"MUELLES",0,2.38,1.91,1.11,.18);
+  }
   if(row.name==="destination")sign(parent,"PATIO",0,1.22,1.69,.86,.22);
   if(row.name==="courier")sign(parent,"DESSET",0,1.84,.77,.90,.21);
   details.push({name:row.name,meshes:row.meshes,triangles:Math.round(row.triangles),
