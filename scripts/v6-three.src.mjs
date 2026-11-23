@@ -19,6 +19,8 @@ if(!stage||!mount||!controls||reduced){
  let cameraPreset="overview",frame=0,particle,parcel,routeHalo;
   const logisticsSensors=[];
   const dockBeacons=[];
+  const operationalFleet=[];
+  const fleetBatches=[];
  let modelStats={ready:false,models:[]};
  let storyActive=false,storyElapsed=0,storyBeat=-1;
  const storyPanel=stage.querySelector(".v63-story");
@@ -213,6 +215,90 @@ if(!stage||!mount||!controls||reduced){
   instanceBoxes(yard,.44,.024,.065,mats.cyan,
    [-1.48,-.86,-.24,.38].map(x=>[x,.052,1.38]));
  }
+
+ // PRIME-3D-04: vehicles share instanced parts, but each truck has a separate
+ // transform aligned to a real loading gate. Original three GLBs remain hashed
+ // and loaded; the obsolete combined fleet is hidden until an asset migration.
+ function buildOperationalFleet(){
+  const hubX=vertical?-.7:-5;
+  const hubZ=vertical?-4.7:0;
+  const gates=[-2.72,-.91,.91,2.72].map(x=>hubX+x);
+  const dockZ=hubZ+3.42; // Trailer rear reaches the physical dock leveller at +2.11.
+  operationalFleet.push(
+   {id:"approach",x:gates[0],z:hubZ+5.35,dockX:gates[0],dockZ,phase:"arrival"},
+   {id:"loading",x:gates[1],z:dockZ,dockX:gates[1],dockZ,phase:"loading"},
+   {id:"outbound",x:gates[2],z:dockZ,dockX:gates[2],dockZ,phase:"departure"},
+   {id:"ready",x:gates[3],z:dockZ,dockX:gates[3],dockZ,phase:"ready"},
+   {id:"yard",x:vertical?2.6:2.0,z:vertical?2.45:5.38,
+    dockX:null,dockZ:null,phase:"yard"}
+  );
+  const fleetRoot=new THREE.Group();
+  fleetRoot.name="prime-independent-trailer-fleet";
+  scene.add(fleetRoot);
+  // Each component is instanced across five real trucks, keeping GPU draw calls
+  // bounded while permitting independently updated vehicle matrices.
+  const addPart=(geometry,material,offsets)=>{
+   const mesh=new THREE.InstancedMesh(geometry,material,operationalFleet.length*offsets.length);
+   mesh.castShadow=!coarse;mesh.receiveShadow=!coarse;
+   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+   fleetRoot.add(mesh);
+   fleetBatches.push({mesh,offsets});
+  };
+  const B=(w,h,d,mat,points)=>addPart(new THREE.BoxGeometry(w,h,d),mat,points);
+  B(.79,.15,2.53,mats.blue,[[0,.43,.04]]);
+  B(.93,1.01,1.83,mats.cream,[[0,1.13,-.39]]);
+  B(.96,.09,1.91,mats.chrome,[[0,1.68,-.39]]);
+  B(.82,.77,.75,mats.blue,[[0,.98,1.06]]);
+  B(.86,.10,.82,mats.cream,[[0,1.40,1.06]]);
+  B(.68,.28,.040,mats.glass,[[0,1.16,1.448]]);
+  B(.62,.15,.045,mats.dark,[[0,.82,1.449]]);
+  B(.73,.11,.085,mats.chrome,[[0,.58,1.49]]);
+  B(.12,.08,.05,mats.headlight,[[-.31,.77,1.489],[.31,.77,1.489]]);
+  B(.79,.70,.040,mats.chrome,[[0,1.10,-1.326]]);
+  B(.035,.17,1.52,mats.blue,[[-.484,1.37,-.39],[.484,1.37,-.39]]);
+  B(.11,.10,.055,mats.chrome,[[-.48,1.20,1.26],[.48,1.20,1.26]]);
+  const wheels=[-.96,.05,1.08].flatMap(z=>
+   [[-.515,.36,z,0,Math.PI/2],[.515,.36,z,0,Math.PI/2]]);
+  addPart(new THREE.CylinderGeometry(.18,.18,.13,10),mats.dark,wheels);
+  addPart(new THREE.CylinderGeometry(.08,.08,.139,10),mats.chrome,wheels);
+  B(.017,.82,.027,mats.side,
+   [-.484,.484].flatMap(x=>[-.87,-.30,.27].map(z=>[x,1.12,z])));
+  B(.81,.018,.035,mats.blue,[[0,1.60,-1.332]]);
+  updateOperationalFleet(0,false);
+ }
+ const easeTraffic=t=>{
+  const u=Math.max(0,Math.min(1,t));return u*u*(3-2*u);
+ };
+ function updateOperationalFleet(seconds,isTour){
+  if(!operationalFleet.length)return;
+  const first=operationalFleet[0],leaving=operationalFleet[2];
+  // Arriving and departing vehicles move through distinct loading lanes;
+  // no discontinuous teleporting loop and no fictitious live tracking.
+  first.z=first.dockZ+(isTour?
+   1.93*(1-easeTraffic((seconds-.85)/2.25)):
+   1.70+.18*Math.sin(frame*.44));
+  leaving.z=leaving.dockZ+(isTour?
+   2.65*easeTraffic((seconds-5.65)/2.55):0);
+  const root=new THREE.Object3D();
+  const part=new THREE.Object3D();
+  const composed=new THREE.Matrix4();
+  for(const {mesh,offsets} of fleetBatches){
+   let n=0;
+   for(const truck of operationalFleet){
+    root.position.set(truck.x,0,truck.z);
+    root.rotation.set(0,0,0);
+    root.updateMatrix();
+    for(const o of offsets){
+     part.position.set(o[0],o[1],o[2]);
+     part.rotation.set(0,o[3]||0,o[4]||0);
+     part.updateMatrix();
+     composed.multiplyMatrices(root.matrix,part.matrix);
+     mesh.setMatrixAt(n++,composed);
+    }
+   }
+   mesh.instanceMatrix.needsUpdate=true;
+  }
+ }
  function decorate(){
   premiumInfrastructure();
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(22,14),mats.road);
@@ -287,7 +373,10 @@ if(!stage||!mount||!controls||reduced){
   rim.position.set(5.5,4,-4);scene.add(rim);
   const neon=new THREE.PointLight(0x62a5ff,4,9);
   neon.position.set(5,3,1);scene.add(neon);
-  storefront();courier();destination();decorate();
+  storefront();
+  const archivedFleet=courier();
+  archivedFleet.visible=false; // Replaced by independently staged trucks, preserve existing GLB contract.
+  destination();decorate();buildOperationalFleet();
   const key=new THREE.OrthographicCamera(-9,9,5,-5,.1,150);
   camera=key;
   renderer=new THREE.WebGLRenderer({antialias:!coarse,alpha:false,powerPreference:"low-power",preserveDrawingBuffer:false});
@@ -430,6 +519,7 @@ if(!stage||!mount||!controls||reduced){
    }
   }
   if(routeHalo)routeHalo.material.opacity=.09+Math.sin(frame*.9)*.018;
+  updateOperationalFleet(storyElapsed,storyActive);
   // Beacon motion follows the existing pause/visibility lifecycle.
   for(let i=0;i<dockBeacons.length;i++){
    const pulse=.91+Math.sin(frame*.85-i*.74)*.09;
@@ -545,6 +635,9 @@ if(!stage||!mount||!controls||reduced){
       glbModels:modelStats.models,glbStatus:stage.dataset.v62ModelsStatus||"not-started",
       premiumInfrastructure:scene.getObjectByName("prime-premium-hub-details")!==undefined,
       dockBeacons:dockBeacons.length,
+      operationalFleet:operationalFleet.map(t=>({id:t.id,x:t.x,z:t.z,dockX:t.dockX,dockZ:t.dockZ,phase:t.phase})),
+      independentFleetDrawBatches:fleetBatches.length,
+      archivedFleetHidden:scene.getObjectByName("courier")?.visible===false,
       tourActive:storyActive,tourSeconds:Number(storyElapsed.toFixed(3)),
       tourBeat:STORY_BEATS[storyBeat]?.id||null,tourDuration:STORY_DURATION,
       tourProgress:storyProgress?.value||0,
