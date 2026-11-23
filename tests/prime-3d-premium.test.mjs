@@ -59,4 +59,8 @@ test("PRIME-3D-04 truck geometry aligns to actual dock gate positions and moves 
  assert.match(scene,/dockStatusLabels\[0\]\.textContent=arriving/);
  assert.match(scene,/dockStatusLabels\[2\]\.textContent=outbound/);
  assert.match(scene,/overview:\{pos:\[6,10\.8,19\.5\],look:\[0,1,0\]\}/);
+ assert.match(scene,/ctx\.fillStyle="#1551D8"/);
+ assert.match(scene,/new THREE\.HemisphereLight\(0xffffff,0x6b90c5,1\.8\)/);
+ assert.match(scene,/new THREE\.DirectionalLight\(0xf5faff,2\.8\)/);
+ assert.match(scene,/size=vertical\?8\.0:coarse\?6\.35:6\.55/);
 });
