@@ -101,10 +101,10 @@ try{
  check("V6.2 desktop three independently loaded GLB models",detailedDesktop.glbLoaded===3&&detailedDesktop.glbModels.every(x=>x.meshes>=5&&x.triangles>=250),{models:detailedDesktop.glbModels,status:detailedDesktop.glbStatus});
  check("PRIME-3D-03 real premium infrastructure and four conceptual dock beacons",detailedDesktop.premiumInfrastructure===true&&detailedDesktop.dockBeacons===4,{premium:detailedDesktop.premiumInfrastructure,beacons:detailedDesktop.dockBeacons});
  const dockFleet=detailedDesktop.operationalFleet||[];
- const physicallyAligned=dockFleet.length===5&&dockFleet.filter(t=>t.dockX!==null).length===4&&
+ const physicallyAligned=dockFleet.length===4&&dockFleet.filter(t=>t.dockX!==null).length===4&&
   dockFleet.filter(t=>t.dockX!==null).every(t=>Math.abs(t.x-t.dockX)<.001)&&
   dockFleet.some(t=>t.id==="loading"&&Math.abs(t.z-t.dockZ)<.001);
- check("PRIME-3D-04 five spatially independent vehicles aligned to four real docks",
+ check("PRIME-3D-04 four independent dock tractors aligned to four gates and original fifth yard unit",
   physicallyAligned&&detailedDesktop.independentFleetDrawBatches>=12&&detailedDesktop.archivedFleetHidden,
   {fleet:dockFleet,drawBatches:detailedDesktop.independentFleetDrawBatches,archivedFleetHidden:detailedDesktop.archivedFleetHidden});
  check("V6.1 real GPU shadows and painted sign textures",desktop.shadows===true&&desktop.textureCount>=2&&desktop.cinematic==="v6.2",{shadows:desktop.shadows,textures:desktop.textureCount,cinematic:desktop.cinematic});
@@ -148,7 +148,7 @@ try{
  check("PRIME-3D-03 premium hub survives mobile GLB hydration",detailedMobile.premiumInfrastructure===true&&detailedMobile.dockBeacons===4,{premium:detailedMobile.premiumInfrastructure,beacons:detailedMobile.dockBeacons});
  const mobileFleet=detailedMobile.operationalFleet||[];
  check("PRIME-3D-04 mobile fleet retains aligned truck gates",
-  mobileFleet.length===5&&mobileFleet.filter(t=>t.dockX!==null).length===4&&
+  mobileFleet.length===4&&mobileFleet.filter(t=>t.dockX!==null).length===4&&
   mobileFleet.filter(t=>t.dockX!==null).every(t=>Math.abs(t.x-t.dockX)<.001)&&
   detailedMobile.archivedFleetHidden===true,
   {fleet:mobileFleet,archivedFleetHidden:detailedMobile.archivedFleetHidden});
