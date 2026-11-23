@@ -132,7 +132,14 @@ async function viewport(width,height,reduce=false){
    businessCTA:style("#negocios .business-pitch-cta").backgroundColor,
    statementAccent:style("#vision h2 span").color,
    stageSummaryArrow:style("#ecosistema .v4-architecture-details summary span").color,
-   threeTourButton:style("#ecosistema .v63-tour").backgroundColor
+   threeTourButton:style("#ecosistema .v63-tour").backgroundColor,
+   threePauseButton:style("#ecosistema .v6-pause").backgroundColor,
+   stageFrame:style("#ecosistema .v5-city-stage").backgroundColor,
+   stageToolbar:style("#ecosistema .v6-three-toolbar").backgroundColor,
+   ecosystemBoard:style("#ecosistema .ecosystem-board").backgroundColor,
+   statementBackground:style("#vision").backgroundColor,
+   footerBackground:style(".site-footer").backgroundColor,
+   navContactBackground:style(".main-nav .nav-contact").backgroundColor
   };
  return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railWords,typeSizes,palette,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
@@ -140,6 +147,7 @@ async function viewport(width,height,reduce=false){
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
   if(diag.disclosures.technical!==false||diag.disclosures.future!==false)fails.push("Freshly navigated page must start with both native disclosures CLOSED: "+JSON.stringify(diag.disclosures));
   const expectedOriginal="rgb(255, 198, 47)";
+  const brandBlue="rgb(21, 81, 216)",pureWhite="rgb(255, 255, 255)",paleBlue="rgb(244, 248, 254)";
   const palette=diag.palette;
   // The final computed color is checked only after the background settles.
   // Never accept a semi-transparent or differently colored CTA as a PASS.
@@ -149,9 +157,12 @@ async function viewport(width,height,reduce=false){
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
    !exactLime||palette.businessCTA!==expectedOriginal||
-   palette.statementAccent!==expectedOriginal||palette.stageSummaryArrow!==expectedOriginal||
-   palette.threeTourButton!==expectedOriginal)
-   fails.push("PRIME-COLOR-02: only the hero CTA may be lime; original palette and 3D must remain yellow: "+JSON.stringify(palette));
+   palette.statementAccent!==brandBlue||palette.stageSummaryArrow!==expectedOriginal||
+   palette.threeTourButton!==pureWhite||palette.threePauseButton!==pureWhite||
+   palette.stageFrame!==paleBlue||palette.stageToolbar!==paleBlue||
+   palette.ecosystemBoard!==pureWhite||palette.statementBackground!==paleBlue||
+   palette.footerBackground!==pureWhite||palette.navContactBackground!==pureWhite)
+   fails.push("PRIME-COLOR-02: only the hero CTA may be lime; brand yellow preserved, page surfaces pale and 3D controls white: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.heroFit.typeLeft<diag.heroFit.compositionLeft-2 ||
     diag.heroFit.rows.length!==2 ||
@@ -210,7 +221,7 @@ try{
  report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
  const visual02=await js('(()=>{const q=s=>document.querySelector(s);const cs=s=>getComputedStyle(q(s));return {cssLoaded:[...document.styleSheets].some(x=>x.href?.endsWith("/styles-visual02.css")),heroPhoto:q("#inicio .prime-photo-image")?.getAttribute("src"),heroLogo:q(".site-header .brand-mark")?.getAttribute("src"),heroCTA:q("#inicio .hero-cta")?.getAttribute("href"),businessShadow:cs("#negocios .business-pitch").boxShadow,storyBorder:cs("#ecosistema .ecosystem-board").borderTopColor,serviceTop:cs("#soluciones .service--main").borderTopWidth,trustBg:cs("#vision").backgroundColor,mobileSafe:document.documentElement.scrollWidth<=document.documentElement.clientWidth+2}})()');
  if(!visual02.cssLoaded||!visual02.heroPhoto?.endsWith("desset-hero-entrega-dos-espejos.webp")||!visual02.heroLogo?.endsWith("deliver-assets-mark.png")||visual02.heroCTA!=="#contacto"||
-   visual02.serviceTop!=="5px"||visual02.trustBg!=="rgb(20, 34, 57)"||!visual02.mobileSafe)
+   visual02.serviceTop!=="5px"||visual02.trustBg!=="rgb(244, 248, 254)"||!visual02.mobileSafe)
   report.failures.push("VISUAL-02 institutional editorial consistency regression: "+JSON.stringify(visual02));
  report.tests.push({name:"VISUAL-02 corporate style, approved hero and responsive safety",visual02});
 
