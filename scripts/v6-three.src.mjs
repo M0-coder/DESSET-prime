@@ -128,7 +128,7 @@ if(!stage||!mount||!controls||reduced){
    box(g,1.66,.17,.38,px,2.19,1.88,mats.blue);
    box(g,1.65,.15,.80,px,.10,2.12,mats.side);
   }
-  sign(g,"DESSET",0,2.72,1.89,1.96,.27);
+  sign(g,"DESSET Prime",0,2.72,1.89,2.60,.27);
   sign(g,"MUELLES",0,2.36,1.89,1.10,.18);
   for(const px of [-2.3,2.3])box(g,.82,.30,.75,px,3.61,-1.2,mats.chrome);
   return g;
