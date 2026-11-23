@@ -163,14 +163,14 @@ export async function hydrateGLBModels({scene,coarse,stage,sign,ownedTextures,is
     node.material.needsUpdate=true;
    }
   });
-  // Keep all scene positions and camera framing unchanged while replacing basic
+  // Keep scene positions unchanged while replacing procedural warehouse placeholders
   // models with the authored, geometrically detailed glTF roots.
   parent.traverse(node=>{if(node.isMesh)node.geometry?.dispose()});
   parent.clear();
   parent.add(row.gltf.scene);
-  if(row.name==="commerce")sign(parent,"DESSET",0,2.11,1.021,1.13,.24);
-  if(row.name==="destination")sign(parent,"DESTINO",0,2.21,1.251,1.02,.18);
-  if(row.name==="courier")sign(parent,"DESSET",.84,1.61,.218,.48,.21);
+  if(row.name==="commerce")sign(parent,"DESSET",0,2.28,1.65,1.25,.22);
+  if(row.name==="destination")sign(parent,"MUELLES",0,2.20,1.08,1.08,.17);
+  if(row.name==="courier")sign(parent,"FLOTA",0,2.12,.9,.80,.18);
   details.push({name:row.name,meshes:row.meshes,triangles:Math.round(row.triangles),
    path:row.url,texturedMaterials:maps.size});
  }
