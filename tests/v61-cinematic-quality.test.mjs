@@ -11,7 +11,7 @@ test("V6.1 cinematic material pipeline is true PBR with self-authored 3D signage
  assert.match(src,/THREE\.MeshStandardMaterial/);
  assert.match(src,/new THREE\.CanvasTexture\(canvas\)/);
  assert.match(src,/sign\(g,"DESSET"/);
- assert.match(src,/sign\(g,"DESTINO"/);
+ assert.match(src,/sign\(g,"MUELLES"/);
  assert.match(src,/THREE\.SRGBColorSpace/);
  assert.match(src,/THREE\.ACESFilmicToneMapping/);
  assert.match(src,/new THREE\.DirectionalLight/);
