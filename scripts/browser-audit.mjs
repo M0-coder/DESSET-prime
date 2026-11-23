@@ -91,6 +91,8 @@ async function viewport(width,height,reduce=false){
   // Visual montage intentionally clips decorative children; keep checking parent bounds and headline text.
   const clip=el.closest(".v4-motion-canvas,.v4-hero-rail,.v5-city-stage");
   if(clip&&clip!==el)return false;
+  // Rail overflow is checked separately with its exact viewport edges and scrollbar tolerance.
+  if(el.classList.contains("v4-hero-rail"))return false;
   const s=getComputedStyle(el),r=el.getBoundingClientRect();
   return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.left < -2 || (s.display!=='none'&&s.visibility!=='hidden'&&r.right>viewport+2&&r.width>0);
  }).slice(0,12).map(el=>({tag:el.tagName,className:typeof el.className==='string'?el.className.slice(0,70):'',right:Math.round(el.getBoundingClientRect().right),left:Math.round(el.getBoundingClientRect().left)}));
@@ -204,7 +206,8 @@ async function viewport(width,height,reduce=false){
  if(diag.railItems.length!==4||diag.railItems.some(i=>!i.visible||!i.inside||!i.textFits||!i.icon||i.fontPx<12)||
     diag.railDisplay.background!==brandBlue||diag.railDisplay.role!=="list"||diag.railDisplay.ariaHidden!==null||
     diag.railDisplay.columns!==(width<=860?2:4)||
-   diag.railDisplay.left>2||diag.railDisplay.right<diag.railDisplay.viewportRight-2)
+   (diag.railDisplay.left>2||diag.railDisplay.left< -16)||
+   (diag.railDisplay.right<diag.railDisplay.viewportRight-2||diag.railDisplay.right>diag.railDisplay.viewportRight+16))
    fails.push("HERO-SERVICE-01: accessible service strip clips content or has wrong layout: "+JSON.stringify({items:diag.railItems,layout:diag.railDisplay}));
  if(width<=700){
   if(!diag.menuLabel?.startsWith("Menú"))fails.push("Mobile menu accessible name must include visible Menú label: "+diag.menuLabel);
