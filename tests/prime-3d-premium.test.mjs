@@ -54,5 +54,7 @@ test("PRIME-3D-04 truck geometry aligns to actual dock gate positions and moves 
   assert.match(html,new RegExp(status));
  assert.match(html,/Puerta 02<\/span><b>En carga/);
  assert.match(scene,/Loading gate 02 is physically open/);
+ assert.match(scene,/dockStatusLabels\[0\]\.textContent=arriving/);
+ assert.match(scene,/dockStatusLabels\[2\]\.textContent=outbound/);
  assert.match(scene,/overview:\{pos:\[6,10\.8,19\.5\],look:\[0,1,0\]\}/);
 });
