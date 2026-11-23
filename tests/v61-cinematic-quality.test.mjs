@@ -10,7 +10,7 @@ const html=read("index.html");
 test("V6.1 cinematic material pipeline is true PBR with self-authored 3D signage",()=>{
  assert.match(src,/THREE\.MeshStandardMaterial/);
  assert.match(src,/new THREE\.CanvasTexture\(canvas\)/);
- assert.match(src,/sign\(g,"DESSET"/);
+ assert.match(src,/sign\(g,"DESSET Prime",0,2\.72,1\.89,2\.60,\.27/);
  assert.match(src,/sign\(g,"MUELLES"/);
  assert.match(src,/THREE\.SRGBColorSpace/);
  assert.match(src,/THREE\.ACESFilmicToneMapping/);
