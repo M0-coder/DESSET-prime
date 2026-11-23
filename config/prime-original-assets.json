@@ -41,7 +41,7 @@
       "path": "assets/roles-geometry-mobile-es.svg",
       "sha256": "5df568e52c15103660ffdf8513d97c0d5ea31a1a37279a4733e9632fb25d1fbf",
       "claim": "owner-declared",
-      "evidence": "Owner-approved mobile palette revision: replace four charcoal #111827 fills/strokes with original DESSET blue #1551D8; geometry, copy and SVG layout preserved. Source SHA256 recalculated against full file bytes. Ownership/assignment remains unverified independently."
+      "evidence": "Owner-approved mobile palette revision: replace four prior charcoal fills/strokes with original DESSET blue #1551D8; geometry, copy and SVG layout preserved. Source SHA256 recalculated against full file bytes. Ownership/assignment remains unverified independently."
     },
     {
       "path": "assets/scene-choose.svg",
