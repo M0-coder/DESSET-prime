@@ -240,8 +240,8 @@ if(!stage||!mount||!controls||reduced){
   const fleetRoot=new THREE.Group();
   fleetRoot.name="prime-independent-trailer-fleet";
   scene.add(fleetRoot);
-  // Each component is instanced across five real trucks, keeping GPU draw calls
-  // bounded while permitting independently updated vehicle matrices.
+  // Group box components by material, then instance their distinct dimensions
+  // via matrices: four tractors, seven box materials and two wheel draw batches.
   const addPart=(geometry,material,offsets)=>{
    const mesh=new THREE.InstancedMesh(geometry,material,operationalFleet.length*offsets.length);
    mesh.castShadow=!coarse;mesh.receiveShadow=!coarse;
@@ -249,7 +249,12 @@ if(!stage||!mount||!controls||reduced){
    fleetRoot.add(mesh);
    fleetBatches.push({mesh,offsets});
   };
-  const B=(w,h,d,mat,points)=>addPart(new THREE.BoxGeometry(w,h,d),mat,points);
+  const boxComponents=new Map();
+  const B=(w,h,d,mat,points)=>{
+   const list=boxComponents.get(mat)||[];
+   for(const p of points)list.push([p[0],p[1],p[2],0,0,w,h,d]);
+   boxComponents.set(mat,list);
+  };
   B(.79,.15,2.53,mats.blue,[[0,.43,.04]]);
   B(.93,1.01,1.83,mats.cream,[[0,1.13,-.39]]);
   B(.96,.09,1.91,mats.chrome,[[0,1.68,-.39]]);
@@ -269,6 +274,8 @@ if(!stage||!mount||!controls||reduced){
   B(.017,.82,.027,mats.side,
    [-.484,.484].flatMap(x=>[-.87,-.30,.27].map(z=>[x,1.12,z])));
   B(.81,.018,.035,mats.blue,[[0,1.60,-1.332]]);
+  for(const [material,offsets] of boxComponents)
+   addPart(new THREE.BoxGeometry(1,1,1),material,offsets);
   updateOperationalFleet(0,false);
  }
  const easeTraffic=t=>{
@@ -306,6 +313,7 @@ if(!stage||!mount||!controls||reduced){
     for(const o of offsets){
      part.position.set(o[0],o[1],o[2]);
      part.rotation.set(0,o[3]||0,o[4]||0);
+     part.scale.set(o[5]??1,o[6]??1,o[7]??1);
      part.updateMatrix();
      composed.multiplyMatrices(root.matrix,part.matrix);
      mesh.setMatrixAt(n++,composed);
