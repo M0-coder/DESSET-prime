@@ -99,6 +99,7 @@ try{
  check("Exactly one GPU canvas",desktop.domCanvas===1,{count:desktop.domCanvas});
  const detailedDesktop=await waitUntil("three real glTF binary models loaded in desktop",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3?p:null})()'),17000);
  check("V6.2 desktop three independently loaded GLB models",detailedDesktop.glbLoaded===3&&detailedDesktop.glbModels.every(x=>x.meshes>=5&&x.triangles>=250),{models:detailedDesktop.glbModels,status:detailedDesktop.glbStatus});
+ check("PRIME-3D-03 real premium infrastructure and four conceptual dock beacons",detailedDesktop.premiumInfrastructure===true&&detailedDesktop.dockBeacons===4,{premium:detailedDesktop.premiumInfrastructure,beacons:detailedDesktop.dockBeacons});
  check("V6.1 real GPU shadows and painted sign textures",desktop.shadows===true&&desktop.textureCount>=2&&desktop.cinematic==="v6.2",{shadows:desktop.shadows,textures:desktop.textureCount,cinematic:desktop.cinematic});
  check("V6.1 desktop geometry and draw call budgets",desktop.geometryCount>35&&desktop.geometryCount<180&&desktop.drawCalls<160,{geometryCount:desktop.geometryCount,drawCalls:desktop.drawCalls});
  const demoHUD=await evalJS('(()=>{const h=document.querySelector(".logistics-hud");const c=h?.querySelectorAll(".logistics-hud__card");const style=h?getComputedStyle(h):null;return {opacity:Number(style?.opacity),visible:style?.visibility,panels:c?.length||0,marked:h?.textContent.includes("DEMO")&&h?.textContent.includes("SIMULACIÓN")}})()');
@@ -137,6 +138,7 @@ try{
  check("Mobile WebGL2 after explicit opt-in",mobile.webgl&&mobile.triangles>100,{mobile});
  const detailedMobile=await waitUntil("three GLB models after mobile user consent",async()=>evalJS('(()=>{const p=window.__dessetV6Probe?.();return p?.glbLoaded===3?p:null})()'),17000);
  check("V6.2 mobile loads all 3 detailed GLB originals after explicit consent",detailedMobile.glbLoaded===3&&detailedMobile.glbModels.length===3,{models:detailedMobile.glbModels});
+ check("PRIME-3D-03 premium hub survives mobile GLB hydration",detailedMobile.premiumInfrastructure===true&&detailedMobile.dockBeacons===4,{premium:detailedMobile.premiumInfrastructure,beacons:detailedMobile.dockBeacons});
  check("Mobile suppresses expensive shadow maps but keeps 3D materials",mobile.shadows===false&&mobile.textureCount>=2,{shadows:mobile.shadows,textures:mobile.textureCount});
  const groups=Object.entries(detailedMobile.objectBounds||{});
  const fullyFramed=groups.length===3&&groups.every(([name,b])=>b.minX>=-1.02&&b.maxX<=1.02&&b.minY>=-1.02&&b.maxY<=1.02);
