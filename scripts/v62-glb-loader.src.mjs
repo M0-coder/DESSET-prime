@@ -169,7 +169,7 @@ export async function hydrateGLBModels({scene,coarse,stage,sign,ownedTextures,is
   parent.clear();
   parent.add(row.gltf.scene);
   if(row.name==="commerce"){
-   sign(parent,"DESSET",0,2.72,1.91,1.9,.29);
+   sign(parent,"DESSET Prime",0,2.72,1.91,2.60,.29);
    sign(parent,"MUELLES",0,2.38,1.91,1.11,.18);
   }
   if(row.name==="destination")sign(parent,"PATIO",0,1.22,1.69,.86,.22);
