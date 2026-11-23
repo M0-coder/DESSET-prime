@@ -139,7 +139,10 @@ async function viewport(width,height,reduce=false){
    ecosystemBoard:style("#ecosistema .ecosystem-board").backgroundColor,
    statementBackground:style("#vision").backgroundColor,
    footerBackground:style(".site-footer").backgroundColor,
-   navContactBackground:style(".main-nav .nav-contact").backgroundColor
+   navContactBackground:style(".main-nav .nav-contact").backgroundColor,
+   primeHeadingColor:style("#desset-prime-heading").color,
+   primeSubtitleColor:style("#ecosistema .prime-3d-heading p").color,
+   primeKickerColor:style("#ecosistema .prime-3d-heading p strong").color
   };
  return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railWords,typeSizes,palette,disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
@@ -161,7 +164,9 @@ async function viewport(width,height,reduce=false){
    palette.threeTourButton!==pureWhite||palette.threePauseButton!==pureWhite||
    palette.stageFrame!==paleBlue||palette.stageToolbar!==paleBlue||
    palette.ecosystemBoard!==pureWhite||palette.statementBackground!==paleBlue||
-   palette.footerBackground!==pureWhite||palette.navContactBackground!==pureWhite)
+   palette.footerBackground!==pureWhite||palette.navContactBackground!==pureWhite||
+   palette.primeHeadingColor!==brandBlue||palette.primeSubtitleColor!=="rgb(17, 24, 39)"||
+   palette.primeKickerColor!=="rgb(17, 24, 39)")
    fails.push("PRIME-COLOR-02: only the hero CTA may be lime; brand yellow preserved, page surfaces pale and 3D controls white: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.heroFit.typeLeft<diag.heroFit.compositionLeft-2 ||
