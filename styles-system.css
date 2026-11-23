@@ -8,12 +8,12 @@
 :root {
  --ds-60-paper:#F7F5EE;
  --ds-60-surface:#FFFDF8;
- --ds-30-ink:#214579;
+ --ds-30-ink:#111111;
  --ds-30-blue:#1551D8;
  --ds-10-gold:#FFC62F;
  --ds-10-signal:#FF3328;
- --ds-copy:#202937;
- --ds-muted:#465060;
+ --ds-copy:#202020;
+ --ds-muted:#404040;
  --ds-stroke:#D6D7D6;
  --ds-radius-compact:12px;
  --ds-radius-surface:18px;
@@ -180,3 +180,6 @@ h1,h2,h3,h4 {text-wrap:balance;}
  .service-access__status{white-space:normal;}
  .service-access__links a{min-height:44px;}
 }
+
+/* A11Y-VIS-01: footer text must be readable on the light footer. */
+.site-footer>span,.site-footer>p{color:#343434}
