@@ -96,7 +96,7 @@ h1,h2,h3,h4 {text-wrap:balance;}
  .service,.business-pitch,.ecosystem-board {border-radius:var(--ds-radius-surface);}
  .v5-city-stage {border-radius:16px;}
  .business-pitch {
-  box-shadow:0 15px 32px rgba(17,24,39,.18),4px 5px 0 rgba(255,198,47,.85);
+  box-shadow:0 15px 32px rgba(21,81,216,.13),4px 5px 0 rgba(255,198,47,.85);
  }
  .hero[data-variant="v4"] .v4-motion-canvas {
   box-shadow:0 17px 32px rgba(1,9,28,.25),5px 5px 0 rgba(255,198,47,.82);
