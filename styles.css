@@ -649,24 +649,24 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
 @media(max-width:1000px){#vision .statement-journey .motion-story-grid.ecosystem-participants{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px}}
 @media(max-width:480px){#vision .statement-journey .motion-story-grid.ecosystem-participants{grid-template-columns:minmax(0,1fr);gap:24px}#vision .statement-body.ecosystem-participants-body>h2{font-size:clamp(30px,8vw,44px);line-height:1.04}#vision .statement-journey .motion-story-unit.ecosystem-participant h3{font-size:20px}}
 
-/* SERVICES-02: two permanent service brands, responsive and compact. */
-#soluciones .solutions-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-#soluciones .solutions-grid .service{grid-column:auto;min-width:0;min-height:0;padding:clamp(24px,4vw,48px);justify-content:flex-start}
-#soluciones .service .service-body{display:flex;flex-direction:column;align-items:stretch;gap:0;min-width:0}
-#soluciones .service .service-body h3{font-family:var(--ds-type-display);font-weight:800;font-size:clamp(30px,3.2vw,48px);letter-spacing:-.035em;line-height:1.12;margin:0;min-height:clamp(120px,12vw,180px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px}
+/* SERVICES-03: one visual contract across desktop, tablet and phone.
+   The versioned stylesheet URL is derived from the exact Git blob. */
+#soluciones .solutions-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:16px}
+#soluciones .solutions-grid .service{grid-column:auto;min-width:0;min-height:0;justify-content:flex-start}
+#soluciones .service .service-body{display:flex;flex-direction:column;align-items:stretch;gap:0;min-width:0;height:100%}
+#soluciones .service .service-body h3{font-family:var(--ds-type-display);font-weight:800;font-size:clamp(30px,3.2vw,48px);letter-spacing:-.035em;line-height:1.12;margin:0;min-height:clamp(108px,10vw,144px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px}
 #soluciones .service--prime h3{color:#111111}
 #soluciones .service--prime h3 span{display:block;color:#1551d8;font-size:.56em}
-#soluciones .service .service-body strong{display:block;padding-top:20px;border-top:1px solid rgba(0,0,0,.13);font-size:clamp(18px,1.6vw,24px);line-height:1.25;font-weight:750}
+#soluciones .service .service-body strong{display:block;text-align:left;padding-top:16px;border-top:1px solid rgba(0,0,0,.13);font-size:clamp(18px,1.6vw,24px);line-height:1.25;font-weight:750}
 #soluciones .service--main .service-body strong{border-top-color:rgba(255,255,255,.25)}
-#soluciones .service .service-body p{font-size:clamp(15px,1.3vw,17px);line-height:1.6;max-width:48ch;margin:10px 0 0}
+#soluciones .service .service-body p{text-align:left;font-size:clamp(15px,1.3vw,17px);line-height:1.6;max-width:none;margin:10px 0 0}
+#soluciones.solutions{background:#f4f8fe;padding-top:clamp(32px,4vw,64px);padding-bottom:clamp(32px,4vw,64px)}
+#soluciones.solutions .solutions-grid .service--main{background:#1551d8;color:#fff;border:1px solid #1551d8;box-shadow:none}
+#soluciones.solutions .solutions-grid .service--main p{color:#fff}
+#soluciones.solutions .solutions-grid .service--prime{background:#fff;color:#111111;border:1px solid #d8dce2;box-shadow:none}
+#soluciones.solutions .solutions-grid .service--prime p{color:#414141}
+#soluciones.solutions .solutions-grid .service{border-radius:12px;padding:clamp(18px,2.2vw,28px)}
 @media(max-width:700px){
- #soluciones .solutions-grid{grid-template-columns:minmax(0,1fr)}
+ #soluciones .solutions-grid{grid-template-columns:minmax(0,1fr);gap:12px}
  #soluciones .service .service-body h3{min-height:108px;font-size:clamp(30px,7vw,42px)}
 }
-
-/* SERVICES-02: scoped visual finish; preserve approved VISUAL-02 bytes. */
-#soluciones.solutions{background:#f4f8fe}
-#soluciones.solutions .solutions-grid .service--main{border:1px solid #1551d8;box-shadow:none}
-#soluciones.solutions .solutions-grid .service--prime{background:#fff;border:1px solid #d8dce2;box-shadow:none}
-#soluciones.solutions .solutions-grid .service{border-radius:12px;padding:clamp(18px,2.2vw,32px)}
-#soluciones.solutions .service-access{border:0;box-shadow:none}
