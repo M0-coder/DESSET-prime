@@ -23,7 +23,7 @@ test("Two direct commercial contact paths replace generic stakeholder cards",()=
 test("commercial contact CTA resolves locally and avoids fictitious contact details",()=>{
  const section=html.match(/<section class="audiences" id="negocios"[^>]*>([\s\S]*?)<\/section>/)?.[1];
  assert.ok(section);
- assert.deepEqual([...section.matchAll(/<a class="(?:business-pitch-cta|partner-cta)" href="([^"]+)" aria-label="([^"]+)">([^<]+)/g)].map(c=>[c[1],c[2],c[3].trim()]),[["#contacto","Más información para comercios","Más información"],["#contacto","Más información para repartidores","Más información"]]);
+ assert.deepEqual([...section.matchAll(/<a class="(?:business-pitch-cta|partner-cta)" href="([^"]+)" aria-label="([^"]+)">([^<]+)/g)].map(c=>[c[1],c[2],c[3].trim()]),[["./comercios.html","Más información para comercios","Más información"],["./repartidores.html","Más información para repartidores","Más información"]]);
  assert.match(html,/id="contacto"/);
  assert.match(html,/data-footer-channel="Instagram" aria-label="Instagram"/);
  assert.match(html,/data-footer-channel="TikTok" aria-label="TikTok"/);

@@ -274,7 +274,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    partners.cards.map(c=>c.title).join("|")!=="Comercios|Repartidores"||
    partners.cards.map(c=>c.label).join("|")!=="Más información|Más información"||
    partners.cards.map(c=>c.accessibleLabel).join("|")!=="Más información para comercios|Más información para repartidores"||
-   partners.cards.some(c=>!c.inside||!c.fit||c.href!=="#contacto"||c.tap<48||c.icon!=="true"||c.border!=="1px"||c.radius!==20||c.shadow!=="none"||c.height>410||c.decoration!=="none"||c.buttonBg!==brandBlue||c.buttonInk!==pureWhite||Math.abs(c.buttonWidth-c.cardContentWidth)>2)||
+   partners.cards.some(c=>!c.inside||!c.fit||c.href!==(c.title==="Comercios"?"./comercios.html":"./repartidores.html")||c.tap<48||c.icon!=="true"||c.border!=="1px"||c.radius!==20||c.shadow!=="none"||c.height>410||c.decoration!=="none"||c.buttonBg!==brandBlue||c.buttonInk!==pureWhite||Math.abs(c.buttonWidth-c.cardContentWidth)>2)||
    partners.cards[0].background!==pureWhite||partners.cards[1].background!=="rgb(255, 255, 255)"||
    Math.abs(partners.cards[0].height-partners.cards[1].height)>2)
     fails.push("Partner cards responsive parity: "+JSON.stringify(partners));
@@ -410,7 +410,7 @@ try{
  await js('document.querySelector("#negocios").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(350);
  const pitch=await js('(()=>{const section=document.querySelector(".business-pitch");const anchor=section.querySelector("a.business-pitch-cta");return {heading:section.querySelector("h3")?.textContent?.replace(/\\s+/g," ").trim(),href:anchor?.getAttribute("href"),label:anchor?.textContent?.trim(),visible:section.getBoundingClientRect().height>180}})()');
- if(!pitch.visible||pitch.href!=="#contacto"||pitch.heading!=="Comercios"||pitch.label!=="Más información")report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
+ if(!pitch.visible||pitch.href!=="./comercios.html"||pitch.heading!=="Comercios"||pitch.label!=="Más información")report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
  report.tests.push({name:"Commercial pitch CTA",pitch});
  await capture("desktop-business-pitch.png");
  const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const services=document.querySelector("#soluciones .solutions-grid");const prim=document.querySelector(".footer-social a[data-footer-channel=Instagram]");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),obsoleteServices:!!document.querySelector(".future-services"),serviceCards:services.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.getAttribute("aria-label"),contactTarget:prim.getAttribute("target"),oldContact:!!document.querySelector(".contact-bottom,.contact-primary,.social-links--official"),headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');
@@ -640,6 +640,22 @@ try{
    await capture((root?"dist-":"source-")+"footer-"+w+"px.png");
    report.tests.push({name:"Company page "+root+w,company});
   }
+ }
+
+ // Audience pages must be responsive and available in source and dist.
+ for(const page of ["comercios","repartidores"]){
+ for(const root of ["","dist/"]){
+  for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
+   await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   await call("Page.navigate",{url:pathToFileURL(resolve(root+page+".html")).href});
+   await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.audience-page')"),"audience page render");
+   await js('document.fonts.ready');
+   const merchant=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content,forms:document.querySelectorAll("form,input,iframe").length,channelLinks:document.querySelectorAll("#canales-oficiales a").length,cta:document.querySelector("#incorporacion a").getAttribute("href"),visible:[...document.querySelectorAll("main h1,main h2,main p,main li")].every(e=>(e.closest("details:not([open])")||e.getBoundingClientRect().width>0&&e.scrollWidth<=e.clientWidth+2))}})()`);
+   if(merchant.title!==(page==="comercios"?"TU NEGOCIO, MÁS ALLÁ DE SUS PUERTAS":"CADA ENTREGA CONECTA UNA HISTORIA")||merchant.sections.join("|")!=="presentacion|beneficios|modelo|incorporacion|preguntas"||merchant.scroll>merchant.width+2||merchant.home!=="./index.html"||merchant.robots!=="noindex,nofollow"||merchant.forms||merchant.channelLinks!==5||merchant.cta!=="#canales-oficiales"||!merchant.visible)report.failures.push("MERCHANT-01 "+root+w+": "+JSON.stringify(merchant));
+   await capture((root?"dist-":"source-")+page+"-"+w+"px.png",true);
+   report.tests.push({name:"Audience page "+page+" "+root+w,merchant});
+  }
+ }
  }
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
