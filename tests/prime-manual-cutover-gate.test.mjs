@@ -89,3 +89,12 @@ test('latest preview cannot replace the canonical production identity',()=>{
  const missing={...project.result,canonical_deployment:undefined,latest_deployment:project.result.canonical_deployment};
  assert.equal(validateCloudflareSnapshot({...p,projectResponse:{success:true,result:missing}}).result,'NO-GO');
 });
+
+ test("pending individual media-license evidence blocks the real manual request CLI",()=>{
+ const gate=readFileSync(root+"/scripts/prime-manual-cutover-gate.mjs","utf8");
+ const record=JSON.parse(readFileSync(root+"/config/prime-selected-media.json","utf8"));
+ assert.equal(record.release_authorized,false);
+ assert.match(gate,/Selected photographs require individual license review before production/);
+ assert.match(gate,/media\.individual_license_review_complete!==true/);
+ assert.match(gate,/a\.verification!=='individual-source-verified'/);
+ });
