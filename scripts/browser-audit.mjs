@@ -164,7 +164,7 @@ async function viewport(width,height,reduce=false,entry=URL){
   return {title:h.textContent.trim(),label:a.textContent.trim(),accessibleLabel:a.getAttribute("aria-label"),buttonBg:getComputedStyle(a).backgroundColor,buttonInk:getComputedStyle(a).color,buttonWidth:ar.width,cardContentWidth:c.clientWidth-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight),href:a.getAttribute("href"),height:r.height,inside:r.left>=partnersBounds.left-2&&r.right<=partnersBounds.right+2,fit:[h,p,a].every(e=>e.scrollWidth<=e.clientWidth+2),tap:ar.height,icon:c.querySelector("svg")?.getAttribute("aria-hidden"),background:s.backgroundColor,border:s.borderTopWidth,radius:parseFloat(s.borderTopLeftRadius),shadow:s.boxShadow,decoration:getComputedStyle(c,"::before").content};
  })};
  const footerNav=document.querySelector(".corporate-footer");
- const footerLayout={columns:getComputedStyle(footerNav).gridTemplateColumns.trim().split(/\\s+/).length,links:[...footerNav.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=viewport+2,height:e.getBoundingClientRect().height})),groups:[...footerNav.querySelectorAll("strong")].map(e=>e.textContent)};
+ const footerLayout={columns:getComputedStyle(footerNav).gridTemplateColumns.trim().split(/\\s+/).length,links:[...footerNav.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=viewport+2,height:e.getBoundingClientRect().height})),groups:[...footerNav.querySelectorAll("strong")].map(e=>e.textContent),social:[...document.querySelectorAll(".footer-social a")].map(e=>({label:e.getAttribute("aria-label"),height:e.getBoundingClientRect().height,width:e.getBoundingClientRect().width})),center:getComputedStyle(document.querySelector(".footer-social")).justifyContent,copyright:document.querySelector(".site-footer>p").textContent};
  const typeSizes={
   heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
   serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
@@ -193,7 +193,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    primeSubtitleColor:style("#ecosistema .prime-3d-heading p").color,
    primeKickerColor:style("#ecosistema .prime-3d-heading p strong").color,
    brandNameInk:style(".site-header .brand-name").color,
-   footerMetaInk:style(".site-footer>span").color,
+   footerBrandInk:style(".footer-brand").color,
    footerCopyInk:style(".site-footer>p").color,
    institutionalInk:style(":root").getPropertyValue("--ds-30-ink").trim().toLowerCase(),
    heroHeadingColor:style("#inicio .v4-headline-a").color,
@@ -220,7 +220,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    palette.threeTourButton!==pureWhite||palette.threePauseButton!==pureWhite||
    palette.stageFrame!==paleBlue||palette.stageToolbar!==paleBlue||
    palette.ecosystemBoard!==pureWhite||palette.statementBackground!==paleBlue||
-   palette.footerBackground!==pureWhite||palette.navContactBackground!==pureWhite||
+   palette.footerBackground!=="rgb(241, 245, 250)"||palette.navContactBackground!==pureWhite||
    palette.primeHeadingColor!==brandBlue||palette.primeSubtitleColor!=="rgb(17, 17, 17)"||
    palette.primeKickerColor!=="rgb(17, 17, 17)"||
    palette.institutionalInk!=="#111111"||
@@ -228,7 +228,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    palette.heroCtaInk!=="rgb(17, 17, 17)"||
    palette.heroPhotoFallbackBg!==paleBlue||
    palette.brandNameInk!=="rgb(17, 17, 17)"||
-   palette.footerMetaInk!=="rgb(52, 52, 52)"||palette.footerCopyInk!=="rgb(52, 52, 52)")
+   palette.footerBrandInk!==brandBlue||palette.footerCopyInk!=="rgb(86, 86, 86)")
    fails.push("PRIME-COLOR-02: only the hero CTA may be lime; brand yellow preserved, page surfaces pale and 3D controls white: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.heroFit.typeLeft<diag.heroFit.compositionLeft-2 ||
@@ -265,7 +265,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    Math.abs(services.cards[0].height-services.cards[1].height)>2||Math.abs(services.cards[0].dividerOffset-services.cards[1].dividerOffset)>2)
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
   if(diag.decorativeArrowCount!==0)fails.push("Decorative arrows remain in interactive controls");
- if(diag.footerLayout.columns!==(width<=860?2:4)||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Institucional"||diag.footerLayout.links.length!==9||diag.footerLayout.links.some(x=>!x.inside||x.height<38))fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
+ if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==9||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
  const partners=diag.partnerLayout;
   if(partners.columns!==(width<=700?1:2)||partners.gap!==(width<=700?12:16)||partners.cards.length!==2||
    partners.cards.map(c=>c.title).join("|")!=="Comercios|Repartidores"||
@@ -631,7 +631,7 @@ try{
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.company-page')"),"company page render");
    await js('document.fonts.ready');
    const company=await js(`(()=>{const v=document.documentElement.clientWidth,n=document.querySelector(".corporate-footer");return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.trim().split(/\\s+/).length,links:[...n.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=v+2})),home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content}})()`);
-   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|areas|informacion-corporativa"||company.scroll>company.width+2||company.columns!==(w<=860?2:4)||company.links.length!==9||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
+   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|areas|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==9||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
    await capture((root?"dist-":"source-")+"company-"+w+"px.png",true);
    report.tests.push({name:"Company page "+root+w,company});
   }
