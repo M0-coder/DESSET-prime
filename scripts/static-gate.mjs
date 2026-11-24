@@ -34,7 +34,7 @@ assert([html,company].every(p=>/name="robots" content="noindex,nofollow"/.test(p
 assert(/Content-Security-Policy/.test(headers),"Missing published-host CSP template");
 assert(/default-src 'self'/.test(headers)&&/script-src 'self'/.test(headers)&&/object-src 'none'/.test(headers),"CSP too relaxed");
 assert(/frame-ancestors 'none'/.test(headers),"Missing frame-ancestors gate");
-assert(/Content-Security-Policy/.test(html),"Missing local CSP meta fallback");
+assert([html,company].every(p=>/Content-Security-Policy/.test(p)),"Missing local CSP meta fallback");
 assert(!/<form\b|<iframe\b|<video\b/i.test(html+company),"Unauthorized form/iframe/video");
 assert(!/(?:onload|onclick|onerror)\s*=/.test(html+company),"Inline event attribute detected");
 for(const [i,s] of js.entries()){

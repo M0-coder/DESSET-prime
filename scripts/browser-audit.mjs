@@ -163,6 +163,8 @@ async function viewport(width,height,reduce=false,entry=URL){
   const r=c.getBoundingClientRect(),h=c.querySelector("h3"),p=c.querySelector("p"),a=c.querySelector("a"),s=getComputedStyle(c),ar=a.getBoundingClientRect();
   return {title:h.textContent.trim(),label:a.textContent.trim(),accessibleLabel:a.getAttribute("aria-label"),buttonBg:getComputedStyle(a).backgroundColor,buttonInk:getComputedStyle(a).color,buttonWidth:ar.width,cardContentWidth:c.clientWidth-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight),href:a.getAttribute("href"),height:r.height,inside:r.left>=partnersBounds.left-2&&r.right<=partnersBounds.right+2,fit:[h,p,a].every(e=>e.scrollWidth<=e.clientWidth+2),tap:ar.height,icon:c.querySelector("svg")?.getAttribute("aria-hidden"),background:s.backgroundColor,border:s.borderTopWidth,radius:parseFloat(s.borderTopLeftRadius),shadow:s.boxShadow,decoration:getComputedStyle(c,"::before").content};
  })};
+ const footerNav=document.querySelector(".corporate-footer");
+ const footerLayout={columns:getComputedStyle(footerNav).gridTemplateColumns.trim().split(/\\s+/).length,links:[...footerNav.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=viewport+2,height:e.getBoundingClientRect().height})),groups:[...footerNav.querySelectorAll("strong")].map(e=>e.textContent)};
  const typeSizes={
   heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
   serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
@@ -198,7 +200,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    heroCtaInk:style("#inicio .hero-cta").color,
    heroPhotoFallbackBg:style("#inicio .prime-photo-surface").backgroundColor
   };
- return {decorativeArrowCount:[...document.querySelectorAll("a,button,summary")].filter(e=>/[↗→➜]/.test(e.textContent)).length,viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,participantLayout,servicesLayout,partnerLayout,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,obsoleteServices:!!document.querySelector('.future-services')},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ return {decorativeArrowCount:[...document.querySelectorAll("a,button,summary")].filter(e=>/[↗→➜]/.test(e.textContent)).length,viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,participantLayout,servicesLayout,partnerLayout,footerLayout,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,obsoleteServices:!!document.querySelector('.future-services')},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
@@ -263,6 +265,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    Math.abs(services.cards[0].height-services.cards[1].height)>2||Math.abs(services.cards[0].dividerOffset-services.cards[1].dividerOffset)>2)
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
   if(diag.decorativeArrowCount!==0)fails.push("Decorative arrows remain in interactive controls");
+ if(diag.footerLayout.columns!==(width<=860?2:4)||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Institucional"||diag.footerLayout.links.length!==9||diag.footerLayout.links.some(x=>!x.inside||x.height<38))fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
  const partners=diag.partnerLayout;
   if(partners.columns!==(width<=700?1:2)||partners.gap!==(width<=700?12:16)||partners.cards.length!==2||
    partners.cards.map(c=>c.title).join("|")!=="Comercios|Repartidores"||
@@ -620,6 +623,19 @@ try{
    report.tests.push({name:"Source/dist partner visual parity "+w,partners:result.partnerLayout});
  }
 
+ // Validate the new company page in both source and packaged form.
+ for(const root of ["","dist/"]){
+  for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
+   await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   await call("Page.navigate",{url:pathToFileURL(resolve(root+"empresa.html")).href});
+   await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.company-page')"),"company page render");
+   await js('document.fonts.ready');
+   const company=await js(`(()=>{const v=document.documentElement.clientWidth,n=document.querySelector(".corporate-footer");return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.trim().split(/\\s+/).length,links:[...n.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=v+2})),home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content}})()`);
+   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|areas|informacion-corporativa"||company.scroll>company.width+2||company.columns!==(w<=860?2:4)||company.links.length!==9||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
+   await capture((root?"dist-":"source-")+"company-"+w+"px.png",true);
+   report.tests.push({name:"Company page "+root+w,company});
+  }
+ }
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
  await writeFile(join(output,"audit.json"),JSON.stringify(report,null,2));
