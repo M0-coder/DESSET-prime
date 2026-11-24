@@ -59,7 +59,7 @@ function verifyManifest(dist){
  const html=readFileSync(join(dist,'index.html'),'utf8');
  assert(html.includes('<meta name="robots" content="noindex,nofollow">'),'source noindex changed');
  assert(!/rel="canonical"/.test(html),'source canonical unexpectedly present');
- for(const scene of ['choose','prepare','move'])assert(html.includes('./assets/scene-'+scene+'.webp'),'independent scene missing');
+ for(const participant of ['proveedores','comercios','consumidores','operadores-logisticos'])assert(html.includes('./assets/ecosistema-'+participant+'.webp'),'independent participant photograph missing: '+participant);
  const services=readFileSync(join(dist,'scripts/service-state.js'),'utf8');
  assert(services.includes('applicationDistribution:"not_published"')&&services.includes('verified:false'),'unverified app distribution changed');
  const headers=readFileSync(join(dist,'_headers'),'utf8');

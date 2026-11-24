@@ -16,7 +16,7 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(info.noindex===true&&info.robots_disallow_all===true,'indexing policy changed');
  check(info.original_files===35&&info.staged_files===38,'package shape mismatch');
  check(info.repeated_packaging_identical===true&&info.independently_compiled_twice===false,'evidence claims changed');
- check(Array.isArray(info.files)&&info.files.length===34,'missing per-asset manifest');
+ check(Array.isArray(info.files)&&info.files.length===38,'missing per-asset manifest');
  check(sha(Buffer.from(JSON.stringify(info.files)))===info.artifacts_sha256,'manifest checksum mismatch');
  const expected=new Map(),actual=new Set();let total=0;
  for(const f of info.files){
@@ -47,7 +47,7 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  const site=readFileSync(join(publicDir,'sitemap.xml'),'utf8');
  check(html.includes('name="robots" content="noindex,nofollow"')&&robots==='User-agent: *\nDisallow: /\n','dangerous indexing state');
  check(html.includes('rel="canonical" href="https://desset.lat/"')&&!site.includes('<loc>'),'release SEO gate not explicit');
- for(const part of ['choose','prepare','move'])check(html.includes('scene-'+part+'.webp'),'story asset missing: '+part);
+ for(const part of ['proveedores','comercios','consumidores','operadores-logisticos']){const path='assets/ecosistema-'+part+'.webp';check(html.includes('./'+path)&&expected.has(path),'participant asset missing: '+part);}
  check(readFileSync(join(publicDir,'scripts/service-state.js'),'utf8').includes('applicationDistribution:"not_published"'),'apps erroneously enabled');
  return {result:'PASS',origin_sha:info.origin_sha,files:expected.size,bytes:total,release_authorized:false,release_decision:'NO-GO'};
 }

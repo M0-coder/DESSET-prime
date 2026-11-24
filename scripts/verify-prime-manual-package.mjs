@@ -30,7 +30,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
    else {check(stat.isFile()&&!seen.has(rel),'Not a regular file: '+rel);seen.add(rel);}
   }
  }
- scan(publicDir);check(seen.size===35,'Unexpected file count');
+ scan(publicDir);check(seen.size===39,'Unexpected file count');
  for(const path of seen)check(want.has(path),'Unexpected file: '+path);
  for(const [path,spec] of want){
   check(seen.has(path),'Missing file: '+path);
@@ -60,9 +60,13 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  }
  check(head.includes("script-src 'self'")&&head.includes("frame-ancestors 'none'")&&head.includes('Cache-Control: no-cache, must-revalidate'),'Security/caching headers lost');
  check(!seen.has('site-manifest.json')&&!seen.has('prime-manual-release-package.json'),'Private evidence exposed publicly');
+ for(const part of ['proveedores','comercios','consumidores','operadores-logisticos']){
+  const path='assets/ecosistema-'+part+'.webp';
+  check(seen.has(path)&&html.includes('./'+path),'Missing participant photo '+path);
+ }
  const status=readFileSync(join(publicDir,'scripts/service-state.js'),'utf8');
  check(status.includes('applicationDistribution:"not_published"')&&status.includes('verified:false'),'Application status changed');
- return {result:'PASS',source_sha:sourceSha,seo:seoPolicy,files:35,production_authorized:false,production_deployed:false};
+ return {result:'PASS',source_sha:sourceSha,seo:seoPolicy,files:39,production_authorized:false,production_deployed:false};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{const [publicDir,reportPath,sourceSha,seoPolicy]=process.argv.slice(2);
