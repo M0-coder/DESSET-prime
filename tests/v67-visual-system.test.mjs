@@ -64,7 +64,7 @@ test("V6.7 updated four-participant ecosystem",()=>{
  assert.ok(scene&&!scene[0].includes('class="v4-flow motion-story"'),"3D area has no storytelling photo grid");
  assert.ok(flow,"No complete four-participant flow");
  const titles=[...flow[0].matchAll(/<h3>(.*?)<\/h3>/g)].map(x=>x[1]);
- assert.deepEqual(titles,["PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS"]);
+ assert.deepEqual(titles,["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"]);
  assert.ok(flow[0].includes("Participantes del modelo de servicios DESSET"));
  assert.ok(!flow[0].includes("ORGANIZAR")&&!flow[0].includes("MOVER"));
  assert.ok(flow[0].includes("Productos y abastecimiento para los negocios."));

@@ -8,7 +8,7 @@ const vision=slice('<section class="statement" id="vision"'),scene=slice('<secti
 const photos=["assets/ecosistema-proveedores.webp","assets/ecosistema-comercios.webp","assets/ecosistema-consumidores.webp","assets/ecosistema-operadores-logisticos.webp"];
 test("ECOSYSTEM-PARTICIPANTS-01 one ordered four-photo ecosystem separate from 3D",()=>{
  assert.match(vision,/<h2 id="vision-title">NO ES SOLO <span>ENTREGAR<\/span><br><strong class="statement-last">ES CONECTAR<\/strong><\/h2>/);
- assert.deepEqual([...vision.matchAll(/<h3>(.*?)<\/h3>/g)].map(x=>x[1]),["PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS"]);
+ assert.deepEqual([...vision.matchAll(/<h3>(.*?)<\/h3>/g)].map(x=>x[1]),["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"]);
  assert.equal((vision.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,4);
  assert.equal((vision.match(/<picture class="v03-photo-story">/g)||[]).length,4);
  for(const path of photos){assert.ok(vision.includes('src="./'+path+'"'));assert.ok(!scene.includes(path))}
@@ -18,7 +18,8 @@ test("ECOSYSTEM-PARTICIPANTS-01 one ordered four-photo ecosystem separate from 3
 test("Four distinct local WebP photos and truthful explanatory copy",()=>{
  for(const path of photos)assert.equal(vision.split('src="./'+path+'"').length-1,1);
  assert.doesNotMatch(vision,/scene-(?:choose|prepare|move)\.(?:webp|svg)/);
- for(const copy of ["Productos y abastecimiento para los negocios.","Canales de venta, gestión de pedidos y acceso a clientes.","Acceso a productos, negocios y servicios.","Recogida, transporte y distribución de mercancías.","Modelo de servicios en desarrollo."])assert.ok(vision.includes(copy));
+ for(const copy of ["Productos y abastecimiento para los negocios.","Canales de venta, gestión de pedidos y acceso a clientes.","Acceso a productos, negocios y servicios.","Recogida, transporte y distribución de mercancías."])assert.ok(vision.includes(copy));
+ assert.doesNotMatch(vision,/Modelo de servicios en desarrollo\.|ecosystem-participants-note|<h3>CONSUMIDORES<\/h3>/);
  assert.match(scene,/Renderización gráfica conceptual de DESSET/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });

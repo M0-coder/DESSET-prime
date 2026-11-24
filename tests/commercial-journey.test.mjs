@@ -41,7 +41,7 @@ test("four independently chosen local photographs and concrete participant roles
  }
  assert.equal((html.match(/class="motion-story-art motion-story-art--/g)||[]).length,4);
  assert.match(css,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
- assert.match(html,/Modelo de servicios en desarrollo\./);
+ assert.doesNotMatch(html,/Modelo de servicios en desarrollo\.|ecosystem-participants-note/);
  assert.doesNotMatch(css,/\.motion-story-art--(?:choose|organize|move) span/);
 });
 

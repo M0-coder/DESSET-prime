@@ -28,9 +28,9 @@ test("truthful service and conceptual 3D disclosures remain without redundant th
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/i);
  assert.match(html,/aria-label="Escena conceptual:/);
  assert.doesNotMatch(flow,/v5-stage-caption|motion-story-bridge/);
- for(const stage of ["PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS"])
+ for(const stage of ["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"])
   assert.ok(statement.includes("<h3>"+stage+"</h3>"),"Approved ecosystem participant missing: "+stage);
- assert.doesNotMatch(flow,/<h3>(?:PROVEEDORES|COMERCIOS|CONSUMIDORES|OPERADORES LOGÍSTICOS)<\/h3>|class="motion-story-unit"/);
+ assert.doesNotMatch(flow,/<h3>(?:PROVEEDORES|COMERCIOS|PERSONAS|OPERADORES LOGÍSTICOS)<\/h3>|class="motion-story-unit"/);
  assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
  assert.match(html,/Esta web no procesa transacciones/);
  assert.doesNotMatch(html,/class="trust-ledger"|UN ECOSISTEMA, TRES PILARES/);

@@ -133,7 +133,7 @@ async function viewport(width,height,reduce=false){
  const participantLayout={columns:getComputedStyle(participantGrid).gridTemplateColumns.trim().split(/\\s+/).length,
   headingAbove:headingBounds.bottom<=participantBounds.top+2,
   left:participantBounds.left,right:participantBounds.right,
-  note:document.querySelector("#vision .ecosystem-participants-note")?.textContent.trim(),
+  obsoleteNote:!!document.querySelector("#vision .ecosystem-participants-note")||document.querySelector("#vision").textContent.includes("Modelo de servicios en desarrollo."),
   cards:[...participantGrid.querySelectorAll(".ecosystem-participant")].map(c=>{
    const box=c.getBoundingClientRect(),image=c.querySelector("img"),p=c.querySelector("p"),h=c.querySelector("h3"),photo=c.querySelector(".ecosystem-participant__photo").getBoundingClientRect();
    return {title:h.textContent.trim(),src:image.getAttribute("src"),alt:image.alt,lazy:image.loading,
@@ -225,10 +225,10 @@ async function viewport(width,height,reduce=false){
    (diag.railDisplay.right<diag.railDisplay.viewportRight-2||diag.railDisplay.right>diag.railDisplay.viewportRight+16))
    fails.push("HERO-SERVICE-01: accessible service strip clips content or has wrong layout: "+JSON.stringify({items:diag.railItems,layout:diag.railDisplay}));
  const participants=diag.participantLayout;
- const expectedParticipantTitles=["PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS"];
+ const expectedParticipantTitles=["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"];
  const expectedParticipantFiles=["./assets/ecosistema-proveedores.webp","./assets/ecosistema-comercios.webp","./assets/ecosistema-consumidores.webp","./assets/ecosistema-operadores-logisticos.webp"];
  if(participants.columns!==(width<=480?1:width<=1000?2:4)||!participants.headingAbove||participants.left< -2||participants.right>diag.viewport+2||
-  participants.note!=="Modelo de servicios en desarrollo."||participants.cards.length!==4||
+  participants.obsoleteNote||participants.cards.length!==4||
   participants.cards.some((c,i)=>c.title!==expectedParticipantTitles[i]||c.src!==expectedParticipantFiles[i]||!c.alt||c.lazy!=="lazy"||!c.inside||!c.fits||Math.abs(c.photoRatio-1.5)>.03||c.fit!=="cover"||c.titleFont<17||c.copyFont<14))
   fails.push("ECOSYSTEM-PARTICIPANTS-01 responsive layout, card order or text clipping: "+JSON.stringify(participants));
  if(width<=700){
@@ -267,7 +267,7 @@ try{
  report.tests.push({name:"V6.6 editorial punctuation and computed corner radii",roundedUI});
 
  const designSystem=await js('(()=>{const color=sel=>getComputedStyle(document.querySelector(sel)).backgroundColor;return {body:color("body"),contact:color(".contact"),feature:color(".solutions-grid .service--main"),brand:color(".business-pitch"),cssLoaded:[...document.styleSheets].some(s=>s.href?.endsWith("/styles-system.css")),steps:[...document.querySelectorAll(".motion-story-unit h3")].map(e=>e.textContent.trim()),contactStatusColor:getComputedStyle(document.querySelector(".contact-status")).color}})()');
- const expectedSteps=["PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS"];
+ const expectedSteps=["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"];
  if(!designSystem.cssLoaded||
     designSystem.body!=="rgb(247, 245, 238)"||
     designSystem.contact!=="rgb(247, 245, 238)"||
