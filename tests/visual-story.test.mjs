@@ -42,7 +42,7 @@ test("motion system is progressive and never hides static content",()=>{
 test("intersection cues animate only once and unobserve",()=>{
  const flow=runMotion(false,true);
  assert.equal(flow.document.documentElement.dataset.motionSystem,"ready");
- assert.equal(flow.observed.length,2);
+ assert.equal(flow.observed.length,3);
  flow.activate();
  assert.equal(flow.unobserved.length,3);
  assert.ok(flow.targets.every(t=>t.classes.has("motion-active")));
@@ -53,7 +53,7 @@ test("visual narrative uses original geometry grammar but makes no operational c
  assert.match(html,/no representa una operación activa/i);
   assert.doesNotMatch(html,/class="motion-brand-thread"/);
  assert.match(html,/class="closing-title"/);
- assert.equal((html.match(/class="closing-line/g)||[]).length,3);
+ assert.equal((html.match(/class="closing-line/g)||[]).length,2);
  assert.match(html,/src="\.\/scripts\/motion\.js"/);
  assert.equal((html.match(/roles-geometry-es.svg/g)||[]).length,1);
   assert.equal((html.match(/src="\.\/assets\/deliver-assets-mark\.png"/g)||[]).length,1);
