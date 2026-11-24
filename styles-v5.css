@@ -67,7 +67,6 @@
 /* V5.4: keyboard focus stays visible on dark/light surfaces and accordions.
    Complements the V4 a/button focus-visible rule without changing mouse appearance. */
 .menu-button:focus-visible,
-.future-services summary:focus-visible,
 .v4-architecture-details summary:focus-visible {
  outline:3px solid #FFC62F;
  outline-offset:4px;

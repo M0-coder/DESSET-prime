@@ -20,16 +20,17 @@ test("V4.3: limited public story, no redundant responsibility section and two sh
  assert.doesNotMatch(cards[1],/<h3>Negocios\./);
 });
 
-test("V4.3: delivery first and optional expansion do not compete in initial viewport",()=>{
- const main=html.match(/<div class="solutions-grid">([\s\S]*?)<\/div>/);
- const optional=html.match(/<details class="future-services">([\s\S]*?)<\/details>/);
- assert.ok(main&&optional);
- assert.equal((main[1].match(/class="service service--main"/g)||[]).length,1);
- assert.doesNotMatch(main[1],/acceso público disponible|operación comercial activa/i);
- assert.equal((optional[1].match(/class="service"/g)||[]).length,2);
- assert.match(optional[1],/Área complementaria del modelo logístico/);
- assert.match(css,/\.future-services summary:focus-visible/);
- assert.doesNotMatch(html,/<details class="future-services"\s+open/);
+test("Two independent visible service brands without implied availability",()=>{
+ const services=html.match(/<section class="solutions"[^>]*>([\s\S]*?)<\/section>/)?.[1];
+ assert.ok(services);
+ assert.match(services,/<h2 id="solutions-title" class="solutions-title">Servicios<\/h2>/);
+ const cards=[...services.matchAll(/<article class="service service--(main|prime)">([\s\S]*?)<\/article>/g)];
+ assert.deepEqual(cards.map(c=>c[1]),["main","prime"]);
+ assert.match(cards[0][2],/<h3>DESSET<\/h3>[\s\S]*?<strong>Comercio y delivery<\/strong>/);
+ assert.match(cards[1][2],/<h3>DESSET <span>prime<\/span><\/h3>[\s\S]*?<strong>Logística integral<\/strong>/);
+ assert.doesNotMatch(services,/<details|service-arrow|future-services|Área complementaria|acceso público disponible|operación comercial activa/i);
+ assert.match(css,/#soluciones \.solutions-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+ assert.match(css,/@media\(max-width:700px\)\{\s*#soluciones \.solutions-grid\{grid-template-columns:minmax\(0,1fr\)/);
 });
 
 test("V4.3: hero CTA reaches the unique primary contact path and is accessible",()=>{

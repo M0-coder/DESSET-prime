@@ -11,10 +11,6 @@
 
 
 #soluciones .solutions-grid .service--main{border:1px solid #1755d4;border-top:5px solid var(--v02-gold);box-shadow:var(--v02-soft)}
-#soluciones .service-arrow{font-size:27px;opacity:.9}
-#soluciones .service-access{border-top:3px solid var(--v02-blue);box-shadow:0 12px 28px rgba(20,34,57,.07)}
-#soluciones .future-services{border-color:#bfc8d3}
-#soluciones .future-grid .service{box-shadow:0 10px 26px rgba(20,34,57,.06)}
 /* Keep the opt-in 3D intact; frame the existing concept art as a professional
    exhibit instead of creating a second visual language or adding new buildings. */
 #ecosistema.ecosystem{background:#eef0ef}
