@@ -681,3 +681,12 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
 .company-page p,.company-page li{font-size:17px;line-height:1.65}
 
 
+
+/* CONTACT-03: one compact editorial closing, with the existing partner cards. */
+#negocios.audiences{background:var(--ds-60-paper);padding-block:clamp(32px,4vw,64px)}
+#negocios #contacto.contact{padding:0;margin:0 0 clamp(24px,3vw,40px);background:var(--ds-60-paper);overflow:visible;text-align:center}
+#negocios #contacto.contact::before,#negocios #contacto.contact::after{content:none;animation:none}
+#negocios #contacto.contact .closing-title{font-size:clamp(19px,2.3vw,32px);font-weight:800;line-height:1.28;letter-spacing:-.025em;margin:0;text-align:center;color:var(--ds-30-ink)}
+#negocios #contacto.contact .closing-line{display:block;width:auto;max-width:100%;margin:0 auto;text-align:center}
+#negocios #contacto.contact .closing-line::after{content:none;animation:none}
+#negocios #contacto.contact .closing-line--final em{font-weight:800;color:var(--ds-30-blue)}
