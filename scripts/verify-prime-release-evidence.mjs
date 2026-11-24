@@ -14,9 +14,9 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(/^[a-f0-9]{40}$/.test(expectedSha)&&info.origin_sha===expectedSha&&info.checkout_sha===expectedSha,'SHA mismatch');
  check(info.release_authorized===false&&info.release_decision==='NO-GO','not an offline-only candidate');
  check(info.noindex===true&&info.robots_disallow_all===true,'indexing policy changed');
- check(info.original_files===35&&info.staged_files===38,'package shape mismatch');
+ check(info.original_files===36&&info.staged_files===39,'package shape mismatch');
  check(info.repeated_packaging_identical===true&&info.independently_compiled_twice===false,'evidence claims changed');
- check(Array.isArray(info.files)&&info.files.length===38,'missing per-asset manifest');
+ check(Array.isArray(info.files)&&info.files.length===39,'missing per-asset manifest');
  check(sha(Buffer.from(JSON.stringify(info.files)))===info.artifacts_sha256,'manifest checksum mismatch');
  const expected=new Map(),actual=new Set();let total=0;
  for(const f of info.files){
@@ -43,6 +43,8 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  }
  check(!expected.has('site-manifest.json')&&!expected.has('prime-release-evidence.json'),'internal proof exposed as web asset');
  const html=readFileSync(join(publicDir,'index.html'),'utf8');
+ const company=readFileSync(join(publicDir,'empresa.html'),'utf8');
+ check(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or noindex changed');
  const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');
  const site=readFileSync(join(publicDir,'sitemap.xml'),'utf8');
  check(html.includes('name="robots" content="noindex,nofollow"')&&robots==='User-agent: *\nDisallow: /\n','dangerous indexing state');

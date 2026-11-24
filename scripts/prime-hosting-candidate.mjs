@@ -19,7 +19,7 @@ const EXTRAS=Object.freeze({
  'sitemap.xml':'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>\n',
  '404.html':'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DESSET — Página no encontrada</title></head><body><main><h1>Página no encontrada</h1><p>La dirección solicitada no existe.</p><a href="/">Volver al inicio</a></main></body></html>\n'
 });
-const REQUIRED=['index.html','_headers','scripts/service-state.js','assets/deliver-assets-mark.png','assets/scene-choose.webp','assets/scene-prepare.webp','assets/scene-move.webp','assets/ecosistema-proveedores.webp','assets/ecosistema-comercios.webp','assets/ecosistema-consumidores.webp','assets/ecosistema-operadores-logisticos.webp','assets/v62-commerce.glb','assets/v62-courier.glb','assets/v62-destination.glb',
+const REQUIRED=['index.html','empresa.html','_headers','scripts/service-state.js','assets/deliver-assets-mark.png','assets/scene-choose.webp','assets/scene-prepare.webp','assets/scene-move.webp','assets/ecosistema-proveedores.webp','assets/ecosistema-comercios.webp','assets/ecosistema-consumidores.webp','assets/ecosistema-operadores-logisticos.webp','assets/v62-commerce.glb','assets/v62-courier.glb','assets/v62-destination.glb',
  'styles-typography.css','fonts/inter-latin-variable.woff2','fonts/plus-jakarta-sans-latin-variable.woff2',
  'fonts/LICENSE-Inter-OFL.txt','fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt'];
 
@@ -57,6 +57,8 @@ function verifyManifest(dist){
  walk(dist);
  assert(actual.length===m.files.length+1&&actual.includes('site-manifest.json')&&actual.every(p=>p==='site-manifest.json'||paths.has(p)),'unlisted file(s) in source dist');
  const html=readFileSync(join(dist,'index.html'),'utf8');
+ const company=readFileSync(join(dist,'empresa.html'),'utf8');
+ assert(company.includes('<meta name="robots" content="noindex,nofollow">')&&!company.includes('rel="canonical"'),'Company page source indexing changed');
  assert(html.includes('<meta name="robots" content="noindex,nofollow">'),'source noindex changed');
  assert(!/rel="canonical"/.test(html),'source canonical unexpectedly present');
  for(const participant of ['proveedores','comercios','consumidores','operadores-logisticos'])assert(html.includes('./assets/ecosistema-'+participant+'.webp'),'independent participant photograph missing: '+participant);
@@ -66,11 +68,11 @@ function verifyManifest(dist){
  assert(headers.includes("script-src 'self'")&&headers.includes("frame-ancestors 'none'")&&headers.includes('Content-Security-Policy'),'security header missing');
  return {manifest:m,manifestSha256:sha256(raw)};
 }
-function stageHtml(source){
+function stageHtml(source,origin=BASE_ORIGIN){
  let html=source;
  assert((html.match(/<\/head>/g)||[]).length===1,'unrecognized head structure');
  assert(!html.includes('rel="canonical"')&&!html.includes('property="og:url"'),'SEO metadata already exists');
- const additions='  <link rel="canonical" href="'+BASE_ORIGIN+'">\n  <meta property="og:url" content="'+BASE_ORIGIN+'">\n';
+ const additions='  <link rel="canonical" href="'+origin+'">\n  <meta property="og:url" content="'+origin+'">\n';
  html=html.replace('</head>',additions+'</head>');
  return html;
 }
@@ -90,8 +92,8 @@ export function preparePrimeHosting({dist,sourceSha,mode}){
    mkdirSync(dirname(dst),{recursive:true});copyFileSync(src,dst,constants.COPYFILE_EXCL);
    let bytes=readFileSync(dst);
    assert(bytes.length===item.bytes&&sha256(bytes)===item.sha256,'copy content changed during transfer: '+item.path);
-   if(item.path==='index.html'){
-    const upgraded=Buffer.from(stageHtml(bytes.toString('utf8')));
+   if(item.path==='index.html'||item.path==='empresa.html'){
+    const upgraded=Buffer.from(stageHtml(bytes.toString('utf8'),item.path==='empresa.html'?BASE_ORIGIN+'empresa':BASE_ORIGIN));
     writeFileSync(dst,upgraded);bytes=upgraded;
    }
    inventory.push({path:item.path,bytes:bytes.length,sha256:sha256(bytes)});
@@ -116,6 +118,8 @@ export function preparePrimeHosting({dist,sourceSha,mode}){
   for(const item of inventory){const bytes=readFileSync(join(publicDir,item.path));assert(bytes.length===item.bytes&&sha256(bytes)===item.sha256,'output hash mismatch '+item.path);}
   const stagedHtml=readFileSync(join(publicDir,'index.html'),'utf8');
   assert(stagedHtml.includes('<meta name="robots" content="noindex,nofollow">')&&stagedHtml.includes('rel="canonical" href="'+BASE_ORIGIN+'"'),'staging robots/canonical gate');
+  const stagedCompany=readFileSync(join(publicDir,'empresa.html'),'utf8');
+  assert(stagedCompany.includes('name="robots" content="noindex,nofollow"')&&stagedCompany.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or indexing gate');
   const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');
   assert(robots==='User-agent: *\nDisallow: /\n','staging indexing guard changed');
   const report={schema:'desset-prime-native-hosting-rehearsal-v1',source_repo:'M0-coder/DESSET-prime',source_sha:sourceSha,

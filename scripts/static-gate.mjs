@@ -6,6 +6,7 @@ import {fileURLToPath} from "node:url";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const read=p=>readFileSync(resolve(root,p),"utf8");
 const html=read("index.html");
+const company=read("empresa.html");
 const headers=read("_headers");
 const js=["scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js"].map(read);
 const styles=["styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css"].map(read);
@@ -14,8 +15,8 @@ const assert=(ok,label)=>{if(!ok)issues.push(label)};
 const localSet=new Set();
 const mainCss=readFileSync(resolve(root,"styles.css"));
 const cssRevision=createHash("sha1").update("blob "+mainCss.length+"\0").update(mainCss).digest("hex");
-assert(html.includes('href="./styles.css?v='+cssRevision+'"'),"Main stylesheet cache revision does not match source bytes");
-for(const tag of html.match(/<(?:script|link|img|source)\b[^>]*>/g)||[]){
+assert([html,company].every(p=>p.includes('href="./styles.css?v='+cssRevision+'"')),"Main stylesheet cache revision does not match source bytes");
+for(const tag of (html+company).match(/<(?:script|link|img|source)\b[^>]*>/g)||[]){
  const attrs=[...tag.matchAll(/\b(?:src|href|srcset)="([^"]+)"/g)].map(m=>m[1]);
  for(const val of attrs){
   if(!val.startsWith("./")){issues.push("Nonlocal DOM resource "+val);continue}
@@ -29,13 +30,13 @@ for(const tag of html.match(/<(?:script|link|img|source)\b[^>]*>/g)||[]){
 }
 for(const url of [...html.matchAll(/href="(#[^"]+)"/g)].map(m=>m[1].slice(1)))
  assert(html.includes('id="'+url+'"'),"Broken in-page navigation anchor #"+url);
-assert(/name="robots" content="noindex,nofollow"/.test(html),"Missing noindex");
+assert([html,company].every(p=>/name="robots" content="noindex,nofollow"/.test(p)),"Missing noindex");
 assert(/Content-Security-Policy/.test(headers),"Missing published-host CSP template");
 assert(/default-src 'self'/.test(headers)&&/script-src 'self'/.test(headers)&&/object-src 'none'/.test(headers),"CSP too relaxed");
 assert(/frame-ancestors 'none'/.test(headers),"Missing frame-ancestors gate");
-assert(/Content-Security-Policy/.test(html),"Missing local CSP meta fallback");
-assert(!/<form\b|<iframe\b|<video\b/i.test(html),"Unauthorized form/iframe/video");
-assert(!/(?:onload|onclick|onerror)\s*=/.test(html),"Inline event attribute detected");
+assert([html,company].every(p=>/Content-Security-Policy/.test(p)),"Missing local CSP meta fallback");
+assert(!/<form\b|<iframe\b|<video\b/i.test(html+company),"Unauthorized form/iframe/video");
+assert(!/(?:onload|onclick|onerror)\s*=/.test(html+company),"Inline event attribute detected");
 for(const [i,s] of js.entries()){
  assert(!/\b(?:eval|new Function)\s*\(/.test(s),"Unsafe eval in scripts index "+i);
  assert(!/\b(?:fetch|WebSocket|XMLHttpRequest|sendBeacon)\s*\(/.test(s),"Unauthorized network call in scripts index "+i);

@@ -676,3 +676,16 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
 
 /* Center text-only actions after removing decorative arrows. */
 #inicio .hero-cta,#contacto .social-links--official a{justify-content:center;text-align:center}
+
+/* CORPORATE-01 */
+.site-footer:has(.corporate-footer){display:block;border-top:1px solid #d8dce2}
+.corporate-footer{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;margin:28px 0;padding:24px 0;border-block:1px solid #d8dce2}
+.corporate-footer strong,.corporate-footer a{display:block;font-size:15px;line-height:1.5}
+.corporate-footer a{padding:8px 0;color:#343434;text-decoration:none;overflow-wrap:anywhere}
+.corporate-footer a:hover{color:#1551d8;text-decoration:underline}
+.site-footer:has(.corporate-footer)>p{max-width:72ch;margin:12px 0 0}
+.company-page{background:#f4f8fe;color:#111;padding:48px var(--edge)}
+.company-page h1{font-size:clamp(36px,5vw,68px);line-height:1.1}
+.company-page section{max-width:78ch;padding:24px 0;border-bottom:1px solid #d8dce2}
+.company-page p,.company-page li{font-size:17px;line-height:1.65}
+@media(max-width:860px){.corporate-footer{grid-template-columns:repeat(2,minmax(0,1fr))}}
