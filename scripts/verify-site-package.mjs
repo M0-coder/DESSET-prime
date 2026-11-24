@@ -69,7 +69,8 @@ check(!html.includes("IDEAS</span>")&&!html.includes("ACCIÓN</span>"),"Unrelate
 check(expected.has("scripts/service-state.js")&&html.includes('src="./scripts/service-state.js"'),"Institutional availability module not packaged");
 const availability=await readFile(resolve(dist,"scripts/service-state.js"),"utf8");
 check(availability.includes('applicationDistribution:"not_published"')&&availability.includes('verified:false'),"Unapproved application publication status");
-check(html.includes('data-service-access')&&html.includes('data-service-status'),"Availability block missing from packaged site");
+check(!/data-service-access|data-service-status|data-app-links|APLICACIONES DESSET|Acceso público no habilitado/.test(html),"Obsolete application availability panel in packaged site");
+check(!/<a\b[^>]*href=["']https?:\/\/(?:play\.google\.com|apps\.apple\.com)(?:[\/:?#"']|$)/i.test(html),"Unapproved application store link in packaged site");
 check(expected.has("assets/roles-geometry-es.svg")&&!expected.has("assets/roles-geometry-v2.svg"),"Only localized diagram may be distributed; sealed original remains source-only");
 check(![...expected].some(x=>x.endsWith(".md")||x.includes("workflow")||x.includes("package")||x.includes("node_modules")), "development files in static site");
 async function inventory(path=""){

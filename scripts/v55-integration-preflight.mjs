@@ -23,7 +23,8 @@ const availability=text("scripts/service-state.js");
 require("Prime remains presentation only",
  /aria-label="Escena conceptual:[^"]*No representa operaciones comerciales activas de DESSET\."/i.test(html)&&
  /no procesa pedidos ni pagos/i.test(html)&&
- /data-service-status[^>]*>Acceso público no habilitado/.test(html)&&
+ !/data-service-access|data-service-status|data-app-links|APLICACIONES DESSET|Acceso público no habilitado/.test(html)&&
+ !/<a\b[^>]*href=["']https?:\/\/(?:play\.google\.com|apps\.apple\.com)(?:[\/:?#"']|$)/i.test(html)&&
  /applicationDistribution:"not_published"/.test(availability)&&
  /verified:false/.test(availability)&&
  !/<form\\b|<iframe\\b/i.test(html));

@@ -97,6 +97,7 @@ test("V6.9 actual web package and UI contains the single activation point",()=>{
  assert.match(css,/@media\(max-width:700px\)/);
  const built=read("dist/index.html");
  assert.ok(built.includes('src="./scripts/service-state.js"'));
+ assert.doesNotMatch(built,/data-service-access|data-service-status|data-app-links|APLICACIONES DESSET|Acceso público no habilitado/);
  assert.equal(read("dist/scripts/service-state.js"),control);
  const manifest=JSON.parse(read("dist/site-manifest.json"));
  assert.ok(manifest.files.some(x=>x.path==="scripts/service-state.js"));
