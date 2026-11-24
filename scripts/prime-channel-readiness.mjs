@@ -11,11 +11,13 @@ const defaultAttestation=JSON.parse(readFileSync(join(repositoryRoot,'config/pri
 const reject=(message)=>{throw Error('NO-GO: '+message)};
 const strict=(ok,msg)=>{if(!ok)reject(msg)};
 
-export function inspectInstitutionalChannels({html,serviceState,attestation=defaultAttestation}){
+export function inspectInstitutionalChannels({html,serviceState,companyHtml=readFileSync(join(repositoryRoot,'empresa.html'),'utf8'),attestation=defaultAttestation}){
  strict(typeof html==='string'&&html.includes('<html lang="es">'),'Prime Spanish HTML missing');
  strict(html.includes('id="contacto"')&&html.includes('aria-labelledby="contact-title"'),'institutional contact missing');
- strict(html.includes('Esta web no procesa transacciones.')&&
-  html.includes('las aplicaciones DESSET cuando estén habilitadas'),'no-commerce disclosure missing');
+ strict(typeof companyHtml==='string'&&companyHtml.includes('Esta web no procesa transacciones.')&&
+  companyHtml.includes('las aplicaciones DESSET cuando estén habilitadas')&&
+  html.includes('href="./empresa.html#informacion-corporativa"'),'accessible company no-commerce disclosure missing');
+ strict(!/<form\b|<iframe\b|\b(?:checkout|payment|submit-order)\b/i.test(companyHtml),'unapproved transactional company UI');
  strict(typeof serviceState==='string'&&serviceState.includes('applicationDistribution:"not_published"')&&
   serviceState.includes('verified:false'),'published app claim not authorized');
  strict(!/<form\b/i.test(html)&&!/\b(?:checkout|payment|submit-order)\b/i.test(html),'unapproved transactional UI');
@@ -43,27 +45,24 @@ export function inspectInstitutionalChannels({html,serviceState,attestation=defa
   approved.set(item.url,item.platform);
  }
  strict(new Set(entries.map(x=>x.platform)).size===5,'duplicate attested platform');
- const nav=html.match(/<nav class="social-links social-links--official" aria-label="Redes sociales de DESSET">([\s\S]*?)<\/nav>/)?.[1];
- strict(typeof nav==='string'&&(nav.match(/<a\b/g)||[]).length===5,
-  'five channels must appear together in the single institutional social navigation');
- strict(!html.includes('social-links--secondary'),'old split/secondary social block must not return');
- const footer=html.match(/<nav class="footer-social" aria-label="Redes sociales oficiales en el pie de página">([\s\S]*?)<\/nav>/)?.[1];
- const mirrors=[...(footer??'').matchAll(/<a\b([^>]+)>/g)];
- strict(mirrors.length===5,'exact five footer social links required');
- const mirrorUrls=new Set();
- for(const hit of mirrors){
-  const a=hit[1],href=a.match(/\bhref="([^"]+)"/)?.[1],name=a.match(/\bdata-footer-channel="([^"]+)"/)?.[1];
-  strict(approved.has(href)&&approved.get(href)===name&&!mirrorUrls.has(href)&&a.includes('aria-label="'+name+'"')&&a.includes('target="_blank"')&&a.includes('rel="noopener noreferrer"'),'invalid footer channel mirror');
-  mirrorUrls.add(href);
+ strict(!/contact-bottom|contact-primary|social-links--official|social-links--secondary/.test(html),'obsolete contact block must not return');
+ for(const doc of [html,companyHtml]){
+  const nav=doc.match(/<nav class="footer-social" aria-label="Redes sociales oficiales en el pie de página">([\s\S]*?)<\/nav>/)?.[1];
+  const links=[...(nav??'').matchAll(/<a\b([^>]+)>/g)],urls=new Set();
+  strict(links.length===5,'exact five footer social links required');
+  for(const hit of links){
+   const a=hit[1],href=a.match(/\bhref="([^"]+)"/)?.[1],name=a.match(/\bdata-footer-channel="([^"]+)"/)?.[1];
+   strict(approved.has(href)&&approved.get(href)===name&&!urls.has(href)&&a.includes('aria-label="'+name+'"')&&a.includes('target="_blank"')&&a.includes('rel="noopener noreferrer"'),'invalid footer channel');
+   urls.add(href);
+  }
+  strict((doc.match(/data-footer-channel=/g)||[]).length===5,'footer channel outside approved navigation');
  }
- strict((html.match(/data-footer-channel=/g)||[]).length===5,'footer mirror outside approved navigation');
  const external=[];
  for(const hit of html.matchAll(/<a\b([^>]+)>/g)){
   const a=hit[1],href=a.match(/\bhref="([^"]+)"/)?.[1]??'';
   if(!/^(?:https?:\/\/|mailto:|tel:)/i.test(href))continue;
   strict(href.startsWith('https://'),'external contact must use HTTPS');
   strict(!/\s|javascript:|data:/i.test(href),'untrusted external link');
-  if(a.includes('data-footer-channel=')){strict(mirrorUrls.has(href),'unapproved mirror URL');continue;}
   const state=a.match(/\bdata-channel-review="([^"]+)"/)?.[1]??'unclassified';
   const basis=a.match(/\bdata-channel-basis="([^"]+)"/)?.[1]??'none';
   strict(['pending','owner-attested','unclassified'].includes(state),'unknown channel review state');
@@ -122,7 +121,7 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{
   const [htmlPath,statePath,reportPath,mode]=process.argv.slice(2);
   strict(htmlPath&&statePath&&isAbsolute(htmlPath)&&isAbsolute(statePath),'absolute source paths required');
-  let report=inspectInstitutionalChannels({html:readFileSync(htmlPath,'utf8'),serviceState:readFileSync(statePath,'utf8')});
+  let report=inspectInstitutionalChannels({html:readFileSync(htmlPath,'utf8'),serviceState:readFileSync(statePath,'utf8'),companyHtml:readFileSync(join(dirname(htmlPath),'empresa.html'),'utf8')});
   if(mode==='--accept-owner-declaration'){
    const {RELEASE_SHA,GITHUB_SHA}=process.env;
    // Human authorization already occurred in GitHub's protected environment.

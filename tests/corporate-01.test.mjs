@@ -27,7 +27,9 @@ for(const dir of ["","dist/"]){
    for(const [,url,name,label] of links){assert.equal(approved.get(url),name);assert.equal(name,label);}
    assert.match(doc,/<p>© 2026 DESSET\. Todos los derechos reservados\.<\/p>/);
   }
+  assert.doesNotMatch(docs["index.html"],/contact-bottom|contact-primary|social-links--official|Conoce los perfiles de DESSET/);
   const company=docs["empresa.html"];
+  assert.match(company,/Esta web no procesa transacciones\./);
   assert.match(company,/<h1>Empresa<\/h1>/);
   assert.doesNotMatch(company,/<form\b|<script\b|<iframe\b/i);
   assert.equal((company.match(/<section id="/g)||[]).length,6);

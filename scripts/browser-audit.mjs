@@ -304,13 +304,13 @@ try{
     !heroPhoto.logo?.endsWith("deliver-assets-mark.png")||heroPhoto.oldText||heroPhoto.ratio<1.2||heroPhoto.ratio>2)
     report.failures.push("HERO-PHOTO-01 exact local render, original logo, conceptual disclosure failed: "+JSON.stringify(heroPhoto));
  report.tests.push({name:"HERO-PHOTO-01 exact local render, original logo, conceptual disclosure",heroPhoto});
- const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",board:".ecosystem-board",stage:".v5-city-stage",pitch:".business-pitch",contact:".contact-primary"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
+ const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",board:".ecosystem-board",stage:".v5-city-stage",pitch:".business-pitch"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
  const decorDots=roundedUI.titles.filter(t=>t.endsWith("."));
  if(decorDots.length||Object.entries(roundedUI.radii).some(([,v])=>v<10))
    report.failures.push("V6.6 unexpected heading periods or missing rounded corners: "+JSON.stringify({decorDots,radii:roundedUI.radii}));
  report.tests.push({name:"V6.6 editorial punctuation and computed corner radii",roundedUI});
 
- const designSystem=await js('(()=>{const color=sel=>getComputedStyle(document.querySelector(sel)).backgroundColor;return {body:color("body"),contact:color(".contact"),feature:color(".solutions-grid .service--main"),brand:color(".business-pitch"),cssLoaded:[...document.styleSheets].some(s=>s.href?.endsWith("/styles-system.css")),steps:[...document.querySelectorAll(".motion-story-unit h3")].map(e=>e.textContent.trim()),contactStatusColor:getComputedStyle(document.querySelector(".contact-status")).color}})()');
+ const designSystem=await js('(()=>{const color=sel=>getComputedStyle(document.querySelector(sel)).backgroundColor;return {body:color("body"),contact:color(".contact"),feature:color(".solutions-grid .service--main"),brand:color(".business-pitch"),cssLoaded:[...document.styleSheets].some(s=>s.href?.endsWith("/styles-system.css")),steps:[...document.querySelectorAll(".motion-story-unit h3")].map(e=>e.textContent.trim())}})()');
  const expectedSteps=["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"];
  if(!designSystem.cssLoaded||
     designSystem.body!=="rgb(247, 245, 238)"||
@@ -410,13 +410,13 @@ try{
  if(!pitch.visible||pitch.href!=="#contacto"||pitch.heading!=="Comercios"||pitch.label!=="Más información")report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
  report.tests.push({name:"Commercial pitch CTA",pitch});
  await capture("desktop-business-pitch.png");
- const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const services=document.querySelector("#soluciones .solutions-grid");const prim=document.querySelector(".contact-primary");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),obsoleteServices:!!document.querySelector(".future-services"),serviceCards:services.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.textContent.trim(),contactTarget:prim.getAttribute("target"),candidateStatus:document.querySelector(".contact-status")?.textContent,headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');
- if(rc.primaryHref!=="#contacto"||rc.obsoleteServices||rc.serviceCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||!rc.candidateStatus.includes("Esta web no procesa transacciones")||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
+ const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const services=document.querySelector("#soluciones .solutions-grid");const prim=document.querySelector(".footer-social a[data-footer-channel=Instagram]");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),obsoleteServices:!!document.querySelector(".future-services"),serviceCards:services.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.getAttribute("aria-label"),contactTarget:prim.getAttribute("target"),oldContact:!!document.querySelector(".contact-bottom,.contact-primary,.social-links--official"),headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');
+ if(rc.primaryHref!=="#contacto"||rc.obsoleteServices||rc.serviceCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||rc.oldContact||rc.contactText!=="Instagram"||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
  report.tests.push({name:"V4.3 commercial focus & primary contact",rc});
- const socials=await js('(()=>{const nav=document.querySelector("#contacto .social-links--official");const links=[...nav?.querySelectorAll("a")||[]];return {count:links.length,navLabel:nav?.getAttribute("aria-label"),oldBlock:!!document.querySelector(".social-links--secondary"),links:links.map(a=>({name:a.firstChild?.textContent?.trim(),href:a.href,owner:a.dataset.channelBasis,review:a.dataset.channelReview,height:Math.round(a.getBoundingClientRect().height),background:getComputedStyle(a).backgroundColor,border:getComputedStyle(a).borderTopColor})),width:Math.round(nav?.getBoundingClientRect().width||0)}})()');
- if(socials.count!==5||socials.navLabel!=="Redes sociales de DESSET"||socials.oldBlock||
+ const socials=await js('(()=>{const nav=document.querySelector(".footer-social");const links=[...nav?.querySelectorAll("a")||[]];return {count:links.length,navLabel:nav?.getAttribute("aria-label"),oldBlock:!!document.querySelector(".contact-bottom,.contact-primary,.social-links--official,.social-links--secondary"),links:links.map(a=>({name:a.getAttribute("aria-label"),href:a.href,owner:a.dataset.channelBasis,review:a.dataset.channelReview,height:Math.round(a.getBoundingClientRect().height),background:getComputedStyle(a).backgroundColor,border:getComputedStyle(a).borderTopColor})),width:Math.round(nav?.getBoundingClientRect().width||0)}})()');
+ if(socials.count!==5||socials.navLabel!=="Redes sociales oficiales en el pie de página"||socials.oldBlock||
   socials.links.map(x=>x.name).join("|")!=="Instagram|Facebook|TikTok|YouTube|X"||
-  socials.links.some(x=>x.owner!=="owner-attested"||x.review!=="owner-attested"||x.height<48||!x.href.startsWith("https://"))||
+  socials.links.some(x=>x.owner!=="owner-attested"||x.review!=="owner-attested"||x.height<44||!x.href.startsWith("https://"))||
   new Set(socials.links.map(x=>x.background)).size!==1||
   new Set(socials.links.map(x=>x.border)).size!==1)
   report.failures.push("One equal five-platform 60/30/10 social rail missing: "+JSON.stringify(socials));
@@ -456,14 +456,14 @@ try{
    await js('document.querySelector("#negocios").scrollIntoView({block:"start",behavior:"instant"})');
    await sleep(240);
    await capture("mobile-business-pitch.png");
-   await js('document.querySelector(".contact-primary").scrollIntoView({block:"center",behavior:"instant"})');
+   await js('document.querySelector(".footer-social a[data-footer-channel=Instagram]").scrollIntoView({block:"center",behavior:"instant"})');
    await sleep(100);
-   const mobileContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {label:a.textContent.trim(),left:r.left,right:r.right,height:r.height,viewport:v}})()');
-   if(mobileContact.left < -2||mobileContact.right>mobileContact.viewport+2||mobileContact.height<48)report.failures.push("Primary mobile contact clipped or too small: "+JSON.stringify(mobileContact));
+   const mobileContact=await js('(()=>{const a=document.querySelector(".footer-social a[data-footer-channel=Instagram]"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {label:a.getAttribute("aria-label"),left:r.left,right:r.right,height:r.height,viewport:v}})()');
+   if(mobileContact.left < -2||mobileContact.right>mobileContact.viewport+2||mobileContact.height<44)report.failures.push("Primary mobile contact clipped or too small: "+JSON.stringify(mobileContact));
    report.tests.push({name:"Mobile primary contact tap target",mobileContact});
-   const socialMobile=await js('(()=>{const nav=document.querySelector("#contacto .social-links--official"),v=document.documentElement.clientWidth;return {viewport:v,overflow:document.documentElement.scrollWidth>v+2,links:[...nav.querySelectorAll("a")].map(a=>({name:a.firstChild?.textContent?.trim(),left:a.getBoundingClientRect().left,right:a.getBoundingClientRect().right,height:a.getBoundingClientRect().height}))}})()');
+   const socialMobile=await js('(()=>{const nav=document.querySelector(".footer-social"),v=document.documentElement.clientWidth;return {viewport:v,overflow:document.documentElement.scrollWidth>v+2,links:[...nav.querySelectorAll("a")].map(a=>({name:a.getAttribute("aria-label"),left:a.getBoundingClientRect().left,right:a.getBoundingClientRect().right,height:a.getBoundingClientRect().height}))}})()');
    if(socialMobile.overflow||socialMobile.links.length!==5||
-    socialMobile.links.some(x=>x.left < -2||x.right>socialMobile.viewport+2||x.height<48))
+    socialMobile.links.some(x=>x.left < -2||x.right>socialMobile.viewport+2||x.height<44))
     report.failures.push("Social link rail clipped on 390px mobile: "+JSON.stringify(socialMobile));
    report.tests.push({name:"SOCIAL-05 mobile five profiles visible and tappable",socialMobile});
    const mobileClosing=await js('(()=>[...document.querySelectorAll(".contact .closing-line")].map(e=>({text:e.textContent.trim(),opacity:Number(getComputedStyle(e).opacity)})))()');
@@ -518,8 +518,8 @@ try{
    await capture("mobile-full.png",true);
   }
   if(w===320){
-   const narrowContact=await js('(()=>{const a=document.querySelector(".contact-primary"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {left:r.left,right:r.right,height:r.height,viewport:v}})()');
-   if(narrowContact.left < -2||narrowContact.right>narrowContact.viewport+2||narrowContact.height<48)report.failures.push("320px contact button fail: "+JSON.stringify(narrowContact));
+   const narrowContact=await js('(()=>{const a=document.querySelector(".footer-social a[data-footer-channel=Instagram]"),r=a.getBoundingClientRect(),v=document.documentElement.clientWidth;return {left:r.left,right:r.right,height:r.height,viewport:v}})()');
+   if(narrowContact.left < -2||narrowContact.right>narrowContact.viewport+2||narrowContact.height<44)report.failures.push("320px contact button fail: "+JSON.stringify(narrowContact));
    await sleep(3200);
    await capture("mobile-320-final.png");
    

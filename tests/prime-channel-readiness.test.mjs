@@ -57,10 +57,10 @@ test('A channel deliberately downgraded to pending remains a launch blocker',()=
  assert.equal(r.channels_status,'PENDING');
 });
 test('TikTok and YouTube are each included once in the same accessible five-link nav',()=>{
- const nav=html.match(/<nav class="social-links social-links--official" aria-label="Redes sociales de DESSET">([\s\S]*?)<\/nav>/)?.[1];
+ const nav=html.match(/<nav class="footer-social" aria-label="Redes sociales oficiales en el pie de página">([\s\S]*?)<\/nav>/)?.[1];
  assert.ok(nav);
  assert.equal((nav.match(/<a\b/g)||[]).length,5);
- for(const platform of ['Instagram','Facebook','TikTok','YouTube','X'])assert.ok(nav.includes('>'+platform+'</a>'),platform);
+ for(const platform of ['Instagram','Facebook','TikTok','YouTube','X'])assert.ok(nav.includes('aria-label="'+platform+'"'),platform);
  for(const platform of ['TikTok','YouTube'])assert.ok(owner.exact_channels.some(c=>c.platform===platform));
 });
 test('Spoofed TikTok hostname is rejected even if forged in the registry and HTML',()=>{
@@ -144,7 +144,14 @@ test('release accepts exact owner-declared links without claiming admin access o
  const directory=mkdtempSync(join(tmpdir(),'desset-channel-test-'));
  try{
   const unknown=join(directory,'index.html');
+  writeFileSync(join(directory,'empresa.html'),readFileSync(join(root,'empresa.html'),'utf8'));
   writeFileSync(unknown,html.replace('</body>','<a href="https://example.org/">otro</a></body>'));
   assert.equal(check({},unknown).status,2);
  }finally{rmSync(directory,{recursive:true,force:true});}
+});
+
+test('company disclosure must remain visible and no duplicate contact rail returns',()=>{
+ const companyHtml=readFileSync(join(root,'empresa.html'),'utf8');
+ assert.throws(()=>inspectInstitutionalChannels({html,serviceState:state,companyHtml:companyHtml.replace('Esta web no procesa transacciones.','')}),/NO-GO/);
+ assert.throws(()=>inspectInstitutionalChannels({html:html.replace('</body>','<div class="contact-bottom"></div></body>'),serviceState:state}),/NO-GO/);
 });
