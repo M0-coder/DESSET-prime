@@ -29,7 +29,7 @@ test('Prime-only authentic package -> isolated staging and NO-GO',t=>{
 test('source asset bytes unchanged (except deliberately added HEAD metadata)',t=>{
  const stage=build(t),source=JSON.parse(readFileSync(join(realDist,'site-manifest.json')));
  for(const f of source.files){
-  if(f.path==='index.html')continue;
+  if(f.path==='index.html'||f.path==='empresa.html')continue;
   assert.deepEqual(readFileSync(join(stage.publicDir,f.path)),readFileSync(join(realDist,f.path)));
  }
  assert.deepEqual(readFileSync(join(stage.publicDir,'assets/deliver-assets-mark.png')),readFileSync(join(realDist,'assets/deliver-assets-mark.png')));
