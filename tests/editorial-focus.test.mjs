@@ -40,7 +40,7 @@ test("primary business narrative remains intelligible without decorative microco
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/i);
  assert.match(html,/aria-label="Escena conceptual:/);
  assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
- assert.match(html,/Esta web no procesa transacciones\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
 });
 
 test("numbered captions do not return in responsive or reduced-motion styling",()=>{

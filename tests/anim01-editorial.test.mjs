@@ -20,7 +20,7 @@ test("ANIM-01 removes arcade scan, glint and pointer-driven lens",()=>{
   assert.match(photoCss,/@keyframes anim02-frame/);
 });
 test("ANIM-01 sequences real sections one time without hiding content or risking trust block",()=>{
- for(const sel of [".solutions-grid .service--main",".business-pitch",".audience-grid--compact .audience",".contact-bottom--rc"])
+ for(const sel of [".solutions-grid .service--main",".business-pitch",".audience-grid--compact .audience"])
   assert.ok(motion.includes(sel));
  assert.doesNotMatch(motion,/\.trust-ledger/);
  assert.match(motion,/root\.dataset\.motionDirection="editorial-cinematic-v1"/);

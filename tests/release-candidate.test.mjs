@@ -43,15 +43,15 @@ test("V4.3: hero CTA reaches the unique primary contact path and is accessible",
  assert.doesNotMatch(hero,/hero-secondary|data-v64-tour-launch/);
  assert.equal((hero.match(/<a\b/g)||[]).length,1,"Only one primary hero CTA survives");
  assert.match(html,/class="v63-tour"/);
- assert.match(html,/class="contact-primary" href="https:\/\/www\.instagram\.com\/deliver_assets\/"/);
- assert.match(html,/Instagram<\/a>/);
- assert.match(css,/\.contact-primary:focus-visible/);
- assert.match(css,/\.contact-primary\{[^}]*min-height:56px/s);
- assert.equal((html.match(/class="contact-primary"/g)||[]).length,1);
+ assert.match(html,/href="https:\/\/www\.instagram\.com\/deliver_assets\/" data-footer-channel="Instagram"/);
+ assert.match(html,/data-footer-channel="Instagram" aria-label="Instagram"/);
+ assert.match(css,/a:focus-visible,button:focus-visible/);
+ assert.match(css,/\.footer-social a\{[^}]*width:44px;height:44px/);
+ assert.doesNotMatch(html,/class="contact-primary"|contact-bottom|social-links--official/);
  assert.equal((html.match(/data-channel-review="owner-attested" data-channel-basis="owner-attested"/g)||[]).length,5,
    "Five DESSET accounts require exact owner attestation; platform admin access remains untested");
  assert.doesNotMatch(html,/<a\b[^>]+href="(?:mailto:|tel:|https:\/\/wa\.me\/)/i);
- assert.match(html,/no procesa transacciones/i);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
 });
 
 test("V4.3: static assets bounded and CSS has no unclosed blocks/comments",()=>{

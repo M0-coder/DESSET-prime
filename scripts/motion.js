@@ -9,7 +9,7 @@
  const cues=document.querySelectorAll(
   ".statement h2, .motion-story, .motion-story-unit, "+
   ".solutions-grid .service--main, .business-pitch, "+
-  ".audience-grid--compact .audience, .contact-bottom--rc, "+
+  ".audience-grid--compact .audience, "+
   ".contact, .closing-line"
  );
  if(!cues.length){root.dataset.motionSystem="empty";return}

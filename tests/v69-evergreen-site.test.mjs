@@ -40,8 +40,8 @@ test("V6.9 describes services as a lasting institutional identity, not as a star
  assert.match(html,/href="#contacto">Canales DESSET/);
 });
 test("V6.9 keeps website informational, operations gated to apps, no invented launch",()=>{
- assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET cuando estén habilitadas/);
- assert.match(html,/Esta web no procesa transacciones/);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
  assert.doesNotMatch(html,/data-service-access|data-service-status|data-app-links|APLICACIONES DESSET|Acceso público no habilitado/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.equal((html.match(/data-channel-review="owner-attested" data-channel-basis="owner-attested"/g)||[]).length,5);

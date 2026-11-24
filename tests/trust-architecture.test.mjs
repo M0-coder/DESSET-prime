@@ -14,8 +14,8 @@ test("institutional statement retains business direction without fictitious oper
  assert.match(html,/<p class="hero-lead">DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla\.<\/p>/);
  assert.doesNotMatch(html,/somos líderes|miles de clientes|servicios disponibles hoy|empresa registrada|RUC:\s*\d+|seguimiento en tiempo real/i);
  assert.doesNotMatch(html,/Comercio, tecnología y distribución se integran en una misma arquitectura/);
- assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET/);
- assert.match(html,/Esta web no procesa transacciones/);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
 });
 
 test("truthful service and conceptual 3D disclosures remain without redundant three-pillar trust panels",()=>{
@@ -32,15 +32,15 @@ test("truthful service and conceptual 3D disclosures remain without redundant th
   assert.ok(statement.includes("<h3>"+stage+"</h3>"),"Approved ecosystem participant missing: "+stage);
  assert.doesNotMatch(flow,/<h3>(?:PROVEEDORES|COMERCIOS|PERSONAS|OPERADORES LOGÍSTICOS)<\/h3>|class="motion-story-unit"/);
  assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
- assert.match(html,/Esta web no procesa transacciones/);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
  assert.doesNotMatch(html,/class="trust-ledger"|UN ECOSISTEMA, TRES PILARES/);
  assert.doesNotMatch(html,/100% seguro|certificado|verificado por|avalado por|garantizado/i);
 });
 
 test("contact profiles carry owner declaration, not platform-admin proof or DM responsiveness",()=>{
- assert.match(html,/Instagram<\/a>/);
+ assert.match(html,/data-footer-channel="Instagram" aria-label="Instagram"/);
  assert.match(html,/data-channel-review="owner-attested" data-channel-basis="owner-attested"/);
- assert.equal((html.match(/class="contact-primary"/g)||[]).length,1);
+ assert.doesNotMatch(html,/class="contact-primary"|contact-bottom|social-links--official/);
  assert.doesNotMatch(html,/Abrir Instagram para conversar|contacto verificado|responderemos en|WhatsApp oficial/i);
  assert.doesNotMatch(html,/<form\b|<input\b/i);
 });

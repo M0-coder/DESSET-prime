@@ -60,7 +60,7 @@ test("V6 has real input controls, opt-in mobile loading and permanent poster fal
 test("V6 does not falsify service status or introduce external transport or deployment",()=>{
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/i);
  assert.match(html,/aria-label="Escena conceptual:/);
- assert.match(html,/Esta web no procesa transacciones\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
  assert.match(html,/noindex,nofollow/);
  assert.doesNotMatch(gpu,/fetch\s*\(|\bXMLHttpRequest\b|sendBeacon|localStorage|sessionStorage|WebSocket/);
  assert.doesNotMatch(gpu,/https?:\/\/[^\s"']+/);

@@ -16,7 +16,7 @@ test("Two direct commercial contact paths replace generic stakeholder cards",()=
  assert.doesNotMatch(section,/¿TU NEGOCIO|<h3>Personas|<h3>Aliados|business-pitch-body|Plantear una colaboración/);
  assert.match(html,/Comercio digital, pedidos y entregas de última milla\./);
  assert.match(html,/no representa una operación activa/i);
- assert.match(html,/no procesa transacciones/i);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/no procesa pedidos ni pagos\./i);
  assert.doesNotMatch(html,/más de [0-9]+ (?:comercios|clientes|repartidores)|entregas en tiempo real|compra ahora/i);
 });
 
@@ -25,9 +25,9 @@ test("commercial contact CTA resolves locally and avoids fictitious contact deta
  assert.ok(section);
  assert.deepEqual([...section.matchAll(/<a class="(?:business-pitch-cta|partner-cta)" href="([^"]+)" aria-label="([^"]+)">([^<]+)/g)].map(c=>[c[1],c[2],c[3].trim()]),[["#contacto","Más información para comercios","Más información"],["#contacto","Más información para repartidores","Más información"]]);
  assert.match(html,/id="contacto"/);
- assert.match(html,/Instagram<\/a>/);
- assert.match(html,/TikTok<\/a>/);
- assert.match(html,/YouTube<\/a>/);
+ assert.match(html,/data-footer-channel="Instagram" aria-label="Instagram"/);
+ assert.match(html,/data-footer-channel="TikTok" aria-label="TikTok"/);
+ assert.match(html,/data-footer-channel="YouTube" aria-label="YouTube"/);
  assert.match(html,/href="https:\/\/www\.instagram\.com\/deliver_assets\/"/);
  assert.doesNotMatch(html,/<a\b[^>]+href="(?:mailto:|tel:|https:\/\/wa\.me\/)/i,"Cannot invent or publish personal/uncorroborated contact details");
 });

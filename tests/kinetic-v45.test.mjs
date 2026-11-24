@@ -13,7 +13,7 @@ test("V4.5 retains exactly three cinematic beats around truthful current content
  for(const word of ["AUMENTA EL VALOR","A TU TIEMPO","PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS","LAS BUENAS","CONEXIONES"])assert.ok(html.includes(word));
  assert.match(html,/no representa una operación activa/i);
  assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
- assert.match(html,/Esta web no procesa transacciones\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
  assert.doesNotMatch(html,/\b0[1-9]\s*\/\s*[^<]+/);
 });
 
@@ -44,9 +44,9 @@ test("V4.5 enlarges typography while keeping narrow-phone and semantic link fall
  assert.match(css,/@media\(min-width:1181px\)\{[\s\S]*?font-size:clamp\(65px,8\.05vw,143px\)/);
  assert.match(css,/@media\(max-width:360px\)\{[\s\S]*?font-size:38px/);
  assert.match(html,/<a class="hero-cta" href="#contacto">/);
- assert.match(html,/Instagram<\/a>/);
- assert.match(html,/TikTok<\/a>/);
- assert.match(html,/YouTube<\/a>/);
+ assert.match(html,/data-footer-channel="Instagram" aria-label="Instagram"/);
+ assert.match(html,/data-footer-channel="TikTok" aria-label="TikTok"/);
+ assert.match(html,/data-footer-channel="YouTube" aria-label="YouTube"/);
  assert.match(html,/data-channel-review="owner-attested" data-channel-basis="owner-attested"/);
  assert.doesNotMatch(html,/clientes activos|entregas en tiempo real|garantizamos la entrega/i);
 });
