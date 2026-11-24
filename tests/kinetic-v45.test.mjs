@@ -12,7 +12,7 @@ test("V4.5 retains exactly three cinematic beats around truthful current content
  for(const id of ["inicio","ecosistema","contacto"])assert.match(html,new RegExp('id="'+id+'"'));
  for(const word of ["AUMENTA EL VALOR","A TU TIEMPO","PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS","LAS BUENAS","CONEXIONES"])assert.ok(html.includes(word));
  assert.match(html,/no representa una operación activa/i);
- assert.match(html,/Acceso público no habilitado/);
+ assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
  assert.match(html,/no procesa pedidos ni pagos/i);
  assert.doesNotMatch(html,/\b0[1-9]\s*\/\s*[^<]+/);
 });
