@@ -28,7 +28,7 @@ test("no numbered editorial label survives in any visible section, card, diagram
 });
 
 test("primary business narrative remains intelligible without decorative microcopy",()=>{
- for(const heading of ["AUMENTA EL VALOR","A TU TIEMPO","NO ES SOLO","Comercio y delivery","¿TU NEGOCIO","PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS","LAS BUENAS"]){
+ for(const heading of ["AUMENTA EL VALOR","A TU TIEMPO","NO ES SOLO","Comercio y delivery","Vende con DESSET","Reparte con DESSET","PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS","LAS BUENAS"]){
   assert.ok(html.includes(heading),"Missing principal heading: "+heading);
  }
  assert.equal((html.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,4);

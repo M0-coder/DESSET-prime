@@ -6,13 +6,14 @@ const html=readFileSync(new URL("index.html",root),"utf8");
 const css=readFileSync(new URL("styles.css",root),"utf8");
 const scenes=["ecosistema-proveedores","ecosistema-comercios","ecosistema-consumidores","ecosistema-operadores-logisticos"];
 
-test("business proposition appears before generic stakeholder cards and keeps an honest launch status",()=>{
- const audience=html.indexOf('id="negocios"');
- const pitch=html.indexOf('class="business-pitch"');
- const cards=html.indexOf('class="audience-grid audience-grid--compact"');
- assert.ok(audience>0 && pitch>audience && cards>pitch,"Commercial value proposition must precede stakeholder cards");
- assert.match(html,/¿TU NEGOCIO/);
- assert.match(html,/Conversemos sobre tu comercio/);
+test("Two direct commercial contact paths replace generic stakeholder cards",()=>{
+ const section=html.match(/<section class="audiences" id="negocios"[^>]*>([\s\S]*?)<\/section>/)?.[1];
+ assert.ok(section);
+ const cards=[...section.matchAll(/<article class="(business-pitch|audience)">([\s\S]*?)<\/article>/g)];
+ assert.deepEqual(cards.map(c=>c[1]),["business-pitch","audience"]);
+ assert.match(cards[0][2],/<h3>Vende con DESSET<\/h3>/);
+ assert.match(cards[1][2],/<h3>Reparte con DESSET<\/h3>/);
+ assert.doesNotMatch(section,/¿TU NEGOCIO|<h3>Personas|<h3>Aliados|business-pitch-body|Plantear una colaboración/);
  assert.match(html,/Comercio digital, pedidos y entregas de última milla\./);
  assert.match(html,/no representa una operación activa/i);
  assert.match(html,/no procesa pedidos ni pagos/i);
@@ -20,9 +21,9 @@ test("business proposition appears before generic stakeholder cards and keeps an
 });
 
 test("commercial contact CTA resolves locally and avoids fictitious contact details",()=>{
- const pitch=html.match(/<div class="business-pitch">([\s\S]*?)<div class="audience-grid audience-grid--compact">/);
- assert.ok(pitch);
- assert.match(pitch[1],/href="#contacto"/);
+ const section=html.match(/<section class="audiences" id="negocios"[^>]*>([\s\S]*?)<\/section>/)?.[1];
+ assert.ok(section);
+ assert.deepEqual([...section.matchAll(/<a class="(?:business-pitch-cta|partner-cta)" href="([^"]+)">([^<]+)/g)].map(c=>[c[1],c[2].trim()]),[["#contacto","Contactar como comercio"],["#contacto","Contactar como repartidor"]]);
  assert.match(html,/id="contacto"/);
  assert.match(html,/Instagram <span/);
  assert.match(html,/TikTok <span/);

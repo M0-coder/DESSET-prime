@@ -14,9 +14,10 @@ test("V4.3: limited public story, no redundant responsibility section and two sh
  assert.doesNotMatch(css,/\.responsibility(?:\b|-)/);
  const cards=html.match(/<div class="audience-grid audience-grid--compact">([\s\S]*?)<\/div>/);
  assert.ok(cards);
- assert.equal((cards[1].match(/class="audience"/g)||[]).length,2);
- assert.match(cards[1],/<h3>Personas<\/h3>/);
- assert.match(cards[1],/<h3>Aliados<\/h3>/);
+ assert.equal((cards[1].match(/<article class="(?:business-pitch|audience)">/g)||[]).length,2);
+ assert.match(cards[1],/<h3>Vende con DESSET<\/h3>/);
+ assert.match(cards[1],/<h3>Reparte con DESSET<\/h3>/);
+ assert.doesNotMatch(cards[1],/<h3>Personas|<h3>Aliados|business-pitch-symbol/);
  assert.doesNotMatch(cards[1],/<h3>Negocios\./);
 });
 
