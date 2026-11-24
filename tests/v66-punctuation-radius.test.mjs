@@ -30,12 +30,12 @@ test("V6.6 all presentation headings and standalone labels omit terminal ornamen
 
 test("V6.6 punctuation stays in natural prose and legal availability disclosures",()=>{
  assert.match(html,/DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla/);
- assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET/);
- assert.match(html,/no procesa transacciones\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET/);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/no procesa transacciones\./);
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/);
  assert.match(html,/aria-label="Escena conceptual:/);
  assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
- assert.match(html,/Esta web no procesa transacciones\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Esta web no procesa transacciones\./);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
 
