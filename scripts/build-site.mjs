@@ -55,8 +55,11 @@ for(const path of files){
    throw Error("Malformed packaged glTF 2.0: "+path);
  }
 }
+const mainCss=await readFile(resolve(root,"styles.css"));
+const cssRevision=createHash("sha1").update("blob "+mainCss.length+"\0").update(mainCss).digest("hex");
+if(!original.includes('href="./styles.css?v='+cssRevision+'"'))throw Error("Main stylesheet cache revision does not match source bytes");
 const refs=[...original.matchAll(/\b(?:src|srcset|href)="(\.\/[^"]+)"/g)]
- .map(m=>m[1].slice(2).split(/\s+/)[0]);
+ .map(m=>m[1].slice(2).split(/\s+/)[0]).map(p=>p==="styles.css?v="+cssRevision?"styles.css":p);
 for(const href of refs){
  if(href.includes("..")||!files.includes(href))
   throw Error("HTML references absent or disallowed website file: "+href);

@@ -1,6 +1,7 @@
 /** Static source and asset integrity scanner: deliberately not a full SAST/SCA tool. */
 import {readFileSync,existsSync,statSync,mkdirSync,writeFileSync} from "node:fs";
 import {resolve} from "node:path";
+import {createHash} from "node:crypto";
 import {fileURLToPath} from "node:url";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const read=p=>readFileSync(resolve(root,p),"utf8");
@@ -11,11 +12,15 @@ const styles=["styles.css","styles-v5.css","styles-system.css","styles-hero-phot
 const issues=[],warnings=[];
 const assert=(ok,label)=>{if(!ok)issues.push(label)};
 const localSet=new Set();
+const mainCss=readFileSync(resolve(root,"styles.css"));
+const cssRevision=createHash("sha1").update("blob "+mainCss.length+"\0").update(mainCss).digest("hex");
+assert(html.includes('href="./styles.css?v='+cssRevision+'"'),"Main stylesheet cache revision does not match source bytes");
 for(const tag of html.match(/<(?:script|link|img|source)\b[^>]*>/g)||[]){
  const attrs=[...tag.matchAll(/\b(?:src|href|srcset)="([^"]+)"/g)].map(m=>m[1]);
  for(const val of attrs){
   if(!val.startsWith("./")){issues.push("Nonlocal DOM resource "+val);continue}
-  const filename=val.slice(2);
+  const raw=val.slice(2);
+  const filename=raw==="styles.css?v="+cssRevision?"styles.css":raw;
   if(filename.includes("..")||filename.startsWith("/")){issues.push("Unsafe asset path "+filename);continue}
   const full=resolve(root,filename);
   assert(existsSync(full),"Referenced asset missing: "+filename);

@@ -32,7 +32,7 @@ test("Two independent visible service brands without implied availability",()=>{
  assert.match(cards[0][2],/<h3>DESSET<\/h3>[\s\S]*?<strong>Comercio y delivery<\/strong>/);
  assert.match(cards[1][2],/<h3>DESSET <span>prime<\/span><\/h3>[\s\S]*?<strong>Logística integral<\/strong>/);
  assert.doesNotMatch(services,/<details|service-arrow|future-services|Área complementaria|acceso público disponible|operación comercial activa/i);
- assert.match(css,/#soluciones \.solutions-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+ assert.match(css,/#soluciones \.solutions-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.match(css,/@media\(max-width:700px\)\{\s*#soluciones \.solutions-grid\{grid-template-columns:minmax\(0,1fr\)/);
 });
 

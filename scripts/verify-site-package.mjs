@@ -27,6 +27,9 @@ for(const entry of manifest.files){
 }
 check(total===manifest.totalBytes,"package size mismatch");
 const html=await readFile(resolve(dist,"index.html"),"utf8");
+const mainCss=await readFile(resolve(dist,"styles.css"));
+const cssRevision=createHash("sha1").update("blob "+mainCss.length+"\0").update(mainCss).digest("hex");
+check(html.includes('href="./styles.css?v='+cssRevision+'"'),"Packaged HTML and main stylesheet cache revision mismatch");
 const loader=await readFile(resolve(dist,"scripts/v5-cinematic.js"),"utf8");
 const vision=html.split('<section class="statement" id="vision"')[1]?.split("</section>")[0]||"";
 const scene=html.split('<section class="ecosystem" id="ecosistema"')[1]?.split("</section>")[0]||"";

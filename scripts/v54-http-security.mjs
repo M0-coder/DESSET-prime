@@ -1,6 +1,7 @@
 /** V5.4: loopback-only HTTP and preview security regression audit.
  * CI evidence, not a penetration test or live-site verification. */
 import {spawn} from "node:child_process";
+import {createHash} from "node:crypto";
 import {readFile, mkdir, writeFile} from "node:fs/promises";
 import {fileURLToPath} from "node:url";
 import {resolve} from "node:path";
@@ -44,7 +45,11 @@ async function check(){
   record("Locally served WOFF2 "+name,font.status===200&&font.headers.get("content-type")?.startsWith("font/woff2")&&Buffer.from(signature).toString()==="wOF2");
  }
  const css=await fetch(host+"/styles-v5.css",{signal:AbortSignal.timeout(5000)});
- record("CSS served with correct MIME",css.status===200&&css.headers.get("content-type")?.startsWith("text/css"));
+ const cssRef=html.match(/href="\.\/(styles\.css\?v=([a-f0-9]{40}))"/);
+ const currentCss=cssRef?await fetch(host+"/"+cssRef[1],{signal:AbortSignal.timeout(5000)}):null;
+ const mainBytes=currentCss?Buffer.from(await currentCss.arrayBuffer()):Buffer.alloc(0);
+ const cssBlob=createHash("sha1").update("blob "+mainBytes.length+"\0").update(mainBytes).digest("hex");
+ record("CSS served with correct MIME and exact versioned main stylesheet bytes",css.status===200&&css.headers.get("content-type")?.startsWith("text/css")&&currentCss?.status===200&&currentCss.headers.get("content-type")?.startsWith("text/css")&&cssBlob===cssRef?.[2]);
  const blocked=["/.git/config","/.github/workflows/preview-checks.yml","/scripts/local-preview.mjs","/docs/V5.3-RELEASE-GATE.md","/%2e%2e/%2e%2e/secret.env","/package.json"];
  for(const path of blocked){
   const resp=await fetch(host+path,{signal:AbortSignal.timeout(5000)});

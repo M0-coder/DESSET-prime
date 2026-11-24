@@ -64,10 +64,10 @@ async function capture(name,full=false){
  report.screenshots.push({name,size_bytes:buf.length});
 }
 const URL=pathToFileURL(resolve("index.html")).href;
-async function viewport(width,height,reduce=false){
+async function viewport(width,height,reduce=false,entry=URL){
  await call("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:width<=800});
  await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:reduce?"reduce":"no-preference"}]});
- await call("Page.navigate",{url:URL});
+ await call("Page.navigate",{url:entry});
  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.hero--motion')"),"page render");
  await js('document.fonts.ready');
  // PRIME-COLOR-02 must sample the final opaque CTA, not a partial CSS
@@ -144,11 +144,13 @@ async function viewport(width,height,reduce=false){
   })};
  const servicesGrid=document.querySelector("#soluciones .solutions-grid");
  const servicesBounds=servicesGrid.getBoundingClientRect();
- const servicesLayout={columns:getComputedStyle(servicesGrid).gridTemplateColumns.trim().split(/\\s+/).length,
+ const servicesSheet=document.querySelector('link[href^="./styles.css?v="]');
+ const servicesLayout={sheetLoaded:!!servicesSheet?.sheet,revision:servicesSheet?.getAttribute("href"),surface:getComputedStyle(servicesGrid.closest("section")).backgroundColor,gap:parseFloat(getComputedStyle(servicesGrid).gap),columns:getComputedStyle(servicesGrid).gridTemplateColumns.trim().split(/\\s+/).length,
   headingAbsent:!document.querySelector("#soluciones > h2"),label:document.querySelector("#soluciones").getAttribute("aria-label"),
   cards:[...servicesGrid.querySelectorAll("article.service")].map(c=>{
    const r=c.getBoundingClientRect(),h=c.querySelector("h3"),p=c.querySelector("p"),s=c.querySelector("strong");
-   return {brand:h.textContent.trim(),service:s.textContent.trim(),copy:p.textContent.trim(),centered:getComputedStyle(h).textAlign==="center"&&getComputedStyle(h).alignItems==="center"&&getComputedStyle(h).justifyContent==="center",brandHeight:h.getBoundingClientRect().height,primeStack:!h.querySelector("span")||getComputedStyle(h.querySelector("span")).display==="block",
+   const style=getComputedStyle(c),brandRect=h.getBoundingClientRect(),textRect=s.getBoundingClientRect(),last=p.getBoundingClientRect(),prime=h.querySelector("span");
+   return {brand:h.textContent.trim(),service:s.textContent.trim(),copy:p.textContent.trim(),background:style.backgroundColor,borderWidth:style.borderTopWidth,borderColor:style.borderTopColor,radius:parseFloat(style.borderTopLeftRadius),shadow:style.boxShadow,primeColor:prime?getComputedStyle(prime).color:null,divider:getComputedStyle(s).borderTopWidth,descriptionColor:getComputedStyle(p).color,alignedCopy:getComputedStyle(s).textAlign==="left"&&getComputedStyle(p).textAlign==="left",bottomSpace:r.bottom-last.bottom,brandBottom:brandRect.bottom-r.top,dividerOffset:textRect.top-r.top,centered:getComputedStyle(h).textAlign==="center"&&getComputedStyle(h).alignItems==="center"&&getComputedStyle(h).justifyContent==="center",brandHeight:h.getBoundingClientRect().height,primeStack:!h.querySelector("span")||getComputedStyle(h.querySelector("span")).display==="block",
     visible:r.height>100&&getComputedStyle(c).visibility!=="hidden",
     inside:r.left>=servicesBounds.left-2&&r.right<=servicesBounds.right+2,
     fits:[h,p,s].every(e=>e.scrollWidth<=e.clientWidth+2),height:r.height,
@@ -244,17 +246,20 @@ async function viewport(width,height,reduce=false){
   participants.cards.some((c,i)=>c.title!==expectedParticipantTitles[i]||c.src!==expectedParticipantFiles[i]||!c.alt||c.lazy!=="lazy"||!c.inside||!c.fits||Math.abs(c.photoRatio-1.5)>.03||c.fit!=="cover"||c.titleFont<17||c.copyFont<14))
   fails.push("ECOSYSTEM-PARTICIPANTS-01 responsive layout, card order or text clipping: "+JSON.stringify(participants));
   const services=diag.servicesLayout;
-  if(!services.headingAbsent||services.label!=="Servicios y aplicaciones DESSET"||services.columns!==(width<=700?1:2)||services.cards.length!==2||
+  if(!services.sheetLoaded||!services.revision?.startsWith("./styles.css?v=")||services.surface!=="rgb(244, 248, 254)"||services.gap!==(width<=700?12:16)||!services.headingAbsent||services.label!=="Servicios y aplicaciones DESSET"||services.columns!==(width<=700?1:2)||services.cards.length!==2||
    services.cards.map(c=>c.brand).join("|")!=="DESSET|DESSET prime"||
    services.cards.map(c=>c.service).join("|")!=="Comercio y delivery|Logística integral"||
    services.cards.some(c=>!c.visible||!c.inside||!c.fits||!c.centered||!c.primeStack||c.brandHeight<100||c.copyFont<15||c.copy.length<30)||
-   (width>700&&Math.abs(services.cards[0].height-services.cards[1].height)>2))
+   services.cards.some(c=>c.borderWidth!=="1px"||c.radius!==12||c.shadow!=="none"||c.divider!=="1px"||!c.alignedCopy||c.bottomSpace>70||c.height>350)||
+   services.cards[0].background!=="rgb(21, 81, 216)"||services.cards[0].borderColor!=="rgb(21, 81, 216)"||services.cards[0].descriptionColor!=="rgb(255, 255, 255)"||
+   services.cards[1].background!=="rgb(255, 255, 255)"||services.cards[1].borderColor!=="rgb(216, 220, 226)"||services.cards[1].primeColor!=="rgb(21, 81, 216)"||services.cards[1].descriptionColor!=="rgb(65, 65, 65)"||
+   Math.abs(services.cards[0].height-services.cards[1].height)>2||Math.abs(services.cards[0].dividerOffset-services.cards[1].dividerOffset)>2)
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
   if(width<=700){
    if(!diag.menuLabel?.startsWith("Menú"))fails.push("Mobile menu accessible name must include visible Menú label: "+diag.menuLabel);
   if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<28||diag.typeSizes.storyTitle<(width<=480?20:17))fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
- report.viewports.push({width,height,reduce,...diag,failures:fails});
+ report.viewports.push({width,height,reduce,source:entry===URL?"source":"dist",...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
  return diag;
 }
@@ -407,7 +412,7 @@ try{
    report.tests.push({name:"PRIME-LAYOUT-01 desktop: heading above four documentary photographs",leanDesktop});
   await capture("desktop-lean-statement.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
- for(const [w,h] of [[1920,1080],[1180,820],[1100,850],[1024,768],[861,900],[860,900],[768,900],[390,844],[320,700]]){
+ for(const [w,h] of [[1920,1080],[1180,820],[1100,850],[1024,768],[861,900],[860,900],[768,900],[700,900],[699,900],[430,932],[390,844],[320,700]]){
   await viewport(w,h);
   if(w===1920||w===1024){
    await sleep(1450);
@@ -510,6 +515,11 @@ try{
    report.tests.push({name:"320px full-page capture: technical disclosure CLOSED, services visible",narrowPageClosed});
    await capture("mobile-320-full.png",true);
   }
+  if([1024,768,430,390,320].includes(w)){
+   await js('document.querySelector("#soluciones").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(700);
+   await capture("services-"+w+"px.png");
+  }
  }
  const reduced=await viewport(390,844,true);
  const mobilePhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");return {src:x?.currentSrc,width:x?.naturalWidth,height:x?.naturalHeight,loaded:!!x?.complete}})()');
@@ -575,6 +585,18 @@ try{
  if(!accessible.hasHero||!accessible.hasContact||accessible.headingCount<6)
   report.failures.push("V5.4 accessibility tree missing landmarks or headlines: "+JSON.stringify(accessible));
  report.tests.push({name:"V5.4 Chromium accessibility tree structural smoke",accessible});
+ // Verify the exact deployable package as well as the working source, on all three device classes.
+ const packaged=pathToFileURL(resolve("dist/index.html")).href;
+ for(const [w,h] of [[1440,900],[768,900],[390,844]]){
+  const result=await viewport(w,h,false,packaged);
+  const source=report.viewports.find(v=>v.source==="source"&&v.width===w&&!v.reduce);
+  const fingerprint=x=>JSON.stringify({surface:x.surface,gap:x.gap,columns:x.columns,revision:x.revision,cards:x.cards.map(c=>({brand:c.brand,background:c.background,borderColor:c.borderColor,borderWidth:c.borderWidth,radius:c.radius,divider:c.divider,primeColor:c.primeColor,centered:c.centered,descriptionColor:c.descriptionColor}))});
+  if(!source||fingerprint(source.servicesLayout)!==fingerprint(result.servicesLayout))report.failures.push("Packaged and source service presentation differ at "+w);
+  await js('document.querySelector("#soluciones").scrollIntoView({block:"center",behavior:"instant"})');
+  await sleep(700);
+  await capture("dist-services-"+w+"px.png");
+  report.tests.push({name:"Source/dist service visual parity "+w,services:result.servicesLayout});
+ }
 
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
