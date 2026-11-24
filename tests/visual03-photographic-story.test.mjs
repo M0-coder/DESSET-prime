@@ -4,7 +4,7 @@ import {readFileSync,statSync} from "node:fs";
 import {createHash} from "node:crypto";
 const root=new URL("../",import.meta.url),read=p=>readFileSync(new URL(p,root),"utf8");
 const html=read("index.html"),css=read("styles.css"),browser=read("scripts/browser-audit.mjs");
-const photos=[{"name":"ecosistema-proveedores","sha256":"bc4c3e9301659949b65373eeeffccb1fddd9b5c67bdbeb8598a511a79dc98170","label":"PROVEEDORES"},{"name":"ecosistema-comercios","sha256":"3370bbb94434edf705b2144bd86f1b60aba1b39f1989d58a5a187dca1b6ff2c2","label":"COMERCIOS"},{"name":"ecosistema-consumidores","sha256":"9f7eb3e2d747b1dbb7fb7a98d4b24fa3d508e544abe95a5a39d0bd33a93f99a7","label":"CONSUMIDORES"},{"name":"ecosistema-operadores-logisticos","sha256":"c52d48b9d9614fd169bdd8301088b85d55a177532b85b004656a873cd14e9230","label":"OPERADORES LOGÍSTICOS"}];
+const photos=[{"name":"ecosistema-proveedores","sha256":"bc4c3e9301659949b65373eeeffccb1fddd9b5c67bdbeb8598a511a79dc98170","label":"PROVEEDORES"},{"name":"ecosistema-comercios","sha256":"3370bbb94434edf705b2144bd86f1b60aba1b39f1989d58a5a187dca1b6ff2c2","label":"COMERCIOS"},{"name":"ecosistema-consumidores","sha256":"9f7eb3e2d747b1dbb7fb7a98d4b24fa3d508e544abe95a5a39d0bd33a93f99a7","label":"PERSONAS"},{"name":"ecosistema-operadores-logisticos","sha256":"c52d48b9d9614fd169bdd8301088b85d55a177532b85b004656a873cd14e9230","label":"OPERADORES LOGÍSTICOS"}];
 test("ECOSYSTEM-PARTICIPANTS-01 four exact photographs, no hero duplication",()=>{
  const vision=html.split('<section class="statement" id="vision"')[1].split("</section>")[0];
  assert.equal((vision.match(/<picture class="v03-photo-story">/g)||[]).length,4);
