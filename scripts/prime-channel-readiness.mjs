@@ -47,12 +47,23 @@ export function inspectInstitutionalChannels({html,serviceState,attestation=defa
  strict(typeof nav==='string'&&(nav.match(/<a\b/g)||[]).length===5,
   'five channels must appear together in the single institutional social navigation');
  strict(!html.includes('social-links--secondary'),'old split/secondary social block must not return');
+ const footer=html.match(/<nav class="footer-social" aria-label="Redes sociales oficiales en el pie de página">([\s\S]*?)<\/nav>/)?.[1];
+ const mirrors=[...(footer??'').matchAll(/<a\b([^>]+)>/g)];
+ strict(mirrors.length===5,'exact five footer social links required');
+ const mirrorUrls=new Set();
+ for(const hit of mirrors){
+  const a=hit[1],href=a.match(/\bhref="([^"]+)"/)?.[1],name=a.match(/\bdata-footer-channel="([^"]+)"/)?.[1];
+  strict(approved.has(href)&&approved.get(href)===name&&!mirrorUrls.has(href)&&a.includes('aria-label="'+name+'"')&&a.includes('target="_blank"')&&a.includes('rel="noopener noreferrer"'),'invalid footer channel mirror');
+  mirrorUrls.add(href);
+ }
+ strict((html.match(/data-footer-channel=/g)||[]).length===5,'footer mirror outside approved navigation');
  const external=[];
  for(const hit of html.matchAll(/<a\b([^>]+)>/g)){
   const a=hit[1],href=a.match(/\bhref="([^"]+)"/)?.[1]??'';
   if(!/^(?:https?:\/\/|mailto:|tel:)/i.test(href))continue;
   strict(href.startsWith('https://'),'external contact must use HTTPS');
   strict(!/\s|javascript:|data:/i.test(href),'untrusted external link');
+  if(a.includes('data-footer-channel=')){strict(mirrorUrls.has(href),'unapproved mirror URL');continue;}
   const state=a.match(/\bdata-channel-review="([^"]+)"/)?.[1]??'unclassified';
   const basis=a.match(/\bdata-channel-basis="([^"]+)"/)?.[1]??'none';
   strict(['pending','owner-attested','unclassified'].includes(state),'unknown channel review state');

@@ -83,11 +83,6 @@ jobs:
             "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof/prime-manual-release-package.json" "$SOURCE_SHA" NOINDEX
       - name: Test public verifier without networking
         run: node --test tests/prime-live-verification.test.mjs
-      - name: Incident 243 read-only verification of already deployed corporate package
-        if: github.event.pull_request.head.ref == 'fix/publication-live-evidence-v1' && github.event.pull_request.head.repo.full_name == 'M0-coder/DESSET-prime'
-        run: |
-          set -euo pipefail
-          node scripts/prime-live-verification.mjs "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof/prime-manual-release-package.json"
       - name: Preserve the verified manual package for review (NOT permission to publish)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:

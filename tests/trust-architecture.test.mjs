@@ -15,7 +15,7 @@ test("institutional statement retains business direction without fictitious oper
  assert.doesNotMatch(html,/somos líderes|miles de clientes|servicios disponibles hoy|empresa registrada|RUC:\s*\d+|seguimiento en tiempo real/i);
  assert.doesNotMatch(html,/Comercio, tecnología y distribución se integran en una misma arquitectura/);
  assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET/);
- assert.match(html,/Este sitio no procesa pedidos ni pagos/);
+ assert.match(html,/Esta web no procesa transacciones/);
 });
 
 test("truthful service and conceptual 3D disclosures remain without redundant three-pillar trust panels",()=>{

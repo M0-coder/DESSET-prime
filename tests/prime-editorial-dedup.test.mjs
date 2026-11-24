@@ -93,7 +93,7 @@ test("EDITORIAL-09 actually deletes the two marked desktop ornaments without hid
 test("CLEANUP-01 removes invisible hero ornaments physically, without touching visible brand or 3D",()=>{
  assert.doesNotMatch(html,/class="(?:v4-shape|v4-canvas-stamp|v5-hero-refraction|motion-brand-thread)/);
  assert.doesNotMatch(read("styles-hero-photo.css"),/\.prime-photo-surface \.v4-shape/);
- assert.equal((html.match(/src="\.\/assets\/deliver-assets-mark\.png"/g)||[]).length,2);
+ assert.equal((html.match(/src="\.\/assets\/deliver-assets-mark\.png"/g)||[]).length,1);
  assert.match(html,/class="prime-photo-image"/);
  assert.match(html,/class="v6-three-mount"/);
  assert.match(html,/class="v63-tour"/);
