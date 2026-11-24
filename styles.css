@@ -663,3 +663,10 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
  #soluciones .solutions-grid{grid-template-columns:minmax(0,1fr)}
  #soluciones .service .service-body h3{min-height:108px;font-size:clamp(30px,7vw,42px)}
 }
+
+/* SERVICES-02: scoped visual finish; preserve approved VISUAL-02 bytes. */
+#soluciones.solutions{background:#f4f8fe}
+#soluciones.solutions .solutions-grid .service--main{border:1px solid #1551d8;box-shadow:none}
+#soluciones.solutions .solutions-grid .service--prime{background:#fff;border:1px solid #d8dce2;box-shadow:none}
+#soluciones.solutions .solutions-grid .service{border-radius:12px;padding:clamp(18px,2.2vw,32px)}
+#soluciones.solutions .service-access{border:0;box-shadow:none}
