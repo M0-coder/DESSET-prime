@@ -161,7 +161,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  const partnerLayout={columns:getComputedStyle(partnersGrid).gridTemplateColumns.trim().split(/\\s+/).length,gap:parseFloat(getComputedStyle(partnersGrid).gap),
  cards:[...partnersGrid.querySelectorAll(":scope > article")].map(c=>{
   const r=c.getBoundingClientRect(),h=c.querySelector("h3"),p=c.querySelector("p"),a=c.querySelector("a"),s=getComputedStyle(c),ar=a.getBoundingClientRect();
-  return {title:h.textContent.trim(),label:a.textContent.replace("↗","").trim(),href:a.getAttribute("href"),height:r.height,inside:r.left>=partnersBounds.left-2&&r.right<=partnersBounds.right+2,fit:[h,p,a].every(e=>e.scrollWidth<=e.clientWidth+2),tap:ar.height,icon:c.querySelector("svg")?.getAttribute("aria-hidden"),background:s.backgroundColor,border:s.borderTopWidth,radius:parseFloat(s.borderTopLeftRadius),shadow:s.boxShadow,decoration:getComputedStyle(c,"::before").content};
+  return {title:h.textContent.trim(),label:a.textContent.trim(),accessibleLabel:a.getAttribute("aria-label"),buttonBg:getComputedStyle(a).backgroundColor,buttonInk:getComputedStyle(a).color,buttonWidth:ar.width,cardContentWidth:c.clientWidth-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight),href:a.getAttribute("href"),height:r.height,inside:r.left>=partnersBounds.left-2&&r.right<=partnersBounds.right+2,fit:[h,p,a].every(e=>e.scrollWidth<=e.clientWidth+2),tap:ar.height,icon:c.querySelector("svg")?.getAttribute("aria-hidden"),background:s.backgroundColor,border:s.borderTopWidth,radius:parseFloat(s.borderTopLeftRadius),shadow:s.boxShadow,decoration:getComputedStyle(c,"::before").content};
  })};
  const typeSizes={
   heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
@@ -198,7 +198,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    heroCtaInk:style("#inicio .hero-cta").color,
    heroPhotoFallbackBg:style("#inicio .prime-photo-surface").backgroundColor
   };
- return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,participantLayout,servicesLayout,partnerLayout,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,obsoleteServices:!!document.querySelector('.future-services')},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ return {decorativeArrowCount:[...document.querySelectorAll("a,button,summary")].filter(e=>/[↗→➜]/.test(e.textContent)).length,viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,participantLayout,servicesLayout,partnerLayout,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,obsoleteServices:!!document.querySelector('.future-services')},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
@@ -213,7 +213,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    (Number(limeChannels[1])>=.9999&&Number(limeChannels[1])<=1));
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
-   !exactLime||palette.businessCTA!==expectedOriginal||
+   !exactLime||palette.businessCTA!==brandBlue||
    palette.statementAccent!==brandBlue||palette.stageSummaryArrow!==expectedOriginal||
    palette.threeTourButton!==pureWhite||palette.threePauseButton!==pureWhite||
    palette.stageFrame!==paleBlue||palette.stageToolbar!==paleBlue||
@@ -262,12 +262,14 @@ async function viewport(width,height,reduce=false,entry=URL){
    services.cards[1].background!=="rgb(255, 255, 255)"||services.cards[1].borderColor!=="rgb(216, 220, 226)"||services.cards[1].primeColor!=="rgb(21, 81, 216)"||services.cards[1].descriptionColor!=="rgb(65, 65, 65)"||
    Math.abs(services.cards[0].height-services.cards[1].height)>2||Math.abs(services.cards[0].dividerOffset-services.cards[1].dividerOffset)>2)
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
-  const partners=diag.partnerLayout;
+  if(diag.decorativeArrowCount!==0)fails.push("Decorative arrows remain in interactive controls");
+ const partners=diag.partnerLayout;
   if(partners.columns!==(width<=700?1:2)||partners.gap!==(width<=700?12:16)||partners.cards.length!==2||
-   partners.cards.map(c=>c.title).join("|")!=="Vende con DESSET|Reparte con DESSET"||
-   partners.cards.map(c=>c.label).join("|")!=="Contactar como comercio|Contactar como repartidor"||
-   partners.cards.some(c=>!c.inside||!c.fit||c.href!=="#contacto"||c.tap<48||c.icon!=="true"||c.border!=="1px"||c.radius!==20||c.shadow!=="none"||c.height>410||c.decoration!=="none")||
-   partners.cards[0].background!=="rgb(21, 81, 216)"||partners.cards[1].background!=="rgb(255, 255, 255)"||
+   partners.cards.map(c=>c.title).join("|")!=="Comercios|Repartidores"||
+   partners.cards.map(c=>c.label).join("|")!=="Más información|Más información"||
+   partners.cards.map(c=>c.accessibleLabel).join("|")!=="Más información para comercios|Más información para repartidores"||
+   partners.cards.some(c=>!c.inside||!c.fit||c.href!=="#contacto"||c.tap<48||c.icon!=="true"||c.border!=="1px"||c.radius!==20||c.shadow!=="none"||c.height>410||c.decoration!=="none"||c.buttonBg!==brandBlue||c.buttonInk!==pureWhite||Math.abs(c.buttonWidth-c.cardContentWidth)>2)||
+   partners.cards[0].background!==pureWhite||partners.cards[1].background!=="rgb(255, 255, 255)"||
    Math.abs(partners.cards[0].height-partners.cards[1].height)>2)
     fails.push("Partner cards responsive parity: "+JSON.stringify(partners));
   if(width<=700){
@@ -311,7 +313,7 @@ try{
     designSystem.body!=="rgb(247, 245, 238)"||
     designSystem.contact!=="rgb(247, 245, 238)"||
     designSystem.feature!=="rgb(21, 81, 216)"||
-    designSystem.brand!=="rgb(21, 81, 216)"||
+    designSystem.brand!=="rgb(255, 255, 255)"||
     JSON.stringify(designSystem.steps)!==JSON.stringify(expectedSteps))
    report.failures.push("V6.7 computed 60-30-10 palette or four-participant narrative mismatch: "+JSON.stringify(designSystem));
  report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
@@ -402,7 +404,7 @@ try{
  await js('document.querySelector("#negocios").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(350);
  const pitch=await js('(()=>{const section=document.querySelector(".business-pitch");const anchor=section.querySelector("a.business-pitch-cta");return {heading:section.querySelector("h3")?.textContent?.replace(/\\s+/g," ").trim(),href:anchor?.getAttribute("href"),label:anchor?.textContent?.trim(),visible:section.getBoundingClientRect().height>180}})()');
- if(!pitch.visible||pitch.href!=="#contacto"||pitch.heading!=="Vende con DESSET"||!pitch.label.includes("Contactar como comercio"))report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
+ if(!pitch.visible||pitch.href!=="#contacto"||pitch.heading!=="Comercios"||pitch.label!=="Más información")report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
  report.tests.push({name:"Commercial pitch CTA",pitch});
  await capture("desktop-business-pitch.png");
  const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const services=document.querySelector("#soluciones .solutions-grid");const prim=document.querySelector(".contact-primary");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),obsoleteServices:!!document.querySelector(".future-services"),serviceCards:services.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.textContent.trim(),contactTarget:prim.getAttribute("target"),candidateStatus:document.querySelector(".contact-status")?.textContent,headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');

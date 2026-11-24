@@ -15,8 +15,8 @@ test("V4.3: limited public story, no redundant responsibility section and two sh
  const cards=html.match(/<div class="audience-grid audience-grid--compact">([\s\S]*?)<\/div>/);
  assert.ok(cards);
  assert.equal((cards[1].match(/<article class="(?:business-pitch|audience)">/g)||[]).length,2);
- assert.match(cards[1],/<h3>Vende con DESSET<\/h3>/);
- assert.match(cards[1],/<h3>Reparte con DESSET<\/h3>/);
+ assert.match(cards[1],/<h3>Comercios<\/h3>/);
+ assert.match(cards[1],/<h3>Repartidores<\/h3>/);
  assert.doesNotMatch(cards[1],/<h3>Personas|<h3>Aliados|business-pitch-symbol/);
  assert.doesNotMatch(cards[1],/<h3>Negocios\./);
 });
@@ -44,7 +44,7 @@ test("V4.3: hero CTA reaches the unique primary contact path and is accessible",
  assert.equal((hero.match(/<a\b/g)||[]).length,1,"Only one primary hero CTA survives");
  assert.match(html,/class="v63-tour"/);
  assert.match(html,/class="contact-primary" href="https:\/\/www\.instagram\.com\/deliver_assets\/"/);
- assert.match(html,/Instagram <span/);
+ assert.match(html,/Instagram<\/a>/);
  assert.match(css,/\.contact-primary:focus-visible/);
  assert.match(css,/\.contact-primary\{[^}]*min-height:56px/s);
  assert.equal((html.match(/class="contact-primary"/g)||[]).length,1);
@@ -71,4 +71,11 @@ test("V4.3: static assets bounded and CSS has no unclosed blocks/comments",()=>{
  assert.equal(depth,0,"Unclosed CSS rule");
  assert.equal(comment,false,"Unclosed CSS comment");
  assert.equal(quote,null,"Unclosed CSS string");
+});
+
+test("Public controls have no decorative arrows and partner buttons share one visual contract",()=>{
+ for(const m of html.matchAll(/<(a|button|summary)\b[^>]*>([\s\S]*?)<\/\1>/g))assert.doesNotMatch(m[2],/[↗→➜]/);
+ assert.match(html,/class="disclosure-indicator"/);
+ assert.match(css,/\.v4-architecture-details\[open\] summary \.disclosure-indicator/);
+ assert.match(css,/#negocios\.audiences \.audience-grid--compact>article a\{[^}]*background:#1551d8;color:#fff/);
 });

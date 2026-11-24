@@ -60,7 +60,7 @@ test('TikTok and YouTube are each included once in the same accessible five-link
  const nav=html.match(/<nav class="social-links social-links--official" aria-label="Redes sociales de DESSET">([\s\S]*?)<\/nav>/)?.[1];
  assert.ok(nav);
  assert.equal((nav.match(/<a\b/g)||[]).length,5);
- for(const platform of ['Instagram','Facebook','TikTok','YouTube','X'])assert.ok(nav.includes('>'+platform+' <span'),platform);
+ for(const platform of ['Instagram','Facebook','TikTok','YouTube','X'])assert.ok(nav.includes('>'+platform+'</a>'),platform);
  for(const platform of ['TikTok','YouTube'])assert.ok(owner.exact_channels.some(c=>c.platform===platform));
 });
 test('Spoofed TikTok hostname is rejected even if forged in the registry and HTML',()=>{

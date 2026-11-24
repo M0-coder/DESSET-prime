@@ -11,8 +11,8 @@ test("Two direct commercial contact paths replace generic stakeholder cards",()=
  assert.ok(section);
  const cards=[...section.matchAll(/<article class="(business-pitch|audience)">([\s\S]*?)<\/article>/g)];
  assert.deepEqual(cards.map(c=>c[1]),["business-pitch","audience"]);
- assert.match(cards[0][2],/<h3>Vende con DESSET<\/h3>/);
- assert.match(cards[1][2],/<h3>Reparte con DESSET<\/h3>/);
+ assert.match(cards[0][2],/<h3>Comercios<\/h3>/);
+ assert.match(cards[1][2],/<h3>Repartidores<\/h3>/);
  assert.doesNotMatch(section,/¿TU NEGOCIO|<h3>Personas|<h3>Aliados|business-pitch-body|Plantear una colaboración/);
  assert.match(html,/Comercio digital, pedidos y entregas de última milla\./);
  assert.match(html,/no representa una operación activa/i);
@@ -23,11 +23,11 @@ test("Two direct commercial contact paths replace generic stakeholder cards",()=
 test("commercial contact CTA resolves locally and avoids fictitious contact details",()=>{
  const section=html.match(/<section class="audiences" id="negocios"[^>]*>([\s\S]*?)<\/section>/)?.[1];
  assert.ok(section);
- assert.deepEqual([...section.matchAll(/<a class="(?:business-pitch-cta|partner-cta)" href="([^"]+)">([^<]+)/g)].map(c=>[c[1],c[2].trim()]),[["#contacto","Contactar como comercio"],["#contacto","Contactar como repartidor"]]);
+ assert.deepEqual([...section.matchAll(/<a class="(?:business-pitch-cta|partner-cta)" href="([^"]+)" aria-label="([^"]+)">([^<]+)/g)].map(c=>[c[1],c[2],c[3].trim()]),[["#contacto","Más información para comercios","Más información"],["#contacto","Más información para repartidores","Más información"]]);
  assert.match(html,/id="contacto"/);
- assert.match(html,/Instagram <span/);
- assert.match(html,/TikTok <span/);
- assert.match(html,/YouTube <span/);
+ assert.match(html,/Instagram<\/a>/);
+ assert.match(html,/TikTok<\/a>/);
+ assert.match(html,/YouTube<\/a>/);
  assert.match(html,/href="https:\/\/www\.instagram\.com\/deliver_assets\/"/);
  assert.doesNotMatch(html,/<a\b[^>]+href="(?:mailto:|tel:|https:\/\/wa\.me\/)/i,"Cannot invent or publish personal/uncorroborated contact details");
 });
