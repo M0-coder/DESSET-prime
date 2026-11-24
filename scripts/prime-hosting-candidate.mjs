@@ -19,7 +19,7 @@ const EXTRAS=Object.freeze({
  'sitemap.xml':'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>\n',
  '404.html':'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DESSET — Página no encontrada</title></head><body><main><h1>Página no encontrada</h1><p>La dirección solicitada no existe.</p><a href="/">Volver al inicio</a></main></body></html>\n'
 });
-const REQUIRED=['index.html','empresa.html','comercios.html','_headers','scripts/service-state.js','assets/deliver-assets-mark.png','assets/scene-choose.webp','assets/scene-prepare.webp','assets/scene-move.webp','assets/ecosistema-proveedores.webp','assets/ecosistema-comercios.webp','assets/ecosistema-consumidores.webp','assets/ecosistema-operadores-logisticos.webp','assets/v62-commerce.glb','assets/v62-courier.glb','assets/v62-destination.glb',
+const REQUIRED=['index.html','empresa.html','comercios.html','repartidores.html','_headers','scripts/service-state.js','assets/deliver-assets-mark.png','assets/scene-choose.webp','assets/scene-prepare.webp','assets/scene-move.webp','assets/ecosistema-proveedores.webp','assets/ecosistema-comercios.webp','assets/ecosistema-consumidores.webp','assets/ecosistema-operadores-logisticos.webp','assets/v62-commerce.glb','assets/v62-courier.glb','assets/v62-destination.glb',
  'styles-typography.css','fonts/inter-latin-variable.woff2','fonts/plus-jakarta-sans-latin-variable.woff2',
  'fonts/LICENSE-Inter-OFL.txt','fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt'];
 
@@ -60,6 +60,8 @@ function verifyManifest(dist){
  const company=readFileSync(join(dist,'empresa.html'),'utf8');
  const merchant=readFileSync(join(dist,'comercios.html'),'utf8');
  assert(merchant.includes('<meta name="robots" content="noindex,nofollow">')&&!merchant.includes('rel="canonical"'),'Merchant page source indexing changed');
+ const rider=readFileSync(join(dist,'repartidores.html'),'utf8');
+ assert(rider.includes('<meta name="robots" content="noindex,nofollow">')&&!rider.includes('rel="canonical"'),'Rider page source indexing changed');
  assert(company.includes('<meta name="robots" content="noindex,nofollow">')&&!company.includes('rel="canonical"'),'Company page source indexing changed');
  assert(html.includes('<meta name="robots" content="noindex,nofollow">'),'source noindex changed');
  assert(!/rel="canonical"/.test(html),'source canonical unexpectedly present');
@@ -94,7 +96,7 @@ export function preparePrimeHosting({dist,sourceSha,mode}){
    mkdirSync(dirname(dst),{recursive:true});copyFileSync(src,dst,constants.COPYFILE_EXCL);
    let bytes=readFileSync(dst);
    assert(bytes.length===item.bytes&&sha256(bytes)===item.sha256,'copy content changed during transfer: '+item.path);
-   if(['index.html','empresa.html','comercios.html'].includes(item.path)){
+   if(['index.html','empresa.html','comercios.html','repartidores.html'].includes(item.path)){
     const upgraded=Buffer.from(stageHtml(bytes.toString('utf8'),item.path==='index.html'?BASE_ORIGIN:BASE_ORIGIN+item.path.replace(/\.html$/,'')));
     writeFileSync(dst,upgraded);bytes=upgraded;
    }
@@ -122,6 +124,8 @@ export function preparePrimeHosting({dist,sourceSha,mode}){
   assert(stagedHtml.includes('<meta name="robots" content="noindex,nofollow">')&&stagedHtml.includes('rel="canonical" href="'+BASE_ORIGIN+'"'),'staging robots/canonical gate');
   const stagedMerchant=readFileSync(join(publicDir,'comercios.html'),'utf8');
   assert(stagedMerchant.includes('name="robots" content="noindex,nofollow"')&&stagedMerchant.includes('rel="canonical" href="https://desset.lat/comercios"'),'Merchant page canonical or indexing gate');
+  const stagedRider=readFileSync(join(publicDir,'repartidores.html'),'utf8');
+  assert(stagedRider.includes('name="robots" content="noindex,nofollow"')&&stagedRider.includes('rel="canonical" href="https://desset.lat/repartidores"'),'Rider page canonical or indexing gate');
   const stagedCompany=readFileSync(join(publicDir,'empresa.html'),'utf8');
   assert(stagedCompany.includes('name="robots" content="noindex,nofollow"')&&stagedCompany.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or indexing gate');
   const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');

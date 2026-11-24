@@ -13,7 +13,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(['INDEX','NOINDEX'].includes(seoPolicy)&&seoPolicy===m.seo_policy,'SEO policy differs');
  check(m.project==='desset-institucional'&&m.canonical==='https://desset.lat/','Wrong Pages destination');
  check(m.production_authorized===false&&m.production_deployed===false,'Report attempts to authorize production');
- check(m.original_files===37&&m.package_files===41&&Array.isArray(m.assets)&&m.assets.length===41,'Missing/extra source assets');
+ check(m.original_files===38&&m.package_files===42&&Array.isArray(m.assets)&&m.assets.length===42,'Missing/extra source assets');
  check(hash(Buffer.from(JSON.stringify(m.assets)))===m.assets_manifest_sha256,'Manifest SHA changed');
  const want=new Map(),seen=new Set();
  for(const a of m.assets){
@@ -30,7 +30,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
    else {check(stat.isFile()&&!seen.has(rel),'Not a regular file: '+rel);seen.add(rel);}
   }
  }
- scan(publicDir);check(seen.size===41,'Unexpected file count');
+ scan(publicDir);check(seen.size===42,'Unexpected file count');
  for(const path of seen)check(want.has(path),'Unexpected file: '+path);
  for(const [path,spec] of want){
   check(seen.has(path),'Missing file: '+path);
@@ -49,6 +49,8 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  const html=readFileSync(join(publicDir,'index.html'),'utf8');
  const merchant=readFileSync(join(publicDir,'comercios.html'),'utf8');
  check(merchant.includes('name="robots" content="noindex,nofollow"')&&merchant.includes('rel="canonical" href="https://desset.lat/comercios"'),'Merchant page canonical or noindex changed');
+ const rider=readFileSync(join(publicDir,'repartidores.html'),'utf8');
+ check(rider.includes('name="robots" content="noindex,nofollow"')&&rider.includes('rel="canonical" href="https://desset.lat/repartidores"'),'Rider page canonical or noindex changed');
  const company=readFileSync(join(publicDir,'empresa.html'),'utf8');
  check(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or noindex changed');
  const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');
@@ -70,7 +72,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  }
  const status=readFileSync(join(publicDir,'scripts/service-state.js'),'utf8');
  check(status.includes('applicationDistribution:"not_published"')&&status.includes('verified:false'),'Application status changed');
- return {result:'PASS',source_sha:sourceSha,seo:seoPolicy,files:41,production_authorized:false,production_deployed:false};
+ return {result:'PASS',source_sha:sourceSha,seo:seoPolicy,files:42,production_authorized:false,production_deployed:false};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{const [publicDir,reportPath,sourceSha,seoPolicy]=process.argv.slice(2);

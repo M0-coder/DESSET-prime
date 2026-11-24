@@ -3,18 +3,21 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 const read=p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 for(const dir of ["","dist/"]){
- test("MERCHANT-01 informational journey, no active commerce or data collection ("+(dir||"source")+")",()=>{
-  const home=read(dir+"index.html"),merchant=read(dir+"comercios.html");
-  assert.match(home,/class="business-pitch-cta" href="\.\/comercios\.html"/);
-  assert.match(home,/class="partner-cta" href="#contacto"/);
-  assert.match(merchant,/<h1>Comercios<\/h1>/);
-  for(const id of ["modelo","preparacion","condiciones","incorporacion","preguntas","canales-oficiales"])assert.equal((merchant.match(new RegExp('id="'+id+'"','g'))||[]).length,1);
-  assert.match(merchant,/no una operación activa/);
-  assert.match(merchant,/Las comisiones, zonas de cobertura, liquidaciones y responsabilidades se comunicarán cuando estén aprobadas/);
-  assert.match(merchant,/no recibe solicitudes de alta, documentación, pedidos ni pagos/);
-  assert.match(merchant,/name="robots" content="noindex,nofollow"/);
-  assert.match(merchant,/form-action 'none'/);
-  assert.doesNotMatch(merchant,/<(?:form|input|script|iframe)\b/i);
-  assert.match(merchant,/href="#canales-oficiales"/);
+ for(const [page,headline,cta] of [["comercios","TU NEGOCIO, MÁS ALLÁ DE SUS PUERTAS","business-pitch-cta"],["repartidores","CADA ENTREGA CONECTA UNA HISTORIA","partner-cta"]]){
+ test("Audience page "+page+" presentation and institutional safety ("+(dir||"source")+")",()=>{
+ const home=read(dir+"index.html"),html=read(dir+page+".html");
+ assert.ok(home.includes('class="'+cta+'" href="./'+page+'.html"'));
+ assert.ok(html.includes('<h1 id="audience-title">'+headline+'</h1>'));
+ for(const id of ["presentacion","beneficios","modelo","incorporacion","preguntas","canales-oficiales"])assert.equal((html.match(new RegExp('id="'+id+'"','g'))||[]).length,1);
+ assert.equal((html.match(/class="ap-card"/g)||[]).length,3);
+ assert.equal((html.match(/class="ap-step"/g)||[]).length,4);
+ assert.equal((html.match(/<details>/g)||[]).length,3);
+ assert.match(html,/no representa una operación activa/);
+ assert.match(html,/cuando estén aprobados/);
+ assert.match(html,/name="robots" content="noindex,nofollow"/);
+ assert.match(html,/form-action 'none'/);
+ assert.doesNotMatch(html,/<(?:form|input|script|iframe)\b/i);
+ assert.match(html,/href="#canales-oficiales"/);
  });
+ }
 }

@@ -14,9 +14,9 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(/^[a-f0-9]{40}$/.test(expectedSha)&&info.origin_sha===expectedSha&&info.checkout_sha===expectedSha,'SHA mismatch');
  check(info.release_authorized===false&&info.release_decision==='NO-GO','not an offline-only candidate');
  check(info.noindex===true&&info.robots_disallow_all===true,'indexing policy changed');
- check(info.original_files===37&&info.staged_files===40,'package shape mismatch');
+ check(info.original_files===38&&info.staged_files===41,'package shape mismatch');
  check(info.repeated_packaging_identical===true&&info.independently_compiled_twice===false,'evidence claims changed');
- check(Array.isArray(info.files)&&info.files.length===40,'missing per-asset manifest');
+ check(Array.isArray(info.files)&&info.files.length===41,'missing per-asset manifest');
  check(sha(Buffer.from(JSON.stringify(info.files)))===info.artifacts_sha256,'manifest checksum mismatch');
  const expected=new Map(),actual=new Set();let total=0;
  for(const f of info.files){
@@ -45,6 +45,8 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  const html=readFileSync(join(publicDir,'index.html'),'utf8');
  const merchant=readFileSync(join(publicDir,'comercios.html'),'utf8');
  check(merchant.includes('name="robots" content="noindex,nofollow"')&&merchant.includes('rel="canonical" href="https://desset.lat/comercios"'),'Merchant page canonical or noindex changed');
+ const rider=readFileSync(join(publicDir,'repartidores.html'),'utf8');
+ check(rider.includes('name="robots" content="noindex,nofollow"')&&rider.includes('rel="canonical" href="https://desset.lat/repartidores"'),'Rider page canonical or noindex changed');
  const company=readFileSync(join(publicDir,'empresa.html'),'utf8');
  check(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or noindex changed');
  const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');

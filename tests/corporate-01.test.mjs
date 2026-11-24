@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import {createHash} from "node:crypto";
 const root=new URL("../",import.meta.url),read=p=>readFileSync(new URL(p,root),"utf8");
-const pages=["index.html","empresa.html","comercios.html"];
+const pages=["index.html","empresa.html","comercios.html","repartidores.html"];
 const approved=new Map(JSON.parse(read("config/prime-social-owner-attestation.json")).exact_channels.map(c=>[c.url,c.platform]));
 for(const dir of ["","dist/"]){
  test("Corporate links resolve in "+(dir||"source"),()=>{
@@ -13,7 +13,7 @@ for(const dir of ["","dist/"]){
    for(const m of doc.matchAll(/<a\b[^>]*href="([^"]+)"/g)){
     const href=m[1];
     if(href.startsWith("https://")){assert.ok(approved.has(href));continue}
-    const match=href.match(/^(?:\.\/(index|empresa|comercios)\.html)?(?:#([a-z0-9-]+))?$/);
+    const match=href.match(/^(?:\.\/(index|empresa|comercios|repartidores)\.html)?(?:#([a-z0-9-]+))?$/);
     assert.ok(match,"Unapproved route "+href);
     const target=docs[match[1]?match[1]+".html":name];
     assert.ok(target);

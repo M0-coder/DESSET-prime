@@ -274,7 +274,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    partners.cards.map(c=>c.title).join("|")!=="Comercios|Repartidores"||
    partners.cards.map(c=>c.label).join("|")!=="Más información|Más información"||
    partners.cards.map(c=>c.accessibleLabel).join("|")!=="Más información para comercios|Más información para repartidores"||
-   partners.cards.some(c=>!c.inside||!c.fit||c.href!==(c.title==="Comercios"?"./comercios.html":"#contacto")||c.tap<48||c.icon!=="true"||c.border!=="1px"||c.radius!==20||c.shadow!=="none"||c.height>410||c.decoration!=="none"||c.buttonBg!==brandBlue||c.buttonInk!==pureWhite||Math.abs(c.buttonWidth-c.cardContentWidth)>2)||
+   partners.cards.some(c=>!c.inside||!c.fit||c.href!==(c.title==="Comercios"?"./comercios.html":"./repartidores.html")||c.tap<48||c.icon!=="true"||c.border!=="1px"||c.radius!==20||c.shadow!=="none"||c.height>410||c.decoration!=="none"||c.buttonBg!==brandBlue||c.buttonInk!==pureWhite||Math.abs(c.buttonWidth-c.cardContentWidth)>2)||
    partners.cards[0].background!==pureWhite||partners.cards[1].background!=="rgb(255, 255, 255)"||
    Math.abs(partners.cards[0].height-partners.cards[1].height)>2)
     fails.push("Partner cards responsive parity: "+JSON.stringify(partners));
@@ -642,18 +642,20 @@ try{
   }
  }
 
- // Merchant page must be reachable, responsive and identical in source and dist.
+ // Audience pages must be responsive and available in source and dist.
+ for(const page of ["comercios","repartidores"]){
  for(const root of ["","dist/"]){
   for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
    await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
-   await call("Page.navigate",{url:pathToFileURL(resolve(root+"comercios.html")).href});
-   await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.company-page')"),"merchant page render");
+   await call("Page.navigate",{url:pathToFileURL(resolve(root+page+".html")).href});
+   await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.audience-page')"),"audience page render");
    await js('document.fonts.ready');
-   const merchant=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content,forms:document.querySelectorAll("form,input,iframe").length,channelLinks:document.querySelectorAll("#canales-oficiales a").length,cta:document.querySelector("#incorporacion a").getAttribute("href"),visible:[...document.querySelectorAll("main h1,main h2,main p,main li")].every(e=>e.getBoundingClientRect().width>0&&e.scrollWidth<=e.clientWidth+2)}})()`);
-   if(merchant.title!=="Comercios"||merchant.sections.join("|")!=="modelo|preparacion|condiciones|incorporacion|preguntas"||merchant.scroll>merchant.width+2||merchant.home!=="./index.html"||merchant.robots!=="noindex,nofollow"||merchant.forms||merchant.channelLinks!==5||merchant.cta!=="#canales-oficiales"||!merchant.visible)report.failures.push("MERCHANT-01 "+root+w+": "+JSON.stringify(merchant));
-   await capture((root?"dist-":"source-")+"merchant-"+w+"px.png",true);
-   report.tests.push({name:"Merchant page "+root+w,merchant});
+   const merchant=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content,forms:document.querySelectorAll("form,input,iframe").length,channelLinks:document.querySelectorAll("#canales-oficiales a").length,cta:document.querySelector("#incorporacion a").getAttribute("href"),visible:[...document.querySelectorAll("main h1,main h2,main p,main li")].every(e=>(e.closest("details:not([open])")||e.getBoundingClientRect().width>0&&e.scrollWidth<=e.clientWidth+2))}})()`);
+   if(merchant.title!==(page==="comercios"?"TU NEGOCIO, MÁS ALLÁ DE SUS PUERTAS":"CADA ENTREGA CONECTA UNA HISTORIA")||merchant.sections.join("|")!=="presentacion|beneficios|modelo|incorporacion|preguntas"||merchant.scroll>merchant.width+2||merchant.home!=="./index.html"||merchant.robots!=="noindex,nofollow"||merchant.forms||merchant.channelLinks!==5||merchant.cta!=="#canales-oficiales"||!merchant.visible)report.failures.push("MERCHANT-01 "+root+w+": "+JSON.stringify(merchant));
+   await capture((root?"dist-":"source-")+page+"-"+w+"px.png",true);
+   report.tests.push({name:"Audience page "+page+" "+root+w,merchant});
   }
+ }
  }
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
