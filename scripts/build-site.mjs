@@ -17,7 +17,7 @@ const compiled=["assets/v6-three.bundle.js",
 const typefaces=["fonts/inter-latin-variable.woff2","fonts/plus-jakarta-sans-latin-variable.woff2",
  "fonts/LICENSE-Inter-OFL.txt","fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt"];
 const files=[
- "index.html","empresa.html","comercios.html","repartidores.html","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-typography.css","_headers",
+ "index.html","empresa.html","comercios.html","repartidores.html","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-typography.css","styles-audiences.css","_headers",
  "scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js",
  ...allowStatic,...compiled,...typefaces
 ].sort();
@@ -41,7 +41,7 @@ if(!loader.includes('activationObserver.observe(stage)')||
  throw Error("Viewport-activated 3D scene is not connected to bundled WebGL or manual fallback.");
 if(files.length>40)throw Error("Too many release files for DESSET Prime: "+files.length);
 for(const path of files){
- if(path.split("/").includes("..") || !(path==="assets/v6-three.bundle.js" || /^(?:(?:index|empresa|comercios|repartidores)\.html|styles(?:-v5|-system|-hero-photo|-visual02|-typography)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb)|fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2|fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt)$/.test(path)))
+ if(path.split("/").includes("..") || !(path==="assets/v6-three.bundle.js" || /^(?:(?:index|empresa|comercios|repartidores)\.html|styles(?:-v5|-system|-hero-photo|-visual02|-typography|-audiences)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb)|fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2|fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt)$/.test(path)))
    throw Error("Unexpected package path: "+path);
  const info=await stat(resolve(root,path));
  if(!info.isFile()||info.size===0)throw Error("Required website file missing/empty: "+path);

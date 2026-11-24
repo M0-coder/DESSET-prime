@@ -18,6 +18,11 @@ for(const dir of ["","dist/"]){
  assert.match(html,/form-action 'none'/);
  assert.doesNotMatch(html,/<(?:form|input|script|iframe)\b/i);
  assert.match(html,/href="#canales-oficiales"/);
+ assert.ok(html.includes('href="./styles-audiences.css"'));
+ assert.ok(!home.includes("styles-audiences.css"));
+ assert.ok(!read(dir+"empresa.html").includes("styles-audiences.css"));
+ assert.ok(Buffer.byteLength(read(dir+"styles-audiences.css"),"utf8")<4500);
+ assert.doesNotMatch(read(dir+"styles-audiences.css"),/@import\b|url\(\s*['"]?https?:/i);
  });
  }
 }

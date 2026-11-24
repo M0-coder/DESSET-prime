@@ -20,7 +20,7 @@ const EXTRAS=Object.freeze({
  '404.html':'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DESSET — Página no encontrada</title></head><body><main><h1>Página no encontrada</h1><p>La dirección solicitada no existe.</p><a href="/">Volver al inicio</a></main></body></html>\n'
 });
 const REQUIRED=['index.html','empresa.html','comercios.html','repartidores.html','_headers','scripts/service-state.js','assets/deliver-assets-mark.png','assets/scene-choose.webp','assets/scene-prepare.webp','assets/scene-move.webp','assets/ecosistema-proveedores.webp','assets/ecosistema-comercios.webp','assets/ecosistema-consumidores.webp','assets/ecosistema-operadores-logisticos.webp','assets/v62-commerce.glb','assets/v62-courier.glb','assets/v62-destination.glb',
- 'styles-typography.css','fonts/inter-latin-variable.woff2','fonts/plus-jakarta-sans-latin-variable.woff2',
+ 'styles-typography.css','styles-audiences.css','fonts/inter-latin-variable.woff2','fonts/plus-jakarta-sans-latin-variable.woff2',
  'fonts/LICENSE-Inter-OFL.txt','fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt'];
 
 function safeName(name){return typeof name==='string'&&(/^[a-z0-9_.\/-]+$/.test(name)||/^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(name))&&!name.startsWith('/')&&!name.split('/').some(part=>!part||part==='.'||part==='..');}

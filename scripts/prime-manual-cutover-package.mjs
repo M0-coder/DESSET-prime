@@ -11,7 +11,7 @@ import {preparePrimeHosting} from './prime-hosting-candidate.mjs';
 import {generateThirdPartyNotices} from './prime-third-party-notices.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const sha256=b=>createHash('sha256').update(b).digest('hex');
-const requiredSpecial=['index.html','empresa.html','comercios.html','repartidores.html','_headers','robots.txt','sitemap.xml','404.html','THIRD-PARTY-NOTICES.txt',
+const requiredSpecial=['index.html','empresa.html','comercios.html','repartidores.html','styles-audiences.css','_headers','robots.txt','sitemap.xml','404.html','THIRD-PARTY-NOTICES.txt',
  'fonts/LICENSE-Inter-OFL.txt','fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt'];
 const assert=(condition,message)=>{if(!condition)throw Error('NO-GO: '+message)};
 const canonical='https://desset.lat/';
@@ -64,7 +64,7 @@ export function preparePrimeCutoverPackage({dist,sourceSha,seoPolicy,outputDir,e
      if(st.isDirectory())scan(full,rel);else{assert(st.isFile(),'Not a regular file in package');paths.push(rel);}
    }
   }scan(output);
-  assert(paths.length===42&&paths.every(x=>expected.has(x)),'Unexpected candidate inventory');
+  assert(paths.length===43&&paths.every(x=>expected.has(x)),'Unexpected candidate inventory');
   for(const path of requiredSpecial)assert(paths.includes(path),'Missing required static host policy '+path);
   const modifiable=new Set(['index.html','_headers','robots.txt','sitemap.xml','THIRD-PARTY-NOTICES.txt']);
   const inventory=paths.sort().map(path=>{
