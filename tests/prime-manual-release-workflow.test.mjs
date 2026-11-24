@@ -68,9 +68,11 @@ test('live Cloudflare state checked twice before the one real Pages mutation',()
  assert.equal(deployLines.length,1,"Exactly one mutation command, excluding --help probe");
 });
 test('release checks both domains and static security/rollback handling',()=>{
- assert.match(job,/https:\/\/desset\.lat\//);
- assert.match(job,/https:\/\/www\.desset\.lat\//);
- assert.match(job,/content-security-policy:/);
+ const live=readFileSync(root+'/scripts/prime-live-verification.mjs','utf8');
+ assert.match(job,/node scripts\/prime-live-verification\.mjs/);
+ assert.ok(live.includes('https://desset.lat')&&live.includes('https://www.desset.lat'));
+ assert.ok(live.includes('content-security-policy'));
+ assert.match(live,/method:'GET'/);
  assert.match(job,/NO automatic rollback/);
  assert.ok(job.includes('SEO_POLICY: NOINDEX'));
  assert.ok(!doc.includes('inputs.seo_policy'));
