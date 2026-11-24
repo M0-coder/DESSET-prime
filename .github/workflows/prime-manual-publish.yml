@@ -81,6 +81,8 @@ jobs:
             "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof"
           node scripts/verify-prime-manual-package.mjs \
             "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof/prime-manual-release-package.json" "$SOURCE_SHA" NOINDEX
+      - name: Test public verifier without networking
+        run: node --test tests/prime-live-verification.test.mjs
       - name: Preserve the verified manual package for review (NOT permission to publish)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -249,30 +251,9 @@ jobs:
             sleep 5
           done
       - name: Check public HTTPS, resources, SEO policy, CSP and 404
-        env:
-          SEO_POLICY: NOINDEX
         run: |
           set -euo pipefail
-          curl --retry 4 --retry-delay 3 --fail-with-body -sSL https://desset.lat/ -o "$RUNNER_TEMP/prime-live.html"
-          grep -Fq 'DESSET — Comercio en movimiento' "$RUNNER_TEMP/prime-live.html"
-          grep -Fq 'rel="canonical" href="https://desset.lat/"' "$RUNNER_TEMP/prime-live.html"
-          if [ "$SEO_POLICY" = INDEX ]; then
-            grep -Fq 'name="robots" content="index,follow"' "$RUNNER_TEMP/prime-live.html"
-          else
-            grep -Fq 'name="robots" content="noindex,nofollow"' "$RUNNER_TEMP/prime-live.html"
-          fi
-          for file in THIRD-PARTY-NOTICES.txt robots.txt sitemap.xml styles.css styles-v5.css styles-system.css styles-hero-photo.css styles-visual02.css scripts/app.js scripts/motion.js scripts/v5-cinematic.js scripts/service-state.js assets/deliver-assets-mark.png assets/scene-move.webp assets/ecosistema-proveedores.webp assets/ecosistema-comercios.webp assets/ecosistema-consumidores.webp assets/ecosistema-operadores-logisticos.webp assets/v62-courier.glb; do
-            mkdir -p "$RUNNER_TEMP/live/$(dirname "$file")"
-            curl --retry 4 --retry-delay 3 --fail-with-body -sSL "https://desset.lat/$file" -o "$RUNNER_TEMP/live/$file"
-            cmp -s "$RUNNER_TEMP/prime-manual-public/$file" "$RUNNER_TEMP/live/$file"
-          done
-          curl --fail-with-body -sSL https://www.desset.lat/ -o "$RUNNER_TEMP/prime-www.html"
-          grep -Fq 'DESSET — Comercio en movimiento' "$RUNNER_TEMP/prime-www.html"
-          status="$(curl --silent --show-error -L -o /dev/null -w '%{http_code}' https://desset.lat/__desset_prime_missing_path__)"
-          test "$status" = "404"
-          curl -fsSI https://desset.lat/ -o "$RUNNER_TEMP/prime-live-headers.txt"
-          grep -iq '^content-security-policy:' "$RUNNER_TEMP/prime-live-headers.txt"
-          echo "PUBLIC LIVE SMOKE PASS at exactly $GITHUB_SHA"
+          node scripts/prime-live-verification.mjs "$RUNNER_TEMP/prime-manual-public" "$RUNNER_TEMP/prime-manual-proof/prime-manual-release-package.json"
       - name: Emergency rollback instructions if live checks fail (NO automatic rollback)
         if: failure() && steps.prime_publish.outcome == 'success'
         run: |
