@@ -301,12 +301,10 @@ try{
   report.failures.push("VISUAL-02 institutional editorial consistency regression: "+JSON.stringify(visual02));
  report.tests.push({name:"VISUAL-02 corporate style, approved hero and responsive safety",visual02});
 
- const appAccess=await js('(()=>{const p=document.querySelector("[data-service-access]");const status=p?.querySelector("[data-service-status]");const links=p?.querySelector("[data-app-links]");return {found:!!p,availability:p?.dataset.applicationAvailability,status:status?.textContent.trim(),liveLinks:links?.querySelectorAll("a").length,linksHidden:links?.hidden,role:status?.getAttribute("role")}})()');
- if(!appAccess.found||appAccess.availability!=="not-published"||
-   appAccess.status!=="Acceso público no habilitado"||
-   !appAccess.linksHidden||appAccess.liveLinks!==0||appAccess.role!=="status")
-   report.failures.push("V6.9 web wrongly claims live app availability: "+JSON.stringify(appAccess));
- report.tests.push({name:"V6.9 enterprise services remain permanent, app availability remains truthful",appAccess});
+ const appAccess=await js('(()=>{const s=document.querySelector("#soluciones");return {panel:!!document.querySelector("[data-service-access],.service-access,[data-service-status],[data-app-links]"),obsoleteText:/APLICACIONES DESSET|Acceso público no habilitado/.test(s.textContent),storeLinks:[...document.querySelectorAll("a[href]")].filter(a=>["play.google.com","apps.apple.com"].includes(new URL(a.href).hostname)).length,cards:s.querySelectorAll(".solutions-grid article.service").length}})()');
+ if(appAccess.panel||appAccess.obsoleteText||appAccess.storeLinks!==0||appAccess.cards!==2)
+   report.failures.push("Services must contain only the two brands, no app availability panel or store links: "+JSON.stringify(appAccess));
+ report.tests.push({name:"Two service cards only; app availability panel absent and no unverified store links",appAccess});
  const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),photoLoaded:document.querySelector("#inicio .prime-photo-image")?.complete}))()');
  if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<50||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png")||!kineticIntro.photoLoaded)report.failures.push("V4.5 visible hero/photo and original brand failed: "+JSON.stringify(kineticIntro));
  report.tests.push({name:"V4.5 visible headline, photograph and original mark",kineticIntro});

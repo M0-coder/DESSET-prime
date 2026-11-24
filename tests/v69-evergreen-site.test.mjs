@@ -31,7 +31,7 @@ test("V6.9 describes services as a lasting institutional identity, not as a star
  assert.doesNotMatch(html,/UN ECOSISTEMA, TRES PILARES/);
  assert.match(html,/class="business-pitch"/);
  for(const phrase of ["Comercio y delivery","Logística integral","Paquetería, transporte y distribución de mercancías",
- "PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS","APLICACIONES DESSET"])
+ "PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"])
   assert.ok(html.includes(phrase),"Missing institutional service facet "+phrase);
  assert.doesNotMatch(html,/Proyecto en desarrollo|En construcción|En desarrollo: una plataforma|Horizonte futuro|antes del lanzamiento|validar necesidades con comercios|estamos construyendo un sistema/i);
  assert.equal((html.match(/<section\b/g)||[]).length,6);
@@ -42,14 +42,19 @@ test("V6.9 describes services as a lasting institutional identity, not as a star
 test("V6.9 keeps website informational, operations gated to apps, no invented launch",()=>{
  assert.match(html,/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET cuando estén habilitadas/);
  assert.match(html,/Este sitio no procesa pedidos ni pagos/);
- assert.match(html,/data-service-status role="status" aria-live="polite">Acceso público no habilitado/);
- assert.match(html,/data-app-links hidden/);
+ assert.doesNotMatch(html,/data-service-access|data-service-status|data-app-links|APLICACIONES DESSET|Acceso público no habilitado/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.equal((html.match(/data-channel-review="owner-attested" data-channel-basis="owner-attested"/g)||[]).length,5);
  assert.doesNotMatch(html,/<form\b|<iframe\b|href="https?:\/\/(?:play\.google\.com|apps\.apple\.com|wa\.me)/i);
  assert.match(control,/applicationDistribution:"not_published"/);
  assert.match(control,/verified:false/);
  assert.doesNotMatch(control,/fetch\s*\(|localStorage|XMLHttpRequest|sendBeacon/);
+});
+test("Inactive application controller is a no-op with no public panel",()=>{
+ let queries=0;
+ const document={querySelector(sel){assert.equal(sel,"[data-service-access]");queries++;return null},createElement(){throw new Error("Unexpected public UI creation")}};
+ vm.runInNewContext(control,{document,URL},{timeout:700});
+ assert.equal(queries,1);
 });
 test("V6.9 default availability controller never falsely displays applications as launched",()=>{
  const result=simulate();
@@ -92,6 +97,7 @@ test("V6.9 actual web package and UI contains the single activation point",()=>{
  assert.match(css,/@media\(max-width:700px\)/);
  const built=read("dist/index.html");
  assert.ok(built.includes('src="./scripts/service-state.js"'));
+ assert.doesNotMatch(built,/data-service-access|data-service-status|data-app-links|APLICACIONES DESSET|Acceso público no habilitado/);
  assert.equal(read("dist/scripts/service-state.js"),control);
  const manifest=JSON.parse(read("dist/site-manifest.json"));
  assert.ok(manifest.files.some(x=>x.path==="scripts/service-state.js"));
