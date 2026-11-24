@@ -145,10 +145,10 @@ async function viewport(width,height,reduce=false){
  const servicesGrid=document.querySelector("#soluciones .solutions-grid");
  const servicesBounds=servicesGrid.getBoundingClientRect();
  const servicesLayout={columns:getComputedStyle(servicesGrid).gridTemplateColumns.trim().split(/\\s+/).length,
-  title:document.querySelector("#solutions-title")?.textContent.trim(),
+  headingAbsent:!document.querySelector("#soluciones > h2"),label:document.querySelector("#soluciones").getAttribute("aria-label"),
   cards:[...servicesGrid.querySelectorAll("article.service")].map(c=>{
    const r=c.getBoundingClientRect(),h=c.querySelector("h3"),p=c.querySelector("p"),s=c.querySelector("strong");
-   return {brand:h.textContent.trim(),service:s.textContent.trim(),copy:p.textContent.trim(),
+   return {brand:h.textContent.trim(),service:s.textContent.trim(),copy:p.textContent.trim(),centered:getComputedStyle(h).textAlign==="center"&&getComputedStyle(h).alignItems==="center"&&getComputedStyle(h).justifyContent==="center",brandHeight:h.getBoundingClientRect().height,primeStack:!h.querySelector("span")||getComputedStyle(h.querySelector("span")).display==="block",
     visible:r.height>100&&getComputedStyle(c).visibility!=="hidden",
     inside:r.left>=servicesBounds.left-2&&r.right<=servicesBounds.right+2,
     fits:[h,p,s].every(e=>e.scrollWidth<=e.clientWidth+2),height:r.height,
@@ -244,10 +244,10 @@ async function viewport(width,height,reduce=false){
   participants.cards.some((c,i)=>c.title!==expectedParticipantTitles[i]||c.src!==expectedParticipantFiles[i]||!c.alt||c.lazy!=="lazy"||!c.inside||!c.fits||Math.abs(c.photoRatio-1.5)>.03||c.fit!=="cover"||c.titleFont<17||c.copyFont<14))
   fails.push("ECOSYSTEM-PARTICIPANTS-01 responsive layout, card order or text clipping: "+JSON.stringify(participants));
   const services=diag.servicesLayout;
-  if(services.title!=="Servicios"||services.columns!==(width<=700?1:2)||services.cards.length!==2||
+  if(!services.headingAbsent||services.label!=="Servicios y aplicaciones DESSET"||services.columns!==(width<=700?1:2)||services.cards.length!==2||
    services.cards.map(c=>c.brand).join("|")!=="DESSET|DESSET prime"||
    services.cards.map(c=>c.service).join("|")!=="Comercio y delivery|Logística integral"||
-   services.cards.some(c=>!c.visible||!c.inside||!c.fits||c.copyFont<15||c.copy.length<30)||
+   services.cards.some(c=>!c.visible||!c.inside||!c.fits||!c.centered||!c.primeStack||c.brandHeight<100||c.copyFont<15||c.copy.length<30)||
    (width>700&&Math.abs(services.cards[0].height-services.cards[1].height)>2))
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
   if(width<=700){
@@ -297,7 +297,7 @@ try{
  report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
  const visual02=await js('(()=>{const q=s=>document.querySelector(s);const cs=s=>getComputedStyle(q(s));return {cssLoaded:[...document.styleSheets].some(x=>x.href?.endsWith("/styles-visual02.css")),heroPhoto:q("#inicio .prime-photo-image")?.getAttribute("src"),heroLogo:q(".site-header .brand-mark")?.getAttribute("src"),heroCTA:q("#inicio .hero-cta")?.getAttribute("href"),businessShadow:cs("#negocios .business-pitch").boxShadow,storyBorder:cs("#ecosistema .ecosystem-board").borderTopColor,serviceTop:cs("#soluciones .service--main").borderTopWidth,trustBg:cs("#vision").backgroundColor,mobileSafe:document.documentElement.scrollWidth<=document.documentElement.clientWidth+2}})()');
  if(!visual02.cssLoaded||!visual02.heroPhoto?.endsWith("desset-hero-entrega-dos-espejos.webp")||!visual02.heroLogo?.endsWith("deliver-assets-mark.png")||visual02.heroCTA!=="#contacto"||
-   visual02.serviceTop!=="5px"||visual02.trustBg!=="rgb(244, 248, 254)"||!visual02.mobileSafe)
+   visual02.serviceTop!=="1px"||visual02.trustBg!=="rgb(244, 248, 254)"||!visual02.mobileSafe)
   report.failures.push("VISUAL-02 institutional editorial consistency regression: "+JSON.stringify(visual02));
  report.tests.push({name:"VISUAL-02 corporate style, approved hero and responsive safety",visual02});
 

@@ -23,7 +23,10 @@ test("V4.3: limited public story, no redundant responsibility section and two sh
 test("Two independent visible service brands without implied availability",()=>{
  const services=html.match(/<section class="solutions"[^>]*>([\s\S]*?)<\/section>/)?.[1];
  assert.ok(services);
- assert.match(services,/<h2 id="solutions-title" class="solutions-title">Servicios<\/h2>/);
+ assert.doesNotMatch(services,/<h2\b|solutions-title/);
+ assert.match(html,/<section class="solutions" id="soluciones" aria-label="Servicios y aplicaciones DESSET">/);
+ assert.match(css,/#soluciones \.service \.service-body h3\{[^}]*align-items:center;justify-content:center;text-align:center/);
+ assert.match(css,/#soluciones \.service--prime h3 span\{display:block/);
  const cards=[...services.matchAll(/<article class="service service--(main|prime)">([\s\S]*?)<\/article>/g)];
  assert.deepEqual(cards.map(c=>c[1]),["main","prime"]);
  assert.match(cards[0][2],/<h3>DESSET<\/h3>[\s\S]*?<strong>Comercio y delivery<\/strong>/);
