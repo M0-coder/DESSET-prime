@@ -1,0 +1,90 @@
+{
+  "schema": "desset-prime-selected-media-v1",
+  "scope": "ECOSYSTEM-PARTICIPANTS-01; selected images, not part of exclusive ownership declaration",
+  "individual_license_review_complete": false,
+  "release_authorized": false,
+  "assets": [
+    {
+      "path": "assets/ecosistema-proveedores.webp",
+      "sha256": "bc4c3e9301659949b65373eeeffccb1fddd9b5c67bdbeb8598a511a79dc98170",
+      "bytes": 224402,
+      "claim": "third-party",
+      "author": "Adem Albayrak",
+      "source": "https://www.pexels.com/cs-cz/foto/letecky-pohled-na-sklizen-dyni-na-farme-40236120/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "verification": "source-identified",
+      "source_id": "40236120"
+    },
+    {
+      "path": "assets/ecosistema-comercios.webp",
+      "sha256": "3370bbb94434edf705b2144bd86f1b60aba1b39f1989d58a5a187dca1b6ff2c2",
+      "bytes": 186760,
+      "claim": "third-party",
+      "author": "Hoteles Sublimes (nombre del archivo)",
+      "source": "https://www.pexels.com/photo/26309839/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "verification": "individual-source-pending",
+      "source_id": "26309839"
+    },
+    {
+      "path": "assets/ecosistema-consumidores.webp",
+      "sha256": "9f7eb3e2d747b1dbb7fb7a98d4b24fa3d508e544abe95a5a39d0bd33a93f99a7",
+      "bytes": 63586,
+      "claim": "third-party",
+      "author": "wang binghua (nombre del archivo)",
+      "source": "https://unsplash.com/photos/DHnmO_mO0Pg",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "verification": "individual-source-pending",
+      "source_id": "DHnmO_mO0Pg"
+    },
+    {
+      "path": "assets/ecosistema-operadores-logisticos.webp",
+      "sha256": "c52d48b9d9614fd169bdd8301088b85d55a177532b85b004656a873cd14e9230",
+      "bytes": 124688,
+      "claim": "ai-generated-owner-selected",
+      "author": "Imagen generada con ChatGPT, seleccionada por el usuario",
+      "source": "conversation-upload",
+      "license": "AI-generated; ownership not independently verified",
+      "license_url": null,
+      "verification": "owner-selected",
+      "source_id": "owner-approved-2026-11-24"
+    }
+  ],
+  "owner_attestation": {
+    "status": "owner-attested-free-download",
+    "date": "2026-11-24",
+    "scope": "ECOSYSTEM-PARTICIPANTS-01; illustrative website use of these three selected external photos only",
+    "statement": "El titular confirma que descargó las fotografías ofrecidas como gratuitas y autoriza su uso en la web DESSET.",
+    "source": "direct owner instruction in the project conversation",
+    "general_license_terms_reviewed_on": "2026-11-24",
+    "individual_source_verification": false,
+    "independent_legal_verification": false,
+    "exclusive_ownership_claim": false,
+    "assets": [
+      {
+        "path": "assets/ecosistema-proveedores.webp",
+        "sha256": "bc4c3e9301659949b65373eeeffccb1fddd9b5c67bdbeb8598a511a79dc98170",
+        "source_id": "40236120",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/"
+      },
+      {
+        "path": "assets/ecosistema-comercios.webp",
+        "sha256": "3370bbb94434edf705b2144bd86f1b60aba1b39f1989d58a5a187dca1b6ff2c2",
+        "source_id": "26309839",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/"
+      },
+      {
+        "path": "assets/ecosistema-consumidores.webp",
+        "sha256": "9f7eb3e2d747b1dbb7fb7a98d4b24fa3d508e544abe95a5a39d0bd33a93f99a7",
+        "source_id": "DHnmO_mO0Pg",
+        "license": "Unsplash License",
+        "license_url": "https://unsplash.com/license"
+      }
+    ]
+  }
+}

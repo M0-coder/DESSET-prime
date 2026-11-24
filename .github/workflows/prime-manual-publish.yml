@@ -261,7 +261,7 @@ jobs:
           else
             grep -Fq 'name="robots" content="noindex,nofollow"' "$RUNNER_TEMP/prime-live.html"
           fi
-          for file in THIRD-PARTY-NOTICES.txt robots.txt sitemap.xml styles.css styles-v5.css styles-system.css styles-hero-photo.css styles-visual02.css scripts/app.js scripts/motion.js scripts/v5-cinematic.js scripts/service-state.js assets/deliver-assets-mark.png assets/scene-move.webp assets/v62-courier.glb; do
+          for file in THIRD-PARTY-NOTICES.txt robots.txt sitemap.xml styles.css styles-v5.css styles-system.css styles-hero-photo.css styles-visual02.css scripts/app.js scripts/motion.js scripts/v5-cinematic.js scripts/service-state.js assets/deliver-assets-mark.png assets/scene-move.webp assets/ecosistema-proveedores.webp assets/ecosistema-comercios.webp assets/ecosistema-consumidores.webp assets/ecosistema-operadores-logisticos.webp assets/v62-courier.glb; do
             mkdir -p "$RUNNER_TEMP/live/$(dirname "$file")"
             curl --retry 4 --retry-delay 3 --fail-with-body -sSL "https://desset.lat/$file" -o "$RUNNER_TEMP/live/$file"
             cmp -s "$RUNNER_TEMP/prime-manual-public/$file" "$RUNNER_TEMP/live/$file"

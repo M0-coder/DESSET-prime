@@ -31,7 +31,7 @@ test("V6.9 describes services as a lasting institutional identity, not as a star
  assert.doesNotMatch(html,/UN ECOSISTEMA, TRES PILARES/);
  assert.match(html,/class="business-pitch"/);
  for(const phrase of ["Pedidos y","Paquetería y transporte","Comercio y servicios",
- "ELEGIR","PREPARAR","ENTREGAR","APLICACIONES DESSET"])
+ "PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS","APLICACIONES DESSET"])
   assert.ok(html.includes(phrase),"Missing institutional service facet "+phrase);
  assert.doesNotMatch(html,/Proyecto en desarrollo|En construcción|En desarrollo: una plataforma|Horizonte futuro|antes del lanzamiento|validar necesidades con comercios|estamos construyendo un sistema/i);
  assert.equal((html.match(/<section\b/g)||[]).length,6);

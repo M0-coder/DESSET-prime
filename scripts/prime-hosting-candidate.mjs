@@ -19,7 +19,7 @@ const EXTRAS=Object.freeze({
  'sitemap.xml':'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>\n',
  '404.html':'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DESSET — Página no encontrada</title></head><body><main><h1>Página no encontrada</h1><p>La dirección solicitada no existe.</p><a href="/">Volver al inicio</a></main></body></html>\n'
 });
-const REQUIRED=['index.html','_headers','scripts/service-state.js','assets/deliver-assets-mark.png','assets/scene-choose.webp','assets/scene-prepare.webp','assets/scene-move.webp','assets/v62-commerce.glb','assets/v62-courier.glb','assets/v62-destination.glb',
+const REQUIRED=['index.html','_headers','scripts/service-state.js','assets/deliver-assets-mark.png','assets/scene-choose.webp','assets/scene-prepare.webp','assets/scene-move.webp','assets/ecosistema-proveedores.webp','assets/ecosistema-comercios.webp','assets/ecosistema-consumidores.webp','assets/ecosistema-operadores-logisticos.webp','assets/v62-commerce.glb','assets/v62-courier.glb','assets/v62-destination.glb',
  'styles-typography.css','fonts/inter-latin-variable.woff2','fonts/plus-jakarta-sans-latin-variable.woff2',
  'fonts/LICENSE-Inter-OFL.txt','fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt'];
 
@@ -59,7 +59,7 @@ function verifyManifest(dist){
  const html=readFileSync(join(dist,'index.html'),'utf8');
  assert(html.includes('<meta name="robots" content="noindex,nofollow">'),'source noindex changed');
  assert(!/rel="canonical"/.test(html),'source canonical unexpectedly present');
- for(const scene of ['choose','prepare','move'])assert(html.includes('./assets/scene-'+scene+'.webp'),'independent scene missing');
+ for(const participant of ['proveedores','comercios','consumidores','operadores-logisticos'])assert(html.includes('./assets/ecosistema-'+participant+'.webp'),'independent participant photograph missing: '+participant);
  const services=readFileSync(join(dist,'scripts/service-state.js'),'utf8');
  assert(services.includes('applicationDistribution:"not_published"')&&services.includes('verified:false'),'unverified app distribution changed');
  const headers=readFileSync(join(dist,'_headers'),'utf8');

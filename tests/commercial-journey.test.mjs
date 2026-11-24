@@ -4,7 +4,7 @@ import {readFileSync,statSync} from "node:fs";
 const root=new URL("../",import.meta.url);
 const html=readFileSync(new URL("index.html",root),"utf8");
 const css=readFileSync(new URL("styles.css",root),"utf8");
-const scenes=["choose","prepare","move"];
+const scenes=["ecosistema-proveedores","ecosistema-comercios","ecosistema-consumidores","ecosistema-operadores-logisticos"];
 
 test("business proposition appears before generic stakeholder cards and keeps an honest launch status",()=>{
  const audience=html.indexOf('id="negocios"');
@@ -31,21 +31,17 @@ test("commercial contact CTA resolves locally and avoids fictitious contact deta
  assert.doesNotMatch(html,/<a\b[^>]+href="(?:mailto:|tel:|https:\/\/wa\.me\/)/i,"Cannot invent or publish personal/uncorroborated contact details");
 });
 
-test("three locally illustrated business scenes use original semantics, not generic shape placeholders",()=>{
- const places=["elegir","organizar","mover"];
- for(const [i,scene] of scenes.entries()){
-  const path="assets/scene-"+scene+".svg";
-  const svg=readFileSync(new URL(path,root),"utf8");
-  assert.match(html,new RegExp("src=\"\\./"+path.replace(".","\\.")+"\""));
-  assert.match(svg,/<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
-  assert.match(svg,/<path\b|<rect\b/);
-  assert.match(svg,/(#1551D8|#FFC62F|#FF3328)/);
-  assert.ok(svg.length>=900 && svg.length<5000,"Vector too empty or unexpectedly large: "+scene);
-  assert.ok(statSync(new URL(path,root)).size<5000);
-  assert.match(svg,new RegExp('aria-label="[^"]*(?:'+places[i]+'|seleccionando|entrega|pedido|comercio|paquete)[^"]*"','i'));
+test("four independently chosen local photographs and concrete participant roles",()=>{
+ for(const scene of scenes){
+  const path="assets/"+scene+".webp",bytes=readFileSync(new URL(path,root));
+  assert.ok(html.includes('src="./'+path+'"'));
+  assert.equal(bytes.toString("ascii",0,4),"RIFF");
+  assert.equal(bytes.toString("ascii",8,12),"WEBP");
+  assert.ok(statSync(new URL(path,root)).size<=225000);
  }
- assert.equal((html.match(/class="motion-story-art motion-story-art--/g)||[]).length,3);
- assert.match(css,/\.motion-story-art img\{/);
+ assert.equal((html.match(/class="motion-story-art motion-story-art--/g)||[]).length,4);
+ assert.match(css,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+ assert.match(html,/Modelo de servicios en desarrollo\./);
  assert.doesNotMatch(css,/\.motion-story-art--(?:choose|organize|move) span/);
 });
 

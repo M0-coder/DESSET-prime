@@ -19,6 +19,12 @@ test('14 owner-declared active original media are individually SHA-256 verified'
  const r=checkAssetRightsAndLicenses(opts);
  assert.equal(r.outcome,'PASS');assert.equal(r.assets_checked,14);
  assert.equal(r.legal_title_independently_verified,false);
+ assert.equal(r.selected_media_checked,4);assert.equal(r.individual_license_review_complete,false);
+ assert.equal(r.selected_media_review.basis,'owner-attested-free-download');
+ assert.equal(r.selected_media_review.release_authorized,false);
+ assert.equal(r.selected_media_owner_attestation.independent_legal_verification,false);
+ assert.equal(r.selected_media.filter(a=>a.claim==="third-party").length,3);
+ assert.ok(r.selected_media.every(a=>a.claim!=="owner-declared"));
  assert.equal(r.fonts_checked,2);assert.equal(r.font_license,'SIL-OFL-1.1');
  assert.equal(r.fonts_are_third_party,true);
  assert.equal(r.publication_authorized,false);assert.equal(r.release_decision,'NO-GO');
@@ -64,4 +70,10 @@ test('unreviewed Three.js upgrade is rejected',()=>{
 test('lockfile package integrity is mandatory',()=>{
  const changed=deep(lock);delete changed.packages['node_modules/three'].integrity;
  assert.throws(()=>checkAssetRightsAndLicenses({...opts,lock:changed}),/NO-GO/);
+});
+
+test("tampered selected photograph is rejected without claiming third-party ownership",t=>{
+ const copy=copyDist(t);
+ writeFileSync(join(copy,'assets/ecosistema-proveedores.webp'),'changed');
+ assert.throws(()=>checkAssetRightsAndLicenses({...opts,dist:copy}),/NO-GO/);
 });

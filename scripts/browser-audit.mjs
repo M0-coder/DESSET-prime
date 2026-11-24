@@ -127,6 +127,21 @@ async function viewport(width,height,reduce=false){
   columns:getComputedStyle(rail).gridTemplateColumns.trim().split(/\\s+/).length,
   role:rail.getAttribute("role"),ariaHidden:rail.getAttribute("aria-hidden"),
   left:Math.round(railBox.left),right:Math.round(railBox.right),viewportRight:document.documentElement.clientWidth};
+ const participantGrid=document.querySelector("#vision .ecosystem-participants");
+ const participantHeading=document.querySelector("#vision h2");
+ const participantBounds=participantGrid.getBoundingClientRect(),headingBounds=participantHeading.getBoundingClientRect();
+ const participantLayout={columns:getComputedStyle(participantGrid).gridTemplateColumns.trim().split(/\\s+/).length,
+  headingAbove:headingBounds.bottom<=participantBounds.top+2,
+  left:participantBounds.left,right:participantBounds.right,
+  note:document.querySelector("#vision .ecosystem-participants-note")?.textContent.trim(),
+  cards:[...participantGrid.querySelectorAll(".ecosystem-participant")].map(c=>{
+   const box=c.getBoundingClientRect(),image=c.querySelector("img"),p=c.querySelector("p"),h=c.querySelector("h3"),photo=c.querySelector(".ecosystem-participant__photo").getBoundingClientRect();
+   return {title:h.textContent.trim(),src:image.getAttribute("src"),alt:image.alt,lazy:image.loading,
+    inside:box.left>=participantBounds.left-2&&box.right<=participantBounds.right+2,
+    fits:h.scrollWidth<=h.clientWidth+2&&p.scrollWidth<=p.clientWidth+2,
+    photoRatio:photo.width/photo.height,fit:getComputedStyle(image).objectFit,
+    titleFont:parseFloat(getComputedStyle(h).fontSize),copyFont:parseFloat(getComputedStyle(p).fontSize)};
+  })};
  const typeSizes={
   heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
   serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
@@ -162,7 +177,7 @@ async function viewport(width,height,reduce=false){
    heroCtaInk:style("#inicio .hero-cta").color,
    heroPhotoFallbackBg:style("#inicio .prime-photo-surface").backgroundColor
   };
- return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ return {viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,participantLayout,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,future:document.querySelector('.future-services')?.open},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
@@ -209,9 +224,16 @@ async function viewport(width,height,reduce=false){
    (diag.railDisplay.left>2||diag.railDisplay.left< -16)||
    (diag.railDisplay.right<diag.railDisplay.viewportRight-2||diag.railDisplay.right>diag.railDisplay.viewportRight+16))
    fails.push("HERO-SERVICE-01: accessible service strip clips content or has wrong layout: "+JSON.stringify({items:diag.railItems,layout:diag.railDisplay}));
+ const participants=diag.participantLayout;
+ const expectedParticipantTitles=["PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS"];
+ const expectedParticipantFiles=["./assets/ecosistema-proveedores.webp","./assets/ecosistema-comercios.webp","./assets/ecosistema-consumidores.webp","./assets/ecosistema-operadores-logisticos.webp"];
+ if(participants.columns!==(width<=480?1:width<=1000?2:4)||!participants.headingAbove||participants.left< -2||participants.right>diag.viewport+2||
+  participants.note!=="Modelo de servicios en desarrollo."||participants.cards.length!==4||
+  participants.cards.some((c,i)=>c.title!==expectedParticipantTitles[i]||c.src!==expectedParticipantFiles[i]||!c.alt||c.lazy!=="lazy"||!c.inside||!c.fits||Math.abs(c.photoRatio-1.5)>.03||c.fit!=="cover"||c.titleFont<17||c.copyFont<14))
+  fails.push("ECOSYSTEM-PARTICIPANTS-01 responsive layout, card order or text clipping: "+JSON.stringify(participants));
  if(width<=700){
   if(!diag.menuLabel?.startsWith("Menú"))fails.push("Mobile menu accessible name must include visible Menú label: "+diag.menuLabel);
-  if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<28||diag.typeSizes.storyTitle<26)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
+  if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<28||diag.typeSizes.storyTitle<(width<=480?20:17))fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
  report.viewports.push({width,height,reduce,...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
@@ -245,14 +267,14 @@ try{
  report.tests.push({name:"V6.6 editorial punctuation and computed corner radii",roundedUI});
 
  const designSystem=await js('(()=>{const color=sel=>getComputedStyle(document.querySelector(sel)).backgroundColor;return {body:color("body"),contact:color(".contact"),feature:color(".solutions-grid .service--main"),brand:color(".business-pitch"),cssLoaded:[...document.styleSheets].some(s=>s.href?.endsWith("/styles-system.css")),steps:[...document.querySelectorAll(".motion-story-unit h3")].map(e=>e.textContent.trim()),contactStatusColor:getComputedStyle(document.querySelector(".contact-status")).color}})()');
- const expectedSteps=["ELEGIR","PREPARAR","ENTREGAR"];
+ const expectedSteps=["PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS"];
  if(!designSystem.cssLoaded||
     designSystem.body!=="rgb(247, 245, 238)"||
     designSystem.contact!=="rgb(247, 245, 238)"||
     designSystem.feature!=="rgb(21, 81, 216)"||
     designSystem.brand!=="rgb(21, 81, 216)"||
     JSON.stringify(designSystem.steps)!==JSON.stringify(expectedSteps))
-   report.failures.push("V6.7 computed 60-30-10 palette or three-step narrative mismatch: "+JSON.stringify(designSystem));
+   report.failures.push("V6.7 computed 60-30-10 palette or four-participant narrative mismatch: "+JSON.stringify(designSystem));
  report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
  const visual02=await js('(()=>{const q=s=>document.querySelector(s);const cs=s=>getComputedStyle(q(s));return {cssLoaded:[...document.styleSheets].some(x=>x.href?.endsWith("/styles-visual02.css")),heroPhoto:q("#inicio .prime-photo-image")?.getAttribute("src"),heroLogo:q(".site-header .brand-mark")?.getAttribute("src"),heroCTA:q("#inicio .hero-cta")?.getAttribute("href"),businessShadow:cs("#negocios .business-pitch").boxShadow,storyBorder:cs("#ecosistema .ecosystem-board").borderTopColor,serviceTop:cs("#soluciones .service--main").borderTopWidth,trustBg:cs("#vision").backgroundColor,mobileSafe:document.documentElement.scrollWidth<=document.documentElement.clientWidth+2}})()');
  if(!visual02.cssLoaded||!visual02.heroPhoto?.endsWith("desset-hero-entrega-dos-espejos.webp")||!visual02.heroLogo?.endsWith("deliver-assets-mark.png")||visual02.heroCTA!=="#contacto"||
@@ -305,21 +327,22 @@ try{
  await js('document.querySelector(".motion-story").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(450);
  const storyState=await js('({sequence:document.querySelector(".motion-story").classList.contains("motion-active"),cards:[...document.querySelectorAll(".motion-story-unit")].map(x=>({text:x.querySelector("h3")?.textContent,active:x.classList.contains("motion-active")}))})');
- if(!storyState.sequence||storyState.cards.length!==3||storyState.cards.some(x=>!x.active))report.failures.push("Narrative motion sequence not activated: "+JSON.stringify(storyState));
+ if(!storyState.sequence||storyState.cards.length!==4||storyState.cards.some(x=>!x.active))report.failures.push("Narrative motion sequence not activated: "+JSON.stringify(storyState));
  report.tests.push({name:"Scroll-bound narrative sequence",storyState});
  const scenes=await js('(()=>[...document.querySelectorAll(".motion-story-art img")].map(el=>({src:el.getAttribute("src"),complete:el.complete,width:el.naturalWidth,height:el.naturalHeight,rendered:el.getBoundingClientRect().width})))()');
- if(scenes.length!==3||scenes.some(x=>!x.complete||x.width<100||x.height<100||x.rendered<45))report.failures.push("Commercial narrative illustrations missing or too small: "+JSON.stringify(scenes));
- report.tests.push({name:"Narrative photographs load and SVG fallback attributes remain",scenes});
- const v03=await js('(()=>[...document.querySelectorAll(".motion-story-art img")].map(x=>({src:x.getAttribute("src"),current:x.currentSrc,photo:!!x.closest("picture.v03-photo-story"),fit:getComputedStyle(x).objectFit,loaded:x.complete&&x.naturalWidth===960&&x.naturalHeight===640})))()');
- const v03Photos=["scene-choose.webp","scene-prepare.webp","scene-move.webp"];
- if(v03.length!==3||new Set(v03.map(x=>x.current)).size!==3||v03.some((x,i)=>!x.photo||!x.current.endsWith(v03Photos[i])||x.fit!=="cover"||!x.loaded||!x.src.endsWith(["scene-choose.svg","scene-prepare.svg","scene-move.svg"][i])))
-  report.failures.push("VISUAL-03 distinct user-approved WebP photographs or SVG fallback failed: "+JSON.stringify(v03));
- report.tests.push({name:"VISUAL-03 three different approved photos, exact sizes, original SVG fallbacks",v03});
+ if(scenes.length!==4||scenes.some(x=>!x.complete||x.width<100||x.height<100||x.rendered<45))report.failures.push("Commercial narrative illustrations missing or too small: "+JSON.stringify(scenes));
+ report.tests.push({name:"Four local narrative photographs load",scenes});
+ const v03=await js('(()=>[...document.querySelectorAll(".motion-story-art img")].map(x=>({src:x.getAttribute("src"),current:x.currentSrc,photo:!!x.closest("picture.v03-photo-story"),fit:getComputedStyle(x).objectFit,loaded:x.complete,width:x.naturalWidth,height:x.naturalHeight,alt:x.alt})))()');
+ const v03Photos=["ecosistema-proveedores.webp","ecosistema-comercios.webp","ecosistema-consumidores.webp","ecosistema-operadores-logisticos.webp"];
+ const v03Dimensions=[[1000,563],[750,1000],[1000,563],[1000,750]];
+ if(v03.length!==4||new Set(v03.map(x=>x.current)).size!==4||v03.some((x,i)=>!x.photo||!x.current.endsWith(v03Photos[i])||x.fit!=="cover"||!x.loaded||!x.src.endsWith(v03Photos[i])||x.width!==v03Dimensions[i][0]||x.height!==v03Dimensions[i][1]||!x.alt))
+  report.failures.push("ECOSYSTEM-PARTICIPANTS-01 distinct approved WebP photographs or exact dimensions failed: "+JSON.stringify(v03));
+ report.tests.push({name:"ECOSYSTEM-PARTICIPANTS-01 four different approved photos, exact sizes, alternative text",v03});
 
  await capture("desktop-story-motion.png");
  const kineticJourney=await js('(()=>{const cards=[...document.querySelectorAll(".motion-story-unit")].map(c=>({active:c.classList.contains("motion-active"),animation:getComputedStyle(c.querySelector("img")).animationName}));return {cards,noBridge:!document.querySelector(".motion-story-bridge"),noHeroLabel:!document.querySelector(".v4-hero-declaration")}})()');
- if(kineticJourney.cards.length!==3||kineticJourney.cards.some(x=>!x.active||x.animation!=="v45-scene-illustration")||!kineticJourney.noBridge||!kineticJourney.noHeroLabel)report.failures.push("Three-beat narrative sequence failed: "+JSON.stringify(kineticJourney));
- report.tests.push({name:"V4.5 staggered real-scene illustration motion",kineticJourney});
+ if(kineticJourney.cards.length!==4||kineticJourney.cards.some(x=>!x.active||x.animation!=="none")||!kineticJourney.noBridge||!kineticJourney.noHeroLabel)report.failures.push("Four-participant photography must remain stable: "+JSON.stringify(kineticJourney));
+ report.tests.push({name:"ECOSYSTEM-PARTICIPANTS-01 stable documentary photography, existing scroll cue",kineticJourney});
  await sleep(1250);
  await capture("desktop-story-final.png");
  await js('document.querySelector("#contacto").scrollIntoView({block:"center",behavior:"instant"})');
@@ -369,9 +392,9 @@ try{
  report.tests.push({name:"Optional services disclosure restored to native closed state",futureClosed});
   await js('document.querySelector("#vision").scrollIntoView({block:"center",behavior:"instant"})');
   await sleep(180);
-   const leanDesktop=await js("(()=>{const x=document.querySelector(\"#vision\"),b=x.querySelector(\".statement-body\"),h=x.querySelector(\"h2\"),j=x.querySelector(\".statement-journey\"),t=h.getBoundingClientRect(),r=j.getBoundingClientRect(),last=h.querySelector(\".statement-last\").getBoundingClientRect(),cards=[...j.querySelectorAll(\".motion-story-unit\")];return {children:b.children.length,cols:getComputedStyle(b).gridTemplateColumns.split(\" \").length,text:h.textContent.trim(),left:t.left,right:t.right,titleContentRight:last.right,journeyLeft:r.left,journeyRight:r.right,storyCards:cards.length,photos:cards.map(c=>c.querySelector(\"img\").getBoundingClientRect().width),viewport:document.documentElement.clientWidth,duplicates:x.querySelectorAll(\".statement-side,.trust-ledger\").length,empty3d:!document.querySelector(\"#ecosistema .motion-story-unit\"),scrollWidth:document.documentElement.scrollWidth}})()");
-   if(leanDesktop.children!==2||leanDesktop.cols!==2||leanDesktop.storyCards!==3||!leanDesktop.empty3d||leanDesktop.duplicates!==0||leanDesktop.left< -2||leanDesktop.journeyRight>leanDesktop.viewport+2||leanDesktop.titleContentRight>leanDesktop.journeyLeft+2||leanDesktop.scrollWidth>leanDesktop.viewport+2||leanDesktop.photos.some(w=>w<80)||!leanDesktop.text.includes("ES CONECTAR"))report.failures.push("PRIME-LAYOUT-01 desktop statement cards overlap or escaped to 3D: "+JSON.stringify(leanDesktop));
-   report.tests.push({name:"PRIME-LAYOUT-01 desktop: editorial statement with three original photographs",leanDesktop});
+   const leanDesktop=await js("(()=>{const x=document.querySelector(\"#vision\"),b=x.querySelector(\".statement-body\"),h=x.querySelector(\"h2\"),j=x.querySelector(\".statement-journey\"),t=h.getBoundingClientRect(),r=j.getBoundingClientRect(),last=h.querySelector(\".statement-last\").getBoundingClientRect(),cards=[...j.querySelectorAll(\".motion-story-unit\")];return {children:b.children.length,cols:getComputedStyle(j.querySelector(\".ecosystem-participants\")).gridTemplateColumns.split(\" \").length,text:h.textContent.trim(),left:t.left,right:t.right,titleContentRight:last.right,titleBottom:t.bottom,journeyTop:r.top,journeyLeft:r.left,journeyRight:r.right,storyCards:cards.length,photos:cards.map(c=>c.querySelector(\"img\").getBoundingClientRect().width),viewport:document.documentElement.clientWidth,duplicates:x.querySelectorAll(\".statement-side,.trust-ledger\").length,empty3d:!document.querySelector(\"#ecosistema .motion-story-unit\"),scrollWidth:document.documentElement.scrollWidth}})()");
+   if(leanDesktop.children!==2||leanDesktop.cols!==4||leanDesktop.storyCards!==4||!leanDesktop.empty3d||leanDesktop.duplicates!==0||leanDesktop.left< -2||leanDesktop.journeyRight>leanDesktop.viewport+2||leanDesktop.titleContentRight>leanDesktop.viewport+2||leanDesktop.titleBottom>leanDesktop.journeyTop+2||leanDesktop.scrollWidth>leanDesktop.viewport+2||leanDesktop.photos.some(w=>w<80)||!leanDesktop.text.includes("ES CONECTAR"))report.failures.push("PRIME-LAYOUT-01 desktop statement cards overlap or escaped to 3D: "+JSON.stringify(leanDesktop));
+   report.tests.push({name:"PRIME-LAYOUT-01 desktop: heading above four documentary photographs",leanDesktop});
   await capture("desktop-lean-statement.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
  for(const [w,h] of [[1920,1080],[1180,820],[1100,850],[1024,768],[861,900],[860,900],[768,900],[390,844],[320,700]]){
@@ -414,9 +437,9 @@ try{
    await capture("mobile-contact-final.png");
     await js('document.querySelector("#vision").scrollIntoView({block:"center",behavior:"instant"})');
     await sleep(160);
-     const leanMobile=await js("(()=>{const x=document.querySelector(\"#vision\"),b=x.querySelector(\".statement-body\"),h=x.querySelector(\"h2\"),j=x.querySelector(\".statement-journey\"),t=h.getBoundingClientRect(),r=j.getBoundingClientRect(),last=h.querySelector(\".statement-last\").getBoundingClientRect(),cards=[...j.querySelectorAll(\".motion-story-unit\")];return {children:b.children.length,cols:getComputedStyle(b).gridTemplateColumns.split(\" \").length,left:t.left,right:t.right,titleRight:last.right,titleBottom:t.bottom,journeyTop:r.top,journeyLeft:r.left,journeyRight:r.right,storyCards:cards.length,photos:cards.map(c=>c.querySelector(\"img\").getBoundingClientRect().width),viewport:document.documentElement.clientWidth,duplicates:x.querySelectorAll(\".statement-side,.trust-ledger\").length,font:parseFloat(getComputedStyle(h).fontSize),scrollWidth:document.documentElement.scrollWidth,empty3d:!document.querySelector(\"#ecosistema .motion-story-unit\")}})()");
-     if(leanMobile.children!==2||leanMobile.cols!==1||leanMobile.storyCards!==3||!leanMobile.empty3d||leanMobile.duplicates!==0||leanMobile.left< -2||leanMobile.journeyRight>leanMobile.viewport+2||leanMobile.titleRight>leanMobile.viewport+2||leanMobile.titleBottom>leanMobile.journeyTop+2||leanMobile.photos.some(w=>w<70)||leanMobile.scrollWidth>leanMobile.viewport+2||leanMobile.font<31)report.failures.push("PRIME-LAYOUT-01 mobile journey clips or overlaps heading: "+JSON.stringify(leanMobile));
-     report.tests.push({name:"PRIME-LAYOUT-01 mobile: three relocated photos and text fully visible",leanMobile});
+     const leanMobile=await js("(()=>{const x=document.querySelector(\"#vision\"),b=x.querySelector(\".statement-body\"),h=x.querySelector(\"h2\"),j=x.querySelector(\".statement-journey\"),t=h.getBoundingClientRect(),r=j.getBoundingClientRect(),last=h.querySelector(\".statement-last\").getBoundingClientRect(),cards=[...j.querySelectorAll(\".motion-story-unit\")];return {children:b.children.length,cols:getComputedStyle(j.querySelector(\".ecosystem-participants\")).gridTemplateColumns.split(\" \").length,left:t.left,right:t.right,titleRight:last.right,titleBottom:t.bottom,journeyTop:r.top,journeyLeft:r.left,journeyRight:r.right,storyCards:cards.length,photos:cards.map(c=>c.querySelector(\"img\").getBoundingClientRect().width),viewport:document.documentElement.clientWidth,duplicates:x.querySelectorAll(\".statement-side,.trust-ledger\").length,font:parseFloat(getComputedStyle(h).fontSize),scrollWidth:document.documentElement.scrollWidth,empty3d:!document.querySelector(\"#ecosistema .motion-story-unit\")}})()");
+     if(leanMobile.children!==2||leanMobile.cols!==1||leanMobile.storyCards!==4||!leanMobile.empty3d||leanMobile.duplicates!==0||leanMobile.left< -2||leanMobile.journeyRight>leanMobile.viewport+2||leanMobile.titleRight>leanMobile.viewport+2||leanMobile.titleBottom>leanMobile.journeyTop+2||leanMobile.photos.some(w=>w<70)||leanMobile.scrollWidth>leanMobile.viewport+2||leanMobile.font<30)report.failures.push("PRIME-LAYOUT-01 mobile journey clips or overlaps heading: "+JSON.stringify(leanMobile));
+     report.tests.push({name:"PRIME-LAYOUT-01 mobile: four approved photos and text fully visible",leanMobile});
     await capture("mobile-lean-statement.png");
    await js("document.querySelector('.menu-button').click()");
    const menu=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),display:getComputedStyle(document.querySelector('.main-nav')).display})");

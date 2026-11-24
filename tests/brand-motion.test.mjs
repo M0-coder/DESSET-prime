@@ -33,9 +33,7 @@ test("V4: identidad visual original y movimiento finito + accesible",()=>{
 });
 test("V4: la secuencia cotidiana es visible y el diagrama técnico no domina la página",()=>{
  assert.match(html,/v4-flow-board/);
- assert.match(html,/ELEGIR/);
- assert.match(html,/<h3>PREPARAR<\/h3>/);
- assert.match(html,/<h3>ENTREGAR<\/h3>/);
+ for(const label of ["PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS"])assert.ok(html.includes("<h3>"+label+"</h3>"));
  assert.match(html,/<details class="v4-architecture-details">/);
  assert.equal((html.match(/roles-geometry-es\.svg/g)||[]).length,1);
  assert.match(app,/event\.key==="Escape"/);

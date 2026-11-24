@@ -8,6 +8,37 @@ import {fileURLToPath} from 'node:url';
 const targetPath=resolve(dirname(fileURLToPath(import.meta.url)),'../config/prime-release-target.json');
 const HEX40=/^[a-f0-9]{40}$/,UUID=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/;
 const mark=(errors,condition,message)=>{if(!condition)errors.push(message)};
+// An owner declaration is a scoped documentary basis, not independent license or title proof.
+// Never use this result to bypass the protected production environment.
+export function reviewSelectedMedia(media){
+ const rejected={accepted:false,basis:'pending',individual_license_review_complete:false,release_authorized:false};
+ if(media?.schema!=='desset-prime-selected-media-v1'||media.release_authorized!==false||!Array.isArray(media.assets)||media.assets.length!==4)return rejected;
+ const expected=new Map([
+  ['assets/ecosistema-proveedores.webp',['40236120','Pexels License','https://www.pexels.com/license/']],
+  ['assets/ecosistema-comercios.webp',['26309839','Pexels License','https://www.pexels.com/license/']],
+  ['assets/ecosistema-consumidores.webp',['DHnmO_mO0Pg','Unsplash License','https://unsplash.com/license']]
+ ]);
+ const external=media.assets.filter(a=>a?.claim==='third-party');
+ const generated=media.assets.filter(a=>a?.claim==='ai-generated-owner-selected');
+ if(external.length!==3||generated.length!==1||generated[0].path!=='assets/ecosistema-operadores-logisticos.webp'||generated[0].verification!=='owner-selected')return rejected;
+ if(new Set(external.map(a=>a.path)).size!==3||external.some(a=>{
+  const spec=expected.get(a.path);
+  return !spec||a.source_id!==spec[0]||a.license!==spec[1]||a.license_url!==spec[2]||!/^[a-f0-9]{64}$/.test(a.sha256)||typeof a.source!=='string'||!a.source.includes(a.source_id)||!a.source.startsWith(a.license==='Pexels License'?'https://www.pexels.com/':'https://unsplash.com/photos/');
+ }))return rejected;
+ if(media.individual_license_review_complete===true&&external.every(a=>a.verification==='individual-source-verified'))return {accepted:true,basis:'individual-source-verified',individual_license_review_complete:true,release_authorized:false};
+ const declaration=media.owner_attestation;
+ if(media.individual_license_review_complete!==false||declaration?.status!=='owner-attested-free-download'||
+  declaration.scope!=='ECOSYSTEM-PARTICIPANTS-01; illustrative website use of these three selected external photos only'||
+  declaration.source!=='direct owner instruction in the project conversation'||typeof declaration.statement!=='string'||!declaration.statement.trim()||
+  !/^\d{4}-\d{2}-\d{2}$/.test(declaration.date)||!/^\d{4}-\d{2}-\d{2}$/.test(declaration.general_license_terms_reviewed_on)||
+  declaration.individual_source_verification!==false||declaration.independent_legal_verification!==false||declaration.exclusive_ownership_claim!==false||
+  !Array.isArray(declaration.assets)||declaration.assets.length!==3)return rejected;
+ if(!external.every(a=>{
+  const matches=declaration.assets.filter(x=>x?.path===a.path);
+  return matches.length===1&&['sha256','source_id','license','license_url'].every(key=>matches[0][key]===a[key]);
+ }))return rejected;
+ return {accepted:true,basis:'owner-attested-free-download',individual_license_review_complete:false,release_authorized:false};
+}
 export function validateReleaseIntent({repository,ref,event,expectedSha,checkoutSha,previousId,seoPolicy,target}){
  const err=[];
  mark(err,repository===target?.repository,'Wrong GitHub repository');
@@ -47,11 +78,14 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{
   const task=process.argv[2],target=JSON.parse(readFileSync(targetPath,'utf8'));
   if(task==='request'){
+   const media=JSON.parse(readFileSync(resolve(dirname(targetPath),'prime-selected-media.json'),'utf8'));
+   const mediaReview=reviewSelectedMedia(media);
+   if(!mediaReview.accepted)throw Error('Selected photographs require a valid scoped review before production');
    const e=process.env;
    const out=validateReleaseIntent({repository:e.GITHUB_REPOSITORY,ref:e.GITHUB_REF,event:e.GITHUB_EVENT_NAME,
      expectedSha:e.RELEASE_SHA,checkoutSha:e.GITHUB_SHA,previousId:e.PREVIOUS_DEPLOYMENT_ID,
      seoPolicy:e.SEO_POLICY,target});
-   console.log(JSON.stringify(out));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
+   console.log(JSON.stringify({...out,selected_media_review:mediaReview}));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
   }else if(task==='cloudflare'){
    const [projectPath,domainPath]=process.argv.slice(3);
    const out=validateCloudflareSnapshot({projectResponse:JSON.parse(readFileSync(projectPath,'utf8')),

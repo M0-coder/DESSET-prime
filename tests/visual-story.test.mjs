@@ -48,8 +48,8 @@ test("intersection cues animate only once and unobserve",()=>{
  assert.ok(flow.targets.every(t=>t.classes.has("motion-active")));
 });
 test("visual narrative uses original geometry grammar but makes no operational claim",()=>{
- assert.equal((html.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,3);
- for(const label of ["ELEGIR","PREPARAR","ENTREGAR"])assert.match(html,new RegExp("<h3>"+label));
+ assert.equal((html.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,4);
+ for(const label of ["PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS"])assert.match(html,new RegExp("<h3>"+label));
  assert.match(html,/no representa una operación activa/i);
   assert.doesNotMatch(html,/class="motion-brand-thread"/);
  assert.match(html,/class="closing-title"/);

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {validateReleaseIntent,validateCloudflareSnapshot} from '../scripts/prime-manual-cutover-gate.mjs';
+import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia} from '../scripts/prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const target=JSON.parse(readFileSync(root+'/config/prime-release-target.json','utf8'));
 const sha='a'.repeat(40);
@@ -88,4 +88,41 @@ test('latest preview cannot replace the canonical production identity',()=>{
  assert.equal(validateCloudflareSnapshot({...p,projectResponse:{success:true,result:changed}}).result,'NO-GO');
  const missing={...project.result,canonical_deployment:undefined,latest_deployment:project.result.canonical_deployment};
  assert.equal(validateCloudflareSnapshot({...p,projectResponse:{success:true,result:missing}}).result,'NO-GO');
+});
+
+const media=JSON.parse(readFileSync(root+"/config/prime-selected-media.json","utf8"));
+const copyMedia=()=>JSON.parse(JSON.stringify(media));
+test("Scoped owner declaration covers exactly the three external photo hashes, not independent proof or publication approval",()=>{
+ const review=reviewSelectedMedia(media);
+ assert.deepEqual(review,{accepted:true,basis:'owner-attested-free-download',individual_license_review_complete:false,release_authorized:false});
+ assert.equal(media.release_authorized,false);
+ assert.equal(media.owner_attestation.independent_legal_verification,false);
+ assert.equal(media.owner_attestation.exclusive_ownership_claim,false);
+ const gate=readFileSync(root+"/scripts/prime-manual-cutover-gate.mjs","utf8");
+ assert.match(gate,/const mediaReview=reviewSelectedMedia\(media\)/);
+ assert.match(gate,/if\(!mediaReview.accepted\)throw Error/);
+});
+test("Missing declaration, incomplete or mismatched hashes, wrong source/license and overclaimed rights are rejected",()=>{
+ const mutations=[
+  m=>delete m.owner_attestation,
+  m=>m.owner_attestation.assets.pop(),
+  m=>m.owner_attestation.assets[1]=m.owner_attestation.assets[0],
+  m=>m.owner_attestation.assets[0].sha256='0'.repeat(64),
+  m=>m.assets[0].sha256='1'.repeat(64),
+  m=>m.assets[1].source_id='wrong',
+  m=>m.assets[2].license_url='https://example.org/',
+  m=>m.assets[0].source='https://example.org/40236120/',
+  m=>m.owner_attestation.scope='all future media',
+  m=>m.owner_attestation.independent_legal_verification=true,
+  m=>m.owner_attestation.exclusive_ownership_claim=true,
+  m=>m.individual_license_review_complete=true,
+  m=>m.release_authorized=true
+ ];
+ for(const mutate of mutations){const m=copyMedia();mutate(m);assert.equal(reviewSelectedMedia(m).accepted,false);}
+});
+test("Independent source verification remains a distinct basis and owner declaration never enables publication alone",()=>{
+ const m=copyMedia();delete m.owner_attestation;m.individual_license_review_complete=true;
+ for(const asset of m.assets.filter(a=>a.claim==='third-party'))asset.verification='individual-source-verified';
+ assert.deepEqual(reviewSelectedMedia(m),{accepted:true,basis:'individual-source-verified',individual_license_review_complete:true,release_authorized:false});
+ assert.equal(validateReleaseIntent({...valid,ref:'refs/heads/design/ecosystem-participants-01'}).result,'NO-GO');
 });
