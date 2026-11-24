@@ -26,12 +26,13 @@ test("Seven redundant editorial blocks are removed from the actual HTML, not hid
   assert.doesNotMatch(html,/data-v64-tour-launch/);
 });
 
-test("Prime still has six uniquely named sections and working in-page links",()=>{
+test("Prime still has five uniquely named sections and working in-page links",()=>{
   const sections=[...html.matchAll(/<section\b[^>]*>/g)].map(m=>m[0]);
-  assert.equal(sections.length,6);
-  assert.equal((html.match(/<\/section>/g)||[]).length,6);
-  for(const id of ["inicio","vision","soluciones","ecosistema","negocios","contacto"])
+  assert.equal(sections.length,5);
+  assert.equal((html.match(/<\/section>/g)||[]).length,5);
+  for(const id of ["inicio","vision","soluciones","ecosistema","negocios"])
     assert.ok(sections.some(s=>s.includes('id="'+id+'"')),"Section missing: "+id);
+  assert.equal((html.match(/id="contacto"/g)||[]).length,1,"Contact anchor remains unique");
   for(const id of ["soluciones","ecosistema","negocios"])
     assert.match(sections.find(s=>s.includes('id="'+id+'"')),/aria-label="[^"]+"/);
   const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));

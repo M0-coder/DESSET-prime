@@ -158,7 +158,8 @@ async function viewport(width,height,reduce=false,entry=URL){
   })};
  const partnersGrid=document.querySelector("#negocios .audience-grid--compact");
  const partnersBounds=partnersGrid.getBoundingClientRect();
- const partnerLayout={columns:getComputedStyle(partnersGrid).gridTemplateColumns.trim().split(/\\s+/).length,gap:parseFloat(getComputedStyle(partnersGrid).gap),
+ const close=document.querySelector("#contacto"),heading=close.querySelector("h2"),lines=[...heading.querySelectorAll(".closing-line")],headingStyle=getComputedStyle(heading);
+ const partnerLayout={closing:{joined:close.parentElement===partnersGrid.parentElement&&close.nextElementSibling===partnersGrid,background:getComputedStyle(close.parentElement).backgroundColor,headerBackground:getComputedStyle(close).backgroundColor,align:headingStyle.textAlign,font:parseFloat(headingStyle.fontSize),words:lines.map(l=>l.textContent.trim()),colors:lines.map(l=>getComputedStyle(l.querySelector("em")||l).color),decorAbsent:[close,...lines].every(l=>["::before","::after"].every(p=>["none","normal"].includes(getComputedStyle(l,p).content))),cardFonts:[...partnersGrid.querySelectorAll("h3")].map(h=>parseFloat(getComputedStyle(h).fontSize))},columns:getComputedStyle(partnersGrid).gridTemplateColumns.trim().split(/\\s+/).length,gap:parseFloat(getComputedStyle(partnersGrid).gap),
  cards:[...partnersGrid.querySelectorAll(":scope > article")].map(c=>{
   const r=c.getBoundingClientRect(),h=c.querySelector("h3"),p=c.querySelector("p"),a=c.querySelector("a"),s=getComputedStyle(c),ar=a.getBoundingClientRect();
   return {title:h.textContent.trim(),label:a.textContent.trim(),accessibleLabel:a.getAttribute("aria-label"),buttonBg:getComputedStyle(a).backgroundColor,buttonInk:getComputedStyle(a).color,buttonWidth:ar.width,cardContentWidth:c.clientWidth-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight),href:a.getAttribute("href"),height:r.height,inside:r.left>=partnersBounds.left-2&&r.right<=partnersBounds.right+2,fit:[h,p,a].every(e=>e.scrollWidth<=e.clientWidth+2),tap:ar.height,icon:c.querySelector("svg")?.getAttribute("aria-hidden"),background:s.backgroundColor,border:s.borderTopWidth,radius:parseFloat(s.borderTopLeftRadius),shadow:s.boxShadow,decoration:getComputedStyle(c,"::before").content};
@@ -267,6 +268,8 @@ async function viewport(width,height,reduce=false,entry=URL){
   if(diag.decorativeArrowCount!==0)fails.push("Decorative arrows remain in interactive controls");
  if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==9||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
  const partners=diag.partnerLayout;
+ const cl=partners.closing;
+ if(!cl.joined||cl.background!==cl.headerBackground||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(17, 17, 17)|rgb(21, 81, 216)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
   if(partners.columns!==(width<=700?1:2)||partners.gap!==(width<=700?12:16)||partners.cards.length!==2||
    partners.cards.map(c=>c.title).join("|")!=="Comercios|Repartidores"||
    partners.cards.map(c=>c.label).join("|")!=="Más información|Más información"||
@@ -354,7 +357,7 @@ try{
  await capture("desktop-final.png");
  
   const v5Cover=await js('(()=>({mode:document.documentElement.dataset.v5Mode,overlayAbsent:!document.querySelector(".v5-hero-refraction"),stage:!!document.querySelector(".v5-city-stage"),staticText:document.querySelector(".v6-static-fallback")?.textContent.includes("CENTRO"),noPoster:!document.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),contactLight:!!document.querySelector(".v5-contact-light")}))()');
-  if(v5Cover.mode!=="ready"||!v5Cover.overlayAbsent||!v5Cover.stage||!v5Cover.staticText||!v5Cover.noPoster||!v5Cover.contactLight)report.failures.push("V5 image-free 3D section incomplete: "+JSON.stringify(v5Cover));
+  if(v5Cover.mode!=="ready"||!v5Cover.overlayAbsent||!v5Cover.stage||!v5Cover.staticText||!v5Cover.noPoster||v5Cover.contactLight)report.failures.push("V5 image-free 3D section incomplete: "+JSON.stringify(v5Cover));
   report.tests.push({name:"V5 image-free accessible WebGL fallback",v5Cover});
  await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(580);
@@ -390,17 +393,17 @@ try{
  await js('document.querySelector("#contacto").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(450);
  const closing=await js('[...document.querySelectorAll(".closing-line")].map(x=>({word:x.textContent.trim(),active:x.classList.contains("motion-active")}))');
- if(closing.length!==3||closing.some(x=>!x.active))report.failures.push("Closing editorial sequence not activated: "+JSON.stringify(closing));
+ if(closing.length!==2||closing.some(x=>!x.active))report.failures.push("Closing editorial sequence not activated: "+JSON.stringify(closing));
  report.tests.push({name:"Brand closing motion",closing});
  const closingInk=await js('(()=>[...document.querySelectorAll(".contact .closing-line")].map(e=>({text:e.textContent.trim(),opacity:Number(getComputedStyle(e).opacity)})))()');
  if(closingInk.some(x=>x.opacity<.99))report.failures.push("V6.7 contact heading loses contrast during motion: "+JSON.stringify(closingInk));
  report.tests.push({name:"V6.7 closing headline remains opaque during cinema animation",closingInk});
  await capture("desktop-closing-motion.png");
- const kineticFinale=await js('(()=>{const contact=document.querySelector("#contacto"),middle=contact.querySelector(".closing-line--middle");return {active:contact.classList.contains("motion-active"),lineAnimation:getComputedStyle(middle).animationName,underlineAnimation:getComputedStyle(middle,"::after").animationName,slashAnimation:getComputedStyle(contact,"::after").animationName}})()');
- if(!kineticFinale.active||kineticFinale.lineAnimation!=="v45-closing-reveal"||kineticFinale.underlineAnimation!=="v45-underline"||kineticFinale.slashAnimation!=="v45-contact-slash")report.failures.push("Kinetic final contact scene failed: "+JSON.stringify(kineticFinale));
- report.tests.push({name:"V4.5 closing scene and finite underline",kineticFinale});
- const v5Finale=await js('(()=>{const e=document.querySelector("#contacto"),light=e.querySelector(".v5-contact-light");return {visible:e.classList.contains("v5-visible"),effect:getComputedStyle(light).animationName}})()');
- if(!v5Finale.visible||v5Finale.effect!=="v5-contact-arrive")report.failures.push("V5 cinematic contact light did not reveal: "+JSON.stringify(v5Finale));
+ const kineticFinale=await js('(()=>{const contact=document.querySelector("#contacto"),middle=contact.querySelector(".closing-line--final");return {active:contact.classList.contains("motion-active"),lineAnimation:getComputedStyle(middle).animationName,underlineAnimation:getComputedStyle(middle,"::after").animationName,slashAnimation:getComputedStyle(contact,"::after").animationName}})()');
+ if(!kineticFinale.active||kineticFinale.lineAnimation!=="v45-closing-reveal"||kineticFinale.underlineAnimation!=="none"||kineticFinale.slashAnimation!=="none")report.failures.push("Kinetic final contact scene failed: "+JSON.stringify(kineticFinale));
+ report.tests.push({name:"CONTACT-03 closing without underline or slash",kineticFinale});
+ const v5Finale=await js('(()=>{const e=document.querySelector("#contacto"),light=e.querySelector(".v5-contact-light");return {visible:e.classList.contains("v5-visible"),lightAbsent:!light}})()');
+ if(!v5Finale.visible||!v5Finale.lightAbsent)report.failures.push("CONTACT-03 retired ambient light returned: "+JSON.stringify(v5Finale));
  report.tests.push({name:"V5 ambient finale",v5Finale});
  await sleep(1250);
  await capture("desktop-closing-final.png");
@@ -556,7 +559,7 @@ try{
   report.failures.push("ANIM-02 reduced-motion accessibility contract failed: "+JSON.stringify(anim02Reduced));
  report.tests.push({name:"ANIM-02 reduced motion leaves approved image and copy static",anim02Reduced});
 
-  const v5Reduced=await js('(()=>{const e=document.querySelector(".v5-city-stage"),t=e.querySelector(".v6-static-fallback");return {mode:document.documentElement.dataset.v5Mode,light:getComputedStyle(document.querySelector(".v5-contact-light")).animationName,textVisible:!!t&&getComputedStyle(t).visibility!=="hidden",noImage:!e.querySelector("img,picture,.v5-responsive-art,.v5-stage-render,.v5-stage-scan"),gpuHidden:getComputedStyle(e.querySelector(".v6-three-mount")).display==="none",sceneDescription:e.getAttribute("aria-label"),noCaption:!document.querySelector(".v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge")}})()');
+  const v5Reduced=await js('(()=>{const e=document.querySelector(".v5-city-stage"),t=e.querySelector(".v6-static-fallback");return {mode:document.documentElement.dataset.v5Mode,light:document.querySelector(".v5-contact-light")?"present":"none",textVisible:!!t&&getComputedStyle(t).visibility!=="hidden",noImage:!e.querySelector("img,picture,.v5-responsive-art,.v5-stage-render,.v5-stage-scan"),gpuHidden:getComputedStyle(e.querySelector(".v6-three-mount")).display==="none",sceneDescription:e.getAttribute("aria-label"),noCaption:!document.querySelector(".v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge")}})()');
   if(v5Reduced.mode!=="reduced"||v5Reduced.light!=="none"||!v5Reduced.textVisible||!v5Reduced.noImage||!v5Reduced.gpuHidden||!v5Reduced.sceneDescription?.includes("conceptual")||!v5Reduced.noCaption||!v5Reduced.noBridge)report.failures.push("V5 reduced-motion semantic text fallback failed: "+JSON.stringify(v5Reduced));
   report.tests.push({name:"V5 image-free reduced-motion fallback",v5Reduced});
  await capture("mobile-reduced-motion.png");

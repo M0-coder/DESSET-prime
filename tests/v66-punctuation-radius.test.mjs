@@ -12,7 +12,7 @@ function visibleText(markup){
 test("V6.6 all presentation headings and standalone labels omit terminal ornamental dots",()=>{
  const headings=[...html.matchAll(/<(h[1-4]|strong)\b[^>]*>([\s\S]*?)<\/\1>/gi)]
   .map(x=>({tag:x[1],text:visibleText(x[2])}));
- assert.ok(headings.length>=16,"Expected all six sections to be inspected");
+ assert.ok(headings.length>=16,"Expected all five sections to be inspected");
  for(const heading of headings)
   assert.ok(!/[.]$/.test(heading.text),"Ornamental full stop remains in "+heading.tag+": "+heading.text);
  assert.match(html,/aria-label="Participantes del modelo de servicios DESSET"/);
@@ -59,7 +59,7 @@ test("V6.6 rounded design uses disciplined radius scale, not global clipping",()
 });
 
 test("V6.6 change is limited to presentation: no commerce launch or public publishing",()=>{
- assert.equal((html.match(/<section\b/g)||[]).length,6);
+ assert.equal((html.match(/<section\b/g)||[]).length,5);
  assert.doesNotMatch(html,/data-v64-tour-launch/);
  assert.match(html,/id="ecosistema" aria-label/);
  assert.match(html,/class="v63-tour"/);

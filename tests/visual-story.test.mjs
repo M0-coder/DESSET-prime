@@ -53,7 +53,7 @@ test("visual narrative uses original geometry grammar but makes no operational c
  assert.match(html,/no representa una operación activa/i);
   assert.doesNotMatch(html,/class="motion-brand-thread"/);
  assert.match(html,/class="closing-title"/);
- assert.equal((html.match(/class="closing-line/g)||[]).length,3);
+ assert.equal((html.match(/class="closing-line/g)||[]).length,2);
  assert.match(html,/src="\.\/scripts\/motion\.js"/);
  assert.equal((html.match(/roles-geometry-es.svg/g)||[]).length,1);
   assert.equal((html.match(/src="\.\/assets\/deliver-assets-mark\.png"/g)||[]).length,1);
