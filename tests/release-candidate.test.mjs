@@ -8,7 +8,8 @@ const css=readFileSync(new URL("styles.css",root),"utf8");
 
 test("V4.3: limited public story, no redundant responsibility section and two short audience choices",()=>{
  const ids=[...html.matchAll(/<section\b[^>]*\bid="([^"]+)"/g)].map(m=>m[1]);
- assert.deepEqual(ids,["inicio","vision","soluciones","ecosistema","negocios","contacto"]);
+ assert.deepEqual(ids,["inicio","vision","soluciones","ecosistema","negocios"]);
+ assert.match(html,/<section class="audiences" id="negocios"[^>]*>\s*<div class="contact" id="contacto"/);
  assert.doesNotMatch(html,/class="responsibility"/);
  assert.doesNotMatch(html,/class="statement-track"/);
  assert.doesNotMatch(css,/\.responsibility(?:\b|-)/);

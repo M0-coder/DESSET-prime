@@ -42,7 +42,7 @@ test("motion system is progressive and never hides static content",()=>{
 test("intersection cues animate only once and unobserve",()=>{
  const flow=runMotion(false,true);
  assert.equal(flow.document.documentElement.dataset.motionSystem,"ready");
- assert.equal(flow.observed.length,3);
+ assert.equal(flow.observed.length,2);
  flow.activate();
  assert.equal(flow.unobserved.length,3);
  assert.ok(flow.targets.every(t=>t.classes.has("motion-active")));
