@@ -17,7 +17,6 @@ test("V5.4 keyboard landmarks and visible focus have source contracts",()=>{
  assert.match(html,/aria-controls="main-nav" aria-expanded="false"/);
  assert.match(html,/class="v4-architecture-details"/);
  assert.match(css,/\.menu-button:focus-visible/);
- assert.match(css,/\.future-services summary:focus-visible/);
  assert.match(css,/\.v4-architecture-details summary:focus-visible/);
  assert.match(browser,/Input\.dispatchKeyEvent/);
  for(const phrase of ["V5.4 keyboard first-Tab skip-link","V5.4 keyboard menu Enter and Escape",

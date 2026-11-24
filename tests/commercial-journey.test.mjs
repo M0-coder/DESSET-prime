@@ -13,7 +13,7 @@ test("business proposition appears before generic stakeholder cards and keeps an
  assert.ok(audience>0 && pitch>audience && cards>pitch,"Commercial value proposition must precede stakeholder cards");
  assert.match(html,/¿TU NEGOCIO/);
  assert.match(html,/Conversemos sobre tu comercio/);
- assert.match(html,/Un modelo integrado para solicitudes de clientes/);
+ assert.match(html,/Comercio digital, pedidos y entregas de última milla\./);
  assert.match(html,/no representa una operación activa/i);
  assert.match(html,/no procesa pedidos ni pagos/i);
  assert.doesNotMatch(html,/más de [0-9]+ (?:comercios|clientes|repartidores)|entregas en tiempo real|compra ahora/i);
