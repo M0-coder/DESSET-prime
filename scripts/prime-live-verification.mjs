@@ -10,7 +10,7 @@ const allowed=new Set(origins);
 const headersRequired=['content-security-policy','x-content-type-options'];
 export async function verifyLive({publicDir,reportPath,request=fetch,attempts=5,delay=3000,log=console.log}){
  const m=JSON.parse(readFileSync(reportPath,'utf8'));
- if(m.schema!=='desset-prime-manual-release-package-v1'||m.seo_policy!=='NOINDEX'||m.production_authorized!==false||m.production_deployed!==false||m.package_files!==43||m.assets?.length!==43||hash(Buffer.from(JSON.stringify(m.assets)))!==m.assets_manifest_sha256)throw Error('NO-GO: unverified package manifest');
+ if(m.schema!=='desset-prime-manual-release-package-v1'||m.seo_policy!=='NOINDEX'||m.production_authorized!==false||m.production_deployed!==false||m.package_files!==45||m.assets?.length!==45||hash(Buffer.from(JSON.stringify(m.assets)))!==m.assets_manifest_sha256)throw Error('NO-GO: unverified package manifest');
  const paths=new Set();
  for(const a of m.assets){
   if(typeof a.path!=='string'||a.path.startsWith('/')||a.path.split('/').some(p=>!p||p==='.'||p==='..')||!(/^[a-z0-9_.\/-]+$/.test(a.path)||a.path==='THIRD-PARTY-NOTICES.txt'||/^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(a.path))||paths.has(a.path))throw Error('NO-GO: invalid or duplicate asset');
@@ -18,7 +18,7 @@ export async function verifyLive({publicDir,reportPath,request=fetch,attempts=5,
   const b=readFileSync(join(publicDir,a.path));
   if(b.length!==a.bytes||hash(b)!==a.sha256)throw Error('NO-GO: local package mismatch '+a.path);
  }
- for(const p of ['index.html','empresa.html','comercios.html','repartidores.html','styles-audiences.css','404.html','_headers','robots.txt','sitemap.xml'])if(!paths.has(p))throw Error('NO-GO: missing '+p);
+ for(const p of ['index.html','empresa.html','comercios.html','repartidores.html','prime.html','styles-audiences.css','styles-prime.css','404.html','_headers','robots.txt','sitemap.xml'])if(!paths.has(p))throw Error('NO-GO: missing '+p);
  async function get(url){
   for(let i=0;i<5;i++){
    if(!allowed.has(new URL(url).origin))throw Error('unexpected redirect origin');
@@ -59,7 +59,7 @@ export async function verifyLive({publicDir,reportPath,request=fetch,attempts=5,
   }
  }
  for(const origin of origins){
-  const jobs=m.assets.filter(a=>a.path!=='_headers'&&a.path!=='404.html').map(a=>({a,route:a.path==='index.html'?'/':['empresa.html','comercios.html','repartidores.html'].includes(a.path)?'/'+a.path.replace(/\.html$/,''):'/'+a.path,html:['index.html','empresa.html','comercios.html','repartidores.html'].includes(a.path)}));
+  const jobs=m.assets.filter(a=>a.path!=='_headers'&&a.path!=='404.html').map(a=>({a,route:a.path==='index.html'?'/':['empresa.html','comercios.html','repartidores.html','prime.html'].includes(a.path)?'/'+a.path.replace(/\.html$/,''):'/'+a.path,html:['index.html','empresa.html','comercios.html','repartidores.html','prime.html'].includes(a.path)}));
   // Validate actual stylesheet URL as used by browsers, not just the bare filename.
   const rev=readFileSync(join(publicDir,'index.html'),'utf8').match(/href="\.\/styles\.css\?v=([a-f0-9]{40})"/)?.[1];
   if(!rev)throw Error('NO-GO: missing CSS revision');
@@ -67,6 +67,7 @@ export async function verifyLive({publicDir,reportPath,request=fetch,attempts=5,
   jobs.push({a:m.assets.find(a=>a.path==='empresa.html'),route:'/empresa.html',html:true});
   jobs.push({a:m.assets.find(a=>a.path==='comercios.html'),route:'/comercios.html',html:true});
   jobs.push({a:m.assets.find(a=>a.path==='repartidores.html'),route:'/repartidores.html',html:true});
+  jobs.push({a:m.assets.find(a=>a.path==='prime.html'),route:'/prime.html',html:true});
   for(let i=0;i<jobs.length;i+=6)await Promise.all(jobs.slice(i,i+6).map(j=>probe(origin,j.route,j.a,200,j.html)));
   await probe(origin,'/__desset_prime_missing_path__',m.assets.find(a=>a.path==='404.html'),404);
  }

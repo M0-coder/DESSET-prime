@@ -12,7 +12,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length>=18&&manifest.files.length<40,"unexpected file count");
+check(manifest.files.length>=18&&manifest.files.length<=41,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -30,12 +30,14 @@ const html=await readFile(resolve(dist,"index.html"),"utf8");
 const company=await readFile(resolve(dist,"empresa.html"),"utf8");
 const rider=await readFile(resolve(dist,"repartidores.html"),"utf8");
 check(expected.has("repartidores.html")&&rider.includes('name="robots" content="noindex,nofollow"'),"Rider page absent or indexing changed");
+const prime=await readFile(resolve(dist,"prime.html"),"utf8");
+check(expected.has("prime.html")&&prime.includes('name="robots" content="noindex,nofollow"'),"Prime page absent or indexing changed");
 const merchant=await readFile(resolve(dist,"comercios.html"),"utf8");
 check(expected.has("comercios.html")&&merchant.includes('name="robots" content="noindex,nofollow"'),"Merchant page absent or indexing changed");
 check(expected.has("empresa.html")&&company.includes('name="robots" content="noindex,nofollow"'),"Company page absent or indexing changed");
 const mainCss=await readFile(resolve(dist,"styles.css"));
 const cssRevision=createHash("sha1").update("blob "+mainCss.length+"\0").update(mainCss).digest("hex");
-check([html,company,merchant,rider].every(p=>p.includes('href="./styles.css?v='+cssRevision+'"')),"Packaged HTML and main stylesheet cache revision mismatch");
+check([html,company,merchant,rider,prime].every(p=>p.includes('href="./styles.css?v='+cssRevision+'"')),"Packaged HTML and main stylesheet cache revision mismatch");
 const loader=await readFile(resolve(dist,"scripts/v5-cinematic.js"),"utf8");
 const vision=html.split('<section class="statement" id="vision"')[1]?.split("</section>")[0]||"";
 const scene=html.split('<section class="ecosystem" id="ecosistema"')[1]?.split("</section>")[0]||"";
@@ -58,6 +60,7 @@ for(const name of ["commerce","courier","destination"]){
 check(expected.has("assets/v6-three.bundle.js"),"Three.js bundle is missing");
 check(expected.has("styles-typography.css")&&html.includes('href="./styles-typography.css"'),"Locally hosted type system missing");
 check(expected.has("styles-audiences.css")&&[merchant,rider].every(p=>p.includes('href="./styles-audiences.css"'))&&!html.includes("styles-audiences.css")&&!company.includes("styles-audiences.css"),"Audience styles must remain isolated");
+check(expected.has("styles-prime.css")&&prime.includes('href="./styles-prime.css"')&&[html,company,merchant,rider].every(p=>!p.includes("styles-prime.css")),"Prime styles must remain isolated");
 const typography=await readFile(resolve(dist,"styles-typography.css"),"utf8");
 for(const file of ["inter-latin-variable.woff2","plus-jakarta-sans-latin-variable.woff2"]){
  const path="fonts/"+file;
