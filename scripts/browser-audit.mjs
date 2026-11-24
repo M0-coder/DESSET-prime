@@ -274,7 +274,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    partners.cards.map(c=>c.title).join("|")!=="Comercios|Repartidores"||
    partners.cards.map(c=>c.label).join("|")!=="Más información|Más información"||
    partners.cards.map(c=>c.accessibleLabel).join("|")!=="Más información para comercios|Más información para repartidores"||
-   partners.cards.some(c=>!c.inside||!c.fit||c.href!=="#contacto"||c.tap<48||c.icon!=="true"||c.border!=="1px"||c.radius!==20||c.shadow!=="none"||c.height>410||c.decoration!=="none"||c.buttonBg!==brandBlue||c.buttonInk!==pureWhite||Math.abs(c.buttonWidth-c.cardContentWidth)>2)||
+   partners.cards.some(c=>!c.inside||!c.fit||c.href!==(c.title==="Comercios"?"./comercios.html":"#contacto")||c.tap<48||c.icon!=="true"||c.border!=="1px"||c.radius!==20||c.shadow!=="none"||c.height>410||c.decoration!=="none"||c.buttonBg!==brandBlue||c.buttonInk!==pureWhite||Math.abs(c.buttonWidth-c.cardContentWidth)>2)||
    partners.cards[0].background!==pureWhite||partners.cards[1].background!=="rgb(255, 255, 255)"||
    Math.abs(partners.cards[0].height-partners.cards[1].height)>2)
     fails.push("Partner cards responsive parity: "+JSON.stringify(partners));
@@ -410,7 +410,7 @@ try{
  await js('document.querySelector("#negocios").scrollIntoView({block:"center",behavior:"instant"})');
  await sleep(350);
  const pitch=await js('(()=>{const section=document.querySelector(".business-pitch");const anchor=section.querySelector("a.business-pitch-cta");return {heading:section.querySelector("h3")?.textContent?.replace(/\\s+/g," ").trim(),href:anchor?.getAttribute("href"),label:anchor?.textContent?.trim(),visible:section.getBoundingClientRect().height>180}})()');
- if(!pitch.visible||pitch.href!=="#contacto"||pitch.heading!=="Comercios"||pitch.label!=="Más información")report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
+ if(!pitch.visible||pitch.href!=="./comercios.html"||pitch.heading!=="Comercios"||pitch.label!=="Más información")report.failures.push("Business CTA not credible or inaccessible: "+JSON.stringify(pitch));
  report.tests.push({name:"Commercial pitch CTA",pitch});
  await capture("desktop-business-pitch.png");
  const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const services=document.querySelector("#soluciones .solutions-grid");const prim=document.querySelector(".footer-social a[data-footer-channel=Instagram]");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),obsoleteServices:!!document.querySelector(".future-services"),serviceCards:services.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.getAttribute("aria-label"),contactTarget:prim.getAttribute("target"),oldContact:!!document.querySelector(".contact-bottom,.contact-primary,.social-links--official"),headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');

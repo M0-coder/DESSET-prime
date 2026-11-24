@@ -28,6 +28,8 @@ for(const entry of manifest.files){
 check(total===manifest.totalBytes,"package size mismatch");
 const html=await readFile(resolve(dist,"index.html"),"utf8");
 const company=await readFile(resolve(dist,"empresa.html"),"utf8");
+const merchant=await readFile(resolve(dist,"comercios.html"),"utf8");
+check(expected.has("comercios.html")&&merchant.includes('name="robots" content="noindex,nofollow"'),"Merchant page absent or indexing changed");
 check(expected.has("empresa.html")&&company.includes('name="robots" content="noindex,nofollow"'),"Company page absent or indexing changed");
 const mainCss=await readFile(resolve(dist,"styles.css"));
 const cssRevision=createHash("sha1").update("blob "+mainCss.length+"\0").update(mainCss).digest("hex");
