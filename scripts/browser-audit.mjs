@@ -633,6 +633,8 @@ try{
    const company=await js(`(()=>{const v=document.documentElement.clientWidth,n=document.querySelector(".corporate-footer");return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.trim().split(/\\s+/).length,links:[...n.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=v+2})),home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content}})()`);
    if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|areas|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==9||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
    await capture((root?"dist-":"source-")+"company-"+w+"px.png",true);
+   await js('document.querySelector(".site-footer").scrollIntoView({block:"end",behavior:"instant"})');
+   await capture((root?"dist-":"source-")+"footer-"+w+"px.png");
    report.tests.push({name:"Company page "+root+w,company});
   }
  }
