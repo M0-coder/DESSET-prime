@@ -10,7 +10,7 @@ const photoCss=readFileSync(new URL("styles-hero-photo.css",root),"utf8");
 
 test("V4.5 retains exactly three cinematic beats around truthful current content",()=>{
  for(const id of ["inicio","ecosistema","contacto"])assert.match(html,new RegExp('id="'+id+'"'));
- for(const word of ["AUMENTA EL VALOR","A TU TIEMPO","ELEGIR","PREPARAR","ENTREGAR","LAS BUENAS","CONEXIONES"])assert.ok(html.includes(word));
+ for(const word of ["AUMENTA EL VALOR","A TU TIEMPO","PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS","LAS BUENAS","CONEXIONES"])assert.ok(html.includes(word));
  assert.match(html,/no representa una operación activa/i);
  assert.match(html,/Acceso público no habilitado/);
  assert.match(html,/no procesa pedidos ni pagos/i);
@@ -23,7 +23,8 @@ test("V4.5 uses native finite keyframes for original geometry and original SVG s
  assert.match(css,/\.motion-story-unit--choose\.motion-active \.motion-story-art img\{animation-delay:\.05s\}/);
  assert.match(css,/\.motion-story-unit--organize\.motion-active \.motion-story-art img\{animation-delay:\.16s\}/);
  assert.match(css,/\.motion-story-unit--move\.motion-active \.motion-story-art img\{animation-delay:\.27s\}/);
- for(const illustration of ["choose","prepare","move"])assert.match(html,new RegExp("assets/scene-"+illustration+".svg"));
+ for(const photo of ["ecosistema-proveedores","ecosistema-comercios","ecosistema-consumidores","ecosistema-operadores-logisticos"])assert.ok(html.includes("assets/"+photo+".webp"));
+ assert.match(css,/ECOSYSTEM-PARTICIPANTS-01/);
  assert.match(html,/class="brand-mark" src="\.\/assets\/deliver-assets-mark\.png"/);
  assert.doesNotMatch(css,/animation-iteration-count\s*:\s*infinite|animation\s*:[^;}]*\binfinite\b/i);
 });

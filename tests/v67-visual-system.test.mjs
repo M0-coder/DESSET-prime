@@ -55,19 +55,19 @@ test("V6.7 key foregrounds meet WCAG AA contrast for normal text",()=>{
    name+" has insufficient contrast "+contrast(foreground,background).toFixed(2));
 });
 
-test("V6.7 complete narrative agrees on Elegir → Preparar → Entregar",()=>{
- assert.ok(html.includes('aria-label="Tres momentos conceptuales de un pedido: elegir, preparar y entregar"'));
+test("V6.7 updated four-participant ecosystem",()=>{
+ assert.ok(html.includes('aria-label="Participantes del modelo de servicios DESSET"'));
  assert.ok(!html.includes('id="ecosystem-title"'));
  const flow=html.match(/<section class="statement" id="vision"[\s\S]*?<\/section>/);
  assert.match(flow?.[0]||"",/<div class="v4-flow motion-story statement-journey"/);
  const scene=html.match(/<section class="ecosystem" id="ecosistema"[\s\S]*?<\/section>/);
  assert.ok(scene&&!scene[0].includes('class="v4-flow motion-story"'),"3D area has no storytelling photo grid");
- assert.ok(flow,"No complete three-step flow");
+ assert.ok(flow,"No complete four-participant flow");
  const titles=[...flow[0].matchAll(/<h3>(.*?)<\/h3>/g)].map(x=>x[1]);
- assert.deepEqual(titles,["ELEGIR","PREPARAR","ENTREGAR"]);
- assert.ok(flow[0].includes("elegir, preparar y entregar"));
+ assert.deepEqual(titles,["PROVEEDORES","COMERCIOS","CONSUMIDORES","OPERADORES LOGÍSTICOS"]);
+ assert.ok(flow[0].includes("Participantes del modelo de servicios DESSET"));
  assert.ok(!flow[0].includes("ORGANIZAR")&&!flow[0].includes("MOVER"));
- assert.ok(flow[0].includes("Explorar opciones y gestionar solicitudes desde la experiencia de clientes."));
+ assert.ok(flow[0].includes("Productos y abastecimiento para los negocios."));
  assert.ok(html.includes("las funciones de clientes, comercios, repartidores y control"));
  assert.ok(!html.includes("la arquitectura de Customer, Business, Rider"));
  assert.ok(!storyboard.includes('title:"01 /')&&!storyboard.includes('title:"02 /'));
