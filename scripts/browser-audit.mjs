@@ -641,6 +641,20 @@ try{
    report.tests.push({name:"Company page "+root+w,company});
   }
  }
+
+ // Merchant page must be reachable, responsive and identical in source and dist.
+ for(const root of ["","dist/"]){
+  for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
+   await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   await call("Page.navigate",{url:pathToFileURL(resolve(root+"comercios.html")).href});
+   await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.company-page')"),"merchant page render");
+   await js('document.fonts.ready');
+   const merchant=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content,forms:document.querySelectorAll("form,input,iframe").length,channelLinks:document.querySelectorAll("#canales-oficiales a").length,cta:document.querySelector("#incorporacion a").getAttribute("href"),visible:[...document.querySelectorAll("main h1,main h2,main p,main li")].every(e=>e.getBoundingClientRect().width>0&&e.scrollWidth<=e.clientWidth+2)}})()`);
+   if(merchant.title!=="Comercios"||merchant.sections.join("|")!=="modelo|preparacion|condiciones|incorporacion|preguntas"||merchant.scroll>merchant.width+2||merchant.home!=="./index.html"||merchant.robots!=="noindex,nofollow"||merchant.forms||merchant.channelLinks!==5||merchant.cta!=="#canales-oficiales"||!merchant.visible)report.failures.push("MERCHANT-01 "+root+w+": "+JSON.stringify(merchant));
+   await capture((root?"dist-":"source-")+"merchant-"+w+"px.png",true);
+   report.tests.push({name:"Merchant page "+root+w,merchant});
+  }
+ }
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
  await writeFile(join(output,"audit.json"),JSON.stringify(report,null,2));
