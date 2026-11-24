@@ -14,8 +14,8 @@ test("institutional statement retains business direction without fictitious oper
  assert.match(html,/<p class="hero-lead">DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla\.<\/p>/);
  assert.doesNotMatch(html,/somos líderes|miles de clientes|servicios disponibles hoy|empresa registrada|RUC:\s*\d+|seguimiento en tiempo real/i);
  assert.doesNotMatch(html,/Comercio, tecnología y distribución se integran en una misma arquitectura/);
- assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Sitio institucional: los pedidos y pagos corresponden a las aplicaciones DESSET/);
- assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Esta web no procesa transacciones\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
 });
 
 test("truthful service and conceptual 3D disclosures remain without redundant three-pillar trust panels",()=>{
@@ -32,7 +32,7 @@ test("truthful service and conceptual 3D disclosures remain without redundant th
   assert.ok(statement.includes("<h3>"+stage+"</h3>"),"Approved ecosystem participant missing: "+stage);
  assert.doesNotMatch(flow,/<h3>(?:PROVEEDORES|COMERCIOS|PERSONAS|OPERADORES LOGÍSTICOS)<\/h3>|class="motion-story-unit"/);
  assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
- assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Esta web no procesa transacciones\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
  assert.doesNotMatch(html,/class="trust-ledger"|UN ECOSISTEMA, TRES PILARES/);
  assert.doesNotMatch(html,/100% seguro|certificado|verificado por|avalado por|garantizado/i);
 });

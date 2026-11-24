@@ -29,7 +29,7 @@ for(const dir of ["","dist/"]){
   }
   assert.doesNotMatch(docs["index.html"],/contact-bottom|contact-primary|social-links--official|Conoce los perfiles de DESSET/);
   const company=docs["empresa.html"];
-  assert.match(company,/Esta web no procesa transacciones\./);
+  assert.match(company,/Este sitio no procesa pedidos ni pagos\./);
   assert.match(company,/<h1>Empresa<\/h1>/);
   assert.doesNotMatch(company,/<form\b|<script\b|<iframe\b/i);
   assert.equal((company.match(/<section id="/g)||[]).length,6);

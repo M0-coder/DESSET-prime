@@ -13,7 +13,7 @@ test("V4.5 retains exactly three cinematic beats around truthful current content
  for(const word of ["AUMENTA EL VALOR","A TU TIEMPO","PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS","LAS BUENAS","CONEXIONES"])assert.ok(html.includes(word));
  assert.match(html,/no representa una operación activa/i);
  assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
- assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Esta web no procesa transacciones\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
  assert.doesNotMatch(html,/\b0[1-9]\s*\/\s*[^<]+/);
 });
 

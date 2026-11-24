@@ -17,7 +17,7 @@ test("activos históricos originales sin alteración",()=>{
 test("estructura pública informativa y alcance responsable",()=>{
  for(const id of ["inicio","vision","soluciones","ecosistema","negocios","contacto"])
   assert.match(html,new RegExp('id="'+id+'"'));
- assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Esta web no procesa transacciones\./);
+ assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
  assert.doesNotMatch(html,/Conocer otras áreas del ecosistema/);
  assert.match(html,/<h3>DESSET <span>prime<\/span><\/h3>/);
  assert.match(html,/conceptual/i);

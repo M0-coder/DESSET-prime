@@ -14,8 +14,7 @@ const strict=(ok,msg)=>{if(!ok)reject(msg)};
 export function inspectInstitutionalChannels({html,serviceState,companyHtml=readFileSync(join(repositoryRoot,'empresa.html'),'utf8'),attestation=defaultAttestation}){
  strict(typeof html==='string'&&html.includes('<html lang="es">'),'Prime Spanish HTML missing');
  strict(html.includes('id="contacto"')&&html.includes('aria-labelledby="contact-title"'),'institutional contact missing');
- strict(typeof companyHtml==='string'&&companyHtml.includes('Esta web no procesa transacciones.')&&
-  companyHtml.includes('las aplicaciones DESSET cuando estén habilitadas')&&
+ strict(typeof companyHtml==='string'&&companyHtml.includes('Este sitio no procesa pedidos ni pagos.')&&
   html.includes('href="./empresa.html#informacion-corporativa"'),'accessible company no-commerce disclosure missing');
  strict(!/<form\b|<iframe\b|\b(?:checkout|payment|submit-order)\b/i.test(companyHtml),'unapproved transactional company UI');
  strict(typeof serviceState==='string'&&serviceState.includes('applicationDistribution:"not_published"')&&

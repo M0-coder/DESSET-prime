@@ -152,6 +152,6 @@ test('release accepts exact owner-declared links without claiming admin access o
 
 test('company disclosure must remain visible and no duplicate contact rail returns',()=>{
  const companyHtml=readFileSync(join(root,'empresa.html'),'utf8');
- assert.throws(()=>inspectInstitutionalChannels({html,serviceState:state,companyHtml:companyHtml.replace('Esta web no procesa transacciones.','')}),/NO-GO/);
+ assert.throws(()=>inspectInstitutionalChannels({html,serviceState:state,companyHtml:companyHtml.replace('Este sitio no procesa pedidos ni pagos.','')}),/NO-GO/);
  assert.throws(()=>inspectInstitutionalChannels({html:html.replace('</body>','<div class="contact-bottom"></div></body>'),serviceState:state}),/NO-GO/);
 });
