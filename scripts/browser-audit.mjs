@@ -64,10 +64,10 @@ async function capture(name,full=false){
  report.screenshots.push({name,size_bytes:buf.length});
 }
 const URL=pathToFileURL(resolve("index.html")).href;
-async function viewport(width,height,reduce=false){
+async function viewport(width,height,reduce=false,entry=URL){
  await call("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:width<=800});
  await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:reduce?"reduce":"no-preference"}]});
- await call("Page.navigate",{url:URL});
+ await call("Page.navigate",{url:entry});
  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.hero--motion')"),"page render");
  await js('document.fonts.ready');
  // PRIME-COLOR-02 must sample the final opaque CTA, not a partial CSS
@@ -259,7 +259,7 @@ async function viewport(width,height,reduce=false){
    if(!diag.menuLabel?.startsWith("Menú"))fails.push("Mobile menu accessible name must include visible Menú label: "+diag.menuLabel);
   if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<28||diag.typeSizes.storyTitle<(width<=480?20:17))fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
- report.viewports.push({width,height,reduce,...diag,failures:fails});
+ report.viewports.push({width,height,reduce,source:entry===URL?"source":"dist",...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
  return diag;
 }
@@ -585,6 +585,18 @@ try{
  if(!accessible.hasHero||!accessible.hasContact||accessible.headingCount<6)
   report.failures.push("V5.4 accessibility tree missing landmarks or headlines: "+JSON.stringify(accessible));
  report.tests.push({name:"V5.4 Chromium accessibility tree structural smoke",accessible});
+ // Verify the exact deployable package as well as the working source, on all three device classes.
+ const packaged=pathToFileURL(resolve("dist/index.html")).href;
+ for(const [w,h] of [[1440,900],[768,900],[390,844]]){
+  const result=await viewport(w,h,false,packaged);
+  const source=report.viewports.find(v=>v.source==="source"&&v.width===w&&!v.reduce);
+  const fingerprint=x=>JSON.stringify({surface:x.surface,gap:x.gap,columns:x.columns,revision:x.revision,cards:x.cards.map(c=>({brand:c.brand,background:c.background,borderColor:c.borderColor,borderWidth:c.borderWidth,radius:c.radius,divider:c.divider,primeColor:c.primeColor,centered:c.centered,descriptionColor:c.descriptionColor}))});
+  if(!source||fingerprint(source.servicesLayout)!==fingerprint(result.servicesLayout))report.failures.push("Packaged and source service presentation differ at "+w);
+  await js('document.querySelector("#soluciones").scrollIntoView({block:"center",behavior:"instant"})');
+  await sleep(700);
+  await capture("dist-services-"+w+"px.png");
+  report.tests.push({name:"Source/dist service visual parity "+w,services:result.servicesLayout});
+ }
 
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{

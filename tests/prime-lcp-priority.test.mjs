@@ -18,7 +18,8 @@ function check(html){
   assert.ok(tag.includes('media="'+media[i]+'"'),"Wrong viewport preloading condition");
  }
  assert.ok(assets.every(x=>x.index<html.indexOf('href="./fonts/')),"Hero image must take priority over fonts");
- assert.ok(assets.every(x=>x.index<html.indexOf('href="./styles.css"')),"Hero image discovered before render-blocking CSS");
+ const mainStyle=html.match(/href="\.\/styles\.css\?v=[a-f0-9]{40}"/);
+ assert.ok(mainStyle&&assets.every(x=>x.index<mainStyle.index),"Hero image discovered before versioned render-blocking CSS");
  assert.match(html,/<source type="image\/webp" media="\(max-width: 700px\)" srcset="\.\/assets\/desset-hero-entrega-mobile\.webp">/);
  assert.match(html,/class="prime-photo-image"[^>]*src="\.\/assets\/desset-hero-entrega-dos-espejos\.webp"[^>]*loading="eager" fetchpriority="high"/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
