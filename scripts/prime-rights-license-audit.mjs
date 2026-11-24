@@ -8,6 +8,7 @@ import {createHash} from 'node:crypto';
 import {join,resolve,dirname,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {checkPrimeFonts} from './prime-font-licenses.mjs';
+import {reviewSelectedMedia} from './prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const requireSafe=(okay,reason)=>{if(!okay)throw Error('NO-GO: '+reason)};
@@ -87,6 +88,7 @@ export function checkAssetRightsAndLicenses({
   owner_declaration_status:'owner-declared',legal_title_independently_verified:false,
   assets_checked:verified.length,assets:verified,
   selected_media_checked:selectedVerified.length,selected_media:selectedVerified,individual_license_review_complete:selected.individual_license_review_complete===true&&selectedVerified.filter(a=>a.claim==='third-party').every(a=>a.verification==='individual-source-verified'),
+  selected_media_review:reviewSelectedMedia(selected),selected_media_owner_attestation:selected.owner_attestation??null,
   third_party_packages:packages.sort((a,b)=>a.name.localeCompare(b.name)),
   compiled_bundle:'assets/v6-three.bundle.js',compiled_bundle_contains_third_party:true,
   fonts_checked:fontEvidence.families,font_license:fontEvidence.license,
@@ -102,6 +104,6 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   if(outfile){requireSafe(isAbsolute(outfile),'report path must be absolute');const {writeFileSync}=await import('node:fs');
     writeFileSync(outfile,JSON.stringify(result,null,2)+'\n',{flag:'wx'});}
   console.log(JSON.stringify({outcome:result.outcome,assets:result.assets_checked,
-    selected_media:result.selected_media_checked,individual_license_review_complete:result.individual_license_review_complete,packages:result.third_party_packages.length,legal_verification:false,release_decision:'NO-GO'}));
+    selected_media:result.selected_media_checked,individual_license_review_complete:result.individual_license_review_complete,selected_media_review_basis:result.selected_media_review.basis,packages:result.third_party_packages.length,legal_verification:false,release_decision:'NO-GO'}));
  }catch(e){console.error(e.message);process.exitCode=1;}
 }

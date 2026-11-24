@@ -20,6 +20,9 @@ test('14 owner-declared active original media are individually SHA-256 verified'
  assert.equal(r.outcome,'PASS');assert.equal(r.assets_checked,14);
  assert.equal(r.legal_title_independently_verified,false);
  assert.equal(r.selected_media_checked,4);assert.equal(r.individual_license_review_complete,false);
+ assert.equal(r.selected_media_review.basis,'owner-attested-free-download');
+ assert.equal(r.selected_media_review.release_authorized,false);
+ assert.equal(r.selected_media_owner_attestation.independent_legal_verification,false);
  assert.equal(r.selected_media.filter(a=>a.claim==="third-party").length,3);
  assert.ok(r.selected_media.every(a=>a.claim!=="owner-declared"));
  assert.equal(r.fonts_checked,2);assert.equal(r.font_license,'SIL-OFL-1.1');

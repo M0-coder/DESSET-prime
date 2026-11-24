@@ -52,5 +52,39 @@
       "verification": "owner-selected",
       "source_id": "owner-approved-2026-11-24"
     }
-  ]
+  ],
+  "owner_attestation": {
+    "status": "owner-attested-free-download",
+    "date": "2026-11-24",
+    "scope": "ECOSYSTEM-PARTICIPANTS-01; illustrative website use of these three selected external photos only",
+    "statement": "El titular confirma que descargó las fotografías ofrecidas como gratuitas y autoriza su uso en la web DESSET.",
+    "source": "direct owner instruction in the project conversation",
+    "general_license_terms_reviewed_on": "2026-11-24",
+    "individual_source_verification": false,
+    "independent_legal_verification": false,
+    "exclusive_ownership_claim": false,
+    "assets": [
+      {
+        "path": "assets/ecosistema-proveedores.webp",
+        "sha256": "bc4c3e9301659949b65373eeeffccb1fddd9b5c67bdbeb8598a511a79dc98170",
+        "source_id": "40236120",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/"
+      },
+      {
+        "path": "assets/ecosistema-comercios.webp",
+        "sha256": "3370bbb94434edf705b2144bd86f1b60aba1b39f1989d58a5a187dca1b6ff2c2",
+        "source_id": "26309839",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/"
+      },
+      {
+        "path": "assets/ecosistema-consumidores.webp",
+        "sha256": "9f7eb3e2d747b1dbb7fb7a98d4b24fa3d508e544abe95a5a39d0bd33a93f99a7",
+        "source_id": "DHnmO_mO0Pg",
+        "license": "Unsplash License",
+        "license_url": "https://unsplash.com/license"
+      }
+    ]
+  }
 }
