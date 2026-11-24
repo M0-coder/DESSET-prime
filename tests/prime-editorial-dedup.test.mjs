@@ -43,11 +43,10 @@ test("Prime still has six uniquely named sections and working in-page links",()=
 
 test("Removal preserves real visual service, mobile imagery, GPU scene, honest app status, and official channels",()=>{
   for(const required of [
-    'class="hero-cta"','class="business-pitch"','class="service-access"',
+    'class="hero-cta"','class="business-pitch"',
     'class="v5-city-stage"','class="v6-three-mount"',
     'class="v63-tour"','class="v6-pause"',
     'ecosistema-proveedores.webp','ecosistema-comercios.webp','ecosistema-consumidores.webp','ecosistema-operadores-logisticos.webp',
-    'data-service-access','data-app-links hidden',
   ])assert.ok(html.includes(required),"Functional element removed: "+required);
   assert.equal((html.match(/data-channel-basis="owner-attested"/g)||[]).length,5);
   assert.match(cinematic,/activationObserver\.observe\(stage\)/);
@@ -87,7 +86,7 @@ test("EDITORIAL-09 actually deletes the two marked desktop ornaments without hid
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/);
  assert.doesNotMatch(css,/\.prime-photo-caption/);
  assert.match(html,/aria-label="Escena conceptual:/);
- assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
+ assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
  assert.equal((html.match(/data-channel-basis="owner-attested"/g)||[]).length,5);
 });
 

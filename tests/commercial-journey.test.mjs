@@ -47,7 +47,7 @@ test("four independently chosen local photographs and concrete participant roles
 
 test("no fake availability, brand replacement, remote imagery or public checkout",()=>{
  assert.match(html,/DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla/);
- assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
+ assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
  assert.match(html,/assets\/deliver-assets-mark\.png/);
  assert.doesNotMatch(html,/<form\b|<input\b|<button[^>]*comprar|https?:\/\/images\./i);
 });

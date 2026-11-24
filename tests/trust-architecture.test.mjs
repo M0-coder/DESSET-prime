@@ -31,7 +31,7 @@ test("truthful service and conceptual 3D disclosures remain without redundant th
  for(const stage of ["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"])
   assert.ok(statement.includes("<h3>"+stage+"</h3>"),"Approved ecosystem participant missing: "+stage);
  assert.doesNotMatch(flow,/<h3>(?:PROVEEDORES|COMERCIOS|PERSONAS|OPERADORES LOGÍSTICOS)<\/h3>|class="motion-story-unit"/);
- assert.match(html,/data-service-status[^>]*>Acceso público no habilitado/);
+ assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
  assert.match(html,/Esta web no procesa transacciones/);
  assert.doesNotMatch(html,/class="trust-ledger"|UN ECOSISTEMA, TRES PILARES/);
  assert.doesNotMatch(html,/100% seguro|certificado|verificado por|avalado por|garantizado/i);

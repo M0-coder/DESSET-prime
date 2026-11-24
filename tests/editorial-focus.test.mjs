@@ -39,7 +39,7 @@ test("primary business narrative remains intelligible without decorative microco
  assert.doesNotMatch(html,/Área complementaria del modelo logístico|Un ecosistema, experiencias conectadas/);
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/i);
  assert.match(html,/aria-label="Escena conceptual:/);
- assert.match(html,/Acceso público no habilitado/);
+ assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
  assert.match(html,/Este sitio no procesa pedidos ni pagos/);
 });
 
