@@ -11,6 +11,8 @@ for(const dir of ["","dist/"]){
  assert.match(section,/<span class="closing-line">LAS BUENAS CONEXIONES<\/span>\s*<span class="closing-line closing-line--final"><em>COMIENZAN AQUÍ<\/em>/);
  assert.equal((section.match(/<article\b/g)||[]).length,2);
  assert.doesNotMatch(section,/v5-contact-light|closing-line--middle|contact-bottom/);
+ assert.match(css,/#negocios\.audiences\{background:#f4f8fe;/);
+ assert.equal((css.match(/#negocios\.audiences\{background:/g)||[]).length,1);
  assert.match(css,/#negocios #contacto\.contact::before,#negocios #contacto\.contact::after\{content:none;animation:none\}/);
  assert.match(css,/#negocios #contacto\.contact \.closing-line::after\{content:none;animation:none\}/);
  });

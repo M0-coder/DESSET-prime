@@ -269,7 +269,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==9||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
  const partners=diag.partnerLayout;
  const cl=partners.closing;
- if(!cl.joined||cl.background!==cl.headerBackground||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(17, 17, 17)|rgb(21, 81, 216)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
+ if(!cl.joined||cl.background!=="rgb(244, 248, 254)"||cl.headerBackground!=="rgba(0, 0, 0, 0)"||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(17, 17, 17)|rgb(21, 81, 216)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
   if(partners.columns!==(width<=700?1:2)||partners.gap!==(width<=700?12:16)||partners.cards.length!==2||
    partners.cards.map(c=>c.title).join("|")!=="Comercios|Repartidores"||
    partners.cards.map(c=>c.label).join("|")!=="Más información|Más información"||
@@ -317,7 +317,7 @@ try{
  const expectedSteps=["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"];
  if(!designSystem.cssLoaded||
     designSystem.body!=="rgb(247, 245, 238)"||
-    designSystem.contact!=="rgb(247, 245, 238)"||
+    designSystem.contact!=="rgba(0, 0, 0, 0)"||
     designSystem.feature!=="rgb(21, 81, 216)"||
     designSystem.brand!=="rgb(255, 255, 255)"||
     JSON.stringify(designSystem.steps)!==JSON.stringify(expectedSteps))
