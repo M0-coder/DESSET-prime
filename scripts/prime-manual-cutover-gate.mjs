@@ -47,6 +47,8 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{
   const task=process.argv[2],target=JSON.parse(readFileSync(targetPath,'utf8'));
   if(task==='request'){
+   const media=JSON.parse(readFileSync(resolve(dirname(targetPath),'prime-selected-media.json'),'utf8'));
+   if(media.individual_license_review_complete!==true||media.assets.filter(a=>a.claim==='third-party').length!==3||media.assets.some(a=>a.claim==='third-party'&&a.verification!=='individual-source-verified'))throw Error('Selected photographs require individual license review before production');
    const e=process.env;
    const out=validateReleaseIntent({repository:e.GITHUB_REPOSITORY,ref:e.GITHUB_REF,event:e.GITHUB_EVENT_NAME,
      expectedSha:e.RELEASE_SHA,checkoutSha:e.GITHUB_SHA,previousId:e.PREVIOUS_DEPLOYMENT_ID,

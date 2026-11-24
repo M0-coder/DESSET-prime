@@ -38,18 +38,30 @@ export function checkAssetRightsAndLicenses({
     !expected.has(a.path),'invalid or duplicated declared media');
   expected.set(a.path,a.sha256);
  }
+ const selected=JSON.parse(readFileSync(join(root,'config/prime-selected-media.json'),'utf8'));
+ requireSafe(selected.schema==='desset-prime-selected-media-v1'&&selected.release_authorized===false&&Array.isArray(selected.assets)&&selected.assets.length===4,'invalid selected media inventory');
+ const selectedByPath=new Map();
+ for(const a of selected.assets){
+  requireSafe(/^assets\/ecosistema-[a-z0-9-]+\.webp$/.test(a.path)&&/^[a-f0-9]{64}$/.test(a.sha256)&&Number.isSafeInteger(a.bytes)&&a.bytes>0&&!expected.has(a.path)&&!selectedByPath.has(a.path),'invalid/duplicated selected photograph');
+  requireSafe(a.claim==='third-party'||a.claim==='ai-generated-owner-selected','selected media must not be declared exclusive owner property');
+  if(a.claim==='third-party')requireSafe(['Pexels License','Unsplash License'].includes(a.license)&&typeof a.source==='string'&&typeof a.license_url==='string'&&['source-identified','individual-source-pending','individual-source-verified'].includes(a.verification),'missing external license record');
+  selectedByPath.set(a.path,a);expected.set(a.path,a.sha256);
+ }
+ requireSafe(selected.assets.filter(a=>a.claim==='third-party').length===3,'expected three externally licensed photographs');
  const sources=source.files.filter(f=>isMedia(f.path));
  requireSafe(sources.length===expected.size,'unexpected original-media inventory');
- const verified=[];
+ const verified=[],selectedVerified=[];
  for(const entry of sources){
   requireSafe(expected.get(entry.path)===entry.sha256,'unreviewed image or 3D hash: '+entry.path);
   const path=join(dist,entry.path),stat=lstatSync(path);
   requireSafe(stat.isFile()&&!stat.isSymbolicLink(),'invalid original media file: '+entry.path);
   const bytes=readFileSync(path);
   requireSafe(bytes.length===entry.bytes&&hash(bytes)===entry.sha256,'modified original media bytes: '+entry.path);
-  verified.push({path:entry.path,bytes:entry.bytes,sha256:entry.sha256,claim:'owner-declared'});
+  const a=selectedByPath.get(entry.path);
+  if(a){requireSafe(a.bytes===bytes.length&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid approved WebP '+entry.path);selectedVerified.push({...a});}
+  else verified.push({path:entry.path,bytes:entry.bytes,sha256:entry.sha256,claim:'owner-declared'});
  }
- requireSafe(verified.length===14&&verified.every(x=>expected.has(x.path)),'incomplete ownership registry');
+ requireSafe(verified.length===14&&verified.every(x=>expected.has(x.path))&&selectedVerified.length===4,'incomplete ownership or selected media registry');
  // SPDX/license metadata is derived from the reproducible npm lock, not from the owner assertion.
  requireSafe(lock.lockfileVersion===3&&pkg.dependencies?.three==='0.187.0'&&
    pkg.devDependencies?.esbuild==='0.28.2','unreviewed package versions');
@@ -74,6 +86,7 @@ export function checkAssetRightsAndLicenses({
  return {schema:'desset-prime-rights-and-sbom-evidence-v1',outcome:'PASS',
   owner_declaration_status:'owner-declared',legal_title_independently_verified:false,
   assets_checked:verified.length,assets:verified,
+  selected_media_checked:selectedVerified.length,selected_media:selectedVerified,individual_license_review_complete:selected.individual_license_review_complete===true&&selectedVerified.filter(a=>a.claim==='third-party').every(a=>a.verification==='individual-source-verified'),
   third_party_packages:packages.sort((a,b)=>a.name.localeCompare(b.name)),
   compiled_bundle:'assets/v6-three.bundle.js',compiled_bundle_contains_third_party:true,
   fonts_checked:fontEvidence.families,font_license:fontEvidence.license,
@@ -89,6 +102,6 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   if(outfile){requireSafe(isAbsolute(outfile),'report path must be absolute');const {writeFileSync}=await import('node:fs');
     writeFileSync(outfile,JSON.stringify(result,null,2)+'\n',{flag:'wx'});}
   console.log(JSON.stringify({outcome:result.outcome,assets:result.assets_checked,
-    packages:result.third_party_packages.length,legal_verification:false,release_decision:'NO-GO'}));
+    selected_media:result.selected_media_checked,individual_license_review_complete:result.individual_license_review_complete,packages:result.third_party_packages.length,legal_verification:false,release_decision:'NO-GO'}));
  }catch(e){console.error(e.message);process.exitCode=1;}
 }

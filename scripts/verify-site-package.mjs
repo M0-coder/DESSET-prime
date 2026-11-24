@@ -31,9 +31,9 @@ const loader=await readFile(resolve(dist,"scripts/v5-cinematic.js"),"utf8");
 const vision=html.split('<section class="statement" id="vision"')[1]?.split("</section>")[0]||"";
 const scene=html.split('<section class="ecosystem" id="ecosistema"')[1]?.split("</section>")[0]||"";
 check(vision.includes('class="v4-flow motion-story statement-journey"')&&
- (vision.match(/class="motion-story-unit motion-story-unit--/g)||[]).length===3&&
+ (vision.match(/class="motion-story-unit motion-story-unit--/g)||[]).length===4&&
  !scene.includes("motion-story-unit")&&scene.includes('class="v6-three-mount"'),
- "PRIME-LAYOUT-01 relocate three photos without duplicating or damaging 3D scene");
+ "PRIME-LAYOUT-01 include four participant photos without duplicating or damaging 3D scene");
 check(html.includes('id="ecosistema"')&&html.includes('aria-label="Escena tridimensional conceptual de DESSET"')&&
  !html.includes('data-v64-tour-launch'),"3D section landmark or duplicate hero CTA regression");
 check(html.includes('class="v63-tour"')&&html.includes('class="v6-three-mount"'),"3D tour not mounted in ecosystem");

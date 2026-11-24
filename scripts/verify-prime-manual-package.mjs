@@ -13,7 +13,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(['INDEX','NOINDEX'].includes(seoPolicy)&&seoPolicy===m.seo_policy,'SEO policy differs');
  check(m.project==='desset-institucional'&&m.canonical==='https://desset.lat/','Wrong Pages destination');
  check(m.production_authorized===false&&m.production_deployed===false,'Report attempts to authorize production');
- check(m.original_files===31&&m.package_files===35&&Array.isArray(m.assets)&&m.assets.length===35,'Missing/extra source assets');
+ check(m.original_files===35&&m.package_files===39&&Array.isArray(m.assets)&&m.assets.length===39,'Missing/extra source assets');
  check(hash(Buffer.from(JSON.stringify(m.assets)))===m.assets_manifest_sha256,'Manifest SHA changed');
  const want=new Map(),seen=new Set();
  for(const a of m.assets){
