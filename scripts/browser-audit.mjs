@@ -267,7 +267,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    Math.abs(services.cards[0].height-services.cards[1].height)>2||Math.abs(services.cards[0].dividerOffset-services.cards[1].dividerOffset)>2)
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
   if(diag.decorativeArrowCount!==0)fails.push("Decorative arrows remain in interactive controls");
- if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==10||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
+ if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==11||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
  const partners=diag.partnerLayout;
  const cl=partners.closing;
  if(!cl.joined||cl.background!=="rgb(244, 248, 254)"||cl.headerBackground!=="rgba(0, 0, 0, 0)"||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(17, 17, 17)|rgb(21, 81, 216)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
@@ -635,7 +635,7 @@ try{
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.company-page')"),"company page render");
    await js('document.fonts.ready');
    const company=await js(`(()=>{const v=document.documentElement.clientWidth,n=document.querySelector(".corporate-footer");return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.trim().split(/\\s+/).length,links:[...n.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=v+2})),home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content}})()`);
-   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|areas|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==10||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
+   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|areas|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==11||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
    await capture((root?"dist-":"source-")+"company-"+w+"px.png",true);
    await js('document.querySelector(".site-footer").scrollIntoView({block:"end",behavior:"instant"})');
    await capture((root?"dist-":"source-")+"footer-"+w+"px.png");
@@ -728,6 +728,35 @@ try{
   await js('document.querySelector("#incidentes a").click()');
   await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/contacto.html') && location.hash==='#seguridad' && !!document.querySelector('.contact-page')"),"Trust incident contact destination");
   report.tests.push({name:"Trust navigation and incident route "+root,pass:true});
+ }
+ // NEWS-01: real filter selection, brand disclosure, responsive source and dist.
+ for(const root of ["","dist/"]){
+  for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
+   await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   await call("Page.navigate",{url:pathToFileURL(resolve(root+"noticias.html")).href});
+   await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.news-page')"),"news page render");
+   await js('document.fonts.ready');
+   const news=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,width:v,scroll:document.documentElement.scrollWidth,filters:document.querySelectorAll(".nw-filter input[type=radio]").length,selected:document.querySelector(".nw-filter input:checked").id,forms:document.querySelectorAll("form,iframe,textarea,script,input:not([type=radio])").length,social:document.querySelectorAll(".footer-social,[data-footer-channel]").length,fit:[...document.querySelectorAll(".nw-filter label")].every(e=>e.getBoundingClientRect().height>=44)}})()`);
+   if(news.title!=="Sala de noticias."||news.scroll>news.width+2||news.filters!==4||news.selected!=="nw-all"||news.forms||news.social||!news.fit)report.failures.push("NEWS-01 "+root+w+": "+JSON.stringify(news));
+   await capture((root?"dist-":"source-")+"noticias-"+w+"px.png",true);
+   for(const id of ["nw-press","nw-announcements","nw-media","nw-all"]){
+    await js("document.querySelector('label[for="+id+"]').click()");
+    const selected=await js("(()=>({id:document.querySelector('.nw-filter input:checked').id,visible:[...document.querySelectorAll('.nw-state')].filter(e=>getComputedStyle(e).display!=='none').map(e=>e.className)}))()");
+    if(selected.id!==id||selected.visible.length!==1||selected.visible[0]!=="nw-state "+id)report.failures.push("NEWS-01 filter "+JSON.stringify(selected));
+   }
+   await js('document.querySelector("#recursos-de-marca summary").click()');
+   if(!await js('document.querySelector("#recursos-de-marca").open && document.querySelector(".nw-brand-content img").complete && document.querySelector(".nw-brand-content img").naturalWidth>0'))report.failures.push("NEWS-01 brand preview failed");
+   await capture((root?"dist-":"source-")+"noticias-open-"+w+"px.png",true);
+   report.tests.push({name:"News directory "+root+w,news});
+  }
+  await call("Page.navigate",{url:pathToFileURL(resolve(root+"index.html")).href});
+  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.corporate-footer a[href=\"./noticias.html\"]')"),"News entry");
+  await js('document.querySelector(\'.corporate-footer a[href="./noticias.html"]\').click()');
+  await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/noticias.html') && !!document.querySelector('.news-page')"),"News destination");
+  await js('document.querySelector("#recursos-de-marca summary").click()');
+  await js('document.querySelector(".nw-brand-content a").click()');
+  await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/contacto.html') && location.hash==='#prensa' && !!document.querySelector('.contact-page')"),"News press contact destination");
+  report.tests.push({name:"News navigation and press route "+root,pass:true});
  }
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{

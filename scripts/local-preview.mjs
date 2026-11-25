@@ -14,7 +14,7 @@ const port=4173;
 const mime={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",
  ".js":"text/javascript; charset=utf-8",".svg":"image/svg+xml",
  ".png":"image/png",".webp":"image/webp",".woff2":"font/woff2",".txt":"text/plain; charset=utf-8",".glb":"model/gltf-binary"};
-const permitted=rel=>rel==="index.html"||rel==="empresa.html"||rel==="comercios.html"||rel==="repartidores.html"||rel==="prime.html"||rel==="contacto.html"||rel==="confianza.html"||rel==="styles.css"||rel==="styles-v5.css"||rel==="styles-system.css"||rel==="styles-hero-photo.css"||rel==="styles-visual02.css"||rel==="styles-typography.css"||rel==="styles-audiences.css"||rel==="styles-prime.css"||rel==="styles-contact.css"||rel==="styles-trust.css"
+const permitted=rel=>rel==="index.html"||rel==="empresa.html"||rel==="comercios.html"||rel==="repartidores.html"||rel==="prime.html"||rel==="contacto.html"||rel==="confianza.html"||rel==="noticias.html"||rel==="styles.css"||rel==="styles-v5.css"||rel==="styles-system.css"||rel==="styles-hero-photo.css"||rel==="styles-visual02.css"||rel==="styles-typography.css"||rel==="styles-audiences.css"||rel==="styles-prime.css"||rel==="styles-contact.css"||rel==="styles-trust.css"||rel==="styles-news.css"
  || /^fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2$/.test(rel)
  || /^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(rel)
  || /^scripts\/(?:app|motion|v5-cinematic|service-state)\.js$/.test(rel)

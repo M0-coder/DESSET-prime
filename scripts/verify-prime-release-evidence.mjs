@@ -14,9 +14,9 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(/^[a-f0-9]{40}$/.test(expectedSha)&&info.origin_sha===expectedSha&&info.checkout_sha===expectedSha,'SHA mismatch');
  check(info.release_authorized===false&&info.release_decision==='NO-GO','not an offline-only candidate');
  check(info.noindex===true&&info.robots_disallow_all===true,'indexing policy changed');
- check(info.original_files===45&&info.staged_files===48,'package shape mismatch');
+ check(info.original_files===47&&info.staged_files===50,'package shape mismatch');
  check(info.repeated_packaging_identical===true&&info.independently_compiled_twice===false,'evidence claims changed');
- check(Array.isArray(info.files)&&info.files.length===48,'missing per-asset manifest');
+ check(Array.isArray(info.files)&&info.files.length===50,'missing per-asset manifest');
  check(sha(Buffer.from(JSON.stringify(info.files)))===info.artifacts_sha256,'manifest checksum mismatch');
  const expected=new Map(),actual=new Set();let total=0;
  for(const f of info.files){
@@ -53,6 +53,8 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(contact.includes('name="robots" content="noindex,nofollow"')&&contact.includes('rel="canonical" href="https://desset.lat/contacto"'),'Contact page canonical or noindex changed');
  const trust=readFileSync(join(publicDir,'confianza.html'),'utf8');
  check(trust.includes('name="robots" content="noindex,nofollow"')&&trust.includes('rel="canonical" href="https://desset.lat/confianza"'),'Trust page canonical or noindex changed');
+ const news=readFileSync(join(publicDir,'noticias.html'),'utf8');
+ check(news.includes('name="robots" content="noindex,nofollow"')&&news.includes('rel="canonical" href="https://desset.lat/noticias"'),'News page canonical or noindex changed');
  const company=readFileSync(join(publicDir,'empresa.html'),'utf8');
  check(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or noindex changed');
  const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');

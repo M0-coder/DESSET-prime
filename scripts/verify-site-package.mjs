@@ -12,7 +12,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length>=18&&manifest.files.length<=45,"unexpected file count");
+check(manifest.files.length>=18&&manifest.files.length<=47,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -36,6 +36,8 @@ const contact=await readFile(resolve(dist,"contacto.html"),"utf8");
 check(expected.has("contacto.html")&&contact.includes('name="robots" content="noindex,nofollow"'),"Contact page absent or indexing changed");
 const trust=await readFile(resolve(dist,"confianza.html"),"utf8");
 check(expected.has("confianza.html")&&trust.includes('name="robots" content="noindex,nofollow"'),"Trust page absent or indexing changed");
+const news=await readFile(resolve(dist,"noticias.html"),"utf8");
+check(expected.has("noticias.html")&&news.includes('name="robots" content="noindex,nofollow"'),"News page absent or indexing changed");
 const merchant=await readFile(resolve(dist,"comercios.html"),"utf8");
 check(expected.has("comercios.html")&&merchant.includes('name="robots" content="noindex,nofollow"'),"Merchant page absent or indexing changed");
 check(expected.has("empresa.html")&&company.includes('name="robots" content="noindex,nofollow"'),"Company page absent or indexing changed");
@@ -67,6 +69,7 @@ check(expected.has("styles-audiences.css")&&[merchant,rider].every(p=>p.includes
 check(expected.has("styles-prime.css")&&prime.includes('href="./styles-prime.css"')&&[html,company,merchant,rider].every(p=>!p.includes("styles-prime.css")),"Prime styles must remain isolated");
 check(expected.has("styles-contact.css")&&contact.includes('href="./styles-contact.css"')&&[html,company,merchant,rider,prime].every(p=>!p.includes("styles-contact.css")),"Contact styles must remain isolated");
 check(expected.has("styles-trust.css")&&trust.includes('href="./styles-trust.css"')&&[html,company,merchant,rider,prime,contact].every(p=>!p.includes("styles-trust.css")),"Trust styles must remain isolated");
+check(expected.has("styles-news.css")&&news.includes('href="./styles-news.css"')&&[html,company,merchant,rider,prime,contact,trust].every(p=>!p.includes("styles-news.css")),"News styles must remain isolated");
 const typography=await readFile(resolve(dist,"styles-typography.css"),"utf8");
 for(const file of ["inter-latin-variable.woff2","plus-jakarta-sans-latin-variable.woff2"]){
  const path="fonts/"+file;
