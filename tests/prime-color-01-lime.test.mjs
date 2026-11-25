@@ -21,8 +21,11 @@ test("Only Hablemos de tu negocio retains owner-approved #CDFC8A",()=>{
  assert.equal(css.includes("PRIME-COLOR-01"),false,"Do not retain global lime overrides");
  assert.ok(statSync(new URL("styles-visual02.css",root)).size<=8200);
 });
-test("Every prior institutional color in VISUAL-02 is restored byte-for-byte",()=>{
- const original=css.slice(0,cut);
+test("VISUAL-02 preserves the approved stylesheet except the two authorized neutral-color edits",()=>{
+ const revised=css.slice(0,cut);
+ assert.equal(revised.split("--v02-deep:#000000;").length,2,"Exactly one authorized black editorial token");
+ assert.equal(revised.split("#ecosistema .ecosystem-board{background:#142239;").length,2,"Exactly one preserved visual component color");
+ const original=revised.replace("--v02-deep:#000000;","--v02-deep:#142239;").replace("#ecosistema .ecosystem-board{background:#142239;","#ecosistema .ecosystem-board{background:var(--v02-deep);");
  const sha=createHash("sha1").update("blob "+Buffer.byteLength(original)+"\0").update(original).digest("hex");
  assert.equal(sha,"58bc1934ced19bd632b2291531c8a505cce365f9", "Previously approved stylesheet modified unexpectedly");
  for(const [path,pattern] of [
