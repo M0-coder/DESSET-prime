@@ -1,5 +1,5 @@
 /* TRUST-01: scoped institutional trust center, independent of service pages. */
-.trust-page{background:#fff;color:#111}
+.trust-page{background:#fff;color:#000000}
 .trust-page .tr-inner{max-width:1040px;margin:auto;padding-inline:var(--edge,24px)}
 .trust-page .tr-hero{background:#000000;color:#fff;padding-block:clamp(32px,5vw,72px)}
 .trust-page .tr-hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,320px);align-items:center;gap:24px}

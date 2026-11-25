@@ -1,5 +1,5 @@
 /* Commercial audience pages only. No selectors affect the existing homepage or company page. */
-.audience-page{background:#f4f8fe;color:#111}
+.audience-page{background:#f4f8fe;color:#000000}
 .audience-page .ap-hero{display:grid;grid-template-columns:1.08fr .92fr;align-items:stretch;background:#073bbc;color:#fff;min-height:clamp(380px,38vw,580px)}
 .audience-page .ap-hero-copy{padding:clamp(36px,6vw,96px) var(--edge);align-self:center;min-width:0}
 .audience-page .ap-eyebrow{font-size:14px;font-weight:750;letter-spacing:.09em;text-transform:uppercase;margin:0 0 18px}

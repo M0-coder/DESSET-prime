@@ -1,5 +1,5 @@
 /* CONTACT-04: editorial directory, no repeated commercial content. */
-.contact-page{background:#fff;color:#111}
+.contact-page{background:#fff;color:#000000}
 .contact-page .ct-inner{max-width:1040px;margin:auto;padding-inline:var(--edge)}
 .contact-page .ct-hero{background:#f4f8fe;padding-block:clamp(36px,6vw,80px)}
 .contact-page h1{font-family:var(--ds-type-display);font-weight:800;font-size:clamp(32px,4.5vw,64px);letter-spacing:-.035em;line-height:1.12;margin:0 0 15px;overflow-wrap:break-word}

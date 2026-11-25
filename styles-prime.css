@@ -1,7 +1,7 @@
 /* PRIME-01 only: independent institutional logistics page. */
 .site-header .prime-header-brand .brand-name{font-family:var(--ds-type-display);color:#073bbc;font-weight:800;letter-spacing:-.035em;white-space:nowrap;font-style:normal}
 .site-header .prime-header-brand .pr-wordmark{font-size:1em;font-weight:500;font-style:normal;color:inherit;letter-spacing:-.025em}
-.prime-page{background:#f4f8fe;color:#111}
+.prime-page{background:#f4f8fe;color:#000000}
 .prime-page .pr-inner{max-width:1360px;margin:0 auto;padding-inline:var(--edge)}
 .prime-page .pr-hero,.prime-page .pr-vision{background:#000000;color:#fff}
 .prime-page .pr-hero{padding-block:clamp(36px,5vw,78px)}
