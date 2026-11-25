@@ -8,7 +8,7 @@ import {createHash} from 'node:crypto';
 import {join,resolve,dirname,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {checkPrimeFonts} from './prime-font-licenses.mjs';
-import {reviewSelectedMedia} from './prime-manual-cutover-gate.mjs';
+import {reviewSelectedMedia,reviewPrimePageMedia} from './prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const requireSafe=(okay,reason)=>{if(!okay)throw Error('NO-GO: '+reason)};
@@ -49,9 +49,15 @@ export function checkAssetRightsAndLicenses({
   selectedByPath.set(a.path,a);expected.set(a.path,a.sha256);
  }
  requireSafe(selected.assets.filter(a=>a.claim==='third-party').length===3,'expected three externally licensed photographs');
+ requireSafe(reviewPrimePageMedia(selected),'invalid Prime page photograph registry');
+ const primePageByPath=new Map();
+ for(const a of selected.prime_page_assets){
+  requireSafe(!expected.has(a.path),'duplicated Prime page photograph');
+  primePageByPath.set(a.path,a);expected.set(a.path,a.sha256);
+ }
  const sources=source.files.filter(f=>isMedia(f.path));
  requireSafe(sources.length===expected.size,'unexpected original-media inventory');
- const verified=[],selectedVerified=[];
+ const verified=[],selectedVerified=[],primePageVerified=[];
  for(const entry of sources){
   requireSafe(expected.get(entry.path)===entry.sha256,'unreviewed image or 3D hash: '+entry.path);
   const path=join(dist,entry.path),stat=lstatSync(path);
@@ -60,9 +66,14 @@ export function checkAssetRightsAndLicenses({
   requireSafe(bytes.length===entry.bytes&&hash(bytes)===entry.sha256,'modified original media bytes: '+entry.path);
   const a=selectedByPath.get(entry.path);
   if(a){requireSafe(a.bytes===bytes.length&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid approved WebP '+entry.path);selectedVerified.push({...a});}
+  else if(primePageByPath.has(entry.path)){
+   const p=primePageByPath.get(entry.path);
+   requireSafe(p.bytes===bytes.length&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid Prime page WebP '+entry.path);
+   primePageVerified.push({...p});
+  }
   else verified.push({path:entry.path,bytes:entry.bytes,sha256:entry.sha256,claim:'owner-declared'});
  }
- requireSafe(verified.length===14&&verified.every(x=>expected.has(x.path))&&selectedVerified.length===4,'incomplete ownership or selected media registry');
+ requireSafe(verified.length===14&&verified.every(x=>expected.has(x.path))&&selectedVerified.length===4&&primePageVerified.length===6,'incomplete ownership or selected media registry');
  // SPDX/license metadata is derived from the reproducible npm lock, not from the owner assertion.
  requireSafe(lock.lockfileVersion===3&&pkg.dependencies?.three==='0.187.0'&&
    pkg.devDependencies?.esbuild==='0.28.2','unreviewed package versions');
@@ -87,6 +98,7 @@ export function checkAssetRightsAndLicenses({
  return {schema:'desset-prime-rights-and-sbom-evidence-v1',outcome:'PASS',
   owner_declaration_status:'owner-declared',legal_title_independently_verified:false,
   assets_checked:verified.length,assets:verified,
+  prime_page_media_checked:primePageVerified.length,prime_page_media:primePageVerified,
   selected_media_checked:selectedVerified.length,selected_media:selectedVerified,individual_license_review_complete:selected.individual_license_review_complete===true&&selectedVerified.filter(a=>a.claim==='third-party').every(a=>a.verification==='individual-source-verified'),
   selected_media_review:reviewSelectedMedia(selected),selected_media_owner_attestation:selected.owner_attestation??null,
   third_party_packages:packages.sort((a,b)=>a.name.localeCompare(b.name)),

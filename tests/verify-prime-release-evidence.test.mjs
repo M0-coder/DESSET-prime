@@ -17,7 +17,7 @@ function fixture(t){
 }
 test('independent verifier checks all 46 original/rehearsal resource hashes',t=>{
  const f=fixture(t),r=verifyPrimeReleaseEvidence({...f,expectedSha:SHA});
- assert.equal(r.result,'PASS');assert.equal(r.files,53);assert.equal(r.release_authorized,false);
+ assert.equal(r.result,'PASS');assert.equal(r.files,59);assert.equal(r.release_authorized,false);
 });
 test('rejects tampered publication bytes',t=>{
  const f=fixture(t);writeFileSync(join(f.publicDir,'assets/scene-move.webp'),'corrupt');

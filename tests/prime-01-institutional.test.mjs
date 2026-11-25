@@ -19,6 +19,13 @@ for(const dir of ["","dist/"]){
  assert.match(html,/EL FUTURO NO TIENE FRONTERAS\./);
  for(const name of ["Paquetería","Distribución","Fulfillment","Tecnología logística"])assert.ok(html.includes("<h3>"+name+"</h3>"));
  assert.equal((html.match(/class="pr-card"/g)||[]).length,4);
+ const photos=["assets/prime-hero-logistica.webp","assets/prime-paqueteria.webp","assets/prime-distribucion.webp","assets/prime-fulfillment.webp","assets/prime-tecnologia-logistica.webp","assets/prime-vision-internacional.webp"];
+ for(const path of photos)assert.equal(html.split('src="./'+path+'"').length,2,'Expected one local photograph: '+path);
+ assert.match(html,/<figure class="pr-hero-art"><img[^>]+fetchpriority="high"/);
+ assert.equal((html.match(/class="pr-card-art"><img/g)||[]).length,4);
+ assert.match(html,/<figure class="pr-vision-art"><img/);
+ assert.match(css,/\.pr-vision-art img/);
+
  assert.match(html,/no representa una operación activa/);
  assert.match(html,/no representa flota, puertos ni infraestructura propia/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
