@@ -15,6 +15,11 @@ for(const dir of ["","dist/"]){
  const doc=read(dir+page+".html");assert.ok(doc.includes('href="./prime.html">DESSET prime</a>'));assert.ok(!doc.includes("styles-prime.css"));
  }
  const home=read(dir+"index.html"),service=home.match(/<article class="service service--prime">([\s\S]*?)<\/article>/)?.[1];
+ const canonicalFooter=home.match(/<nav class="corporate-footer"[\s\S]*?<\/nav>/)?.[0];
+ assert.ok(canonicalFooter,"Missing canonical footer");
+ const primeFooter=html.match(/<nav class="corporate-footer"[\s\S]*?<\/nav>/)?.[0];
+ assert.equal(primeFooter,canonicalFooter.replace('href="#soluciones"','href="./index.html#soluciones"').replace('href="./prime.html"','href="./prime.html" aria-current="page"'),"Prime footer must preserve the canonical site map");
+
  assert.ok(service);
  assert.ok(service.includes('<a class="prime-service-cta" href="./prime.html" aria-label="Más información sobre DESSET prime">Más información</a>'));
  assert.equal((home.match(/class="prime-service-cta"/g)||[]).length,1);
