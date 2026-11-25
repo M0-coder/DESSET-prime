@@ -689,3 +689,8 @@ a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--blu
 #negocios #contacto.contact .closing-line{display:block;width:auto;max-width:100%;margin:0 auto;text-align:center}
 #negocios #contacto.contact .closing-line::after{content:none;animation:none}
 #negocios #contacto.contact .closing-line--final em{font-weight:800;color:var(--ds-30-blue)}
+
+/* PRIME-NAV-01: direct institutional link, scoped to the Prime card. */
+#soluciones .service--prime .prime-service-cta{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;padding:12px 16px;margin-top:12px;border:1px solid #1551d8;border-radius:10px;background:#1551d8;color:#fff;font-size:14px;line-height:1.4;font-weight:750;text-align:center;text-decoration:none}
+#soluciones .prime-service-cta:hover{background:#123fae;border-color:#123fae;color:#fff}
+#soluciones .prime-service-cta:focus-visible{outline:3px solid #1551d8;outline-offset:4px}
