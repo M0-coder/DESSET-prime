@@ -436,8 +436,9 @@ try{
    report.tests.push({name:"PRIME-LAYOUT-01 desktop: heading above four documentary photographs",leanDesktop});
   await capture("desktop-lean-statement.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
- for(const [w,h] of [[1920,1080],[1180,820],[1100,850],[1024,768],[861,900],[860,900],[768,900],[700,900],[699,900],[430,932],[390,844],[320,700]]){
+ for(const [w,h] of [[1920,1080],[1180,820],[1100,850],[1024,768],[961,900],[960,900],[861,900],[860,900],[768,900],[700,900],[699,900],[430,932],[390,844],[320,700]]){
   await viewport(w,h);
+  await verifySharedNavigation("","index",w);
   if(w===1920||w===1024){
    await sleep(1450);
    await capture(w===1920?"desktop-1920-hero-fit.png":"desktop-1024-hero-fit.png");
@@ -613,6 +614,7 @@ try{
  const packaged=pathToFileURL(resolve("dist/index.html")).href;
  for(const [w,h] of [[1440,900],[768,900],[390,844]]){
   const result=await viewport(w,h,false,packaged);
+  await verifySharedNavigation("dist/","index",w);
   const source=report.viewports.find(v=>v.source==="source"&&v.width===w&&!v.reduce);
   const fingerprint=x=>JSON.stringify({surface:x.surface,gap:x.gap,columns:x.columns,revision:x.revision,cards:x.cards.map(c=>({brand:c.brand,background:c.background,borderColor:c.borderColor,borderWidth:c.borderWidth,radius:c.radius,divider:c.divider,primeColor:c.primeColor,centered:c.centered,descriptionColor:c.descriptionColor,cta:c.cta}))});
   if(!source||fingerprint(source.servicesLayout)!==fingerprint(result.servicesLayout))report.failures.push("Packaged and source service presentation differ at "+w);
@@ -629,14 +631,14 @@ try{
 
  // WEB-CLOSE-02: test real shared navigation on every institutional viewport.
  async function verifySharedNavigation(root,page,w){
-  const state=await js(`(()=>{const n=document.querySelector(".main-nav"),b=document.querySelector(".menu-button"),f=document.querySelector(".corporate-footer"),v=document.documentElement.clientWidth;if(!n||!b||!f)return null;return {ready:document.documentElement.classList.contains("js-enabled"),nav:getComputedStyle(n).display,button:getComputedStyle(b).display,expanded:b.getAttribute("aria-expanded"),links:n.querySelectorAll("a").length,footer:f.querySelectorAll("a").length,inside:[...f.querySelectorAll("a")].every(a=>a.getBoundingClientRect().left>=0&&a.getBoundingClientRect().right<=v+2),overflow:document.documentElement.scrollWidth>v+2}})()`);
+  const state=await js(`(()=>{const n=document.querySelector(".main-nav"),b=document.querySelector(".menu-button"),f=document.querySelector(".corporate-footer"),v=document.documentElement.clientWidth;if(!n||!b||!f)return null;const brand=document.querySelector(".site-header .brand"),name=brand?.querySelector(".brand-name"),mark=brand?.querySelector(".brand-mark");if(!brand||!name||!mark)return null;const br=Math.max(brand.getBoundingClientRect().right,name.getBoundingClientRect().right,mark.getBoundingClientRect().right),navVisible=getComputedStyle(n).display!=="none",other=navVisible?n.querySelector("a"):b,links=[...n.querySelectorAll("a")];return {geometry:br<=other.getBoundingClientRect().left+1&&(!navVisible||links.every((a,i)=>a.getBoundingClientRect().right<=v+2&&(!i||links[i-1].getBoundingClientRect().right<=a.getBoundingClientRect().left+1))),ready:document.documentElement.classList.contains("js-enabled"),nav:getComputedStyle(n).display,button:getComputedStyle(b).display,expanded:b.getAttribute("aria-expanded"),links:n.querySelectorAll("a").length,footer:f.querySelectorAll("a").length,inside:[...f.querySelectorAll("a")].every(a=>a.getBoundingClientRect().left>=0&&a.getBoundingClientRect().right<=v+2),overflow:document.documentElement.scrollWidth>v+2}})()`);
   const label=root+page+" "+w;
-  if(!state||!state.ready||state.links!==6||state.footer!==14||!state.inside||state.overflow||state.expanded!=="false"){report.failures.push("WEB-CLOSE-02 initial "+label+": "+JSON.stringify(state));return;}
-  if(w<=700){
+  if(!state||!state.ready||state.links!==6||state.footer!==14||!state.inside||!state.geometry||state.overflow||state.expanded!=="false"){report.failures.push("WEB-CLOSE-02 initial "+label+": "+JSON.stringify(state));return;}
+  if(w<=960){
    if(state.nav!=="none"||state.button==="none")report.failures.push("WEB-CLOSE-02 mobile initial "+label);
    const result=await js(`(()=>{const n=document.querySelector(".main-nav"),b=document.querySelector(".menu-button"),v=document.documentElement.clientWidth;b.click();const open=b.getAttribute("aria-expanded")==="true"&&getComputedStyle(n).display!=="none"&&[...n.querySelectorAll("a")].every(a=>a.getBoundingClientRect().left>=0&&a.getBoundingClientRect().right<=v+2&&a.getBoundingClientRect().height>=44);return open})()`);
    if(!result)report.failures.push("WEB-CLOSE-02 open menu "+label);
-   if(w===390)await capture((root?"dist-":"source-")+page+"-shared-menu-390px.png");
+   if(w===390||w===768)await capture((root?"dist-":"source-")+page+"-shared-menu-"+w+"px.png");
    const closed=await js(`(()=>{const b=document.querySelector(".menu-button"),n=document.querySelector(".main-nav");document.dispatchEvent(new KeyboardEvent("keydown",{key:"Escape",bubbles:true}));const close=b.getAttribute("aria-expanded")==="false"&&getComputedStyle(n).display==="none"&&document.activeElement===b;document.documentElement.classList.remove("js-enabled");const fallback=getComputedStyle(n).display!=="none"&&[...n.querySelectorAll("a")].every(a=>a.getBoundingClientRect().height>=44);document.documentElement.classList.add("js-enabled");b.blur();return {close,fallback}})()`);
    if(!closed.close||!closed.fallback)report.failures.push("WEB-CLOSE-02 Escape/fallback "+label+": "+JSON.stringify(closed));
   }else if(state.nav==="none"||state.button!=="none")report.failures.push("WEB-CLOSE-02 desktop navigation "+label);

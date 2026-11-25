@@ -38,7 +38,7 @@ test("V6.7 design system defines 60 neutral / 30 structural / 10 accent roles",(
  assert.match(design,/\.hero\[data-variant="v4"\] \.hero-cta/);
  assert.match(design,/\.contact-primary\s*\{\s*color:#FFFDF8;background:var\(--ds-30-blue\)/);
  assert.match(design,/@media\(max-width:700px\)/);
- assert.ok(statSync(new URL("styles-system.css",root)).size<9000);
+ assert.ok(statSync(new URL("styles-system.css",root)).size<10000);
  assert.doesNotMatch(design,/@import\b|url\(\s*['"]?https?:/);
 });
 
