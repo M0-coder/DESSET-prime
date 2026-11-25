@@ -9,7 +9,7 @@ const html=read("index.html");
 const company=read("empresa.html");
 const headers=read("_headers");
 const js=["scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js"].map(read);
-const styles=["styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-audiences.css"].map(read);
+const styles=["styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-audiences.css","styles-prime.css"].map(read);
 const issues=[],warnings=[];
 const assert=(ok,label)=>{if(!ok)issues.push(label)};
 const localSet=new Set();
@@ -43,7 +43,7 @@ for(const [i,s] of js.entries()){
 }
 assert(styles.every(s=>!/@import\b|url\(\s*['"]?https?:/i.test(s)),"Remote CSS dependency");
 assert(!/\b(?:pages:\s*write|id-token:\s*write)\b/.test(read(".github/workflows/preview-checks.yml")),"CI write token permission");
-const budget={html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:9000,hero_css_bytes:9500,visual02_css_bytes:8200,audiences_css_bytes:4500,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000};
+const budget={html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:9000,hero_css_bytes:9500,visual02_css_bytes:8200,audiences_css_bytes:4500,prime_css_bytes:4500,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000};
 const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
  typography_css_bytes:statSync(resolve(root,"styles-typography.css")).size,
  v5_css_bytes:statSync(resolve(root,"styles-v5.css")).size,
@@ -51,6 +51,7 @@ const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
  hero_css_bytes:statSync(resolve(root,"styles-hero-photo.css")).size,
  visual02_css_bytes:statSync(resolve(root,"styles-visual02.css")).size,
  audiences_css_bytes:statSync(resolve(root,"styles-audiences.css")).size,
+ prime_css_bytes:statSync(resolve(root,"styles-prime.css")).size,
  hero_webp_bytes:statSync(resolve(root,"assets/desset-hero-entrega-dos-espejos.webp")).size,
  mobile_hero_webp_bytes:statSync(resolve(root,"assets/desset-hero-entrega-mobile.webp")).size};
 for(const [name,size]of Object.entries(sizes))assert(size<=budget[name],name+" exceeds budget");

@@ -657,6 +657,19 @@ try{
   }
  }
  }
+ // PRIME-01: verify the institutional logistics route in source and exact package.
+ for(const root of ["","dist/"]){
+  for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
+   await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   await call("Page.navigate",{url:pathToFileURL(resolve(root+"prime.html")).href});
+   await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.prime-page')"),"prime page render");
+   await js('document.fonts.ready');
+   const prime=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].length,cards:document.querySelectorAll(".pr-card").length,steps:document.querySelectorAll(".pr-steps li").length,width:v,scroll:document.documentElement.scrollWidth,background:getComputedStyle(document.querySelector(".pr-hero")).backgroundColor,forms:document.querySelectorAll("form,input,iframe").length,links:document.querySelectorAll("#canales-oficiales a").length,cta:document.querySelector(".pr-button").getAttribute("href"),images:[...document.querySelectorAll("main img")].every(e=>e.complete&&e.naturalWidth>0),visible:[...document.querySelectorAll("main h1,main h2,main h3,main p,main li")].every(e=>e.clientWidth>0&&e.scrollWidth<=e.clientWidth+2)}})()`);
+   if(prime.title!=="DE ORIGEN A DESTINO. MÁS ALLÁ DE LAS DISTANCIAS."||prime.sections!==5||prime.cards!==4||prime.steps!==4||prime.scroll>prime.width+2||prime.background!=="rgb(17, 29, 53)"||prime.forms||prime.links!==5||prime.cta!=="#modelo"||!prime.images||!prime.visible)report.failures.push("PRIME-01 "+root+w+": "+JSON.stringify(prime));
+   await capture((root?"dist-":"source-")+"prime-"+w+"px.png",true);
+   report.tests.push({name:"Prime page "+root+w,prime});
+  }
+ }
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
  await writeFile(join(output,"audit.json"),JSON.stringify(report,null,2));
