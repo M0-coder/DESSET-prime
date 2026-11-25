@@ -21,7 +21,10 @@ for(const dir of ["","dist/"]){
  assert.doesNotMatch(home.match(/<article class="service service--main">([\s\S]*?)<\/article>/)?.[1]||"",/prime-service-cta/);
  assert.match(read(dir+"styles.css"),/#soluciones \.service--prime \.prime-service-cta\{[^}]*min-height:48px/);
  assert.ok(html.includes('href="./styles-prime.css"'));
- assert.match(html,/DE ORIGEN A DESTINO\. MÁS ALLÁ DE LAS DISTANCIAS\./);
+ assert.ok(html.includes("<h1 id=\"prime-title\"><span>DEL ORIGEN AL DESTINO</span> <span>MÁS ALLÁ DE LAS DISTANCIAS</span></h1><p class=\"pr-lead\">Creemos que la distancia no debe ser una barrera para el comercio, las empresas ni las personas. Nuestro propósito es conectar cada origen con su destino, independientemente de lo lejos que esté.</p>"));
+ assert.equal((html.match(/<h1\b/g)||[]).length,1);
+ assert.doesNotMatch(html,/Conectamos la visión del comercio con el futuro de la logística/);
+ assert.match(css,/\.prime-page h1 span\{display:block;text-wrap:balance\}/);
  assert.match(html,/EL FUTURO NO TIENE FRONTERAS\./);
  for(const name of ["Paquetería","Distribución","Fulfillment","Tecnología logística"])assert.ok(html.includes("<h3>"+name+"</h3>"));
  assert.equal((html.match(/class="pr-card"/g)||[]).length,4);
