@@ -37,7 +37,9 @@ test("V6.9 describes services as a lasting institutional identity, not as a star
  assert.equal((html.match(/<section\b/g)||[]).length,5);
  assert.match(html,/href="#soluciones">Servicios/);
  assert.match(html,/href="#ecosistema">Cómo funciona/);
- assert.match(html,/href="#contacto">Canales DESSET/);
+ assert.match(html,/href="\.\/contacto\.html">Canales DESSET/);
+ assert.match(read("contacto.html"),/<h1>Contacto institucional<\/h1>/);
+ assert.match(html,/href="#contacto"/);
 });
 test("V6.9 keeps website informational, operations gated to apps, no invented launch",()=>{
  assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);

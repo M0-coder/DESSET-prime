@@ -681,6 +681,28 @@ try{
    report.tests.push({name:"Prime direct navigation "+root+selector,pass:true});
   }
  }
+ // CONTACT-04: responsive directory, disclosure and actual navigation, no collection.
+ for(const root of ["","dist/"]){
+  for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
+   await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   await call("Page.navigate",{url:pathToFileURL(resolve(root+"contacto.html")).href});
+   await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.contact-page')"),"contact page render");
+   await js('document.fonts.ready');
+   const contact=await js(`(()=>{const v=document.documentElement.clientWidth,s=[...document.querySelectorAll(".ct-item summary")];return {title:document.querySelector("h1").textContent,width:v,scroll:document.documentElement.scrollWidth,items:s.length,closed:document.querySelectorAll("details[open]").length,forms:document.querySelectorAll("form,input,iframe,textarea").length,social:document.querySelectorAll(".footer-social,[data-footer-channel]").length,fit:s.every(e=>e.clientWidth>=e.scrollWidth-2&&e.getBoundingClientRect().height>=48&&e.querySelector("span").scrollWidth<=e.querySelector("span").clientWidth+2)}})()`);
+   if(contact.title!=="Contacto institucional"||contact.scroll>contact.width+2||contact.items!==9||contact.closed||contact.forms||contact.social||!contact.fit)report.failures.push("CONTACT-04 "+root+w+": "+JSON.stringify(contact));
+   await capture((root?"dist-":"source-")+"contacto-"+w+"px.png",true);
+   await js('document.querySelector(".ct-item summary").click()');
+   if(!await js('document.querySelector(".ct-item").open && document.querySelector(".ct-item p").textContent.includes("aún no está habilitado")'))report.failures.push("CONTACT-04 disclosure failed");
+   report.tests.push({name:"Contact directory "+root+w,contact});
+  }
+  for(const selector of [".main-nav .nav-contact",'.corporate-footer a[href="./contacto.html"]']){
+   await call("Page.navigate",{url:pathToFileURL(resolve(root+"index.html")).href});
+   await until(async()=>await js("document.readyState==='complete' && !!document.querySelector("+JSON.stringify(selector)+")"),"Contact entry");
+   await js("document.querySelector("+JSON.stringify(selector)+").click()");
+   await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/contacto.html') && !!document.querySelector('.contact-page')"),"Contact destination");
+   report.tests.push({name:"Contact navigation "+root+selector,pass:true});
+  }
+ }
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
  await writeFile(join(output,"audit.json"),JSON.stringify(report,null,2));

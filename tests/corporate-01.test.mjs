@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import {createHash} from "node:crypto";
 const root=new URL("../",import.meta.url),read=p=>readFileSync(new URL(p,root),"utf8");
-const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html"];
+const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html"];
 const approved=new Map(JSON.parse(read("config/prime-social-owner-attestation.json")).exact_channels.map(c=>[c.url,c.platform]));
 for(const dir of ["","dist/"]){
  test("Corporate links resolve in "+(dir||"source"),()=>{
@@ -13,14 +13,15 @@ for(const dir of ["","dist/"]){
    for(const m of doc.matchAll(/<a\b[^>]*href="([^"]+)"/g)){
     const href=m[1];
     if(href.startsWith("https://")){assert.ok(approved.has(href));continue}
-    const match=href.match(/^(?:\.\/(index|empresa|comercios|repartidores|prime)\.html)?(?:#([a-z0-9-]+))?$/);
+    const match=href.match(/^(?:\.\/(index|empresa|comercios|repartidores|prime|contacto)\.html)?(?:#([a-z0-9-]+))?$/);
     assert.ok(match,"Unapproved route "+href);
     const target=docs[match[1]?match[1]+".html":name];
     assert.ok(target);
     if(match[2])assert.ok(target.includes('id="'+match[2]+'"'),"Missing anchor "+href);
    }
   }
-  for(const doc of Object.values(docs)){
+  for(const [name,doc] of Object.entries(docs)){
+   if(name==="contacto.html"){assert.doesNotMatch(doc,/footer-social|data-footer-channel|https:\/\//);assert.match(doc,/<p>© 2026 DESSET\. Todos los derechos reservados\.<\/p>/);continue;}
    const footer=doc.match(/<nav class="footer-social"[^>]*>([\s\S]*?)<\/nav>/)?.[1];assert.ok(footer);
    const links=[...footer.matchAll(/href="([^"]+)" data-footer-channel="([^"]+)" aria-label="([^"]+)" target="_blank" rel="noopener noreferrer"/g)];
    assert.equal(links.length,5);assert.equal(new Set(links.map(m=>m[1])).size,5);
