@@ -71,11 +71,11 @@ test("durable outbox: concurrent claim, expired lease, provider failure and acce
  let a=openMerchantIntake(path,policy),b=openMerchantIntake(path,policy),sink=openSyntheticSink(sinkPath);
  try{const id=a.submit(input,opts).id;const c=a.claimNotification(actor,100,10);assert.equal(c.request_id,id);assert.equal(b.claimNotification(actor,105,10),null);
  const next=b.claimNotification(actor,111,10);assert.notEqual(next.token,c.token);assert.throws(()=>a.finishNotification(actor,c,true,112),/STALE_LEASE/);b.finishNotification(actor,next,false,112);
- assert.equal((await deliverOne(a,{send:async()=>{throw Error("offline");}},{clock:()=>200})).state,"RETRY");
- assert.equal((await deliverOne(a,{send:async m=>{await sink.send(m);throw Error("lost acknowledgement");}},{clock:()=>300})).state,"RETRY");
+ assert.equal((await deliverOne(a,{send:async()=>{throw Error("offline");}},{clock:()=>200,retryBaseMs:1})).state,"RETRY");
+ assert.equal((await deliverOne(a,{send:async m=>{await sink.send(m);throw Error("lost acknowledgement");}},{clock:()=>300,retryBaseMs:1})).state,"RETRY");
  assert.equal(sink.count(),1);a.close();a=null;b.close();b=null;sink.close();sink=null;
  a=openMerchantIntake(path,policy);sink=openSyntheticSink(sinkPath);
- assert.equal((await deliverOne(a,sink,{clock:()=>400})).state,"SENT");assert.equal(sink.count(),1);
+ assert.equal((await deliverOne(a,sink,{clock:()=>400,retryBaseMs:1})).state,"SENT");assert.equal(sink.count(),1);
  assert.equal((await deliverOne(a,sink,{clock:()=>500})).state,"EMPTY");
  assert.equal(a.notificationState(actor,id).status,"SENT");assert.equal(a.notificationState(actor,id).attempts,5);
  assert.equal(a.list(actor).length,1);
@@ -85,4 +85,29 @@ test("SQLite closed backup restores request and pending notification",t=>{
  const dir=tmp(t),file=join(dir,"intake.sqlite"),backup=join(dir,"restored.sqlite"),policy={enabled:true,privacyVersion:"TEST-v1"};
  const a=openMerchantIntake(file,policy);let id;try{id=a.submit(input,opts).id;}finally{a.close();}
  copyFileSync(file,backup);const b=openMerchantIntake(backup,policy);try{assert.equal(b.list(actor)[0].id,id);assert.equal(b.notificationState(actor,id).status,"PENDING");}finally{b.close();}
+});
+
+test("full pipeline: HTTP intake -> durable queue -> provider retry -> authenticated panel -> reviewed",async t=>{
+ const f=await fixture(t),s=openMerchantIntake(f.databasePath),sink=openSyntheticSink(join(f.dir,"sink.sqlite"));
+ try{
+  const a=await submit(f),id=(await a.json()).id;assert.equal(a.status,201);
+  const b=await submit(f,{...input,business_name:"Synthetic second"},{requestKey:"test-key-00000002"});assert.equal(b.status,201);const other=(await b.json()).id;
+  const cookie=await f.login();
+  const snapshot=async()=>await (await f.request("/api/admin/requests",{cookie})).json();
+  const before=await snapshot();assert.equal(before.requests.length,2);assert.ok(before.requests.every(r=>r.notification.status==="PENDING"));
+  const failed=await deliverOne(s,{send:async()=>{throw Error("temporary outage");}},{clock:()=>100});assert.equal(failed.state,"RETRY");
+  assert.equal((await deliverOne(s,sink,{clock:()=>101})).state,"SENT");
+  assert.equal((await deliverOne(s,sink,{clock:()=>102})).state,"EMPTY");
+  assert.equal((await deliverOne(s,sink,{clock:()=>1100})).state,"SENT");assert.equal(sink.count(),2);
+  const state=await snapshot();assert.ok(state.requests.every(r=>r.notification.status==="SENT"));assert.equal(state.requests.reduce((n,r)=>n+r.notification.attempts,0),3);
+  assert.equal((await f.request("/admin/review",{method:"POST",form:true,cookie,body:{id,decision:"APPROVED",csrf:state.csrf}})).status,303);
+  assert.equal((await f.request("/admin/review",{method:"POST",form:true,cookie,body:{id:other,decision:"REJECTED",csrf:state.csrf}})).status,303);
+  const after=await snapshot();assert.equal(after.requests.find(r=>r.id===id).status,"APPROVED");assert.equal(after.requests.find(r=>r.id===other).status,"REJECTED");assert.ok(after.requests.every(r=>r.history.length===1));
+ }finally{sink.close();s.close();}
+});
+test("session expires and login attempts are bounded",async t=>{
+ const f=await fixture(t,true,10),cookie=await f.login();
+ await new Promise(resolve=>setTimeout(resolve,30));assert.equal((await f.request("/admin",{cookie})).status,401);
+ for(let i=0;i<7;i++)assert.equal((await f.request("/login",{method:"POST",form:true,body:{password:"wrong"}})).status,401);
+ assert.equal((await f.request("/login",{method:"POST",form:true,body:{password:"wrong"}})).status,429);
 });
