@@ -39,8 +39,8 @@ test("INK-REMOVAL-01: retired charcoal pigment is absent from every published te
 test("INK-REMOVAL-01: actual source colors were replaced, never masked by extra CSS",()=>{
  const system=read("styles-system.css"),hero=read("styles-hero-photo.css");
  const scene=read("styles-v5.css"),diagram=read("assets/roles-geometry-mobile-es.svg");
- assert.match(system,/--ds-30-ink:#111111/);
- assert.match(hero,/#inicio \.v4-headline-a\{color:#111111\}/);
+ assert.match(system,/--ds-30-ink:#000000/);
+ assert.match(hero,/#inicio \.v4-headline-a\{color:#000000\}/);
  assert.match(hero,/#inicio \.prime-photo-surface\{[^\n]*background:#f4f8fe/);
  assert.match(scene,/#ecosistema \.prime-3d-heading p\{[^\n]*color:#111111/);
  assert.match(scene,/#ecosistema \.prime-3d-heading p strong\{[^\n]*color:#111111/);
@@ -62,7 +62,7 @@ test("INK-REMOVAL-01: revised blue ink remains WCAG AA on light backgrounds",()=
   return nums[0]*.2126+nums[1]*.7152+nums[2]*.0722;
  };
  for(const background of ["#ffffff","#f4f8fe","#f7f5ee","#cdfc8a"]){
-  const a=lum("#111111"),b=lum(background);
+  const a=lum("#000000"),b=lum(background);
   assert.ok((Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=4.5,`Insufficient neutral-ink contrast on ${background}`);
  }
 });

@@ -9,10 +9,10 @@ const html=read("index.html"),system=read("styles-system.css"),
  three=read("scripts/v6-three.src.mjs"),mainCss=read("styles.css");
 
 test("VISUAL-A11Y-01 neutral black text does not replace brand blue",()=>{
- assert.match(system,/--ds-30-ink:#111111/);
- assert.match(hero,/#inicio \.v4-headline-a\{color:#111111\}/);
+ assert.match(system,/--ds-30-ink:#000000/);
+ assert.match(hero,/#inicio \.v4-headline-a\{color:#000000\}/);
  assert.match(hero,/#inicio \.hero-lead\{color:#333333/);
- assert.match(typography,/#vision\.statement\{background:#f4f8fe;color:#111111\}/);
+ assert.match(typography,/#vision\.statement\{background:#f4f8fe;color:#000000\}/);
  assert.match(mainCss,/--blue:#073BBC/);
  assert.match(hero,/#inicio \.v4-headline-b\{color:#073bbc\}/);
  assert.match(hero,/background:#073bbc;color:#fff/);

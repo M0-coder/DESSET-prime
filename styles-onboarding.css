@@ -1,5 +1,5 @@
 /* Merchant pre-registration preview only. */
-.onboarding-page{background:#fff;color:#111}
+.onboarding-page{background:#fff;color:#000000}
 .onboarding-page .ob-hero{background:#f4f8fe;padding:clamp(32px,6vw,80px) var(--edge)}
 .onboarding-page .ob-hero h1{font:800 clamp(32px,5vw,64px)/1.12 var(--ds-type-display);letter-spacing:-.035em;margin:12px 0;overflow-wrap:anywhere}
 .onboarding-page .ob-kicker{font-weight:750;font-size:13px;letter-spacing:.08em;color:#073bbc}

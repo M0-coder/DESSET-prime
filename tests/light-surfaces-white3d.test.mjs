@@ -16,11 +16,11 @@ function contrast(a,b){
  return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);
 }
 test("LIGHT-SURFACES-01 removes institutional charcoal backgrounds without changing brand surfaces",()=>{
- assert.match(theme,/#vision\.statement\{background:#f4f8fe;color:#111111\}/);
+ assert.match(theme,/#vision\.statement\{background:#f4f8fe;color:#000000\}/);
  assert.match(theme,/#ecosistema \.ecosystem-board\{background:#fff;/);
- assert.match(theme,/\.site-footer\{background:#fff;color:#111111;/);
+ assert.match(theme,/\.site-footer\{background:#fff;color:#000000;/);
  assert.match(theme,/\.main-nav \.nav-contact\{background:#fff;color:#073bbc;/);
- assert.match(theme,/#vision \.statement-journey \.motion-story-unit h3\{color:#111111\}/);
+ assert.match(theme,/#vision \.statement-journey \.motion-story-unit h3\{color:#000000\}/);
  assert.match(theme,/#vision \.statement-journey \.motion-story-unit p\{color:#363636\}/);
  assert.match(scene,/background:#f4f8fe; color:#162943;/);
  assert.match(scene,/z-index:7;background:#f4f8fe;color:#162943;/);

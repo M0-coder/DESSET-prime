@@ -40,7 +40,7 @@ test("VISUAL-02 preserves the approved stylesheet except the explicitly authoriz
  ])assert.match(read(path),pattern,"Original yellow missing: "+path);
 });
 test("The only lime CTA retains WCAG AA contrast and 3D markup remains unchanged",()=>{
- assert.ok(contrast("#111111",lime)>=4.5,"Neutral black ink must remain legible on lime");
+ assert.ok(contrast("#000000",lime)>=4.5,"Neutral black ink must remain legible on lime");
  assert.equal(oldGold,"#FFC62F");
  assert.match(html,/class="v6-three-mount"/);
  assert.match(html,/class="v63-tour"/);

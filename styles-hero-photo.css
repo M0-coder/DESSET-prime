@@ -1,17 +1,17 @@
 /* HERO-PHOTO-01: original DESSET logo, approved photo, editorial cinema.
    Do not modify the opt-in 3D engine or the remaining institutional sections. */
-#inicio.hero[data-variant="v4"]{background:#f7f5ee;color:#111111;min-height:auto;padding:clamp(24px,3vw,45px) var(--edge) 0;overflow:hidden}
+#inicio.hero[data-variant="v4"]{background:#f7f5ee;color:#000000;min-height:auto;padding:clamp(24px,3vw,45px) var(--edge) 0;overflow:hidden}
 #inicio.hero[data-variant="v4"]::before{display:none}
 #inicio .v4-hero-composition{width:100%;max-width:1530px;margin:0 auto;padding:clamp(18px,2.3vw,34px) 0 clamp(24px,3vw,44px);display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:clamp(24px,3.6vw,62px);align-items:center;min-height:clamp(510px,43vw,690px)}
 #inicio .v4-hero-type{min-width:0;z-index:1}
 #inicio .motion-headline{font-size:clamp(46px,5.5vw,100px);font-weight:950;letter-spacing:-.082em;line-height:.94;margin:0 0 22px}
-#inicio .v4-headline-a{color:#111111}
+#inicio .v4-headline-a{color:#000000}
 #inicio .v4-headline-b{color:#073bbc}
 #inicio .motion-line{padding-bottom:.11em}
 #inicio .v4-hero-bottom{display:flex;flex-direction:column;align-items:flex-start;border:0;gap:24px;padding:0;margin:0;width:100%}
 #inicio .hero-lead{color:#333333;font-size:clamp(15px,1.25vw,19px);line-height:1.65;max-width:48ch;margin:0}
 #inicio .hero-actions{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:10px 24px;margin:0}
-#inicio .hero-cta{background:#ffc62f;color:#111111;min-height:54px;border-radius:12px;padding:16px 20px;font-size:13px;box-shadow:0 4px 0 rgba(178,127,0,.75)}
+#inicio .hero-cta{background:#ffc62f;color:#000000;min-height:54px;border-radius:12px;padding:16px 20px;font-size:13px;box-shadow:0 4px 0 rgba(178,127,0,.75)}
 #inicio .hero-cta:hover{background:#ffe184}
 
 

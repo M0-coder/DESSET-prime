@@ -197,6 +197,9 @@ async function viewport(width,height,reduce=false,entry=URL){
    footerBrandInk:style(".footer-brand").color,
    footerCopyInk:style(".site-footer>p").color,
    institutionalInk:style(":root").getPropertyValue("--ds-30-ink").trim().toLowerCase(),
+   stageInk:style("#ecosistema").getPropertyValue("--ink").trim().toLowerCase(),
+   stageDesignInk:style("#ecosistema").getPropertyValue("--ds-30-ink").trim().toLowerCase(),
+   stageInheritedColor:style("#ecosistema").color,
    heroHeadingColor:style("#inicio .v4-headline-a").color,
    heroCtaInk:style("#inicio .hero-cta").color,
    heroPhotoFallbackBg:style("#inicio .prime-photo-surface").backgroundColor
@@ -224,11 +227,12 @@ async function viewport(width,height,reduce=false,entry=URL){
    palette.footerBackground!=="rgb(241, 245, 250)"||palette.navContactBackground!==pureWhite||
    palette.primeHeadingColor!=="rgb(21, 81, 216)"||palette.primeSubtitleColor!=="rgb(17, 17, 17)"||
    palette.primeKickerColor!=="rgb(17, 17, 17)"||
-   palette.institutionalInk!=="#111111"||
-   palette.heroHeadingColor!=="rgb(17, 17, 17)"||
-   palette.heroCtaInk!=="rgb(17, 17, 17)"||
+   palette.institutionalInk!=="#000000"||
+   palette.stageInk!=="#111111"||palette.stageDesignInk!=="#111111"||palette.stageInheritedColor!=="rgb(17, 17, 17)"||
+   palette.heroHeadingColor!=="rgb(0, 0, 0)"||
+   palette.heroCtaInk!=="rgb(0, 0, 0)"||
    palette.heroPhotoFallbackBg!==paleBlue||
-   palette.brandNameInk!=="rgb(17, 17, 17)"||
+   palette.brandNameInk!=="rgb(0, 0, 0)"||
    palette.footerBrandInk!==brandBlue||palette.footerCopyInk!=="rgb(86, 86, 86)")
    fails.push("PRIME-COLOR-02: only the hero CTA may be lime; brand yellow preserved, page surfaces pale and 3D controls white: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
@@ -270,7 +274,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==14||diag.footerLayout.links.map(x=>x.href).join("|")!=="./empresa.html#quienes-somos|./empresa.html#mision-vision|./empresa.html#valores|#soluciones|./prime.html|./aplicaciones.html|./comercios.html|./repartidores.html|./contacto.html|./confianza.html|./noticias.html|./talento.html|./en.html|./empresa.html#informacion-corporativa"||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
  const partners=diag.partnerLayout;
  const cl=partners.closing;
- if(!cl.joined||cl.background!=="rgb(244, 248, 254)"||cl.headerBackground!=="rgba(0, 0, 0, 0)"||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(17, 17, 17)|rgb(7, 59, 188)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
+ if(!cl.joined||cl.background!=="rgb(244, 248, 254)"||cl.headerBackground!=="rgba(0, 0, 0, 0)"||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(0, 0, 0)|rgb(7, 59, 188)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
   if(partners.columns!==(width<=700?1:2)||partners.gap!==(width<=700?12:16)||partners.cards.length!==2||
    partners.cards.map(c=>c.title).join("|")!=="Comercios|Repartidores"||
    partners.cards.map(c=>c.label).join("|")!=="Más información|Más información"||
