@@ -267,7 +267,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    Math.abs(services.cards[0].height-services.cards[1].height)>2||Math.abs(services.cards[0].dividerOffset-services.cards[1].dividerOffset)>2)
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
   if(diag.decorativeArrowCount!==0)fails.push("Decorative arrows remain in interactive controls");
- if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==11||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
+ if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==12||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
  const partners=diag.partnerLayout;
  const cl=partners.closing;
  if(!cl.joined||cl.background!=="rgb(244, 248, 254)"||cl.headerBackground!=="rgba(0, 0, 0, 0)"||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(17, 17, 17)|rgb(21, 81, 216)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
@@ -635,7 +635,7 @@ try{
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.company-page')"),"company page render");
    await js('document.fonts.ready');
    const company=await js(`(()=>{const v=document.documentElement.clientWidth,n=document.querySelector(".corporate-footer");return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.trim().split(/\\s+/).length,links:[...n.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=v+2})),home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content}})()`);
-   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|areas|historia|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==11||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
+   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|areas|historia|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==12||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
    const history=await js(`(()=>{const e=document.querySelector("#historia"),items=[...e.querySelectorAll(".history-timeline li")];return {year:e.querySelector(".history-year").textContent,items:items.map(n=>n.querySelector("h4").textContent),fit:items.every(n=>n.getBoundingClientRect().left>=0&&n.getBoundingClientRect().right<=document.documentElement.clientWidth+2),ordered:items.every((n,i)=>!i||n.getBoundingClientRect().top>=items[i-1].getBoundingClientRect().bottom-1)}})()`);
    if(history.year!=="2026"||history.items.join("|")!=="Identidad institucional|DESSET prime|Infraestructura corporativa"||!history.fit||!history.ordered)report.failures.push("HISTORY-01 "+root+w+": "+JSON.stringify(history));
    await capture((root?"dist-":"source-")+"company-"+w+"px.png",true);
@@ -761,6 +761,29 @@ try{
   await js('document.querySelector(".nw-brand-content a").click()');
   await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/contacto.html') && location.hash==='#prensa' && !!document.querySelector('.contact-page')"),"News press contact destination");
   report.tests.push({name:"News navigation and press route "+root,pass:true});
+ }
+ // CAREERS-01: culture, no application collection, responsive source and dist.
+ for(const root of ["","dist/"]){
+  for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
+   await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   await call("Page.navigate",{url:pathToFileURL(resolve(root+"talento.html")).href});
+   await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.careers-page')"),"careers page render");
+   await js('document.fonts.ready');
+   const careers=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,width:v,scroll:document.documentElement.scrollWidth,values:[...document.querySelectorAll(".ca-values li span")].map(e=>e.textContent),forms:document.querySelectorAll("form,iframe,textarea,script,input").length,social:document.querySelectorAll(".footer-social,[data-footer-channel]").length,closed:document.querySelector("#oportunidades").textContent.includes("no se reciben candidaturas"),fit:[...document.querySelectorAll(".ca-values li")].every(e=>e.getBoundingClientRect().height>=48&&e.scrollWidth<=e.clientWidth+2)}})()`);
+   if(careers.title!=="El futuro lo construyen las personas."||careers.scroll>careers.width+2||careers.values.join("|")!=="Innovación con propósito|Excelencia en la ejecución|Responsabilidad compartida|Aprendizaje continuo"||careers.forms||careers.social||!careers.closed||!careers.fit)report.failures.push("CAREERS-01 "+root+w+": "+JSON.stringify(careers));
+   await capture((root?"dist-":"source-")+"talento-"+w+"px.png",true);
+   report.tests.push({name:"Careers page "+root+w,careers});
+  }
+  await call("Page.navigate",{url:pathToFileURL(resolve(root+"index.html")).href});
+  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.corporate-footer a[href=\"./talento.html\"]')"),"Careers entry");
+  await js('document.querySelector(\'.corporate-footer a[href="./talento.html"]\').click()');
+  await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/talento.html') && !!document.querySelector('.careers-page')"),"Careers destination");
+  await call("Page.navigate",{url:pathToFileURL(resolve(root+"contacto.html")).href});
+  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('#profesionales a')"),"Careers contact entry");
+  await js('document.querySelector("#profesionales summary").click()');
+  await js('document.querySelector("#profesionales a").click()');
+  await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/talento.html') && !!document.querySelector('.careers-page')"),"Careers contact destination");
+  report.tests.push({name:"Careers navigation "+root,pass:true});
  }
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
