@@ -13,6 +13,7 @@ for(const dir of ["","dist/"]){
    for(const m of doc.matchAll(/<a\b[^>]*href="([^"]+)"/g)){
     const href=m[1];
     if(href.startsWith("https://")){assert.ok(approved.has(href));continue}
+    if(name==="noticias.html"&&href==="./assets/deliver-assets-mark.png"){assert.ok(doc.includes('href="./assets/deliver-assets-mark.png" download="DESSET-simbolo.png"'));continue;}
     const match=href.match(/^(?:\.\/(index|empresa|comercios|repartidores|prime|contacto|confianza|noticias)\.html)?(?:#([a-z0-9-]+))?$/);
     assert.ok(match,"Unapproved route "+href);
     const target=docs[match[1]?match[1]+".html":name];

@@ -33,3 +33,6 @@
 .nw-footer a{color:#1551d8;font-size:24px;font-weight:650;text-decoration:none}
 .nw-footer p{font-size:12px;color:#565656;margin:12px 0 0}
 @media(max-width:480px){.news-page .nw-filter label{padding:8px 12px}.news-page .nw-brand-content{grid-template-columns:minmax(0,1fr)}}
+
+/* BRAND-01: approved existing web symbol and documented portal palette. */
+.news-page .nw-brand-guide{padding:0 0 24px}.news-page .nw-brand-guide h3{margin:18px 0 10px}.news-page .nw-swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:0 0 20px}.news-page .nw-swatches div{border:1px solid #d8dce2;border-radius:8px;overflow:hidden}.news-page .nw-swatches dt,.news-page .nw-swatches dd{padding:12px;margin:0;font-size:13px;font-weight:600}.news-page .nw-blue{background:#1551d8;color:#fff}.news-page .nw-ink{background:#111;color:#fff}.news-page .nw-paper{background:#f4f8fe;color:#111}.news-page .nw-white{background:#fff;color:#111}.news-page .nw-brand-guide ul{padding-left:20px;color:#414141;line-height:1.65;font-size:15px}.news-page .nw-brand-guide a{color:#1551d8;text-decoration:underline}.news-page .nw-download{min-height:44px;font-weight:700}

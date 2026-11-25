@@ -750,6 +750,8 @@ try{
    }
    await js('document.querySelector("#recursos-de-marca summary").click()');
    if(!await js('document.querySelector("#recursos-de-marca").open && document.querySelector(".nw-brand-content img").complete && document.querySelector(".nw-brand-content img").naturalWidth>0'))report.failures.push("NEWS-01 brand preview failed");
+   const brand=await js(`(()=>{const a=document.querySelector(".nw-download"),s=[...document.querySelectorAll(".nw-swatches dt")];return {href:a.getAttribute("href"),download:a.getAttribute("download"),height:a.getBoundingClientRect().height,palette:s.map(e=>getComputedStyle(e).backgroundColor),fit:s.every(e=>e.getBoundingClientRect().right<=document.documentElement.clientWidth+2)}})()`);
+   if(brand.href!=="./assets/deliver-assets-mark.png"||brand.download!=="DESSET-simbolo.png"||brand.height<44||brand.palette.join("|")!=="rgb(21, 81, 216)|rgb(17, 17, 17)|rgb(244, 248, 254)|rgb(255, 255, 255)"||!brand.fit)report.failures.push("BRAND-01 "+root+w+": "+JSON.stringify(brand));
    await capture((root?"dist-":"source-")+"noticias-open-"+w+"px.png",true);
    report.tests.push({name:"News directory "+root+w,news});
   }
@@ -758,7 +760,7 @@ try{
   await js('document.querySelector(\'.corporate-footer a[href="./noticias.html"]\').click()');
   await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/noticias.html') && !!document.querySelector('.news-page')"),"News destination");
   await js('document.querySelector("#recursos-de-marca summary").click()');
-  await js('document.querySelector(".nw-brand-content a").click()');
+  await js('document.querySelector(".nw-brand-guide a").click()');
   await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/contacto.html') && location.hash==='#prensa' && !!document.querySelector('.contact-page')"),"News press contact destination");
   report.tests.push({name:"News navigation and press route "+root,pass:true});
  }

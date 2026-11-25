@@ -13,8 +13,10 @@ for(const dir of ["","dist/"]){
  assert.match(html,/No hay anuncios oficiales publicados/);
  assert.match(html,/No hay apariciones en medios publicadas/);
  assert.match(html,/no constituye una licencia de uso/);
+ assert.match(html,/href="\.\/assets\/deliver-assets-mark\.png" download="DESSET-simbolo\.png"/);
+ assert.equal((html.match(/\bdownload="/g)||[]).length,1);
  assert.match(html,/href="\.\/contacto\.html#prensa"/);
- assert.doesNotMatch(html,/<(?:form|script|iframe|textarea|article|time)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel|\bdownload\b/i);
+ assert.doesNotMatch(html,/<(?:form|script|iframe|textarea|article|time)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel/i);
  for(const page of ["index","empresa","comercios","repartidores","prime","contacto","confianza"]){
  const doc=read(dir+page+".html");assert.ok(doc.includes('href="./noticias.html">Sala de noticias</a>'));assert.ok(!doc.includes("styles-news.css"));
  }
