@@ -20,7 +20,7 @@ test("Static gate scans every institutional page and rejects representative viol
  ["aplicaciones-clientes.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
  ["registro-repartidores.html",s=>s.replace('type="text" disabled','type="text"'),"Enabled data entry in inactive preview"],
  ["incorporacion-repartidores.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
- ["capacitacion-repartidores.html","aplicaciones.html","aplicaciones-clientes.html","aplicaciones-comercios.html","aplicaciones-repartidores.html",s=>s.replace("form-action 'none'","form-action *"),"Missing or weakened local CSP"],
+ ["capacitacion-repartidores.html",s=>s.replace("form-action 'none'","form-action *"),"Missing or weakened local CSP"],
  ["en.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
  ["talento.html",s=>s.replace("</head>",'<script src="https://untrusted.example/a.js"></script></head>'),"Nonlocal DOM resource"],
  ["noticias.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
@@ -28,7 +28,9 @@ test("Static gate scans every institutional page and rejects representative viol
  ["contacto.html",s=>s.replace("</main>",'<form></form></main>'),"Unauthorized form/iframe/video"],
  ["prime.html",s=>s.replace("</main>",'<a href="#absent-anchor">Broken</a></main>'),"Broken in-page navigation anchor"]
  ];
- for(const [page,mutate,expected] of cases){
+ for(const item of cases){
+ assert.equal(item.length,3,"Invalid mutation fixture");
+ const [page,mutate,expected]=item;assert.equal(typeof mutate,"function","Invalid mutation for "+page);
  const path=join(dir,page),original=readFileSync(path,"utf8"),changed=mutate(original);
  assert.notEqual(changed,original);writeFileSync(path,changed);
  const r=run();assert.equal(r.status,1,r.stderr);assert.ok(r.stderr.includes(page+": "+expected),r.stderr);
