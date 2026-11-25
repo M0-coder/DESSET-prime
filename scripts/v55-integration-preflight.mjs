@@ -6,6 +6,7 @@ import {readFileSync,statSync,mkdirSync,writeFileSync} from "node:fs";
 import {resolve} from "node:path";
 import {fileURLToPath} from "node:url";
 import {inspectInstitutionalChannels} from "./prime-channel-readiness.mjs";
+import {assertClosedDistribution} from "./app-distribution-contract.mjs";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const file=x=>readFileSync(resolve(root,x));
 const text=x=>file(x).toString("utf8");
@@ -20,14 +21,15 @@ for(const [path,want] of Object.entries(a)){
  require("Production-approved original asset unchanged: "+path,got===want,{gitBlobSha1:got,expected:want});
 }
 const availability=text("scripts/service-state.js");
+let distributionClosed=false;
+try{assertClosedDistribution(availability,JSON.parse(text("config/app-distribution.json")));distributionClosed=true;}catch{}
 require("Prime remains presentation only",
  /aria-label="Escena conceptual:[^"]*No representa operaciones comerciales activas de DESSET\."/i.test(html)&&
  /Este sitio no procesa pedidos ni pagos\./.test(text("empresa.html"))&&
  !/data-service-access|data-service-status|data-app-links|APLICACIONES DESSET|Acceso público no habilitado/.test(html)&&
  !/<a\b[^>]*href=["']https?:\/\/(?:play\.google\.com|apps\.apple\.com)(?:[\/:?#"']|$)/i.test(html)&&
- /applicationDistribution:"not_published"/.test(availability)&&
- /verified:false/.test(availability)&&
- !/<form\\b|<iframe\\b/i.test(html));
+ distributionClosed&&
+ !/<form\b|<iframe\b/i.test(html));
 require("Prime stays noindex",html.includes('name="robots" content="noindex,nofollow"'));
 require("Prime continues to prohibit remote scripts",/script-src 'self'/.test(html)&&/script-src 'self'/.test(headers));
 require("Production branch and workflow metadata are explicit",snap.official.observed_cloudflare.production_branch==="release-approved"&&snap.official.production_requirements.manual_workflow===".github/workflows/cloudflare-pages-production.yml");
