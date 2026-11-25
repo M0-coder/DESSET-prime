@@ -66,3 +66,18 @@ test("INK-REMOVAL-01: revised blue ink remains WCAG AA on light backgrounds",()=
   assert.ok((Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=4.5,`Insufficient neutral-ink contrast on ${background}`);
  }
 });
+
+test("INK-REMOVAL-02: institutional sections use black without recoloring visual components",()=>{
+ for(const prefix of ["","dist/"]){
+  const prime=read(prefix+"styles-prime.css"),trust=read(prefix+"styles-trust.css"),careers=read(prefix+"styles-careers.css"),editorial=read(prefix+"styles-visual02.css");
+  assert.match(prime,/\.pr-hero,\.prime-page \.pr-vision\{background:#000000;color:#fff/);
+  assert.match(prime,/\.pr-button\{[^}]*background:#fff;color:#000000/);
+  assert.match(trust,/\.tr-hero\{background:#000000;color:#fff/);
+  assert.match(careers,/\.ca-closing\{background:#000000;color:#fff/);
+  assert.match(editorial,/--v02-deep:#000000/);
+  assert.match(editorial,/#ecosistema \.ecosystem-board\{background:#142239;border:1px solid #304158;box-shadow:0 23px 60px rgba\(18,32,50,\.18\)/);
+  assert.match(read(prefix+"styles-typography.css"),/#ecosistema \.ecosystem-board\{background:#fff/);
+  assert.match(prime,/\.pr-vision-art img\{background:#203b5a\}/);
+  assert.match(prime,/color:#1551d8/);
+ }
+});
