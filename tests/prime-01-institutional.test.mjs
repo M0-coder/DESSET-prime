@@ -8,6 +8,12 @@ for(const dir of ["","dist/"]){
  for(const page of ["index","empresa","comercios","repartidores"]){
  const doc=read(dir+page+".html");assert.ok(doc.includes('href="./prime.html">DESSET prime</a>'));assert.ok(!doc.includes("styles-prime.css"));
  }
+ const home=read(dir+"index.html"),service=home.match(/<article class="service service--prime">([\s\S]*?)<\/article>/)?.[1];
+ assert.ok(service);
+ assert.ok(service.includes('<a class="prime-service-cta" href="./prime.html" aria-label="Más información sobre DESSET prime">Más información</a>'));
+ assert.equal((home.match(/class="prime-service-cta"/g)||[]).length,1);
+ assert.doesNotMatch(home.match(/<article class="service service--main">([\s\S]*?)<\/article>/)?.[1]||"",/prime-service-cta/);
+ assert.match(read(dir+"styles.css"),/#soluciones \.service--prime \.prime-service-cta\{[^}]*min-height:48px/);
  assert.ok(html.includes('href="./styles-prime.css"'));
  assert.match(html,/DE ORIGEN A DESTINO\. MÁS ALLÁ DE LAS DISTANCIAS\./);
  assert.match(html,/EL FUTURO NO TIENE FRONTERAS\./);
