@@ -1,5 +1,8 @@
 # MERCHANT-PRODUCTION-01 — candidate, NOT DEPLOYED
 
+## MERCHANT-ACCESS-01 superseding guard
+The HTTP entrypoint is now staging-only, bound to the exact approved workers.dev origin. All intake HTTP methods return 503 and no scheduled handler is exported. Admin requires runtime ctx.access with the dedicated AUD, cryptographic JWT verification, a subject and exact email allowlist, matching runtime identity, a token-bound CSRF check for reviews, and closed D1 staging flags. No Static Assets, service bindings, alternate routes or preview/version URLs. The previous architecture below describes future production, not enabled features. See ACCESS.md for configuration and negative tests.
+
 ## Architecture
 Keep existing Pages and other Workers untouched. Separate Cloudflare Worker for intake and administration. D1 binding DB; use distinct staging and production databases, no cross-environment binding. Turnstile Siteverify and Workers rate-limit binding INTAKE_LIMIT (suggested 10/60 sec per location/IP; not a global quota). Access application must protect /admin and /admin/* with named approved users and enforced independent MFA (prefer passkeys/security keys); deny bypass/service token policies, validate application JWT at origin plus explicit subject allowlist. Public intake is not connected to Pages. Same-origin JSON API for future approved form integration. No DNS, Worker upload, cron registration or public activation authorized by this document.
 

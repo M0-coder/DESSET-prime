@@ -1,5 +1,7 @@
 // MERCHANT-PRODUCTION-01. Cloudflare Worker candidate, not deployed.
 // Explicit bindings and database flags must both be enabled by authorized operators.
+// MERCHANT-ACCESS-01: staging-only HTTP entrypoint; public intake and scheduled sending hard-disabled.
+export const STAGING_ORIGIN="https://desset-merchant-staging.morimil-pabfelon.workers.dev";
 const fields=["business_name","category","department","province","district","address","contact_name","phone","email"];
 const categories=["restaurant","grocery","bakery","specialty","pharmacy","other"];
 const sec={"Cache-Control":"no-store","Content-Security-Policy":"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'","X-Content-Type-Options":"nosniff","Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"};
@@ -36,12 +38,24 @@ export async function verifyAccess(req,env,fetcher=fetch,now=Math.floor(Date.now
  try{
  const raw=req.headers.get("Cf-Access-Jwt-Assertion");if(!raw||raw.length>16384)throw Error();
  const parts=raw.split(".");if(parts.length!==3)throw Error();
- const h=decode(parts[0]),p=decode(parts[1]);if(h.alg!=="RS256"||typeof h.kid!=="string"||h.crit||p.iss!==env.ACCESS_ISSUER||!Array.isArray(p.aud)||!p.aud.includes(env.ACCESS_AUD)||!Number.isSafeInteger(p.exp)||p.exp<=now||!Number.isSafeInteger(p.iat)||p.iat>now+30||(p.nbf!==undefined&&(!Number.isSafeInteger(p.nbf)||p.nbf>now))||typeof p.sub!=="string"||!env.ADMIN_SUBJECTS.split(",").map(x=>x.trim()).includes(p.sub)||!p.email||p.type!=="app")throw Error();
+ const h=decode(parts[0]),p=decode(parts[1]);if(h.alg!=="RS256"||typeof h.kid!=="string"||h.crit||p.iss!==env.ACCESS_ISSUER||!Array.isArray(p.aud)||!p.aud.includes(env.ACCESS_AUD)||!Number.isSafeInteger(p.exp)||p.exp<=now||!Number.isSafeInteger(p.iat)||p.iat>now+30||(p.nbf!==undefined&&(!Number.isSafeInteger(p.nbf)||p.nbf>now))||typeof p.sub!=="string"||!env.ADMIN_SUBJECTS.split(",").map(x=>x.trim()).includes(p.sub)||typeof p.email!=="string"||!p.email.includes("@")||p.exp<=p.iat||p.exp-p.iat>900||p.type!=="app")throw Error();
  const r=await fetcher(env.ACCESS_ISSUER+"/cdn-cgi/access/certs",{redirect:"error",signal:AbortSignal.timeout(5000)});if(!r.ok)throw Error();
- const keys=(await r.json()).keys;if(!Array.isArray(keys))throw Error();const jwk=keys.find(k=>k.kid===h.kid&&k.kty==="RSA"&&(!k.alg||k.alg==="RS256"));if(!jwk)throw Error();
+ const keys=(await r.json()).keys;if(!Array.isArray(keys))throw Error();const matches=keys.filter(k=>k.kid===h.kid&&k.kty==="RSA"&&(!k.alg||k.alg==="RS256")&&(!k.use||k.use==="sig"));if(matches.length!==1)throw Error();const jwk=matches[0];
  const key=await crypto.subtle.importKey("jwk",jwk,{name:"RSASSA-PKCS1-v1_5",hash:"SHA-256"},false,["verify"]);
  if(!await crypto.subtle.verify("RSASSA-PKCS1-v1_5",key,bytes(parts[2]),enc.encode(parts[0]+"."+parts[1])))throw Error();
  return p.sub;
+ }catch{throw fail(403,"ACCESS_DENIED");}
+}
+// Only the Cloudflare runtime can supply ctx.access. A copied signed JWT alone is insufficient.
+async function authorize(req,env,ctx,fetcher,now){
+ if(env.ADMIN_POLICY_VERIFIED!=="true")throw fail(503,"ADMIN_DISABLED");
+ if(!ctx?.access||ctx.access.aud!==env.ACCESS_AUD||typeof ctx.access.getIdentity!=="function")throw fail(403,"ACCESS_CONTEXT_REQUIRED");
+ const actor=await verifyAccess(req,env,fetcher,now);
+ try{
+ const identity=await ctx.access.getIdentity();
+ const raw=req.headers.get("Cf-Access-Jwt-Assertion"),claims=decode(raw.split(".")[1]);
+ if(typeof env.ADMIN_EMAIL!=="string"||!env.ADMIN_EMAIL||typeof identity?.email!=="string"||identity.email.toLowerCase()!==claims.email.toLowerCase()||identity.email.toLowerCase()!==env.ADMIN_EMAIL.toLowerCase())throw Error();
+ return {actor,csrf:await digest("desset-admin-review-v1:"+raw)};
  }catch{throw fail(403,"ACCESS_DENIED");}
 }
 async function state(env){if(!env.DB)throw fail(503,"UNAVAILABLE");const s=await env.DB.prepare("SELECT environment,intake_enabled,notification_enabled,privacy_version FROM merchant_runtime WHERE id=1").first();if(!s||s.environment!==env.ENVIRONMENT||!["staging","production"].includes(s.environment))throw fail(503,"UNAVAILABLE");return s;}
@@ -71,15 +85,18 @@ export async function submit(req,env){
 }
 async function list(env,offset){if(!Number.isSafeInteger(offset)||offset<0||offset>1000000)throw fail(400,"INVALID_OFFSET");const r=await env.DB.prepare("SELECT r.id,r.business_name,r.category,r.department,r.province,r.district,r.address,r.contact_name,r.phone,r.email,r.observations,r.created_at,r.status,e.actor_id,e.created_at reviewed_at,o.status notification_status,o.attempts,o.provider_message_id FROM merchant_requests r JOIN merchant_notification_outbox o ON o.request_id=r.id LEFT JOIN merchant_review_events e ON e.request_id=r.id ORDER BY r.created_at,r.id LIMIT 50 OFFSET ?").bind(offset).all();return r.results;}
 async function review(env,actor,b){if(!exact(b,["id","decision"])||!uuid(b.id)||!["APPROVED","REJECTED"].includes(b.decision))throw fail(400,"INVALID_DECISION");const r=await env.DB.prepare("UPDATE merchant_requests SET status=?,reviewed_by=?,reviewed_at=? WHERE id=? AND status='PENDING' RETURNING id").bind(b.decision,actor,Date.now(),b.id).first();if(r?.id!==b.id)throw fail(409,"NOT_PENDING");return {id:b.id,status:b.decision};}
-function panel(rows,offset){return html('<p>Aprobar una solicitud no activa un comercio.</p>'+rows.map(r=>'<article><h2>'+esc(r.business_name)+'</h2><p>Referencia '+esc(r.id)+' · '+esc(r.status)+'</p><p>'+esc(r.category)+' | '+esc(r.department)+' / '+esc(r.province)+' / '+esc(r.district)+' · '+esc(r.address)+'</p><p>'+esc(r.contact_name)+' · '+esc(r.phone)+' · '+esc(r.email)+'</p><p>'+esc(r.observations)+'</p><p>Notificación: '+esc(r.notification_status)+' · Intentos: '+esc(r.attempts)+'</p><p>Revisión: '+esc(r.actor_id)+' · '+esc(r.reviewed_at)+'</p>'+(r.status==="PENDING"?'<form method="post" action="/admin/review"><input type="hidden" name="id" value="'+esc(r.id)+'"><button name="decision" value="APPROVED">Aprobar</button> <button name="decision" value="REJECTED">Rechazar</button></form>':'')+'</article>').join('')+(offset?'<a href="/admin?offset='+Math.max(0,offset-50)+'">Anterior</a> ':'')+(rows.length===50?'<a href="/admin?offset='+(offset+50)+'">Siguiente</a>':''));}
-export async function handle(req,env){
- try{const url=new URL(req.url);if(!env.SERVICE_ORIGIN||url.origin!==env.SERVICE_ORIGIN||url.protocol!=="https:")throw fail(403,"HOST");
- if(req.method==="POST"&&req.headers.get("Origin")!==env.SERVICE_ORIGIN)throw fail(403,"ORIGIN");
- if(url.pathname==="/api/intake"&&req.method==="POST")return await submit(req,env);
+function panel(rows,offset,csrf){return html('<p>Aprobar una solicitud no activa un comercio.</p>'+rows.map(r=>'<article><h2>'+esc(r.business_name)+'</h2><p>Referencia '+esc(r.id)+' · '+esc(r.status)+'</p><p>'+esc(r.category)+' | '+esc(r.department)+' / '+esc(r.province)+' / '+esc(r.district)+' · '+esc(r.address)+'</p><p>'+esc(r.contact_name)+' · '+esc(r.phone)+' · '+esc(r.email)+'</p><p>'+esc(r.observations)+'</p><p>Notificación: '+esc(r.notification_status)+' · Intentos: '+esc(r.attempts)+'</p><p>Revisión: '+esc(r.actor_id)+' · '+esc(r.reviewed_at)+'</p>'+(r.status==="PENDING"?'<form method="post" action="/admin/review"><input type="hidden" name="id" value="'+esc(r.id)+'"><input type="hidden" name="csrf" value="'+esc(csrf)+'"><button name="decision" value="APPROVED">Aprobar</button> <button name="decision" value="REJECTED">Rechazar</button></form>':'')+'</article>').join('')+(offset?'<a href="/admin?offset='+Math.max(0,offset-50)+'">Anterior</a> ':'')+(rows.length===50?'<a href="/admin?offset='+(offset+50)+'">Siguiente</a>':''));}
+export async function handle(req,env,ctx,fetcher=fetch,now=Math.floor(Date.now()/1000)){
+ try{const url=new URL(req.url);if(env.ENVIRONMENT!=="staging"||env.SERVICE_ORIGIN!==STAGING_ORIGIN||url.origin!==STAGING_ORIGIN||url.protocol!=="https:")throw fail(403,"HOST");
+ if(req.method==="POST"&&(req.headers.get("Origin")!==STAGING_ORIGIN||req.headers.get("Sec-Fetch-Site")==="cross-site"))throw fail(403,"ORIGIN");
+ // No runtime flag or D1 mutation can open public intake in this release.
+ if(url.pathname==="/api/intake")throw fail(503,"INTAKE_DISABLED");
  if(url.pathname==="/admin"||url.pathname.startsWith("/admin/")){
- const actor=await verifyAccess(req,env);await state(env);
- if(req.method==="GET"&&(url.pathname==="/admin"||url.pathname==="/admin/api/requests")){const offset=Number(url.searchParams.get("offset")??0),rows=await list(env,offset);return url.pathname==="/admin"?panel(rows,offset):json({requests:rows});}
- if(req.method==="POST"&&url.pathname==="/admin/review"){await review(env,actor,await body(req,"application/x-www-form-urlencoded"));return new Response(null,{status:303,headers:{...sec,Location:"/admin"}});}
+ const {actor,csrf}=await authorize(req,env,ctx,fetcher,now);
+ const runtime=await state(env);
+ if(runtime.environment!=="staging"||runtime.intake_enabled!==0||runtime.notification_enabled!==0)throw fail(503,"STAGING_NOT_ISOLATED");
+ if(req.method==="GET"&&(url.pathname==="/admin"||url.pathname==="/admin/api/requests")){const offset=Number(url.searchParams.get("offset")??0),rows=await list(env,offset);return url.pathname==="/admin"?panel(rows,offset,csrf):json({requests:rows});}
+ if(req.method==="POST"&&url.pathname==="/admin/review"){const b=await body(req,"application/x-www-form-urlencoded");if(!exact(b,["id","decision","csrf"])||b.csrf!==csrf)throw fail(403,"CSRF");await review(env,actor,{id:b.id,decision:b.decision});return new Response(null,{status:303,headers:{...sec,Location:"/admin"}});}
  }
  return json({error:"NOT_FOUND"},404);
  }catch(e){return json({error:e.publicCode??"INTERNAL_ERROR"},e.status??500);}
@@ -96,4 +113,5 @@ export async function notifyOne(env,at=Date.now()){
  const result=await env.DB.prepare("UPDATE merchant_notification_outbox SET status=?,lease_token=NULL,lease_until=NULL,sent_at=?,provider_message_id=? WHERE request_id=? AND status='SENDING' AND lease_token=?").bind(messageId?"SENT":"NEEDS_REVIEW",messageId?Date.now():null,messageId??null,r.request_id,token).run();
  return result.meta.changes===1?(messageId?"SENT":"NEEDS_REVIEW"):"LEASE_LOST";
 }
-export default {fetch:handle,async scheduled(controller,env){await notifyOne(env);}};
+// Deliberately no scheduled handler or public intake dispatch in this staging-only release.
+export default {fetch(req,env,ctx){return handle(req,env,ctx);}};
