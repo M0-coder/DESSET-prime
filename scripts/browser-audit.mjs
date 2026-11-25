@@ -267,7 +267,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    Math.abs(services.cards[0].height-services.cards[1].height)>2||Math.abs(services.cards[0].dividerOffset-services.cards[1].dividerOffset)>2)
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
   if(diag.decorativeArrowCount!==0)fails.push("Decorative arrows remain in interactive controls");
- if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==9||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
+ if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==10||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
  const partners=diag.partnerLayout;
  const cl=partners.closing;
  if(!cl.joined||cl.background!=="rgb(244, 248, 254)"||cl.headerBackground!=="rgba(0, 0, 0, 0)"||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(17, 17, 17)|rgb(21, 81, 216)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
@@ -635,7 +635,7 @@ try{
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.company-page')"),"company page render");
    await js('document.fonts.ready');
    const company=await js(`(()=>{const v=document.documentElement.clientWidth,n=document.querySelector(".corporate-footer");return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.trim().split(/\\s+/).length,links:[...n.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=v+2})),home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content}})()`);
-   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|areas|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==9||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
+   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|areas|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==10||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
    await capture((root?"dist-":"source-")+"company-"+w+"px.png",true);
    await js('document.querySelector(".site-footer").scrollIntoView({block:"end",behavior:"instant"})');
    await capture((root?"dist-":"source-")+"footer-"+w+"px.png");
@@ -702,6 +702,32 @@ try{
    await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/contacto.html') && !!document.querySelector('.contact-page')"),"Contact destination");
    report.tests.push({name:"Contact navigation "+root+selector,pass:true});
   }
+ }
+ // TRUST-01: directory, actual navigation, safe disclosures and four responsive widths.
+ for(const root of ["","dist/"]){
+  for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
+   await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   await call("Page.navigate",{url:pathToFileURL(resolve(root+"confianza.html")).href});
+   await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.trust-page')"),"trust page render");
+   await js('document.fonts.ready');
+   const trust=await js(`(()=>{const v=document.documentElement.clientWidth,s=[...document.querySelectorAll(".tr-item summary")];return {title:document.querySelector("h1").textContent,width:v,scroll:document.documentElement.scrollWidth,items:s.length,closed:document.querySelectorAll("details[open]").length,forms:document.querySelectorAll("form,input,iframe,textarea").length,social:document.querySelectorAll(".footer-social,[data-footer-channel]").length,fit:s.every(e=>e.clientWidth>=e.scrollWidth-2&&e.getBoundingClientRect().height>=48)}})()`);
+   if(trust.title!=="Centro de confianza"||trust.scroll>trust.width+2||trust.items!==5||trust.closed||trust.forms||trust.social||!trust.fit)report.failures.push("TRUST-01 "+root+w+": "+JSON.stringify(trust));
+   await capture((root?"dist-":"source-")+"confianza-"+w+"px.png",true);
+   for(const id of ["seguridad","privacidad","fraudes","incidentes","transparencia"]){
+    await js("document.querySelector('#"+id+" summary').click()");
+    if(!await js("document.querySelector('#"+id+"').open"))report.failures.push("TRUST-01 disclosure "+id);
+   }
+   await capture((root?"dist-":"source-")+"confianza-open-"+w+"px.png",true);
+   report.tests.push({name:"Trust directory "+root+w,trust});
+  }
+  await call("Page.navigate",{url:pathToFileURL(resolve(root+"index.html")).href});
+  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.corporate-footer a[href=\"./confianza.html\"]')"),"Trust entry");
+  await js('document.querySelector(\'.corporate-footer a[href="./confianza.html"]\').click()');
+  await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/confianza.html') && !!document.querySelector('.trust-page')"),"Trust destination");
+  await js('document.querySelector("#incidentes summary").click()');
+  await js('document.querySelector("#incidentes a").click()');
+  await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/contacto.html') && location.hash==='#seguridad' && !!document.querySelector('.contact-page')"),"Trust incident contact destination");
+  report.tests.push({name:"Trust navigation and incident route "+root,pass:true});
  }
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
