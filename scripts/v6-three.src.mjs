@@ -38,12 +38,12 @@ if(!stage||!mount||!controls||reduced){
  const mats={
   blue:makeMat(PAL.blue,.21,.29),cyan:makeMat(0x5f94ff,.26,.32),
   gold:makeMat(PAL.gold,.22,.36,0xe39505,.13),
-  red:makeMat(PAL.red,.24,.38),dark:makeMat(0x111111,.28,.60),
+  red:makeMat(PAL.red,.24,.38),dark:makeMat(0x172443,.28,.60),
   side:makeMat(0x9bbce0,.18,.65),cream:makeMat(0xf7fbff,.08,.61),
   glass:makeMat(0x73d7f7,.40,.13,0x1c68bb,.47),
   route:makeMat(PAL.gold,.12,.30,0xffb725,1.4),
   road:makeMat(0xdce8f7,.08,.86),
-  trim:makeMat(0x333333,.55,.28),
+  trim:makeMat(0x1a3e83,.55,.28),
   chrome:makeMat(0xc7d8ec,.35,.48),
   windowLight:makeMat(0x82d7f3,.10,.20,0x4b9de8,.70),
   headlight:makeMat(0xfef4cb,.14,.25,0xffc62f,1.6),
@@ -107,7 +107,7 @@ if(!stage||!mount||!controls||reduced){
  };
  const plinth=(parent,w,d)=>{
   const shade=new THREE.Mesh(new THREE.CircleGeometry(1,24),
-   new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.30,depthWrite:false}));
+   new THREE.MeshBasicMaterial({color:0x03060e,transparent:true,opacity:.30,depthWrite:false}));
   shade.rotation.x=-Math.PI/2;shade.position.y=-.279;shade.scale.set(w*.57,d*.58,1);
   parent.add(shade);
   box(parent,w,.23,d,0,-.12,0,mats.side);

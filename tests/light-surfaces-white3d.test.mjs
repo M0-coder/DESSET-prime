@@ -22,19 +22,19 @@ test("LIGHT-SURFACES-01 removes institutional charcoal backgrounds without chang
  assert.match(theme,/\.main-nav \.nav-contact\{background:#fff;color:#1551d8;/);
  assert.match(theme,/#vision \.statement-journey \.motion-story-unit h3\{color:#111111\}/);
  assert.match(theme,/#vision \.statement-journey \.motion-story-unit p\{color:#363636\}/);
- assert.match(scene,/background:#f4f8fe; color:#111111;/);
- assert.match(scene,/z-index:7;background:#f4f8fe;color:#111111;/);
+ assert.match(scene,/background:#f4f8fe; color:#162943;/);
+ assert.match(scene,/z-index:7;background:#f4f8fe;color:#162943;/);
  assert.match(html,/<meta name="theme-color" content="#f4f8fe">/);
 });
 test("LIGHT-SURFACES-01 makes both 3D actions white and readable even when active",()=>{
- assert.match(scene,/background:#fff;color:#111111;/);
+ assert.match(scene,/background:#fff;color:#162943;/);
  assert.match(scene,/\.v6-three-controls \.v63-tour\{\s*background:#fff;color:#1551d8;/);
  assert.match(scene,/\.v6-three-controls button\[aria-pressed="true"\] \{border-color:#1551d8;background:#fff;color:#1551d8;/);
  assert.match(scene,/\.v63-story\{[\s\S]*?background:#fff;border:1px solid #c8d7ec;/);
- assert.match(scene,/color:#111111;background:#eff5ff;/);
+ assert.match(scene,/color:#162943;background:#eff5ff;/);
 });
 test("LIGHT-SURFACES-01 preserves WCAG AA contrast for editorial text and 3D buttons",()=>{
- for(const [fg,bg] of [["#111111","#f4f8fe"],["#444444","#f4f8fe"],["#1551d8","#ffffff"],["#111111","#ffffff"]])
+ for(const [fg,bg] of [["#162943","#f4f8fe"],["#445a77","#f4f8fe"],["#1551d8","#ffffff"],["#162943","#ffffff"]])
   assert.ok(contrast(fg,bg)>=4.5,`${fg} on ${bg} contrast ${contrast(fg,bg).toFixed(2)}`);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/class="v6-three-mount" aria-hidden="true"/);

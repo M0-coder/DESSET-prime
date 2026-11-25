@@ -15,8 +15,8 @@
 #inicio .hero-cta:hover{background:#ffe184}
 
 
-#inicio .prime-photo-surface{width:100%;max-width:none;min-width:0;margin:0;height:auto;aspect-ratio:1.61;border-radius:22px;background:#f4f8fe;box-shadow:0 26px 58px rgba(0,0,0,.19);transform:none;overflow:hidden;isolation:isolate}
-#inicio .prime-photo-surface::before{content:"";position:absolute;inset:57% 0 0;z-index:1;background:linear-gradient(180deg,transparent,rgba(0,0,0,.67));pointer-events:none}
+#inicio .prime-photo-surface{width:100%;max-width:none;min-width:0;margin:0;height:auto;aspect-ratio:1.61;border-radius:22px;background:#f4f8fe;box-shadow:0 26px 58px rgba(14,25,47,.19);transform:none;overflow:hidden;isolation:isolate}
+#inicio .prime-photo-surface::before{content:"";position:absolute;inset:57% 0 0;z-index:1;background:linear-gradient(180deg,transparent,rgba(13,21,35,.67));pointer-events:none}
 #inicio .prime-photo-surface::after{display:none}
 #inicio .prime-photo-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 50%;max-width:none;display:block}
 /* The formerly hidden ornaments are absent from the DOM; no display:none override. */

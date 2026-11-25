@@ -1,7 +1,7 @@
 /* VISUAL-02 — DESSET institutional editorial continuity.
    Only sections BELOW the approved hero; never restyle the rider, logo or 3D.
    No new images, fonts, scripts, external CSS or pseudo-content claims. */
-:root{--v02-deep:#000000;--v02-paper:#f7f5ee;--v02-blue:#1551d8;--v02-gold:#ffc62f;--v02-line:#d5dae2;--v02-soft:0 16px 44px rgba(0,0,0,.12)}
+:root{--v02-deep:#000000;--v02-paper:#f7f5ee;--v02-blue:#1551d8;--v02-gold:#ffc62f;--v02-line:#d5dae2;--v02-soft:0 16px 44px rgba(20,34,57,.12)}
 /* Statement reads as the dark editorial chapter after the photo, not an arcade. */
 #vision.statement{background:var(--v02-deep)}
 #vision .statement-body{gap:clamp(25px,4vw,64px)}
@@ -12,13 +12,13 @@
 
 #soluciones .solutions-grid .service--main{border:1px solid #1755d4;border-top:5px solid var(--v02-gold);box-shadow:var(--v02-soft)}
 #soluciones .service-arrow{font-size:27px;opacity:.9}
-#soluciones .service-access{border-top:3px solid var(--v02-blue);box-shadow:0 12px 28px rgba(0,0,0,.07)}
+#soluciones .service-access{border-top:3px solid var(--v02-blue);box-shadow:0 12px 28px rgba(20,34,57,.07)}
 #soluciones .future-services{border-color:#bfc8d3}
-#soluciones .future-grid .service{box-shadow:0 10px 26px rgba(0,0,0,.06)}
+#soluciones .future-grid .service{box-shadow:0 10px 26px rgba(20,34,57,.06)}
 /* Keep the opt-in 3D intact; frame the existing concept art as a professional
    exhibit instead of creating a second visual language or adding new buildings. */
 #ecosistema.ecosystem{background:#eef0ef}
-#ecosistema .ecosystem-board{background:var(--v02-deep);border:1px solid #444444;box-shadow:0 23px 60px rgba(0,0,0,.18)}
+#ecosistema .ecosystem-board{background:#142239;border:1px solid #304158;box-shadow:0 23px 60px rgba(18,32,50,.18)}
 #ecosistema .v5-city-stage{border:1px solid rgba(230,236,247,.18);box-shadow:0 14px 32px rgba(0,0,0,.16)}
 #vision .motion-story-grid{border-color:rgba(255,255,255,.25)}
 #vision .motion-story-unit{border-color:rgba(255,255,255,.25)}
@@ -26,7 +26,7 @@
 #vision .motion-story-unit p{color:#e3e8f1}
 
 /* Remove the old comic-book offset shadow, keep DESSET royal blue and gold. */
-#negocios .business-pitch{border-top:5px solid var(--v02-gold);box-shadow:0 22px 55px rgba(0,0,0,.2)}
+#negocios .business-pitch{border-top:5px solid var(--v02-gold);box-shadow:0 22px 55px rgba(20,34,57,.2)}
 #negocios .business-pitch h3{letter-spacing:-.065em}
 #negocios .audience-grid--compact{border-top-color:var(--v02-line)}
 #negocios .audience-grid--compact .audience{border-color:var(--v02-line)}
@@ -38,16 +38,16 @@
 @media(max-width:860px){
 
 
- #ecosistema .ecosystem-board{box-shadow:0 14px 34px rgba(0,0,0,.15)}
- #negocios .business-pitch{box-shadow:0 15px 32px rgba(0,0,0,.17)}
+ #ecosistema .ecosystem-board{box-shadow:0 14px 34px rgba(18,32,50,.15)}
+ #negocios .business-pitch{box-shadow:0 15px 32px rgba(20,34,57,.17)}
 }
 @media(max-width:700px){
 
 
- #soluciones .solutions-grid .service--main{box-shadow:0 12px 27px rgba(0,0,0,.12)}
+ #soluciones .solutions-grid .service--main{box-shadow:0 12px 27px rgba(20,34,57,.12)}
  #ecosistema .ecosystem-board{padding:17px 16px 19px}
  #vision .motion-story-unit{border-right:0}
- #negocios .business-pitch{box-shadow:0 12px 26px rgba(0,0,0,.16)}
+ #negocios .business-pitch{box-shadow:0 12px 26px rgba(20,34,57,.16)}
  #contacto .contact-status{padding-left:11px}
 }
 @media(prefers-reduced-motion:reduce){

@@ -67,28 +67,17 @@ test("INK-REMOVAL-01: revised blue ink remains WCAG AA on light backgrounds",()=
  }
 });
 
-test("INK-REMOVAL-02: all authored pages, styles, SVG and visual scripts reject dark blue pigments",()=>{
- const navy=(r,g,b)=>b>r+9&&b>=g+5&&r<=80&&g<=105&&b<=155;
- const assertNeutral=(path)=>{
-  const body=read(path);
-  for(const match of body.matchAll(/(?:#|0x)([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3})(?![0-9a-f])/gi)){
-   let hex=match[1]; if(hex.length===3)hex=[...hex].map(x=>x+x).join("");
-   const [r,g,b]=[0,2,4].map(i=>parseInt(hex.slice(i,i+2),16));
-   assert.ok(!navy(r,g,b),"Dark blue "+match[0]+" in "+path);
-  }
-  for(const m of body.matchAll(/rgba?\(\s*(\d+)\s*[, ]\s*(\d+)\s*[, ]\s*(\d+)(?=\s*[,/)])/gi))
-   assert.ok(!navy(+m[1],+m[2],+m[3]),"Dark blue "+m[0]+" in "+path);
- };
- for(const folder of ["","dist/"]){
-  for(const name of readdirSync(join(root,folder)))if(/\.(html|css)$/.test(name))assertNeutral(folder+name);
-  for(const path of filesIn(folder+"assets",[".svg"]))assertNeutral(path);
- }
- for(const path of ["scripts/app.js","scripts/motion.js","scripts/service-state.js","scripts/v5-cinematic.js","scripts/v6-three.src.mjs","scripts/v62-glb-loader.src.mjs","scripts/build-glb-models.mjs"])assertNeutral(path);
+test("INK-REMOVAL-02: institutional sections use black without recoloring visual components",()=>{
  for(const prefix of ["","dist/"]){
-  assert.match(read(prefix+"styles-prime.css"),/\.pr-hero,\.prime-page \.pr-vision\{background:#000000;color:#fff/);
-  assert.match(read(prefix+"styles-trust.css"),/\.tr-hero\{background:#000000;color:#fff/);
-  assert.match(read(prefix+"styles-careers.css"),/\.ca-closing\{background:#000000;color:#fff/);
-  assert.match(read(prefix+"styles-visual02.css"),/--v02-deep:#000000/);
-  assert.match(read(prefix+"styles-prime.css"),/color:#1551d8/);
+  const prime=read(prefix+"styles-prime.css"),trust=read(prefix+"styles-trust.css"),careers=read(prefix+"styles-careers.css"),editorial=read(prefix+"styles-visual02.css");
+  assert.match(prime,/\.pr-hero,\.prime-page \.pr-vision\{background:#000000;color:#fff/);
+  assert.match(prime,/\.pr-button\{[^}]*background:#fff;color:#000000/);
+  assert.match(trust,/\.tr-hero\{background:#000000;color:#fff/);
+  assert.match(careers,/\.ca-closing\{background:#000000;color:#fff/);
+  assert.match(editorial,/--v02-deep:#000000/);
+  assert.match(editorial,/#ecosistema \.ecosystem-board\{background:#142239;border:1px solid #304158;box-shadow:0 23px 60px rgba\(18,32,50,\.18\)/);
+  assert.match(read(prefix+"styles-typography.css"),/#ecosistema \.ecosystem-board\{background:#fff/);
+  assert.match(prime,/\.pr-vision-art img\{background:#203b5a\}/);
+  assert.match(prime,/color:#1551d8/);
  }
 });

@@ -28,7 +28,7 @@
 .prime-page .pr-steps li{position:relative;display:grid;justify-items:center;gap:12px;text-align:center;min-width:0;font-size:15px}
 .prime-page .pr-steps svg{width:44px;height:44px;color:#1551d8}
 .prime-page .pr-steps li:not(:last-child)::after{content:"";position:absolute;width:20px;height:12px;right:0;top:16px;background:#1551d8;clip-path:polygon(0 42%,68% 42%,68% 0,100% 50%,68% 100%,68% 58%,0 58%)}
-.prime-page .pr-vision-art img{background:#000000}
+.prime-page .pr-vision-art img{background:#203b5a}
 .prime-page .pr-contact{max-width:none;text-align:center;padding-block:clamp(32px,5vw,60px)}
 .prime-page .pr-contact a{display:inline-flex;align-items:center;min-height:44px;color:#1551d8;font-weight:750}
 @media(max-width:700px){.prime-page .pr-hero-art img,.prime-page .pr-vision-art img{aspect-ratio:16/10}.prime-page .pr-grid{gap:10px}.prime-page .pr-card-copy{padding:14px}.prime-page .pr-steps{gap:6px}.prime-page .pr-steps li{font-size:12px}.prime-page .pr-steps svg{width:32px;height:32px}.prime-page .pr-steps li:not(:last-child)::after{width:10px;height:8px;right:0;top:12px}.prime-page h3{font-size:clamp(17px,4vw,22px)}.prime-page .pr-card p{font-size:14px}}

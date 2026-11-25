@@ -19,9 +19,9 @@ if(!globalThis.FileReader)globalThis.FileReader=class FileReader {
  }
 };
 const P={
- royal:0x1551d8,royalLight:0x4878ef,royalDark:0x222222,sky:0x86c2ff,
+ royal:0x1551d8,royalLight:0x4878ef,royalDark:0x112f71,sky:0x86c2ff,
  gold:0xffc62f,goldDark:0xa96812,cream:0xf6f9ff,red:0xff3328,
- redDark:0x871f26,rubber:0x111111,steel:0xb4cce7,glass:0x8ddcff,
+ redDark:0x871f26,rubber:0x131928,steel:0xb4cce7,glass:0x8ddcff,
  asphalt:0xdfe9f6,teal:0x24a9a1,stone:0xc4d5e9,wood:0x805c47,
  brick:0xb83d35,leaf:0x447c5a,light:0xfff8d3
 };
@@ -30,7 +30,7 @@ const material=(name,color,metal=0.12,rough=.55)=>{
  const key=name;
  if(!keyMat.has(key)){
   const m=new THREE.MeshStandardMaterial({name,color,metalness:metal,roughness:rough,
-   emissive:name==="glass"?0x444444:name==="light"?0xffb624:0x000000,
+   emissive:name==="glass"?0x144577:name==="light"?0xffb624:0x000000,
    emissiveIntensity:name==="light"?.45:name==="glass"?.17:0});
   keyMat.set(key,m);
  }
