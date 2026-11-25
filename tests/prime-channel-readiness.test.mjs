@@ -76,7 +76,7 @@ test('A changed registry address is not silently accepted',()=>{
 });
 test('Fraudulent claim that DESSET applications are public fails',()=>{
  assert.throws(()=>inspectInstitutionalChannels({html,
-  serviceState:state.replace('applicationDistribution:"not_published"','applicationDistribution:"published"')}),/NO-GO/);
+  serviceState:state.replace('"policy":"closed"','"policy":"approved"')}),/NO-GO/);
 });
 test('Unapproved payment form fails closed',()=>{
  assert.throws(()=>inspectInstitutionalChannels({html:html.replace('</body>','<form><input></form></body>'),

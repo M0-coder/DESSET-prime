@@ -1,3 +1,4 @@
+import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 /** Independent offline verifier for Prime's optional MANUAL publication package. */
 import {readFileSync,readdirSync,lstatSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -13,7 +14,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(['INDEX','NOINDEX'].includes(seoPolicy)&&seoPolicy===m.seo_policy,'SEO policy differs');
  check(m.project==='desset-institucional'&&m.canonical==='https://desset.lat/','Wrong Pages destination');
  check(m.production_authorized===false&&m.production_deployed===false,'Report attempts to authorize production');
- check(m.original_files===62&&m.package_files===66&&Array.isArray(m.assets)&&m.assets.length===66,'Missing/extra source assets');
+ check(m.original_files===67&&m.package_files===71&&Array.isArray(m.assets)&&m.assets.length===71,'Missing/extra source assets');
  check(hash(Buffer.from(JSON.stringify(m.assets)))===m.assets_manifest_sha256,'Manifest SHA changed');
  const want=new Map(),seen=new Set();
  for(const a of m.assets){
@@ -30,7 +31,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
    else {check(stat.isFile()&&!seen.has(rel),'Not a regular file: '+rel);seen.add(rel);}
   }
  }
- scan(publicDir);check(seen.size===66,'Unexpected file count');
+ scan(publicDir);check(seen.size===71,'Unexpected file count');
  for(const path of seen)check(want.has(path),'Unexpected file: '+path);
  for(const [path,spec] of want){
   check(seen.has(path),'Missing file: '+path);
@@ -70,6 +71,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  for(const name of ["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){const p=readFileSync(join(publicDir,name+'.html'),'utf8');check(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Rider onboarding canonical or indexing gate: '+name);}
  const company=readFileSync(join(publicDir,'empresa.html'),'utf8');
  check(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or noindex changed');
+ for(const name of appPages){const p=readFileSync(join(publicDir,name+'.html'),'utf8');assertClosedAppPage(p,name);check(p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'App directory canonical missing: '+name);}
  const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');
  const map=readFileSync(join(publicDir,'sitemap.xml'),'utf8');
  const head=readFileSync(join(publicDir,'_headers'),'utf8');
@@ -88,7 +90,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
   check(seen.has(path)&&html.includes('./'+path),'Missing participant photo '+path);
  }
  const status=readFileSync(join(publicDir,'scripts/service-state.js'),'utf8');
- check(status.includes('applicationDistribution:"not_published"')&&status.includes('verified:false'),'Application status changed');
+ assertClosedDistribution(status);
  return {result:'PASS',source_sha:sourceSha,seo:seoPolicy,files:m.assets.length,production_authorized:false,production_deployed:false};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){

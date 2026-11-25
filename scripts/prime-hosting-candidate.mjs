@@ -1,3 +1,4 @@
+import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 /**
  * Prime-only hosting integration: OFFLINE LOCAL REHEARSAL. Not a deployment tool.
  * Produces a temporary website rooted at /tmp, plus an audit outside public/.
@@ -19,7 +20,7 @@ const EXTRAS=Object.freeze({
  'sitemap.xml':'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>\n',
  '404.html':'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DESSET — Página no encontrada</title></head><body><main><h1>Página no encontrada</h1><p>La dirección solicitada no existe.</p><a href="/">Volver al inicio</a></main></body></html>\n'
 });
-const REQUIRED=['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','registro-comercios.html','incorporacion-comercios.html','registro-repartidores.html','incorporacion-repartidores.html','capacitacion-repartidores.html','styles-onboarding.css','_headers','scripts/service-state.js','assets/deliver-assets-mark.png','assets/scene-choose.webp','assets/scene-prepare.webp','assets/scene-move.webp','assets/ecosistema-proveedores.webp','assets/ecosistema-comercios.webp','assets/ecosistema-consumidores.webp','assets/ecosistema-operadores-logisticos.webp','assets/v62-commerce.glb','assets/v62-courier.glb','assets/v62-destination.glb',
+const REQUIRED=['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','registro-comercios.html','incorporacion-comercios.html','registro-repartidores.html','incorporacion-repartidores.html','capacitacion-repartidores.html','aplicaciones.html','aplicaciones-clientes.html','aplicaciones-comercios.html','aplicaciones-repartidores.html','styles-onboarding.css','styles-applications.css','_headers','scripts/service-state.js','assets/deliver-assets-mark.png','assets/scene-choose.webp','assets/scene-prepare.webp','assets/scene-move.webp','assets/ecosistema-proveedores.webp','assets/ecosistema-comercios.webp','assets/ecosistema-consumidores.webp','assets/ecosistema-operadores-logisticos.webp','assets/v62-commerce.glb','assets/v62-courier.glb','assets/v62-destination.glb',
  'styles-typography.css','styles-audiences.css','styles-prime.css','styles-contact.css','styles-trust.css','styles-news.css','styles-careers.css','fonts/inter-latin-variable.woff2','fonts/plus-jakarta-sans-latin-variable.woff2',
  'fonts/LICENSE-Inter-OFL.txt','fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt'];
 
@@ -30,7 +31,7 @@ function verifyManifest(dist){
  const dstat=lstatSync(dist);assert(dstat.isDirectory()&&!dstat.isSymbolicLink(),'dist must be a normal directory');
  const raw=readFileSync(join(dist,'site-manifest.json'));const m=JSON.parse(raw.toString('utf8'));
  assert(m.schema==='desset-prime-static-web-package-v1'&&m.entrypoint==='index.html'&&m.domain==='none'&&m.noindex===true,'source package must remain Prime noindex');
- assert(Array.isArray(m.files)&&m.files.length===62,'unexpected Prime asset count');
+ assert(Array.isArray(m.files)&&m.files.length===67,'unexpected Prime asset count');
  const paths=new Set();let size=0;
  for(const f of m.files){
   assert(safeName(f.path)&&!paths.has(f.path),'unsafe or duplicate asset: '+f.path);
@@ -84,7 +85,8 @@ function verifyManifest(dist){
  assert(!/rel="canonical"/.test(html),'source canonical unexpectedly present');
  for(const participant of ['proveedores','comercios','consumidores','operadores-logisticos'])assert(html.includes('./assets/ecosistema-'+participant+'.webp'),'independent participant photograph missing: '+participant);
  const services=readFileSync(join(dist,'scripts/service-state.js'),'utf8');
- assert(services.includes('applicationDistribution:"not_published"')&&services.includes('verified:false'),'unverified app distribution changed');
+ assertClosedDistribution(services);
+ for(const name of appPages)assertClosedAppPage(readFileSync(join(dist,name+".html"),"utf8"),name);
  const headers=readFileSync(join(dist,'_headers'),'utf8');
  assert(headers.includes("script-src 'self'")&&headers.includes("frame-ancestors 'none'")&&headers.includes('Content-Security-Policy'),'security header missing');
  return {manifest:m,manifestSha256:sha256(raw)};
@@ -113,7 +115,7 @@ export function preparePrimeHosting({dist,sourceSha,mode}){
    mkdirSync(dirname(dst),{recursive:true});copyFileSync(src,dst,constants.COPYFILE_EXCL);
    let bytes=readFileSync(dst);
    assert(bytes.length===item.bytes&&sha256(bytes)===item.sha256,'copy content changed during transfer: '+item.path);
-   if(['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','registro-comercios.html','incorporacion-comercios.html','registro-repartidores.html','incorporacion-repartidores.html','capacitacion-repartidores.html'].includes(item.path)){
+   if(['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','registro-comercios.html','incorporacion-comercios.html','registro-repartidores.html','incorporacion-repartidores.html','capacitacion-repartidores.html','aplicaciones.html','aplicaciones-clientes.html','aplicaciones-comercios.html','aplicaciones-repartidores.html'].includes(item.path)){
     const upgraded=Buffer.from(stageHtml(bytes.toString('utf8'),item.path==='index.html'?BASE_ORIGIN:BASE_ORIGIN+item.path.replace(/\.html$/,'')));
     writeFileSync(dst,upgraded);bytes=upgraded;
    }
@@ -162,6 +164,7 @@ export function preparePrimeHosting({dist,sourceSha,mode}){
   for(const name of ["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){const p=readFileSync(join(publicDir,name+'.html'),'utf8');assert(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Rider onboarding canonical or indexing gate: '+name);}
   const stagedCompany=readFileSync(join(publicDir,'empresa.html'),'utf8');
   assert(stagedCompany.includes('name="robots" content="noindex,nofollow"')&&stagedCompany.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or indexing gate');
+ for(const name of appPages){const p=readFileSync(join(publicDir,name+'.html'),'utf8');assertClosedAppPage(p,name);assert(p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'App directory canonical missing: '+name);}
   const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');
   assert(robots==='User-agent: *\nDisallow: /\n','staging indexing guard changed');
   const report={schema:'desset-prime-native-hosting-rehearsal-v1',source_repo:'M0-coder/DESSET-prime',source_sha:sourceSha,

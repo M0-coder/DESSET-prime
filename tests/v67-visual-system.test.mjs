@@ -92,7 +92,7 @@ test("V6.7 stylesheet actually loads in the signed site and strict local preview
  assert.ok(html.includes('<link rel="stylesheet" href="./styles-system.css">'));
  assert.ok(html.indexOf('href="./styles-system.css"')>html.indexOf('href="./styles-v5.css"'));
  assert.ok(build.includes('"styles-system.css"'));
- assert.ok(build.includes('styles(?:-v5|-system|-hero-photo|-visual02|-typography|-audiences|-prime|-contact|-trust|-news|-careers|-onboarding)?'));
+ assert.ok(build.includes('styles(?:-v5|-system|-hero-photo|-visual02|-typography|-audiences|-prime|-contact|-trust|-news|-careers|-onboarding|-applications)?'));
  assert.ok(preview.includes('rel==="styles-system.css"'));
  assert.ok(preview.includes('rel==="styles-visual02.css"'));
  assert.ok(preview.includes('rel==="styles-typography.css"'));

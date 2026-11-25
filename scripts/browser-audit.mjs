@@ -267,7 +267,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    Math.abs(services.cards[0].height-services.cards[1].height)>2||Math.abs(services.cards[0].dividerOffset-services.cards[1].dividerOffset)>2)
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
   if(diag.decorativeArrowCount!==0)fails.push("Decorative arrows remain in interactive controls");
- if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==13||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
+ if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==14||diag.footerLayout.links.map(x=>x.href).join("|")!=="./empresa.html#quienes-somos|./empresa.html#mision-vision|./empresa.html#valores|#soluciones|./prime.html|./aplicaciones.html|./comercios.html|./repartidores.html|./contacto.html|./confianza.html|./noticias.html|./talento.html|./en.html|./empresa.html#informacion-corporativa"||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
  const partners=diag.partnerLayout;
  const cl=partners.closing;
  if(!cl.joined||cl.background!=="rgb(244, 248, 254)"||cl.headerBackground!=="rgba(0, 0, 0, 0)"||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(17, 17, 17)|rgb(21, 81, 216)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
@@ -826,6 +826,23 @@ try{
     await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.onboarding-page')"),"onboarding page");
     const state=await js(`(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,forms:document.querySelectorAll("form,script,iframe").length,enabled:document.querySelectorAll("input:enabled,select:enabled,textarea:enabled,button:enabled").length,notice:document.querySelector(".ob-notice").textContent,fields:document.querySelectorAll("fieldset").length}))()`);
     if(state.scroll>state.width+2||state.forms||state.enabled||(!state.notice.includes("actualmente")&&!state.notice.includes("aún no está habilitada"))||state.fields!==(page.startsWith("registro-")?2:0))report.failures.push("ONBOARDING "+root+page+w+": "+JSON.stringify(state));
+    await capture((root?"dist-":"source-")+page+"-"+w+"px.png",true);
+   }
+  }
+ }
+ // APP-DISTRIBUTION-01 closed directory: actual responsive DOM and manual controls.
+ for(const root of ["","dist/"]){
+  for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
+   await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   for(const page of ["aplicaciones","aplicaciones-clientes","aplicaciones-comercios","aplicaciones-repartidores"]){
+    await call("Page.navigate",{url:pathToFileURL(resolve(root+page+".html")).href});
+    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.apps-page')"),"app directory render");
+    const a=await js(`(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,panels:document.querySelectorAll("[data-app-role]").length,downloads:[...document.querySelectorAll("[data-app-download]")].every(e=>e.textContent==="Descarga no disponible."),links:document.querySelectorAll("[data-app-links] a, a[download], form, iframe").length,country:document.querySelector("[data-app-country]").value,buttons:document.querySelectorAll("[data-app-platform]").length}))()`);
+    if(a.scroll>a.width+2||a.panels!==(page==="aplicaciones"?3:1)||!a.downloads||a.links||a.country!=="PE"||a.buttons!==(page==="aplicaciones"?0:3))report.failures.push("APP-DISTRIBUTION "+root+page+w+": "+JSON.stringify(a));
+    if(page!=="aplicaciones"){
+     const manual=await js(`(()=>{document.querySelector('[data-app-platform="ios"]').click();const country=document.querySelector("[data-app-country]");country.value="OTHER";country.dispatchEvent(new Event("change"));return {selected:document.querySelector('[data-app-platform="ios"]').getAttribute("aria-pressed"),hidden:document.querySelector("[data-app-links]").hidden,count:document.querySelectorAll("[data-app-links] a").length}})()`);
+     if(manual.selected!=="true"||!manual.hidden||manual.count)report.failures.push("APP-DISTRIBUTION manual selection "+root+page+w);
+    }
     await capture((root?"dist-":"source-")+page+"-"+w+"px.png",true);
    }
   }

@@ -1,48 +1,52 @@
-/* DESSET V6.9 — institutional presentation with independently configurable
- * application distribution. This site never accepts orders or payments.
- * Availability is NOT inferred from the presence of a link; a verified
- * publication and explicit status change are both required.
- * No network calls, cookies, analytics or local storage. */
+/* APP-DISTRIBUTION-01. Canonical projection of config/app-distribution.json; checked offline. No tracking, network or storage. */
 (()=>{
- "use strict";
- const config=Object.freeze({
-  applicationDistribution:"not_published", // "published" only after verified release
-  android:Object.freeze({url:null,verified:false}),
-  ios:Object.freeze({url:null,verified:false})
- });
- const panel=document.querySelector("[data-service-access]");
- const label=panel?.querySelector("[data-service-status]");
- const links=panel?.querySelector("[data-app-links]");
- if(!panel||!label||!links)return;
- panel.dataset.applicationAvailability="not-published";
- const stores=Object.freeze([
-  Object.freeze({key:"android",host:"play.google.com",pathname:"/store/apps/details",label:"Google Play"}),
-  Object.freeze({key:"ios",host:"apps.apple.com",pathname:"/",label:"App Store"})
- ]);
- const releases=[];
- for(const store of stores){
-  const entry=config[store.key];
-  if(!entry.verified||typeof entry.url!=="string")continue;
-  let url;
-  try{url=new URL(entry.url)}catch{continue}
-  if(url.protocol!=="https:"||url.hostname!==store.host||!url.pathname.startsWith(store.pathname))continue;
-  releases.push({url:url.href,label:store.label});
+"use strict";
+const registry={"schema":"desset-app-distribution-v1","policy":"closed","queryCountry":"PE","apps":[{"id":"clientes","audience":"Clientes","officialName":null,"activation":"not_enabled","coverage":[],"qr":null,"platforms":{"android":{"status":"not_published","verified":false,"storeId":null,"developer":null,"compatibility":null,"url":null,"countries":[],"evidence":[]},"ios":{"status":"not_published","verified":false,"storeId":null,"developer":null,"compatibility":null,"url":null,"countries":[],"evidence":[]}}},{"id":"comercios","audience":"Comercios","officialName":null,"activation":"not_enabled","coverage":[],"qr":null,"platforms":{"android":{"status":"not_published","verified":false,"storeId":null,"developer":null,"compatibility":null,"url":null,"countries":[],"evidence":[]},"ios":{"status":"not_published","verified":false,"storeId":null,"developer":null,"compatibility":null,"url":null,"countries":[],"evidence":[]}}},{"id":"repartidores","audience":"Repartidores","officialName":null,"activation":"not_enabled","coverage":[],"qr":null,"platforms":{"android":{"status":"not_published","verified":false,"storeId":null,"developer":null,"compatibility":null,"url":null,"countries":[],"evidence":[]},"ios":{"status":"not_published","verified":false,"storeId":null,"developer":null,"compatibility":null,"url":null,"countries":[],"evidence":[]}}}]};
+const roles=new Map(registry.apps.map(x=>[x.id,x]));
+function officialListing(app,platform,country){
+ if(!app||typeof app.officialName!=="string"||!app.officialName.trim()||!["android","ios"].includes(platform)||!/^[A-Z]{2}$/.test(country))return null;
+ const s=app.platforms?.[platform];
+ if(!s||s.status!=="published"||s.verified!==true||typeof s.developer!=="string"||!s.developer.trim()||typeof s.compatibility!=="string"||!s.compatibility.trim()||!s.countries?.includes(country)||typeof s.storeId!=="string")return null;
+ const e=s.evidence?.filter(x=>x.country===country&&x.storeId===s.storeId&&x.developer===s.developer&&x.url===s.url&&typeof x.reference==="string"&&x.reference.trim()&&/^\d{4}-\d{2}-\d{2}$/.test(x.checkedOn));
+ if(e?.length!==1)return null;
+ const id=s.storeId;
+ const exact=platform==="android"&&/^[a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z][a-zA-Z0-9_]*)+$/.test(id)?"https://play.google.com/store/apps/details?id="+id:
+ platform==="ios"&&/^[1-9]\d{5,19}$/.test(id)?"https://apps.apple.com/"+country.toLowerCase()+"/app/id"+id:null;
+ if(!exact||s.url!==exact)return null;
+ return {url:exact,label:platform==="android"?"Google Play":"App Store",compatibility:s.compatibility};
+}
+function suggestDevice(ua){
+ if(/Android/i.test(ua))return "android";
+ if(/iPhone|iPad|iPod/i.test(ua))return "ios";
+ return "desktop";
+}
+if(registry.policy!=="closed"&&registry.policy!=="approved")return;
+const panels=document.querySelectorAll("[data-app-role]");
+if(!panels.length)return;
+const countryControl=document.querySelector("[data-app-country]");
+let device=suggestDevice(typeof navigator==="object"?navigator.userAgent:"");
+function render(){
+ const country=countryControl?.value||registry.queryCountry;
+ for(const panel of panels){
+  const app=roles.get(panel.dataset.appRole),download=panel.querySelector("[data-app-download]"),links=panel.querySelector("[data-app-links]");
+  const releases=registry.policy==="approved"?[...(device==="ios"?["ios","android"]:["android","ios"])].map(p=>officialListing(app,p,country)).filter(Boolean):[];
+  if(download)download.textContent=releases.length?"Descarga disponible para la plataforma indicada.":"Descarga no disponible.";
+  if(links){
+   links.replaceChildren();links.hidden=!releases.length;
+   for(const item of releases){const a=document.createElement("a");a.href=item.url;a.textContent=item.label+" · "+item.compatibility;a.rel="noopener noreferrer";links.appendChild(a);}
+  }
+  const buttons=panel.querySelectorAll("[data-app-platform]");
+  for(const button of buttons)button.setAttribute("aria-pressed",String(button.dataset.appPlatform===device));
+  const deviceStatus=panel.querySelector("[data-app-device-status]");
+  if(deviceStatus)deviceStatus.textContent=device==="android"?"Android seleccionado.":device==="ios"?"iPhone seleccionado.":"Ordenador seleccionado.";
+  // Account activation and local coverage are never inferred from store availability.
  }
- // Changing the label to available requires BOTH an authorized status and
- // a verified store listing, never just a design/UI adjustment.
- if(config.applicationDistribution!=="published"||releases.length===0){
-  label.textContent="Acceso público no habilitado";
-  links.hidden=true;
-  return;
- }
- label.textContent="Aplicaciones publicadas";
- panel.dataset.applicationAvailability="published";
- const fragment=document.createDocumentFragment();
- for(const release of releases){
-  const a=document.createElement("a");
-  a.href=release.url;a.rel="noopener noreferrer";a.target="_blank";
-  a.textContent=release.label;fragment.appendChild(a);
- }
- links.replaceChildren(fragment);
- links.hidden=false;
+}
+for(const panel of panels){
+ const group=panel.querySelector("[data-app-platforms]");
+ if(group)group.hidden=false;
+ for(const button of panel.querySelectorAll("[data-app-platform]"))button.addEventListener("click",()=>{device=button.dataset.appPlatform;render();});
+}
+countryControl?.addEventListener("change",render);
+render();
 })();

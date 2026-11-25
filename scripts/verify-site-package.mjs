@@ -1,3 +1,4 @@
+import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 /** Verify the packaged DESSET Prime website, not only source files.
  * Strict offline integrity and negative-control checks before any preview.
  */
@@ -12,7 +13,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length===62,"unexpected file count");
+check(manifest.files.length===67,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -99,8 +100,10 @@ check(expected.has("assets/desset-hero-entrega-dos-espejos.webp")&&html.includes
 check(expected.has("assets/desset-hero-entrega-mobile.webp")&&html.includes('srcset="./assets/desset-hero-entrega-mobile.webp"'),"Mobile photographic LCP asset missing");
 check(!html.includes("IDEAS</span>")&&!html.includes("ACCIÓN</span>"),"Unrelated old slogan was left");
 check(expected.has("scripts/service-state.js")&&html.includes('src="./scripts/service-state.js"'),"Institutional availability module not packaged");
+for(const name of appPages){const path=name+".html";check(expected.has(path),"Missing app directory page");assertClosedAppPage(await readFile(resolve(dist,path),"utf8"),name);}
+check(expected.has("styles-applications.css"),"Missing app directory stylesheet");
 const availability=await readFile(resolve(dist,"scripts/service-state.js"),"utf8");
-check(availability.includes('applicationDistribution:"not_published"')&&availability.includes('verified:false'),"Unapproved application publication status");
+assertClosedDistribution(availability);
 check(!/data-service-access|data-service-status|data-app-links|APLICACIONES DESSET|Acceso público no habilitado/.test(html),"Obsolete application availability panel in packaged site");
 check(!/<a\b[^>]*href=["']https?:\/\/(?:play\.google\.com|apps\.apple\.com)(?:[\/:?#"']|$)/i.test(html),"Unapproved application store link in packaged site");
 check(expected.has("assets/roles-geometry-es.svg")&&!expected.has("assets/roles-geometry-v2.svg"),"Only localized diagram may be distributed; sealed original remains source-only");

@@ -41,3 +41,9 @@ test("V5.5 migration must target official repo's security gates and require sepa
  assert.match(ci,/permissions:\s*\n\s*contents:\s*read/);
  assert.doesNotMatch(ci,/pages:\s*write|id-token:\s*write/);
 });
+
+test("V5.5 checks the canonical closed distribution, not the retired controller string",()=>{
+ assert.match(app,/assertClosedDistribution\(availability,JSON\.parse\(text\("config\/app-distribution\.json"\)\)\)/);
+ assert.match(app,/distributionClosed&&/);
+ assert.doesNotMatch(app,/applicationDistribution:"not_published"/);
+});

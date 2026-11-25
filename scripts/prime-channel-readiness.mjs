@@ -1,3 +1,4 @@
+import {assertClosedDistribution} from "./app-distribution-contract.mjs";
 /**
  * DESSET Prime institutional channel preflight.
  * Distinguishes owner's source attestation from independent platform-admin verification.
@@ -17,8 +18,7 @@ export function inspectInstitutionalChannels({html,serviceState,companyHtml=read
  strict(typeof companyHtml==='string'&&companyHtml.includes('Este sitio no procesa pedidos ni pagos.')&&
   html.includes('href="./empresa.html#informacion-corporativa"'),'accessible company no-commerce disclosure missing');
  strict(!/<form\b|<iframe\b|\b(?:checkout|payment|submit-order)\b/i.test(companyHtml),'unapproved transactional company UI');
- strict(typeof serviceState==='string'&&serviceState.includes('applicationDistribution:"not_published"')&&
-  serviceState.includes('verified:false'),'published app claim not authorized');
+ try{assertClosedDistribution(serviceState);}catch{reject('published app claim not authorized');}
  strict(!/<form\b/i.test(html)&&!/\b(?:checkout|payment|submit-order)\b/i.test(html),'unapproved transactional UI');
  strict(attestation?.schema==='desset-prime-social-owner-attestation-v1'&&
   attestation?.source_repository==='M0-coder/DESSET-prime'&&
