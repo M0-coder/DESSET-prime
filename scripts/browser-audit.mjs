@@ -699,6 +699,7 @@ try{
    await capture((root?"dist-":"source-")+"contacto-"+w+"px.png",true);
    await js('document.querySelector(".ct-item summary").click()');
    if(!await js('document.querySelector(".ct-item").open && document.querySelector(".ct-item p").textContent.includes("aún no está habilitado")'))report.failures.push("CONTACT-04 disclosure failed");
+   if(!await js('document.querySelector("#alianzas").open && document.querySelector("#alianzas p").textContent.includes("tecnología e integraciones") && document.querySelector("#alianzas p").textContent.includes("viabilidad") && !document.querySelector("#alianzas form,#alianzas input,#alianzas a")'))report.failures.push("PARTNERS-01 scope or inactive channel mismatch");
    report.tests.push({name:"Contact directory "+root+w,contact});
   }
   for(const selector of [".main-nav .nav-contact",'.corporate-footer a[href="./contacto.html"]']){
