@@ -12,7 +12,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length===56,"unexpected file count");
+check(manifest.files.length===59,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -42,6 +42,10 @@ const careers=await readFile(resolve(dist,"talento.html"),"utf8");
 check(expected.has("talento.html")&&careers.includes('name="robots" content="noindex,nofollow"'),"Careers page absent or indexing changed");
 const english=await readFile(resolve(dist,"en.html"),"utf8");
 check(expected.has("en.html")&&english.includes('name="robots" content="noindex,nofollow"'),"English page absent or indexing changed");
+const registration=await readFile(resolve(dist,"registro-comercios.html"),"utf8");
+check(expected.has("registro-comercios.html")&&registration.includes('name="robots" content="noindex,nofollow"'),"Registration page absent or indexing changed");
+const guide=await readFile(resolve(dist,"incorporacion-comercios.html"),"utf8");
+check(expected.has("incorporacion-comercios.html")&&guide.includes('name="robots" content="noindex,nofollow"'),"Guide page absent or indexing changed");
 const merchant=await readFile(resolve(dist,"comercios.html"),"utf8");
 check(expected.has("comercios.html")&&merchant.includes('name="robots" content="noindex,nofollow"'),"Merchant page absent or indexing changed");
 check(expected.has("empresa.html")&&company.includes('name="robots" content="noindex,nofollow"'),"Company page absent or indexing changed");
@@ -115,3 +119,5 @@ const actual=await inventory();
 check(actual.length===expected.size+1,"unexpected file/s in packed site");
 check(actual.every(x=>x==="site-manifest.json"||expected.has(x)),"unknown web package content");
 console.log("DESSET Prime built website PASS: "+expected.size+" SHA-256-verified files (not cryptographically signed), "+total+" bytes; Three.js and three GLB ready, viewport-activated WebGL2 and local guided tour connected");
+
+check(expected.has("styles-onboarding.css")&&[registration,guide].every(p=>p.includes('href="./styles-onboarding.css"')),"Onboarding stylesheet required");

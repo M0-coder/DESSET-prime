@@ -6,11 +6,11 @@ import {fileURLToPath} from "node:url";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const read=p=>readFileSync(resolve(root,p),"utf8");
 const html=read("index.html");
-const pageNames=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html"];
+const pageNames=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html"];
 const pages=pageNames.map(name=>[name,read(name)]);
 const headers=read("_headers");
 const js=["scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js"].map(read);
-const styles=["styles-typography.css","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css"].map(read);
+const styles=["styles-typography.css","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","styles-onboarding.css"].map(read);
 const issues=[],warnings=[];
 const assert=(ok,label)=>{if(!ok)issues.push(label)};
 const localSet=new Set();
@@ -38,6 +38,7 @@ for(const [page,doc] of pages){
   assert(csp.split(";").map(x=>x.trim()).includes(directive),page+": Missing or weakened local CSP directive "+directive);
  assert(!/<(?:form|iframe|video)\b/i.test(doc),page+": Unauthorized form/iframe/video");
  assert(!/(?:\s)on[a-z]+\s*=/i.test(doc),page+": Inline event attribute detected");
+ if(page==="registro-comercios.html")for(const field of doc.matchAll(/<(?:input|select|textarea|button)\b[^>]*>/gi))assert(/\bdisabled\b/.test(field[0]),page+": Enabled data entry in inactive preview");
  if(page!=="index.html")assert(!/<script\b/i.test(doc),page+": Unexpected script on institutional page");
  assert(Buffer.byteLength(doc,"utf8")<=35000,page+": HTML byte budget exceeded");
 }
@@ -50,7 +51,7 @@ for(const [i,s] of js.entries()){
 }
 assert(styles.every(s=>!/@import\b|url\(\s*['"]?https?:/i.test(s)),"Remote CSS dependency");
 assert(!/\b(?:pages:\s*write|id-token:\s*write)\b/.test(read(".github/workflows/preview-checks.yml")),"CI write token permission");
-const budget={html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:9000,hero_css_bytes:9500,visual02_css_bytes:8200,audiences_css_bytes:4500,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000};
+const budget={html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:9000,hero_css_bytes:9500,visual02_css_bytes:8200,audiences_css_bytes:4500,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,onboarding_css_bytes:4000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000};
 const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
  typography_css_bytes:statSync(resolve(root,"styles-typography.css")).size,
  v5_css_bytes:statSync(resolve(root,"styles-v5.css")).size,
@@ -63,6 +64,7 @@ const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
  trust_css_bytes:statSync(resolve(root,"styles-trust.css")).size,
  news_css_bytes:statSync(resolve(root,"styles-news.css")).size,
  careers_css_bytes:statSync(resolve(root,"styles-careers.css")).size,
+ onboarding_css_bytes:statSync(resolve(root,"styles-onboarding.css")).size,
  hero_webp_bytes:statSync(resolve(root,"assets/desset-hero-entrega-dos-espejos.webp")).size,
  mobile_hero_webp_bytes:statSync(resolve(root,"assets/desset-hero-entrega-mobile.webp")).size};
 for(const [name,size]of Object.entries(sizes))assert(size<=budget[name],name+" exceeds budget");
