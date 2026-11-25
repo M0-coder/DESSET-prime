@@ -88,7 +88,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  }
  const status=readFileSync(join(publicDir,'scripts/service-state.js'),'utf8');
  check(status.includes('applicationDistribution:"not_published"')&&status.includes('verified:false'),'Application status changed');
- return {result:'PASS',source_sha:sourceSha,seo:seoPolicy,files:60,production_authorized:false,production_deployed:false};
+ return {result:'PASS',source_sha:sourceSha,seo:seoPolicy,files:m.assets.length,production_authorized:false,production_deployed:false};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{const [publicDir,reportPath,sourceSha,seoPolicy]=process.argv.slice(2);
