@@ -267,7 +267,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    Math.abs(services.cards[0].height-services.cards[1].height)>2||Math.abs(services.cards[0].dividerOffset-services.cards[1].dividerOffset)>2)
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
   if(diag.decorativeArrowCount!==0)fails.push("Decorative arrows remain in interactive controls");
- if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==12||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
+ if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==13||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
  const partners=diag.partnerLayout;
  const cl=partners.closing;
  if(!cl.joined||cl.background!=="rgb(244, 248, 254)"||cl.headerBackground!=="rgba(0, 0, 0, 0)"||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(17, 17, 17)|rgb(21, 81, 216)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
@@ -635,7 +635,7 @@ try{
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.company-page')"),"company page render");
    await js('document.fonts.ready');
    const company=await js(`(()=>{const v=document.documentElement.clientWidth,n=document.querySelector(".corporate-footer");return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.trim().split(/\\s+/).length,links:[...n.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=v+2})),home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content}})()`);
-   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|mensaje-direccion|areas|historia|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==12||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
+   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|mensaje-direccion|areas|historia|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==13||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
    const message=await js(`(()=>{const e=document.querySelector("#mensaje-direccion");return {title:e.querySelector("h2").textContent,paragraphs:e.querySelectorAll("p").length,fit:e.scrollWidth<=e.clientWidth+2,visible:e.getBoundingClientRect().height>0}})()`);
    if(message.title!=="Mensaje de la dirección"||message.paragraphs!==4||!message.fit||!message.visible)report.failures.push("MESSAGE-01 "+root+w+": "+JSON.stringify(message));
    const history=await js(`(()=>{const e=document.querySelector("#historia"),items=[...e.querySelectorAll(".history-timeline li")];return {year:e.querySelector(".history-year").textContent,items:items.map(n=>n.querySelector("h4").textContent),fit:items.every(n=>n.getBoundingClientRect().left>=0&&n.getBoundingClientRect().right<=document.documentElement.clientWidth+2),ordered:items.every((n,i)=>!i||n.getBoundingClientRect().top>=items[i-1].getBoundingClientRect().bottom-1)}})()`);
@@ -787,6 +787,25 @@ try{
   await js('document.querySelector("#profesionales a").click()');
   await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/talento.html') && !!document.querySelector('.careers-page')"),"Careers contact destination");
   report.tests.push({name:"Careers navigation "+root,pass:true});
+ }
+ // GLOBAL-01: English overview, explicit return to Spanish, no independent claims.
+ for(const root of ["","dist/"]){
+  for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
+   await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   await call("Page.navigate",{url:pathToFileURL(resolve(root+"en.html")).href});
+   await until(async()=>await js("document.readyState==='complete' && document.documentElement.lang==='en'"),"English overview");
+   await js('document.fonts.ready');
+   const english=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,lang:document.documentElement.lang,width:v,scroll:document.documentElement.scrollWidth,sections:[...document.querySelectorAll("main section")].map(e=>e.id),back:document.querySelector("header a[hreflang=es]").getAttribute("href"),forms:document.querySelectorAll("form,input,script,iframe,textarea").length,notice:document.querySelector("#information").textContent.includes("currently available in Spanish"),fit:[...document.querySelectorAll("main section")].every(e=>e.scrollWidth<=e.clientWidth+2)}})()`);
+   if(english.title!=="DESSET — International overview"||english.lang!=="en"||english.sections.join("|")!=="about|business|principles|status|information"||english.scroll>english.width+2||english.back!=="./empresa.html"||english.forms||!english.notice||!english.fit)report.failures.push("GLOBAL-01 "+root+w+": "+JSON.stringify(english));
+   await capture((root?"dist-":"source-")+"en-"+w+"px.png",true);
+  }
+  await call("Page.navigate",{url:pathToFileURL(resolve(root+"empresa.html")).href});
+  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('a[hreflang=en]')"),"English language entry");
+  await js('document.querySelector("a[hreflang=en]").click()');
+  await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/en.html') && document.documentElement.lang==='en'"),"English language destination");
+  await js('document.querySelector("header a[hreflang=es]").click()');
+  await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/empresa.html') && document.documentElement.lang==='es'"),"Spanish language return");
+  report.tests.push({name:"Global language navigation "+root,pass:true});
  }
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
