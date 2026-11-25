@@ -6,37 +6,44 @@ import {fileURLToPath} from "node:url";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const read=p=>readFileSync(resolve(root,p),"utf8");
 const html=read("index.html");
-const company=read("empresa.html");
+const pageNames=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html"];
+const pages=pageNames.map(name=>[name,read(name)]);
 const headers=read("_headers");
 const js=["scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js"].map(read);
-const styles=["styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css"].map(read);
+const styles=["styles-typography.css","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css"].map(read);
 const issues=[],warnings=[];
 const assert=(ok,label)=>{if(!ok)issues.push(label)};
 const localSet=new Set();
 const mainCss=readFileSync(resolve(root,"styles.css"));
 const cssRevision=createHash("sha1").update("blob "+mainCss.length+"\0").update(mainCss).digest("hex");
-assert([html,company].every(p=>p.includes('href="./styles.css?v='+cssRevision+'"')),"Main stylesheet cache revision does not match source bytes");
-for(const tag of (html+company).match(/<(?:script|link|img|source)\b[^>]*>/g)||[]){
- const attrs=[...tag.matchAll(/\b(?:src|href|srcset)="([^"]+)"/g)].map(m=>m[1]);
- for(const val of attrs){
-  if(!val.startsWith("./")){issues.push("Nonlocal DOM resource "+val);continue}
-  const raw=val.slice(2);
-  const filename=raw==="styles.css?v="+cssRevision?"styles.css":raw;
-  if(filename.includes("..")||filename.startsWith("/")){issues.push("Unsafe asset path "+filename);continue}
-  const full=resolve(root,filename);
-  assert(existsSync(full),"Referenced asset missing: "+filename);
-  if(existsSync(full))localSet.add(filename);
+for(const [page,doc] of pages){
+ assert(doc.includes('href="./styles.css?v='+cssRevision+'"'),page+": Main stylesheet cache revision does not match source bytes");
+ for(const tag of doc.match(/<(?:script|link|img|source)\b[^>]*>/gi)||[]){
+  const attrs=[...tag.matchAll(/\b(?:src|href|srcset)="([^"]+)"/g)].map(m=>m[1]);
+  for(const val of attrs){
+   if(!val.startsWith("./")){issues.push(page+": Nonlocal DOM resource "+val);continue}
+   const raw=val.slice(2);
+   const filename=raw==="styles.css?v="+cssRevision?"styles.css":raw;
+   if(filename.includes("..")||filename.startsWith("/")||filename.includes("\\")){issues.push(page+": Unsafe asset path "+filename);continue}
+   const full=resolve(root,filename);
+   assert(existsSync(full),page+": Referenced asset missing: "+filename);
+   if(existsSync(full))localSet.add(filename);
+  }
  }
+ for(const url of [...doc.matchAll(/href="#([^"]+)"/g)].map(m=>m[1]))
+  assert(doc.includes('id="'+url+'"'),page+": Broken in-page navigation anchor #"+url);
+ assert(/name="robots" content="noindex,nofollow"/.test(doc),page+": Missing noindex");
+ const csp=doc.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/i)?.[1]||"";
+ for(const directive of ["default-src 'self'","script-src 'self'","object-src 'none'","base-uri 'none'","form-action 'none'"])
+  assert(csp.split(";").map(x=>x.trim()).includes(directive),page+": Missing or weakened local CSP directive "+directive);
+ assert(!/<(?:form|iframe|video)\b/i.test(doc),page+": Unauthorized form/iframe/video");
+ assert(!/(?:\s)on[a-z]+\s*=/i.test(doc),page+": Inline event attribute detected");
+ if(page!=="index.html")assert(!/<script\b/i.test(doc),page+": Unexpected script on institutional page");
+ assert(Buffer.byteLength(doc,"utf8")<=35000,page+": HTML byte budget exceeded");
 }
-for(const url of [...html.matchAll(/href="(#[^"]+)"/g)].map(m=>m[1].slice(1)))
- assert(html.includes('id="'+url+'"'),"Broken in-page navigation anchor #"+url);
-assert([html,company].every(p=>/name="robots" content="noindex,nofollow"/.test(p)),"Missing noindex");
 assert(/Content-Security-Policy/.test(headers),"Missing published-host CSP template");
 assert(/default-src 'self'/.test(headers)&&/script-src 'self'/.test(headers)&&/object-src 'none'/.test(headers),"CSP too relaxed");
 assert(/frame-ancestors 'none'/.test(headers),"Missing frame-ancestors gate");
-assert([html,company].every(p=>/Content-Security-Policy/.test(p)),"Missing local CSP meta fallback");
-assert(!/<form\b|<iframe\b|<video\b/i.test(html+company),"Unauthorized form/iframe/video");
-assert(!/(?:onload|onclick|onerror)\s*=/.test(html+company),"Inline event attribute detected");
 for(const [i,s] of js.entries()){
  assert(!/\b(?:eval|new Function)\s*\(/.test(s),"Unsafe eval in scripts index "+i);
  assert(!/\b(?:fetch|WebSocket|XMLHttpRequest|sendBeacon)\s*\(/.test(s),"Unauthorized network call in scripts index "+i);
@@ -60,9 +67,9 @@ const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
  mobile_hero_webp_bytes:statSync(resolve(root,"assets/desset-hero-entrega-mobile.webp")).size};
 for(const [name,size]of Object.entries(sizes))assert(size<=budget[name],name+" exceeds budget");
 const report={schema:"desset-v5.3-static-gate-v1",checks:"resource allowlist; CSP; no external JS/CSS; noindex; anchors; no deploy; byte budgets",
- assets_checked:[...localSet].sort(),sizes,warnings,issues,
+ pages_checked:pageNames,assets_checked:[...localSet].sort(),sizes,warnings,issues,
  limitations:"Source scanner only; not a replacement for SAST, SCA, penetration testing or HTTP production validation."};
 mkdirSync(resolve(root,"reports/quality"),{recursive:true});
 writeFileSync(resolve(root,"reports/quality/static.json"),JSON.stringify(report,null,2)+"\n");
-console.log("DESSET static/source gate "+(issues.length?"FAIL":"PASS")+": "+localSet.size+" assets, "+issues.length+" issues.");
+console.log("DESSET static/source gate "+(issues.length?"FAIL":"PASS")+": "+pageNames.length+" pages, "+localSet.size+" assets, "+issues.length+" issues.");
 if(issues.length){console.error(issues.join("\n"));process.exitCode=1}
