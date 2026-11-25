@@ -5,6 +5,12 @@ const read=p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 for(const dir of ["","dist/"]){
  test("PRIME-01 isolated editorial route and truthful institutional claims "+(dir||"source"),()=>{
  const html=read(dir+"prime.html"),css=read(dir+"styles-prime.css");
+ const header=html.match(/<header class="site-header">([\s\S]*?)<\/header>/)?.[1]||"";
+ assert.match(header,/<a href="\.\/index\.html" class="brand prime-header-brand" aria-label="DESSET Prime, ir al inicio"><span class="brand-name">DESSET <span class="pr-wordmark">Prime<\/span><\/span><\/a>/);
+ assert.doesNotMatch(header,/<img\b|<svg\b|brand-mark/);
+ assert.match(css,/\.prime-header-brand \.brand-name\{[^}]*color:#1551d8;[^}]*font-weight:800/);
+ assert.match(css,/\.prime-header-brand \.pr-wordmark\{[^}]*font-size:1em;[^}]*font-weight:500;[^}]*font-style:normal;[^}]*color:inherit/);
+ assert.match(read(dir+"index.html"),/<img[^>]*class="brand-mark"[^>]*src="\.\/assets\/deliver-assets-mark\.png"/);
  for(const page of ["index","empresa","comercios","repartidores"]){
  const doc=read(dir+page+".html");assert.ok(doc.includes('href="./prime.html">DESSET prime</a>'));assert.ok(!doc.includes("styles-prime.css"));
  }
