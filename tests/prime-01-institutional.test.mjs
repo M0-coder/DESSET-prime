@@ -26,8 +26,12 @@ for(const dir of ["","dist/"]){
  assert.match(html,/<figure class="pr-vision-art"><img/);
  assert.match(css,/\.pr-vision-art img/);
 
- assert.match(html,/no representa una operación activa/);
- assert.match(html,/no representa flota, puertos ni infraestructura propia/);
+ assert.match(html,/Una visión logística integral/);
+ assert.match(html,/Nuestra visión de largo plazo contempla redes logísticas nacionales e internacionales\./);
+ assert.match(html,/Centro logístico ilustrativo/);
+ assert.match(html,/Imagen de referencia: vista aérea de un buque de carga en puerto/);
+ assert.doesNotMatch(html,/<figcaption\b|class="pr-intro"|class="pr-note"|<p class="pr-kicker">LOGÍSTICA Y DISTRIBUCIÓN<\/p>/);
+ assert.doesNotMatch(css,/\.prime-page (?:figcaption|\.pr-intro|\.pr-note)\{/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/form-action 'none'/);
  assert.doesNotMatch(html,/<(?:form|input|script|iframe)\b/i);
