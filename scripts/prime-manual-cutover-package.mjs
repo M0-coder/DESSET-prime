@@ -11,7 +11,7 @@ import {preparePrimeHosting} from './prime-hosting-candidate.mjs';
 import {generateThirdPartyNotices} from './prime-third-party-notices.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const sha256=b=>createHash('sha256').update(b).digest('hex');
-const requiredSpecial=['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','styles-audiences.css','styles-prime.css','styles-contact.css','styles-trust.css','styles-news.css','styles-careers.css','_headers','robots.txt','sitemap.xml','404.html','THIRD-PARTY-NOTICES.txt',
+const requiredSpecial=['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','registro-comercios.html','incorporacion-comercios.html','styles-onboarding.css','styles-audiences.css','styles-prime.css','styles-contact.css','styles-trust.css','styles-news.css','styles-careers.css','_headers','robots.txt','sitemap.xml','404.html','THIRD-PARTY-NOTICES.txt',
  'fonts/LICENSE-Inter-OFL.txt','fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt'];
 const assert=(condition,message)=>{if(!condition)throw Error('NO-GO: '+message)};
 const canonical='https://desset.lat/';
@@ -64,7 +64,7 @@ export function preparePrimeCutoverPackage({dist,sourceSha,seoPolicy,outputDir,e
      if(st.isDirectory())scan(full,rel);else{assert(st.isFile(),'Not a regular file in package');paths.push(rel);}
    }
   }scan(output);
-  assert(paths.length===60&&paths.every(x=>expected.has(x)),'Unexpected candidate inventory');
+  assert(paths.length===63&&paths.every(x=>expected.has(x)),'Unexpected candidate inventory');
   for(const path of requiredSpecial)assert(paths.includes(path),'Missing required static host policy '+path);
   const modifiable=new Set(['index.html','_headers','robots.txt','sitemap.xml','THIRD-PARTY-NOTICES.txt']);
   const inventory=paths.sort().map(path=>{
@@ -89,6 +89,10 @@ export function preparePrimeCutoverPackage({dist,sourceSha,seoPolicy,outputDir,e
   assert(careers.includes('name="robots" content="noindex,nofollow"')&&careers.includes('rel="canonical" href="https://desset.lat/talento"'),'Careers page must remain noindex');
   const english=readFileSync(join(output,'en.html'),'utf8');
   assert(english.includes('name="robots" content="noindex,nofollow"')&&english.includes('rel="canonical" href="https://desset.lat/en"'),'English page must remain noindex');
+  const registration=readFileSync(join(output,'registro-comercios.html'),'utf8');
+  assert(registration.includes('name="robots" content="noindex,nofollow"')&&registration.includes('rel="canonical" href="https://desset.lat/registro-comercios"'),'Registration page must remain noindex');
+  const guide=readFileSync(join(output,'incorporacion-comercios.html'),'utf8');
+  assert(guide.includes('name="robots" content="noindex,nofollow"')&&guide.includes('rel="canonical" href="https://desset.lat/incorporacion-comercios"'),'Guide page must remain noindex');
   const company=readFileSync(join(output,'empresa.html'),'utf8');
   assert(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page must remain noindex independently of homepage policy');
   const outHtml=readFileSync(htmlPath,'utf8');
