@@ -12,7 +12,10 @@ for(const dir of ["","dist/"]){
  assert.match(html,/No hay comunicados oficiales publicados/);
  assert.match(html,/No hay anuncios oficiales publicados/);
  assert.match(html,/No hay apariciones en medios publicadas/);
- assert.match(html,/no constituye una licencia de uso/);
+ assert.match(html,/ni constituye una licencia de uso/);
+ const brand=html.match(/<details class="nw-brand"[\s\S]*?<\/details>/)?.[0];assert.ok(brand);
+ assert.match(brand,/se reservan para colaboradores autorizados/);assert.match(brand,/El canal de solicitudes aún no está habilitado/);
+ assert.doesNotMatch(brand,/<img\b|<a\b[^>]*(?:download|href="\.\/assets\/)|<input\b/i);
  assert.match(html,/href="\.\/contacto\.html#prensa"/);
  assert.doesNotMatch(html,/<(?:form|script|iframe|textarea|article|time)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel|\bdownload\b/i);
  for(const page of ["index","empresa","comercios","repartidores","prime","contacto","confianza"]){

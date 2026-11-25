@@ -751,7 +751,7 @@ try{
     if(selected.id!==id||selected.visible.length!==1||selected.visible[0]!=="nw-state "+id)report.failures.push("NEWS-01 filter "+JSON.stringify(selected));
    }
    await js('document.querySelector("#recursos-de-marca summary").click()');
-   if(!await js('document.querySelector("#recursos-de-marca").open && document.querySelector(".nw-brand-content img").complete && document.querySelector(".nw-brand-content img").naturalWidth>0'))report.failures.push("NEWS-01 brand preview failed");
+   if(!await js('document.querySelector("#recursos-de-marca").open && document.querySelector(".nw-brand-content").innerText.includes("colaboradores autorizados") && !document.querySelector("#recursos-de-marca img,#recursos-de-marca a[download],#recursos-de-marca a[href*=assets]")'))report.failures.push("NEWS-01 restricted brand request failed");
    await capture((root?"dist-":"source-")+"noticias-open-"+w+"px.png",true);
    report.tests.push({name:"News directory "+root+w,news});
   }
