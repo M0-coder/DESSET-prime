@@ -27,7 +27,8 @@ test("PRIME-HUB-01: DESSET blue title, blue-ink English text and mobile-friendly
  assert.match(css,/#ecosistema \.prime-3d-heading p strong\{display:block;color:#111111/);
  assert.match(css,/font-size:clamp\(36px,5\.6vw,74px\)/);
  assert.match(audit,/primeHeadingColor:style\("#desset-prime-heading"\)\.color/);
- assert.match(audit,/palette\.primeHeadingColor!==brandBlue/);
+ // The 3D chapter retains its original blue independently of the institutional UI.
+ assert.match(audit,/palette\.primeHeadingColor!=="rgb\(21, 81, 216\)"/);
  for(const [fg,bg] of [["#1551d8","#eef0ef"],["#111111","#eef0ef"]]){
   assert.ok(contrast(fg,bg)>=4.5,`${fg} on ${bg} fails normal-text contrast`);
  }
