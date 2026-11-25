@@ -15,13 +15,13 @@
 .trust-page .tr-item:first-child{border-top:1px solid #d8dce2}
 .trust-page summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;padding:16px 0;font-size:clamp(17px,1.7vw,21px);font-weight:700;line-height:1.45;cursor:pointer}
 .trust-page summary::-webkit-details-marker{display:none}
-.trust-page summary span{color:#1551d8;font-size:24px;line-height:1;flex-shrink:0}
+.trust-page summary span{color:#073bbc;font-size:24px;line-height:1;flex-shrink:0}
 .trust-page details[open] summary span{transform:rotate(45deg)}
-.trust-page summary:focus-visible,.trust-page a:focus-visible{outline:3px solid #1551d8;outline-offset:3px}
-.trust-page summary:hover{color:#1551d8}
+.trust-page summary:focus-visible,.trust-page a:focus-visible{outline:3px solid #073bbc;outline-offset:3px}
+.trust-page summary:hover{color:#073bbc}
 .trust-page .tr-item div{padding-bottom:20px}
-.trust-page .tr-item a{display:inline-block;color:#1551d8;text-decoration:underline;padding-block:8px}
+.trust-page .tr-item a{display:inline-block;color:#073bbc;text-decoration:underline;padding-block:8px}
 .tr-footer{background:#f1f5fa;border-top:1px solid #d8dce2;padding:24px var(--edge,24px)}
-.tr-footer a{color:#1551d8;font-size:24px;font-weight:650;text-decoration:none}
+.tr-footer a{color:#073bbc;font-size:24px;font-weight:650;text-decoration:none}
 .tr-footer p{font-size:12px;color:#565656;margin:12px 0 0}
 @media(max-width:700px){.trust-page .tr-hero-grid{grid-template-columns:minmax(0,1fr)}.trust-page .tr-art{max-width:200px}}

@@ -78,6 +78,26 @@ test("INK-REMOVAL-02: institutional sections use black without recoloring visual
   assert.match(editorial,/#ecosistema \.ecosystem-board\{background:#142239;border:1px solid #304158;box-shadow:0 23px 60px rgba\(18,32,50,\.18\)/);
   assert.match(read(prefix+"styles-typography.css"),/#ecosistema \.ecosystem-board\{background:#fff/);
   assert.match(prime,/\.pr-vision-art img\{background:#203b5a\}/);
-  assert.match(prime,/color:#1551d8/);
+  assert.match(prime,/color:#073bbc/);
  }
+});
+
+test("BRAND-BLUE-01: new interface blue in source and package; legacy visual colors remain scoped",()=>{
+ const uiStyles=["styles.css","styles-system.css","styles-prime.css","styles-typography.css","styles-hero-photo.css","styles-visual02.css","styles-applications.css","styles-audiences.css","styles-careers.css","styles-contact.css","styles-news.css","styles-onboarding.css","styles-trust.css"];
+ for(const prefix of ["","dist/"]){
+  for(const file of uiStyles){
+   const content=read(prefix+file);
+   assert.match(content,/#073bbc\b/i,file+" must use the new brand blue");
+   const withoutProtected=content.replace(/\/\*[\s\S]*?\*\//g,"").replace("position:relative;isolation:isolate;background:#1551d8;","");
+   assert.doesNotMatch(withoutProtected,/#1551d8(?![0-9a-f])/i,file+" contains an unapproved legacy interface blue");
+  }
+  assert.match(read(prefix+"styles-v5.css"),/#1551d8/i);
+  assert.match(read(prefix+"styles-prime.css"),/\.pr-kicker\{[^}]*color:#b7caff/);
+  assert.match(read(prefix+"styles.css"),/position:relative;isolation:isolate;background:#1551d8;/);
+ }
+ const lum=h=>{const [r,g,b]=h.slice(1).match(/../g).map(v=>parseInt(v,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return .2126*r+.7152*g+.0722*b};
+ const contrast=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+ for(const bg of ["#ffffff","#f4f8fe","#f7f5ee"])assert.ok(contrast("#073bbc",bg)>=7);
+ assert.ok(contrast("#b7caff","#000000")>=4.5);
+ assert.ok(contrast("#073bbc","#000000")<3,"Dark surfaces require the separate light-blue accent");
 });

@@ -1,7 +1,7 @@
 /* VISUAL-02 — DESSET institutional editorial continuity.
    Only sections BELOW the approved hero; never restyle the rider, logo or 3D.
    No new images, fonts, scripts, external CSS or pseudo-content claims. */
-:root{--v02-deep:#000000;--v02-paper:#f7f5ee;--v02-blue:#1551d8;--v02-gold:#ffc62f;--v02-line:#d5dae2;--v02-soft:0 16px 44px rgba(20,34,57,.12)}
+:root{--v02-deep:#000000;--v02-paper:#f7f5ee;--v02-blue:#073bbc;--v02-gold:#ffc62f;--v02-line:#d5dae2;--v02-soft:0 16px 44px rgba(20,34,57,.12)}
 /* Statement reads as the dark editorial chapter after the photo, not an arcade. */
 #vision.statement{background:var(--v02-deep)}
 #vision .statement-body{gap:clamp(25px,4vw,64px)}
@@ -10,7 +10,7 @@
 
 
 
-#soluciones .solutions-grid .service--main{border:1px solid #1755d4;border-top:5px solid var(--v02-gold);box-shadow:var(--v02-soft)}
+#soluciones .solutions-grid .service--main{border:1px solid #073bbc;border-top:5px solid var(--v02-gold);box-shadow:var(--v02-soft)}
 #soluciones .service-arrow{font-size:27px;opacity:.9}
 #soluciones .service-access{border-top:3px solid var(--v02-blue);box-shadow:0 12px 28px rgba(20,34,57,.07)}
 #soluciones .future-services{border-color:#bfc8d3}

@@ -45,11 +45,11 @@ test("DESSET blue service rail has four accessible, substantive benefits and res
  ])assert.ok(rail.includes('<strong>'+heading+'</strong><p>'+copy+'</p>'),heading+" exact approved description missing");
  assert.doesNotMatch(rail,/FUTURO|seguimiento en tiempo real|entregas activas/i);
  assert.match(heroCss,/#inicio \.v4-hero-rail\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
- assert.match(heroCss,/background:#1551d8;color:#fff;white-space:normal/);
+ assert.match(heroCss,/background:#073bbc;color:#fff;white-space:normal/);
  assert.match(heroCss,/@media\(max-width:860px\)\{#inicio \.v4-hero-rail\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.match(heroCss,/@media\(max-width:520px\)\{#inicio \.v4-rail-item\{display:block/);
- assert.ok(ratio("#E2EBFF","#1551D8")>=4.5,"Small text must meet WCAG AA on brand blue");
- assert.ok(ratio("#FFFFFF","#1551D8")>=4.5,"Heading contrast must meet WCAG AA");
+ assert.ok(ratio("#E2EBFF","#073BBC")>=4.5,"Small text must meet WCAG AA on brand blue");
+ assert.ok(ratio("#FFFFFF","#073BBC")>=4.5,"Heading contrast must meet WCAG AA");
 });
 test("technical diagrams and four roles are one opt-in view, not repeated clutter",()=>{
  const detail=html.match(/<details class="v4-architecture-details">([\s\S]*?)<\/details>/);

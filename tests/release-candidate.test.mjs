@@ -78,5 +78,5 @@ test("Public controls have no decorative arrows and partner buttons share one vi
  for(const m of html.matchAll(/<(a|button|summary)\b[^>]*>([\s\S]*?)<\/\1>/g))assert.doesNotMatch(m[2],/[↗→➜]/);
  assert.match(html,/class="disclosure-indicator"/);
  assert.match(css,/\.v4-architecture-details\[open\] summary \.disclosure-indicator/);
- assert.match(css,/#negocios\.audiences \.audience-grid--compact>article a\{[^}]*background:#1551d8;color:#fff/);
+ assert.match(css,/#negocios\.audiences \.audience-grid--compact>article a\{[^}]*background:#073bbc;color:#fff/);
 });
