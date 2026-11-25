@@ -21,12 +21,12 @@ test('two independently created staging packages match file-by-file; evidence st
  const parent=temp(t),evidenceDir=join(parent,'evidence'),artifactDir=join(parent,'prepared-public');const report=prepareReleaseEvidence({...opts,evidenceDir,artifactDir});
  assert.equal(report.repeated_packaging_identical,true);
  assert.equal(report.independently_compiled_twice,false);
- assert.equal(report.original_files,50);assert.equal(report.staged_files,53);
+ assert.equal(report.original_files,56);assert.equal(report.staged_files,59);
  assert.equal(report.release_authorized,false);assert.equal(report.release_decision,'NO-GO');
  assert.ok(!report.publication_checks_pending.includes(''));
  assert.deepEqual(JSON.parse(readFileSync(join(evidenceDir,'prime-release-evidence.json'),'utf8')),report);
  assert.match(readFileSync(join(artifactDir,'robots.txt'),'utf8'),/Disallow: \/$/m);
- assert.equal(report.files.length,53);
+ assert.equal(report.files.length,59);
  assert.ok(report.files.every(x=>/^[a-f0-9]{64}$/.test(x.sha256))); 
  assert.deepEqual(readFileSync(join(artifactDir,'assets/scene-move.webp')),readFileSync(join(realDist,'assets/scene-move.webp')));
 });
