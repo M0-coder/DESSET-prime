@@ -7,7 +7,8 @@ for(const dir of ["","dist/"]){
  const html=read(dir+"talento.html"),css=read(dir+"styles-careers.css");
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/form-action 'none'/);
- assert.match(html,/no se anuncian vacantes ni se reciben candidaturas/);
+ assert.match(html,/no se anuncian vacantes\./);
+ assert.match(html,/no se reciben candidaturas\./);
  assert.match(html,/<h1>El futuro lo construyen las personas\.<\/h1>/);
  assert.deepEqual([...html.matchAll(/<span>(Innovación con propósito|Excelencia en la ejecución|Responsabilidad compartida|Aprendizaje continuo)<\/span>/g)].map(m=>m[1]),["Innovación con propósito","Excelencia en la ejecución","Responsabilidad compartida","Aprendizaje continuo"]);
  assert.doesNotMatch(html,/<(?:form|input|script|iframe|textarea)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel/i);
