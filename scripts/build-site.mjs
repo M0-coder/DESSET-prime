@@ -17,7 +17,7 @@ const compiled=["assets/v6-three.bundle.js",
 const typefaces=["fonts/inter-latin-variable.woff2","fonts/plus-jakarta-sans-latin-variable.woff2",
  "fonts/LICENSE-Inter-OFL.txt","fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt"];
 const files=[
- "index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-typography.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","_headers",
+ "index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-typography.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","_headers",
  "scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js",
  ...allowStatic,...compiled,...typefaces
 ].sort();
@@ -39,9 +39,9 @@ if(!loader.includes('activationObserver.observe(stage)')||
  !loader.includes('threeStart?.addEventListener("click",loadThree)')||
  !loader.includes('./assets/v6-three.bundle.js'))
  throw Error("Viewport-activated 3D scene is not connected to bundled WebGL or manual fallback.");
-if(files.length>47)throw Error("Too many release files for DESSET Prime: "+files.length);
+if(files.length>49)throw Error("Too many release files for DESSET Prime: "+files.length);
 for(const path of files){
- if(path.split("/").includes("..") || !(path==="assets/v6-three.bundle.js" || /^(?:(?:index|empresa|comercios|repartidores|prime|contacto|confianza|noticias)\.html|styles(?:-v5|-system|-hero-photo|-visual02|-typography|-audiences|-prime|-contact|-trust|-news)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb)|fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2|fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt)$/.test(path)))
+ if(path.split("/").includes("..") || !(path==="assets/v6-three.bundle.js" || /^(?:(?:index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento)\.html|styles(?:-v5|-system|-hero-photo|-visual02|-typography|-audiences|-prime|-contact|-trust|-news|-careers)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb)|fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2|fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt)$/.test(path)))
    throw Error("Unexpected package path: "+path);
  const info=await stat(resolve(root,path));
  if(!info.isFile()||info.size===0)throw Error("Required website file missing/empty: "+path);
@@ -72,8 +72,10 @@ const trust=await readFile(resolve(root,"confianza.html"),"utf8");
 if(!trust.includes('href="./styles.css?v='+cssRevision+'"')||!trust.includes('name="robots" content="noindex,nofollow"'))throw Error("Trust page CSS revision or indexing policy mismatch");
 const news=await readFile(resolve(root,"noticias.html"),"utf8");
 if(!news.includes('href="./styles.css?v='+cssRevision+'"')||!news.includes('name="robots" content="noindex,nofollow"'))throw Error("News page CSS revision or indexing policy mismatch");
-const refs=[...(original+company+merchant+rider+prime+contact+trust+news).matchAll(/\b(?:src|srcset|href)="(\.\/[^"]+)"/g)]
- .map(m=>m[1].slice(2).split(/\s+/)[0]).map(p=>p==="styles.css?v="+cssRevision?"styles.css":/^(index|empresa|comercios|repartidores|prime|contacto|confianza|noticias)\.html#[a-z-]+$/.test(p)?p.split("#")[0]:p);
+const careers=await readFile(resolve(root,"talento.html"),"utf8");
+if(!careers.includes('href="./styles.css?v='+cssRevision+'"')||!careers.includes('name="robots" content="noindex,nofollow"'))throw Error("Careers page CSS revision or indexing policy mismatch");
+const refs=[...(original+company+merchant+rider+prime+contact+trust+news+careers).matchAll(/\b(?:src|srcset|href)="(\.\/[^"]+)"/g)]
+ .map(m=>m[1].slice(2).split(/\s+/)[0]).map(p=>p==="styles.css?v="+cssRevision?"styles.css":/^(index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento)\.html#[a-z-]+$/.test(p)?p.split("#")[0]:p);
 for(const href of refs){
  if(href.includes("..")||!files.includes(href))
   throw Error("HTML references absent or disallowed website file: "+href);
