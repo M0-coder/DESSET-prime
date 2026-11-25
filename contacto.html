@@ -13,12 +13,24 @@
   <link rel="stylesheet" href="./styles-system.css">
   <link rel="stylesheet" href="./styles-typography.css">
   <link rel="stylesheet" href="./styles-contact.css">
+  <script defer src="./scripts/app.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
   <header class="site-header">
-    <a href="./index.html" class="brand" aria-label="DESSET, ir al inicio"><img class="brand-mark" src="./assets/deliver-assets-mark.png" width="96" height="73" alt=""><span class="brand-name">DESSET</span></a>
-    <a href="./index.html">Inicio</a>
+    <a href="./index.html" class="brand" aria-label="DESSET, ir al inicio">
+      <img class="brand-mark" src="./assets/deliver-assets-mark.png" width="96" height="73" alt="" decoding="async">
+      <span class="brand-name">DESSET</span>
+    </a>
+    <button class="menu-button" aria-controls="main-nav" aria-expanded="false" aria-label="Menú — abrir navegación" type="button">Menú <span aria-hidden="true">+</span></button>
+    <nav class="main-nav" id="main-nav" aria-label="Navegación principal">
+      <a href="./empresa.html">Empresa</a>
+      <a href="./index.html#soluciones">Servicios</a>
+      <a href="./aplicaciones.html">Aplicaciones</a>
+      <a href="./index.html#ecosistema">Cómo funciona</a>
+      <a href="./index.html#negocios">Para quiénes</a>
+      <a class="nav-contact" href="./contacto.html" aria-current="page">Canales DESSET</a>
+    </nav>
   </header>
   <main class="contact-page" id="contenido">
     <section class="ct-hero"><div class="ct-inner"><h1>Contacto institucional</h1><p>Selecciona el área correspondiente a tu consulta.</p></div></section>
@@ -35,6 +47,15 @@
       <details class="ct-item" id="otras"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x='3' y='5' width='18' height='14' rx='2'/><path d='m3 6 9 7 9-7'/></svg><span>Otras consultas</span><svg class="ct-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></summary><p>Correspondencia institucional que no encaje en las categorías anteriores. El canal correspondiente aún no está habilitado.</p></details>
     </section>
   </main>
-  <footer class="ct-footer"><a href="./index.html">DESSET</a><p><a href="./confianza.html">Centro de confianza</a></p><p><a href="./noticias.html">Sala de noticias</a></p><p>© 2026 DESSET. Todos los derechos reservados.</p></footer>
+  <footer class="site-footer">
+    <a class="footer-brand" href="./index.html">DESSET</a>
+    <nav class="corporate-footer" aria-label="Mapa del sitio">
+      <div><strong>Empresa</strong><a href="./empresa.html#quienes-somos">Quiénes somos</a><a href="./empresa.html#mision-vision">Misión y visión</a><a href="./empresa.html#valores">Valores</a></div>
+      <div><strong>Servicios</strong><a href="./index.html#soluciones">DESSET</a><a href="./prime.html">DESSET prime</a></div>
+      <div><strong>Ecosistema</strong><a href="./aplicaciones.html">Aplicaciones</a><a href="./comercios.html">Comercios</a><a href="./repartidores.html">Repartidores</a></div>
+      <div><strong>Información institucional</strong><a href="./contacto.html" aria-current="page">Contacto</a><a href="./confianza.html">Centro de confianza</a><a href="./noticias.html">Sala de noticias</a><a href="./talento.html">Talento y cultura</a><a href="./en.html" lang="en" hreflang="en">English</a><a href="./empresa.html#informacion-corporativa">Información corporativa</a></div>
+    </nav>
+    <p>© 2026 DESSET. Todos los derechos reservados.</p>
+  </footer>
 </body>
 </html>

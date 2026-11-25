@@ -627,6 +627,22 @@ try{
    report.tests.push({name:"Source/dist partner visual parity "+w,partners:result.partnerLayout});
  }
 
+ // WEB-CLOSE-02: test real shared navigation on every institutional viewport.
+ async function verifySharedNavigation(root,page,w){
+  const state=await js(`(()=>{const n=document.querySelector(".main-nav"),b=document.querySelector(".menu-button"),f=document.querySelector(".corporate-footer"),v=document.documentElement.clientWidth;if(!n||!b||!f)return null;return {ready:document.documentElement.classList.contains("js-enabled"),nav:getComputedStyle(n).display,button:getComputedStyle(b).display,expanded:b.getAttribute("aria-expanded"),links:n.querySelectorAll("a").length,footer:f.querySelectorAll("a").length,inside:[...f.querySelectorAll("a")].every(a=>a.getBoundingClientRect().left>=0&&a.getBoundingClientRect().right<=v+2),overflow:document.documentElement.scrollWidth>v+2}})()`);
+  const label=root+page+" "+w;
+  if(!state||!state.ready||state.links!==6||state.footer!==14||!state.inside||state.overflow||state.expanded!=="false"){report.failures.push("WEB-CLOSE-02 initial "+label+": "+JSON.stringify(state));return;}
+  if(w<=700){
+   if(state.nav!=="none"||state.button==="none")report.failures.push("WEB-CLOSE-02 mobile initial "+label);
+   const result=await js(`(()=>{const n=document.querySelector(".main-nav"),b=document.querySelector(".menu-button"),v=document.documentElement.clientWidth;b.click();const open=b.getAttribute("aria-expanded")==="true"&&getComputedStyle(n).display!=="none"&&[...n.querySelectorAll("a")].every(a=>a.getBoundingClientRect().left>=0&&a.getBoundingClientRect().right<=v+2&&a.getBoundingClientRect().height>=44);return open})()`);
+   if(!result)report.failures.push("WEB-CLOSE-02 open menu "+label);
+   if(w===390)await capture((root?"dist-":"source-")+page+"-shared-menu-390px.png");
+   const closed=await js(`(()=>{const b=document.querySelector(".menu-button"),n=document.querySelector(".main-nav");document.dispatchEvent(new KeyboardEvent("keydown",{key:"Escape",bubbles:true}));const close=b.getAttribute("aria-expanded")==="false"&&getComputedStyle(n).display==="none"&&document.activeElement===b;document.documentElement.classList.remove("js-enabled");const fallback=getComputedStyle(n).display!=="none"&&[...n.querySelectorAll("a")].every(a=>a.getBoundingClientRect().height>=44);document.documentElement.classList.add("js-enabled");b.blur();return {close,fallback}})()`);
+   if(!closed.close||!closed.fallback)report.failures.push("WEB-CLOSE-02 Escape/fallback "+label+": "+JSON.stringify(closed));
+  }else if(state.nav==="none"||state.button!=="none")report.failures.push("WEB-CLOSE-02 desktop navigation "+label);
+  report.tests.push({name:"WEB-CLOSE-02 shared navigation "+label,state});
+ }
+
  // Validate the new company page in both source and packaged form.
  for(const root of ["","dist/"]){
   for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
@@ -634,8 +650,9 @@ try{
    await call("Page.navigate",{url:pathToFileURL(resolve(root+"empresa.html")).href});
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.company-page')"),"company page render");
    await js('document.fonts.ready');
+   await verifySharedNavigation(root,"empresa",w);
    const company=await js(`(()=>{const v=document.documentElement.clientWidth,n=document.querySelector(".corporate-footer");return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.trim().split(/\\s+/).length,links:[...n.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=v+2})),home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content}})()`);
-   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|mensaje-direccion|areas|historia|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==13||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
+   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|mensaje-direccion|areas|historia|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==14||!company.links.some(x=>x.href==="./aplicaciones.html")||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
    const message=await js(`(()=>{const e=document.querySelector("#mensaje-direccion");return {title:e.querySelector("h2").textContent,paragraphs:e.querySelectorAll("p").length,fit:e.scrollWidth<=e.clientWidth+2,visible:e.getBoundingClientRect().height>0}})()`);
    if(message.title!=="Mensaje de la dirección"||message.paragraphs!==4||!message.fit||!message.visible)report.failures.push("MESSAGE-01 "+root+w+": "+JSON.stringify(message));
    const history=await js(`(()=>{const e=document.querySelector("#historia"),items=[...e.querySelectorAll(".history-timeline li")];return {year:e.querySelector(".history-year").textContent,items:items.map(n=>n.querySelector("h4").textContent),fit:items.every(n=>n.getBoundingClientRect().left>=0&&n.getBoundingClientRect().right<=document.documentElement.clientWidth+2),ordered:items.every((n,i)=>!i||n.getBoundingClientRect().top>=items[i-1].getBoundingClientRect().bottom-1)}})()`);
@@ -657,6 +674,7 @@ try{
    await call("Page.navigate",{url:pathToFileURL(resolve(root+page+".html")).href});
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.audience-page')"),"audience page render");
    await js('document.fonts.ready');
+   await verifySharedNavigation(root,page,w);
    const merchant=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content,forms:document.querySelectorAll("form,input,iframe").length,channelLinks:document.querySelectorAll("#canales-oficiales a").length,cta:document.querySelector("#incorporacion a").getAttribute("href"),visible:[...document.querySelectorAll("main h1,main h2,main p,main li")].every(e=>(e.closest("details:not([open])")||e.getBoundingClientRect().width>0&&e.scrollWidth<=e.clientWidth+2))}})()`);
    if(merchant.title!==(page==="comercios"?"TU NEGOCIO, MÁS ALLÁ DE SUS PUERTAS":"CADA ENTREGA CONECTA UNA HISTORIA")||merchant.sections.join("|")!=="presentacion|beneficios|modelo|incorporacion|preguntas"||merchant.scroll>merchant.width+2||merchant.home!=="./index.html"||merchant.robots!=="noindex,nofollow"||merchant.forms||merchant.channelLinks!==5||merchant.cta!==(page==="comercios"?"./registro-comercios.html":"./registro-repartidores.html")||!merchant.visible)report.failures.push("MERCHANT-01 "+root+w+": "+JSON.stringify(merchant));
    await capture((root?"dist-":"source-")+page+"-"+w+"px.png",true);
@@ -704,6 +722,7 @@ try{
    await call("Page.navigate",{url:pathToFileURL(resolve(root+"contacto.html")).href});
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.contact-page')"),"contact page render");
    await js('document.fonts.ready');
+   await verifySharedNavigation(root,"contacto",w);
    const contact=await js(`(()=>{const v=document.documentElement.clientWidth,s=[...document.querySelectorAll(".ct-item summary")];return {title:document.querySelector("h1").textContent,width:v,scroll:document.documentElement.scrollWidth,items:s.length,closed:document.querySelectorAll("details[open]").length,forms:document.querySelectorAll("form,input,iframe,textarea").length,social:document.querySelectorAll(".footer-social,[data-footer-channel]").length,fit:s.every(e=>e.clientWidth>=e.scrollWidth-2&&e.getBoundingClientRect().height>=48&&e.querySelector("span").scrollWidth<=e.querySelector("span").clientWidth+2)}})()`);
    if(contact.title!=="Contacto institucional"||contact.scroll>contact.width+2||contact.items!==9||contact.closed||contact.forms||contact.social||!contact.fit)report.failures.push("CONTACT-04 "+root+w+": "+JSON.stringify(contact));
    await capture((root?"dist-":"source-")+"contacto-"+w+"px.png",true);
@@ -727,6 +746,7 @@ try{
    await call("Page.navigate",{url:pathToFileURL(resolve(root+"confianza.html")).href});
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.trust-page')"),"trust page render");
    await js('document.fonts.ready');
+   await verifySharedNavigation(root,"confianza",w);
    const trust=await js(`(()=>{const v=document.documentElement.clientWidth,s=[...document.querySelectorAll(".tr-item summary")];return {title:document.querySelector("h1").textContent,width:v,scroll:document.documentElement.scrollWidth,items:s.length,closed:document.querySelectorAll("details[open]").length,forms:document.querySelectorAll("form,input,iframe,textarea").length,social:document.querySelectorAll(".footer-social,[data-footer-channel]").length,fit:s.every(e=>e.clientWidth>=e.scrollWidth-2&&e.getBoundingClientRect().height>=48)}})()`);
    if(trust.title!=="Centro de confianza"||trust.scroll>trust.width+2||trust.items!==5||trust.closed||trust.forms||trust.social||!trust.fit)report.failures.push("TRUST-01 "+root+w+": "+JSON.stringify(trust));
    await capture((root?"dist-":"source-")+"confianza-"+w+"px.png",true);
@@ -753,7 +773,8 @@ try{
    await call("Page.navigate",{url:pathToFileURL(resolve(root+"noticias.html")).href});
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.news-page')"),"news page render");
    await js('document.fonts.ready');
-   const news=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,width:v,scroll:document.documentElement.scrollWidth,filters:document.querySelectorAll(".nw-filter input[type=radio]").length,selected:document.querySelector(".nw-filter input:checked").id,forms:document.querySelectorAll("form,iframe,textarea,script,input:not([type=radio])").length,social:document.querySelectorAll(".footer-social,[data-footer-channel]").length,fit:[...document.querySelectorAll(".nw-filter label")].every(e=>e.getBoundingClientRect().height>=44)}})()`);
+   await verifySharedNavigation(root,"noticias",w);
+   const news=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,width:v,scroll:document.documentElement.scrollWidth,filters:document.querySelectorAll(".nw-filter input[type=radio]").length,selected:document.querySelector(".nw-filter input:checked").id,forms:document.querySelectorAll("form,iframe,textarea,script:not([src='./scripts/app.js']),input:not([type=radio])").length,social:document.querySelectorAll(".footer-social,[data-footer-channel]").length,fit:[...document.querySelectorAll(".nw-filter label")].every(e=>e.getBoundingClientRect().height>=44)}})()`);
    if(news.title!=="Sala de noticias."||news.scroll>news.width+2||news.filters!==4||news.selected!=="nw-all"||news.forms||news.social||!news.fit)report.failures.push("NEWS-01 "+root+w+": "+JSON.stringify(news));
    await capture((root?"dist-":"source-")+"noticias-"+w+"px.png",true);
    for(const id of ["nw-press","nw-announcements","nw-media","nw-all"]){
@@ -782,7 +803,8 @@ try{
    await call("Page.navigate",{url:pathToFileURL(resolve(root+"talento.html")).href});
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.careers-page')"),"careers page render");
    await js('document.fonts.ready');
-   const careers=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,width:v,scroll:document.documentElement.scrollWidth,values:[...document.querySelectorAll(".ca-values li span")].map(e=>e.textContent),forms:document.querySelectorAll("form,iframe,textarea,script,input").length,social:document.querySelectorAll(".footer-social,[data-footer-channel]").length,closed:document.querySelector("#oportunidades").textContent.includes("no se reciben candidaturas"),fit:[...document.querySelectorAll(".ca-values li")].every(e=>e.getBoundingClientRect().height>=48&&e.scrollWidth<=e.clientWidth+2)}})()`);
+   await verifySharedNavigation(root,"talento",w);
+   const careers=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,width:v,scroll:document.documentElement.scrollWidth,values:[...document.querySelectorAll(".ca-values li span")].map(e=>e.textContent),forms:document.querySelectorAll("form,iframe,textarea,script:not([src='./scripts/app.js']),input").length,social:document.querySelectorAll(".footer-social,[data-footer-channel]").length,closed:document.querySelector("#oportunidades").textContent.includes("no se reciben candidaturas"),fit:[...document.querySelectorAll(".ca-values li")].every(e=>e.getBoundingClientRect().height>=48&&e.scrollWidth<=e.clientWidth+2)}})()`);
    if(careers.title!=="El futuro lo construyen las personas."||careers.scroll>careers.width+2||careers.values.join("|")!=="Innovación con propósito|Excelencia en la ejecución|Responsabilidad compartida|Aprendizaje continuo"||careers.forms||careers.social||!careers.closed||!careers.fit)report.failures.push("CAREERS-01 "+root+w+": "+JSON.stringify(careers));
    await capture((root?"dist-":"source-")+"talento-"+w+"px.png",true);
    report.tests.push({name:"Careers page "+root+w,careers});
@@ -837,6 +859,7 @@ try{
    for(const page of ["aplicaciones","aplicaciones-clientes","aplicaciones-comercios","aplicaciones-repartidores"]){
     await call("Page.navigate",{url:pathToFileURL(resolve(root+page+".html")).href});
     await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.apps-page')"),"app directory render");
+    if(page==="aplicaciones"){await js('document.fonts.ready');await verifySharedNavigation(root,page,w);}
     const a=await js(`(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,panels:document.querySelectorAll("[data-app-role]").length,downloads:[...document.querySelectorAll("[data-app-download]")].every(e=>e.textContent==="Descarga no disponible."),links:document.querySelectorAll("[data-app-links] a, a[download], form, iframe").length,country:document.querySelector("[data-app-country]").value,buttons:document.querySelectorAll("[data-app-platform]").length}))()`);
     if(a.scroll>a.width+2||a.panels!==(page==="aplicaciones"?3:1)||!a.downloads||a.links||a.country!=="PE"||a.buttons!==(page==="aplicaciones"?0:3))report.failures.push("APP-DISTRIBUTION "+root+page+w+": "+JSON.stringify(a));
     if(page!=="aplicaciones"){

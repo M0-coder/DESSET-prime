@@ -1,4 +1,5 @@
 import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
+import {institutionalPages,assertInstitutionalNavigation} from "./institutional-navigation-contract.mjs";
 /** Static source and asset integrity scanner: deliberately not a full SAST/SCA tool. */
 import {readFileSync,existsSync,statSync,mkdirSync,writeFileSync} from "node:fs";
 import {resolve} from "node:path";
@@ -40,7 +41,8 @@ for(const [page,doc] of pages){
  assert(!/<(?:form|iframe|video)\b/i.test(doc),page+": Unauthorized form/iframe/video");
  assert(!/(?:\s)on[a-z]+\s*=/i.test(doc),page+": Inline event attribute detected");
  if(["registro-comercios.html","registro-repartidores.html"].includes(page))for(const field of doc.matchAll(/<(?:input|select|textarea|button)\b[^>]*>/gi))assert(/\bdisabled\b/.test(field[0]),page+": Enabled data entry in inactive preview");
- if(appPages.includes(page.replace(/\.html$/,""))){try{assertClosedAppPage(doc,page.replace(/\.html$/,""));}catch(e){issues.push(page+": "+e.message);}}else if(page!=="index.html")assert(!/<script\b/i.test(doc),page+": Unexpected script on institutional page");
+ if(appPages.includes(page.replace(/\.html$/,""))){try{assertClosedAppPage(doc,page.replace(/\.html$/,""));}catch(e){issues.push(page+": "+e.message);}}else if(page!=="index.html"&&!institutionalPages.includes(page.replace(/\.html$/,"")))assert(!/<script\b/i.test(doc),page+": Unexpected script on institutional page");
+ if(institutionalPages.includes(page.replace(/\.html$/,""))){try{assertInstitutionalNavigation(html,doc,page.replace(/\.html$/,""));}catch(e){issues.push(page+": "+e.message);}}
  assert(Buffer.byteLength(doc,"utf8")<=35000,page+": HTML byte budget exceeded");
 }
 assert(/Content-Security-Policy/.test(headers),"Missing published-host CSP template");
