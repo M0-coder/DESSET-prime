@@ -12,7 +12,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length===59,"unexpected file count");
+check(manifest.files.length===62,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -46,6 +46,7 @@ const registration=await readFile(resolve(dist,"registro-comercios.html"),"utf8"
 check(expected.has("registro-comercios.html")&&registration.includes('name="robots" content="noindex,nofollow"'),"Registration page absent or indexing changed");
 const guide=await readFile(resolve(dist,"incorporacion-comercios.html"),"utf8");
 check(expected.has("incorporacion-comercios.html")&&guide.includes('name="robots" content="noindex,nofollow"'),"Guide page absent or indexing changed");
+for(const name of ["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){const path=name+".html",p=await readFile(resolve(dist,path),"utf8");check(expected.has(path)&&p.includes('name="robots" content="noindex,nofollow"')&&p.includes('href="./styles-onboarding.css"')&&p.includes("form-action 'none'"),"Rider onboarding missing or unsafe: "+name);}
 const merchant=await readFile(resolve(dist,"comercios.html"),"utf8");
 check(expected.has("comercios.html")&&merchant.includes('name="robots" content="noindex,nofollow"'),"Merchant page absent or indexing changed");
 check(expected.has("empresa.html")&&company.includes('name="robots" content="noindex,nofollow"'),"Company page absent or indexing changed");
