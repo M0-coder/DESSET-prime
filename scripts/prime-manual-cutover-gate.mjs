@@ -39,6 +39,18 @@ export function reviewSelectedMedia(media){
  }))return rejected;
  return {accepted:true,basis:'owner-attested-free-download',individual_license_review_complete:false,release_authorized:false};
 }
+// Six explicitly selected Prime page photographs; separate from the historical ecosystem attestation.
+export function reviewPrimePageMedia(media){
+ const items=media?.prime_page_assets;
+ const names=["assets/prime-hero-logistica.webp","assets/prime-paqueteria.webp","assets/prime-distribucion.webp","assets/prime-fulfillment.webp","assets/prime-tecnologia-logistica.webp","assets/prime-vision-internacional.webp"];
+ if(!Array.isArray(items)||items.length!==names.length||new Set(items.map(a=>a?.path)).size!==names.length)return false;
+ return names.every((path,i)=>{
+  const a=items.find(x=>x?.path===path);
+  if(!a||! /^[a-f0-9]{64}$/.test(a.sha256)||!Number.isSafeInteger(a.bytes)||a.bytes<=0||!Number.isSafeInteger(a.width)||!Number.isSafeInteger(a.height)||a.width<=0||a.height<=0||typeof a.alt!=='string'||!a.alt.trim())return false;
+  if(i===5)return a.claim==='third-party'&&a.author==='Tom Fisk'&&a.source_id==='1554646'&&a.source==='https://www.pexels.com/photo/aerial-view-of-cargo-ship-1554646/'&&a.license==='Pexels License'&&a.license_url==='https://www.pexels.com/license/'&&a.verification==='individual-source-verified';
+  return a.claim==='ai-generated-owner-selected'&&a.source==='conversation-upload'&&a.license==='AI-generated; ownership not independently verified'&&a.license_url===null&&a.verification==='owner-selected'&&a.source_id==='owner-approved-2026-11-25';
+ });
+}
 export function validateReleaseIntent({repository,ref,event,expectedSha,checkoutSha,previousId,seoPolicy,target}){
  const err=[];
  mark(err,repository===target?.repository,'Wrong GitHub repository');
@@ -81,6 +93,7 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    const media=JSON.parse(readFileSync(resolve(dirname(targetPath),'prime-selected-media.json'),'utf8'));
    const mediaReview=reviewSelectedMedia(media);
    if(!mediaReview.accepted)throw Error('Selected photographs require a valid scoped review before production');
+   if(!reviewPrimePageMedia(media))throw Error('Prime page photographs require a valid individual inventory before production');
    const e=process.env;
    const out=validateReleaseIntent({repository:e.GITHUB_REPOSITORY,ref:e.GITHUB_REF,event:e.GITHUB_EVENT_NAME,
      expectedSha:e.RELEASE_SHA,checkoutSha:e.GITHUB_SHA,previousId:e.PREVIOUS_DEPLOYMENT_ID,

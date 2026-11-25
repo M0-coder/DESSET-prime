@@ -19,7 +19,7 @@ test('14 owner-declared active original media are individually SHA-256 verified'
  const r=checkAssetRightsAndLicenses(opts);
  assert.equal(r.outcome,'PASS');assert.equal(r.assets_checked,14);
  assert.equal(r.legal_title_independently_verified,false);
- assert.equal(r.selected_media_checked,4);assert.equal(r.individual_license_review_complete,false);
+ assert.equal(r.prime_page_media_checked,6);assert.equal(r.prime_page_media.filter(a=>a.claim==='third-party').length,1);assert.equal(r.selected_media_checked,4);assert.equal(r.individual_license_review_complete,false);
  assert.equal(r.selected_media_review.basis,'owner-attested-free-download');
  assert.equal(r.selected_media_review.release_authorized,false);
  assert.equal(r.selected_media_owner_attestation.independent_legal_verification,false);

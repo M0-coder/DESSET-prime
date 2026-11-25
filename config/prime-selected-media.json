@@ -86,5 +86,98 @@
         "license_url": "https://unsplash.com/license"
       }
     ]
-  }
+  },
+  "prime_page_assets": [
+    {
+      "path": "assets/prime-hero-logistica.webp",
+      "sha256": "fc339916df9a3f476de85afff22d0c852b5138d056185f913a4a10597267493b",
+      "bytes": 228190,
+      "width": 1600,
+      "height": 900,
+      "alt": "Centro logístico ilustrativo con vehículos de carga.",
+      "claim": "ai-generated-owner-selected",
+      "author": "Imagen generada con ChatGPT, seleccionada por el usuario",
+      "source": "conversation-upload",
+      "license": "AI-generated; ownership not independently verified",
+      "license_url": null,
+      "verification": "owner-selected",
+      "source_id": "owner-approved-2026-11-25"
+    },
+    {
+      "path": "assets/prime-paqueteria.webp",
+      "sha256": "047e5b792f3e616fdb7304fa3d55c03deb279e38e1dd83d989dd9a28e802bcf2",
+      "bytes": 85864,
+      "width": 960,
+      "height": 540,
+      "alt": "Paquetes de cartón sobre una línea de clasificación.",
+      "claim": "ai-generated-owner-selected",
+      "author": "Imagen generada con ChatGPT, seleccionada por el usuario",
+      "source": "conversation-upload",
+      "license": "AI-generated; ownership not independently verified",
+      "license_url": null,
+      "verification": "owner-selected",
+      "source_id": "owner-approved-2026-11-25"
+    },
+    {
+      "path": "assets/prime-distribucion.webp",
+      "sha256": "f65443a1973e390045521b22b6f93eaa40e7764ccfbd730ce453818ccf0d0e51",
+      "bytes": 65554,
+      "width": 960,
+      "height": 540,
+      "alt": "Vehículos de carga en muelles de distribución.",
+      "claim": "ai-generated-owner-selected",
+      "author": "Imagen generada con ChatGPT, seleccionada por el usuario",
+      "source": "conversation-upload",
+      "license": "AI-generated; ownership not independently verified",
+      "license_url": null,
+      "verification": "owner-selected",
+      "source_id": "owner-approved-2026-11-25"
+    },
+    {
+      "path": "assets/prime-fulfillment.webp",
+      "sha256": "0fe05df44f9e4604360ada4d51cb49f1bde207a6887122ba1f4541ac835cb86f",
+      "bytes": 119204,
+      "width": 960,
+      "height": 540,
+      "alt": "Personal preparando y verificando pedidos en un almacén ilustrativo.",
+      "claim": "ai-generated-owner-selected",
+      "author": "Imagen generada con ChatGPT, seleccionada por el usuario",
+      "source": "conversation-upload",
+      "license": "AI-generated; ownership not independently verified",
+      "license_url": null,
+      "verification": "owner-selected",
+      "source_id": "owner-approved-2026-11-25"
+    },
+    {
+      "path": "assets/prime-tecnologia-logistica.webp",
+      "sha256": "e8c40de384238b1972ee651e8da0d5fa0dcbf105fbd3a44c73c1811db73f955e",
+      "bytes": 91764,
+      "width": 960,
+      "height": 540,
+      "alt": "Centro ilustrativo de seguimiento y coordinación de envíos.",
+      "claim": "ai-generated-owner-selected",
+      "author": "Imagen generada con ChatGPT, seleccionada por el usuario",
+      "source": "conversation-upload",
+      "license": "AI-generated; ownership not independently verified",
+      "license_url": null,
+      "verification": "owner-selected",
+      "source_id": "owner-approved-2026-11-25"
+    },
+    {
+      "path": "assets/prime-vision-internacional.webp",
+      "sha256": "ab596f2edfab233a27b5b3d6c74ad14b86d9913b41e6a96345cf2d038b190414",
+      "bytes": 237970,
+      "width": 1600,
+      "height": 898,
+      "alt": "Vista aérea de un buque de carga en un puerto de Yakarta.",
+      "claim": "third-party",
+      "author": "Tom Fisk",
+      "source": "https://www.pexels.com/photo/aerial-view-of-cargo-ship-1554646/",
+      "source_id": "1554646",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "verification": "individual-source-verified",
+      "verification_note": "Source page and license reviewed 2026-11-25; no independent binary comparison to remote original."
+    }
+  ]
 }
