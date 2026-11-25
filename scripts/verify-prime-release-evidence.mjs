@@ -14,9 +14,9 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(/^[a-f0-9]{40}$/.test(expectedSha)&&info.origin_sha===expectedSha&&info.checkout_sha===expectedSha,'SHA mismatch');
  check(info.release_authorized===false&&info.release_decision==='NO-GO','not an offline-only candidate');
  check(info.noindex===true&&info.robots_disallow_all===true,'indexing policy changed');
- check(info.original_files===56&&info.staged_files===59,'package shape mismatch');
+ check(info.original_files===59&&info.staged_files===62,'package shape mismatch');
  check(info.repeated_packaging_identical===true&&info.independently_compiled_twice===false,'evidence claims changed');
- check(Array.isArray(info.files)&&info.files.length===59,'missing per-asset manifest');
+ check(Array.isArray(info.files)&&info.files.length===62,'missing per-asset manifest');
  check(sha(Buffer.from(JSON.stringify(info.files)))===info.artifacts_sha256,'manifest checksum mismatch');
  const expected=new Map(),actual=new Set();let total=0;
  for(const f of info.files){
@@ -59,6 +59,10 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(careers.includes('name="robots" content="noindex,nofollow"')&&careers.includes('rel="canonical" href="https://desset.lat/talento"'),'Careers page canonical or noindex changed');
  const english=readFileSync(join(publicDir,'en.html'),'utf8');
  check(english.includes('name="robots" content="noindex,nofollow"')&&english.includes('rel="canonical" href="https://desset.lat/en"'),'English page canonical or noindex changed');
+ const registration=readFileSync(join(publicDir,'registro-comercios.html'),'utf8');
+ check(registration.includes('name="robots" content="noindex,nofollow"')&&registration.includes('rel="canonical" href="https://desset.lat/registro-comercios"'),'Registration page canonical or noindex changed');
+ const guide=readFileSync(join(publicDir,'incorporacion-comercios.html'),'utf8');
+ check(guide.includes('name="robots" content="noindex,nofollow"')&&guide.includes('rel="canonical" href="https://desset.lat/incorporacion-comercios"'),'Guide page canonical or noindex changed');
  const company=readFileSync(join(publicDir,'empresa.html'),'utf8');
  check(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or noindex changed');
  const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');
