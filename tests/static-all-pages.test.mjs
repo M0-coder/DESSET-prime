@@ -6,7 +6,7 @@ import {join} from "node:path";
 import {fileURLToPath} from "node:url";
 import {spawnSync} from "node:child_process";
 const root=fileURLToPath(new URL("../",import.meta.url));
-const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html"];
+const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html"];
 test("Static gate scans every institutional page and rejects representative violations",()=>{
  const dir=mkdtempSync(join(tmpdir(),"desset-static-all-"));
  try{

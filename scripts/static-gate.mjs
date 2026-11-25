@@ -6,7 +6,7 @@ import {fileURLToPath} from "node:url";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const read=p=>readFileSync(resolve(root,p),"utf8");
 const html=read("index.html");
-const pageNames=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html"];
+const pageNames=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html"];
 const pages=pageNames.map(name=>[name,read(name)]);
 const headers=read("_headers");
 const js=["scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js"].map(read);
@@ -38,7 +38,7 @@ for(const [page,doc] of pages){
   assert(csp.split(";").map(x=>x.trim()).includes(directive),page+": Missing or weakened local CSP directive "+directive);
  assert(!/<(?:form|iframe|video)\b/i.test(doc),page+": Unauthorized form/iframe/video");
  assert(!/(?:\s)on[a-z]+\s*=/i.test(doc),page+": Inline event attribute detected");
- if(page==="registro-comercios.html")for(const field of doc.matchAll(/<(?:input|select|textarea|button)\b[^>]*>/gi))assert(/\bdisabled\b/.test(field[0]),page+": Enabled data entry in inactive preview");
+ if(["registro-comercios.html","registro-repartidores.html"].includes(page))for(const field of doc.matchAll(/<(?:input|select|textarea|button)\b[^>]*>/gi))assert(/\bdisabled\b/.test(field[0]),page+": Enabled data entry in inactive preview");
  if(page!=="index.html")assert(!/<script\b/i.test(doc),page+": Unexpected script on institutional page");
  assert(Buffer.byteLength(doc,"utf8")<=35000,page+": HTML byte budget exceeded");
 }

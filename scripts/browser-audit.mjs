@@ -658,7 +658,7 @@ try{
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.audience-page')"),"audience page render");
    await js('document.fonts.ready');
    const merchant=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content,forms:document.querySelectorAll("form,input,iframe").length,channelLinks:document.querySelectorAll("#canales-oficiales a").length,cta:document.querySelector("#incorporacion a").getAttribute("href"),visible:[...document.querySelectorAll("main h1,main h2,main p,main li")].every(e=>(e.closest("details:not([open])")||e.getBoundingClientRect().width>0&&e.scrollWidth<=e.clientWidth+2))}})()`);
-   if(merchant.title!==(page==="comercios"?"TU NEGOCIO, MÁS ALLÁ DE SUS PUERTAS":"CADA ENTREGA CONECTA UNA HISTORIA")||merchant.sections.join("|")!=="presentacion|beneficios|modelo|incorporacion|preguntas"||merchant.scroll>merchant.width+2||merchant.home!=="./index.html"||merchant.robots!=="noindex,nofollow"||merchant.forms||merchant.channelLinks!==5||merchant.cta!==(page==="comercios"?"./registro-comercios.html":"#canales-oficiales")||!merchant.visible)report.failures.push("MERCHANT-01 "+root+w+": "+JSON.stringify(merchant));
+   if(merchant.title!==(page==="comercios"?"TU NEGOCIO, MÁS ALLÁ DE SUS PUERTAS":"CADA ENTREGA CONECTA UNA HISTORIA")||merchant.sections.join("|")!=="presentacion|beneficios|modelo|incorporacion|preguntas"||merchant.scroll>merchant.width+2||merchant.home!=="./index.html"||merchant.robots!=="noindex,nofollow"||merchant.forms||merchant.channelLinks!==5||merchant.cta!==(page==="comercios"?"./registro-comercios.html":"./registro-repartidores.html")||!merchant.visible)report.failures.push("MERCHANT-01 "+root+w+": "+JSON.stringify(merchant));
    await capture((root?"dist-":"source-")+page+"-"+w+"px.png",true);
    report.tests.push({name:"Audience page "+page+" "+root+w,merchant});
   }
@@ -821,11 +821,11 @@ try{
  for(const root of ["","dist/"]){
   for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
    await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
-   for(const page of ["registro-comercios","incorporacion-comercios"]){
+   for(const page of ["registro-comercios","incorporacion-comercios","registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){
     await call("Page.navigate",{url:pathToFileURL(resolve(root+page+".html")).href});
     await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.onboarding-page')"),"onboarding page");
     const state=await js(`(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,forms:document.querySelectorAll("form,script,iframe").length,enabled:document.querySelectorAll("input:enabled,select:enabled,textarea:enabled,button:enabled").length,notice:document.querySelector(".ob-notice").textContent,fields:document.querySelectorAll("fieldset").length}))()`);
-    if(state.scroll>state.width+2||state.forms||state.enabled||(!state.notice.includes("actualmente")&&!state.notice.includes("aún no está habilitada"))||state.fields!==(page==="registro-comercios"?2:0))report.failures.push("ONBOARDING "+root+page+w+": "+JSON.stringify(state));
+    if(state.scroll>state.width+2||state.forms||state.enabled||(!state.notice.includes("actualmente")&&!state.notice.includes("aún no está habilitada"))||state.fields!==(page.startsWith("registro-")?2:0))report.failures.push("ONBOARDING "+root+page+w+": "+JSON.stringify(state));
     await capture((root?"dist-":"source-")+page+"-"+w+"px.png",true);
    }
   }

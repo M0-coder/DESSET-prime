@@ -17,7 +17,7 @@ const compiled=["assets/v6-three.bundle.js",
 const typefaces=["fonts/inter-latin-variable.woff2","fonts/plus-jakarta-sans-latin-variable.woff2",
  "fonts/LICENSE-Inter-OFL.txt","fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt"];
 const files=[
- "index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","styles.css","styles-onboarding.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-typography.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","_headers",
+ "index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html","styles.css","styles-onboarding.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-typography.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","_headers",
  "scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js",
  ...allowStatic,...compiled,...typefaces
 ].sort();
@@ -39,9 +39,9 @@ if(!loader.includes('activationObserver.observe(stage)')||
  !loader.includes('threeStart?.addEventListener("click",loadThree)')||
  !loader.includes('./assets/v6-three.bundle.js'))
  throw Error("Viewport-activated 3D scene is not connected to bundled WebGL or manual fallback.");
-if(files.length!==59)throw Error("Too many release files for DESSET Prime: "+files.length);
+if(files.length!==62)throw Error("Too many release files for DESSET Prime: "+files.length);
 for(const path of files){
- if(path.split("/").includes("..") || !(path==="assets/v6-three.bundle.js" || /^(?:(?:index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios)\.html|styles(?:-v5|-system|-hero-photo|-visual02|-typography|-audiences|-prime|-contact|-trust|-news|-careers|-onboarding)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb)|fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2|fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt)$/.test(path)))
+ if(path.split("/").includes("..") || !(path==="assets/v6-three.bundle.js" || /^(?:(?:index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios|registro-repartidores|incorporacion-repartidores|capacitacion-repartidores)\.html|styles(?:-v5|-system|-hero-photo|-visual02|-typography|-audiences|-prime|-contact|-trust|-news|-careers|-onboarding)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb)|fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2|fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt)$/.test(path)))
    throw Error("Unexpected package path: "+path);
  const info=await stat(resolve(root,path));
  if(!info.isFile()||info.size===0)throw Error("Required website file missing/empty: "+path);
@@ -80,8 +80,9 @@ const registration=await readFile(resolve(root,"registro-comercios.html"),"utf8"
 if(!registration.includes('href="./styles.css?v='+cssRevision+'"')||!registration.includes('name="robots" content="noindex,nofollow"'))throw Error("Registration page CSS revision or indexing policy mismatch");
 const guide=await readFile(resolve(root,"incorporacion-comercios.html"),"utf8");
 if(!guide.includes('href="./styles.css?v='+cssRevision+'"')||!guide.includes('name="robots" content="noindex,nofollow"'))throw Error("Guide page CSS revision or indexing policy mismatch");
-const refs=[...(original+company+merchant+rider+prime+contact+trust+news+careers+english+registration+guide).matchAll(/\b(?:src|srcset|href)="(\.\/[^"]+)"/g)]
- .map(m=>m[1].slice(2).split(/\s+/)[0]).map(p=>p==="styles.css?v="+cssRevision?"styles.css":/^(index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios)\.html#[a-z-]+$/.test(p)?p.split("#")[0]:p);
+const riderOnboarding=await Promise.all(["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"].map(async name=>{const doc=await readFile(resolve(root,name+".html"),"utf8");if(!doc.includes('href="./styles.css?v='+cssRevision+'"')||!doc.includes('name="robots" content="noindex,nofollow"'))throw Error("Rider onboarding CSS or indexing mismatch: "+name);return doc;}));
+const refs=[...(original+company+merchant+rider+prime+contact+trust+news+careers+english+registration+guide+riderOnboarding.join("")).matchAll(/\b(?:src|srcset|href)="(\.\/[^"]+)"/g)]
+ .map(m=>m[1].slice(2).split(/\s+/)[0]).map(p=>p==="styles.css?v="+cssRevision?"styles.css":/^(index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios|registro-repartidores|incorporacion-repartidores|capacitacion-repartidores)\.html#[a-z-]+$/.test(p)?p.split("#")[0]:p);
 for(const href of refs){
  if(href.includes("..")||!files.includes(href))
   throw Error("HTML references absent or disallowed website file: "+href);
