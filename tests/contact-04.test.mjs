@@ -10,7 +10,7 @@ for(const dir of ["","dist/"]){
  assert.equal((html.match(/aún no está habilitado/g)||[]).length,9);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/form-action 'none'/);
- assert.doesNotMatch(html,/<(?:form|input|script|iframe|textarea)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel/i);
+ assert.doesNotMatch(html.replace('<script defer src="./scripts/app.js"></script>',""),/<(?:form|input|script|iframe|textarea)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel/i);
  assert.match(html,/no recibe mensajes ni datos personales/);
  for(const page of ["index","empresa","comercios","repartidores","prime"]){
  const doc=read(dir+page+".html");assert.ok(doc.includes('href="./contacto.html">Contacto</a>'));assert.ok(!doc.includes("styles-contact.css"));

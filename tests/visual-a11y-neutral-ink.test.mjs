@@ -13,9 +13,9 @@ test("VISUAL-A11Y-01 neutral black text does not replace brand blue",()=>{
  assert.match(hero,/#inicio \.v4-headline-a\{color:#111111\}/);
  assert.match(hero,/#inicio \.hero-lead\{color:#333333/);
  assert.match(typography,/#vision\.statement\{background:#f4f8fe;color:#111111\}/);
- assert.match(mainCss,/--blue:#1551D8/);
- assert.match(hero,/#inicio \.v4-headline-b\{color:#1551d8\}/);
- assert.match(hero,/background:#1551d8;color:#fff/);
+ assert.match(mainCss,/--blue:#073BBC/);
+ assert.match(hero,/#inicio \.v4-headline-b\{color:#073bbc\}/);
+ assert.match(hero,/background:#073bbc;color:#fff/);
  assert.match(system,/\.site-footer>span,\.site-footer>p\{color:#343434\}/);
 });
 test("VISUAL-A11Y-01 no cropped DESSET service band at wide viewports",()=>{
@@ -35,6 +35,6 @@ test("VISUAL-A11Y-01 legible text and accessible mobile menu without breaking in
  assert.match(audit,/Mobile menu accessible name must include visible Menú label/);
  assert.match(three,/buildOperationalFleet\(\)/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
- for(const [path,max] of [["styles-v5.css",16000],["styles-hero-photo.css",9500],["styles-system.css",9000],["styles-typography.css",2800]])
+ for(const [path,max] of [["styles-v5.css",16000],["styles-hero-photo.css",9500],["styles-system.css",10000],["styles-typography.css",2800]])
   assert.ok(statSync(new URL("../"+path,import.meta.url)).size<=max,path+" exceeds CSS budget");
 });

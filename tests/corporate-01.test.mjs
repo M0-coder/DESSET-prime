@@ -34,7 +34,7 @@ for(const dir of ["","dist/"]){
   const company=docs["empresa.html"];
   assert.match(company,/Este sitio no procesa pedidos ni pagos\./);
   assert.match(company,/<h1>Empresa<\/h1>/);
-  assert.doesNotMatch(company,/<form\b|<script\b|<iframe\b/i);
+  assert.doesNotMatch(company.replace('<script defer src="./scripts/app.js"></script>',""),/<form\b|<script\b|<iframe\b/i);
   assert.equal((company.match(/<section id="/g)||[]).length,8);
   assert.match(docs["index.html"],/href="\.\/empresa\.html">Empresa<\/a>/);
   const css=Buffer.from(read(dir+"styles.css"));

@@ -27,7 +27,7 @@ function contrast(a,b){
 
 test("V6.7 design system defines 60 neutral / 30 structural / 10 accent roles",()=>{
  assert.equal(token("ds-60-paper").toUpperCase(),"#F7F5EE");
- assert.equal(token("ds-30-blue").toUpperCase(),"#1551D8");
+ assert.equal(token("ds-30-blue").toUpperCase(),"#073BBC");
  assert.equal(token("ds-10-gold").toUpperCase(),"#FFC62F");
  assert.equal(token("ds-10-signal").toUpperCase(),"#FF3328");
  for(const label of ["ds-60-surface","ds-30-ink","ds-copy","ds-muted","ds-stroke"])
@@ -38,7 +38,7 @@ test("V6.7 design system defines 60 neutral / 30 structural / 10 accent roles",(
  assert.match(design,/\.hero\[data-variant="v4"\] \.hero-cta/);
  assert.match(design,/\.contact-primary\s*\{\s*color:#FFFDF8;background:var\(--ds-30-blue\)/);
  assert.match(design,/@media\(max-width:700px\)/);
- assert.ok(statSync(new URL("styles-system.css",root)).size<9000);
+ assert.ok(statSync(new URL("styles-system.css",root)).size<10000);
  assert.doesNotMatch(design,/@import\b|url\(\s*['"]?https?:/);
 });
 

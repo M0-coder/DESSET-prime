@@ -1,12 +1,12 @@
 import test from "node:test";import assert from "node:assert/strict";import {readFileSync} from "node:fs";import {createHash} from "node:crypto";
 const read=p=>readFileSync(new URL("../"+p,import.meta.url));
 const reviewed={
- "empresa.html":"69ac7b6cc782b4156017529b453a54dd6598c592",
- "prime.html":"7383623e07c791334a4d5fd6c313b74c139c410b",
- "contacto.html":"d0924b2ba36c0868571d691527419ec7532c205a",
- "confianza.html":"f9b0206c7c6ad9bab6a622d22e6629a77588d332",
- "noticias.html":"b1a7ada09fdb8cd8a82850ef8b2333859a35b92c",
- "talento.html":"d3f9808d6916efcf74a1664a321a9397840d14f4"
+ "empresa.html":"f303b7327ba3166452da5780fe28395c6255d8e2",
+ "prime.html":"99f18f9788727dec8a61983a9616ec043085121b",
+ "contacto.html":"6242c34c78d8ce2db97ff27a7c35ded5426fa3e1",
+ "confianza.html":"9c4a62d0d37f6e24b819a8a5ee3799a9255c4be6",
+ "noticias.html":"f6a4a2577260afc5f1277672608d71ec72f25304",
+ "talento.html":"37790d78da5b4b14ecee7c8e423e4cfae786a88a"
 };
 for(const dir of ["","dist/"]){test("GLOBAL-01 English overview and source editorial review lock "+(dir||"source"),()=>{
  const html=read(dir+"en.html").toString();
@@ -16,6 +16,7 @@ for(const dir of ["","dist/"]){test("GLOBAL-01 English overview and source edito
  assert.match(html,/does not process orders or payments/);
  assert.match(html,/does not imply active international operations/);
  assert.match(html,/Detailed institutional pages are currently available in Spanish/);
+ assert.match(html,/href="\.\/aplicaciones\.html" hreflang="es">Applications \(Spanish\)/);
  assert.match(html,/href="\.\/empresa\.html" lang="es" hreflang="es">Español/);
  assert.doesNotMatch(html,/<(?:script|form|input|iframe|textarea)\b|https?:\/\/|footer-social|data-footer-channel/i);
  for(const page of ["index.html","empresa.html"])assert.match(read(dir+page).toString(),/href="\.\/en\.html" lang="en" hreflang="en">English/);

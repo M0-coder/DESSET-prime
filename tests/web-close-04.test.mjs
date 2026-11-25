@@ -1,0 +1,20 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const read=p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
+test("WEB-CLOSE-04 tablet-only header rules preserve compact and no-JS states",()=>{
+ const css=read("styles-system.css"),block=css.split("/* WEB-CLOSE-04: tablet navigation only; no scene or content layout changes. */")[1];
+ assert.ok(block);
+ assert.match(block,/@media\(min-width:701px\) and \(max-width:960px\)/);
+ assert.match(block,/\.site-header \.main-nav\{position:absolute;top:100%;left:0;right:0;display:flex/);
+ assert.match(block,/\.js-enabled \.site-header \.main-nav\{display:none\}/);
+ assert.match(block,/\.js-enabled \.site-header \.main-nav\[data-open="true"\]\{display:flex/);
+ assert.match(block,/\.js-enabled \.site-header \.menu-button\{display:flex/);
+ for(const selector of block.split("\n").filter(x=>x.trim().startsWith(".")))assert.match(selector,/^(?:\s*\.js-enabled)?\s*\.site-header \.(?:main-nav|menu-button)/);
+ assert.equal(read("dist/styles-system.css"),css);
+ assert.doesNotMatch(read("prime.html"),/class="menu-button"/);
+ const audit=read("scripts/browser-audit.mjs");
+ assert.match(audit,/!state\.geometry/);
+ assert.match(audit,/\[961,900\],\[960,900\]/);
+ assert.match(audit,/if\(w<=960\)/);
+});

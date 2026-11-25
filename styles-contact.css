@@ -10,13 +10,13 @@
 .contact-page .ct-item:first-of-type{border-top:1px solid #d8dce2}
 .contact-page summary{list-style:none;display:grid;grid-template-columns:26px minmax(0,1fr) 20px;align-items:center;gap:16px;min-height:64px;padding:16px 0;cursor:pointer;font-size:clamp(16px,1.5vw,19px);font-weight:700;line-height:1.45}
 .contact-page summary::-webkit-details-marker{display:none}
-.contact-page summary svg{width:24px;height:24px;color:#1551d8}
+.contact-page summary svg{width:24px;height:24px;color:#073bbc}
 .contact-page summary .ct-chevron{width:20px;height:20px}
 .contact-page details[open] .ct-chevron{transform:rotate(90deg)}
-.contact-page summary:focus-visible{outline:3px solid #1551d8;outline-offset:3px}
-.contact-page summary:hover{color:#1551d8}
+.contact-page summary:focus-visible{outline:3px solid #073bbc;outline-offset:3px}
+.contact-page summary:hover{color:#073bbc}
 .contact-page details p{margin:0 36px 20px 42px;max-width:75ch;line-height:1.6;color:#414141;font-size:15px}
 .ct-footer{background:#f1f5fa;border-top:1px solid #d8dce2;padding:24px var(--edge)}
-.ct-footer a{display:inline-block;color:#1551d8;font-size:24px;font-weight:650;text-decoration:none}
+.ct-footer a{display:inline-block;color:#073bbc;font-size:24px;font-weight:650;text-decoration:none}
 .ct-footer p{font-size:12px;color:#565656;margin:12px 0 0}
 @media(max-width:480px){.contact-page summary{gap:12px;grid-template-columns:24px minmax(0,1fr) 20px}.contact-page details p{margin-left:36px;margin-right:0}}

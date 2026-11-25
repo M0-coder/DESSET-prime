@@ -9,7 +9,7 @@
  --ds-60-paper:#F7F5EE;
  --ds-60-surface:#FFFDF8;
  --ds-30-ink:#111111;
- --ds-30-blue:#1551D8;
+ --ds-30-blue:#073BBC;
  --ds-10-gold:#FFC62F;
  --ds-10-signal:#FF3328;
  --ds-copy:#202020;
@@ -179,11 +179,22 @@ h1,h2,h3,h4 {text-wrap:balance;}
 .site-footer>span,.site-footer>p{color:#343434}
 
 /* HISTORY-01: scoped corporate timeline. */
-.company-page #historia .history-kicker{color:#1551d8;font-size:12px;font-weight:700;letter-spacing:.1em;margin:0 0 8px}
-.company-page #historia .history-year{color:#1551d8;font-size:clamp(28px,4vw,42px);line-height:1.2;margin:24px 0 18px}
+.company-page #historia .history-kicker{color:#073bbc;font-size:12px;font-weight:700;letter-spacing:.1em;margin:0 0 8px}
+.company-page #historia .history-year{color:#073bbc;font-size:clamp(28px,4vw,42px);line-height:1.2;margin:24px 0 18px}
 .company-page .history-timeline{list-style:none;margin:0 0 8px 8px;padding:0 0 0 24px;border-left:2px solid #c7d9f9}
 .company-page .history-timeline li{position:relative;padding:0 0 24px;margin:0;min-width:0}
 .company-page .history-timeline li:last-child{padding-bottom:0}
-.company-page .history-timeline li::before{content:"";position:absolute;left:-30px;top:9px;width:10px;height:10px;border-radius:50%;background:#1551d8}
+.company-page .history-timeline li::before{content:"";position:absolute;left:-30px;top:9px;width:10px;height:10px;border-radius:50%;background:#073bbc}
 .company-page .history-timeline h4{font-size:18px;line-height:1.35;margin:0 0 8px}
 .company-page .history-timeline p{margin:0;color:#414141}
+
+/* WEB-CLOSE-04: tablet navigation only; no scene or content layout changes. */
+@media(min-width:701px) and (max-width:960px){
+ .site-header .main-nav{position:absolute;top:100%;left:0;right:0;display:flex;flex-wrap:wrap;gap:0 18px;padding:10px var(--edge);background:var(--ds-60-surface);border-bottom:1px solid var(--ds-stroke)}
+ .site-header .main-nav a{display:flex;align-items:center;min-height:44px;white-space:normal}
+ .js-enabled .site-header .menu-button{display:flex;align-items:center;gap:14px;background:none;border:0;font-weight:750;min-height:44px}
+ .js-enabled .site-header .main-nav{display:none}
+ .js-enabled .site-header .main-nav[data-open="true"]{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-bottom:20px}
+ .js-enabled .site-header .main-nav a{min-height:50px;padding:12px 5px;font-size:17px}
+ .js-enabled .site-header .main-nav .nav-contact{padding:12px 15px;margin-top:8px}
+}

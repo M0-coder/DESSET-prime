@@ -16,7 +16,7 @@ export function assertClosedAppPage(doc,name){
  assert.ok(doc.includes('name="robots" content="noindex,nofollow"')&&doc.includes("form-action 'none'"),"Missing indexing/CSP gate: "+name);
  assert.doesNotMatch(doc,/<(?:form|iframe|object|embed)\b|\bon[a-z]+\s*=|<a\b[^>]*\bhref=["'](?:https?:|market:|itms-apps:)|\sdownload(?:\s|=|>)/i,"Unapproved public distribution control: "+name);
  const scripts=doc.match(/<script\b[^>]*>[\s\S]*?<\/script>/gi)||[];
- assert.deepEqual(scripts,['<script defer src="./scripts/service-state.js"></script>'],"Only existing distribution controller allowed: "+name);
+ assert.deepEqual(scripts,name==="aplicaciones"?['<script defer src="./scripts/app.js"></script>','<script defer src="./scripts/service-state.js"></script>']:['<script defer src="./scripts/service-state.js"></script>'],"Only approved local navigation/distribution controllers allowed: "+name);
  assert.ok(doc.includes('href="./styles-applications.css"')&&doc.includes('data-app-download>Descarga no disponible.'),"Missing inactive default: "+name);
  assert.doesNotMatch(doc,/<img\b[^>]*(?:qr|\.apk|\.ipa)/i,"Unapproved QR or installer");
 }

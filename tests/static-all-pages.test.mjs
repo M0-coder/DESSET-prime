@@ -16,6 +16,9 @@ test("Static gate scans every institutional page and rejects representative viol
  const ok=run();assert.equal(ok.status,0,ok.stderr);
  assert.deepEqual(JSON.parse(readFileSync(join(dir,"reports/quality/static.json"),"utf8")).pages_checked,pages);
  const cases=[
+ ["empresa.html",s=>s.replace('<script defer src="./scripts/app.js"></script>','<script defer src="./scripts/motion.js"></script>'),"Only approved local navigation script permitted"],
+ ["comercios.html",s=>s.replace('href="./aplicaciones.html">Aplicaciones','href="./empresa.html">Aplicaciones'),"Header differs from canonical navigation"],
+ ["contacto.html",s=>s.replace('<script defer src="./scripts/app.js"></script>',''),"Only approved local navigation script permitted"],
  ["aplicaciones.html",s=>s.replace("</main>",'<a href="https://untrusted.example/app">Descarga</a></main>'),"Unapproved public distribution control"],
  ["aplicaciones-clientes.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
  ["registro-repartidores.html",s=>s.replace('type="text" disabled','type="text"'),"Enabled data entry in inactive preview"],

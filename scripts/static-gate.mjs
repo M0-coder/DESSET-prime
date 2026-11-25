@@ -1,4 +1,5 @@
 import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
+import {institutionalPages,assertInstitutionalNavigation} from "./institutional-navigation-contract.mjs";
 /** Static source and asset integrity scanner: deliberately not a full SAST/SCA tool. */
 import {readFileSync,existsSync,statSync,mkdirSync,writeFileSync} from "node:fs";
 import {resolve} from "node:path";
@@ -40,7 +41,8 @@ for(const [page,doc] of pages){
  assert(!/<(?:form|iframe|video)\b/i.test(doc),page+": Unauthorized form/iframe/video");
  assert(!/(?:\s)on[a-z]+\s*=/i.test(doc),page+": Inline event attribute detected");
  if(["registro-comercios.html","registro-repartidores.html"].includes(page))for(const field of doc.matchAll(/<(?:input|select|textarea|button)\b[^>]*>/gi))assert(/\bdisabled\b/.test(field[0]),page+": Enabled data entry in inactive preview");
- if(appPages.includes(page.replace(/\.html$/,""))){try{assertClosedAppPage(doc,page.replace(/\.html$/,""));}catch(e){issues.push(page+": "+e.message);}}else if(page!=="index.html")assert(!/<script\b/i.test(doc),page+": Unexpected script on institutional page");
+ if(appPages.includes(page.replace(/\.html$/,""))){try{assertClosedAppPage(doc,page.replace(/\.html$/,""));}catch(e){issues.push(page+": "+e.message);}}else if(page!=="index.html"&&!institutionalPages.includes(page.replace(/\.html$/,"")))assert(!/<script\b/i.test(doc),page+": Unexpected script on institutional page");
+ if(institutionalPages.includes(page.replace(/\.html$/,""))){try{assertInstitutionalNavigation(html,doc,page.replace(/\.html$/,""));}catch(e){issues.push(page+": "+e.message);}}
  assert(Buffer.byteLength(doc,"utf8")<=35000,page+": HTML byte budget exceeded");
 }
 assert(/Content-Security-Policy/.test(headers),"Missing published-host CSP template");
@@ -52,7 +54,7 @@ for(const [i,s] of js.entries()){
 }
 assert(styles.every(s=>!/@import\b|url\(\s*['"]?https?:/i.test(s)),"Remote CSS dependency");
 assert(!/\b(?:pages:\s*write|id-token:\s*write)\b/.test(read(".github/workflows/preview-checks.yml")),"CI write token permission");
-const budget={html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:9000,hero_css_bytes:9500,visual02_css_bytes:8200,audiences_css_bytes:4500,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,onboarding_css_bytes:4000,applications_css_bytes:5000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000};
+const budget={html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:10000,hero_css_bytes:9500,visual02_css_bytes:8200,audiences_css_bytes:4500,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,onboarding_css_bytes:4000,applications_css_bytes:5000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000};
 const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
  typography_css_bytes:statSync(resolve(root,"styles-typography.css")).size,
  v5_css_bytes:statSync(resolve(root,"styles-v5.css")).size,

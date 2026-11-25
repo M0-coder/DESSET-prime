@@ -20,7 +20,7 @@ test("V4: portada comercial editorial con mensaje legible, CTA reales y sin oper
  assert.doesNotMatch(head,/Huacho|clientes activos|seguimiento en tiempo real|descarga la app|operación en vivo/i);
 });
 test("V4: identidad visual original y movimiento finito + accesible",()=>{
- assert.match(css,/--blue:#1551D8/);
+ assert.match(css,/--blue:#073BBC/);
  assert.match(css,/--yellow:#FFC62F/);
  assert.match(css,/--red:#FF3328/);
  for(const animation of ["v4-type-rise","v4-canvas-reveal","v4-yellow-swipe","v4-red-pop","v4-intro-fade","v4-rail-enter"])assert.match(css,new RegExp("@keyframes "+animation));

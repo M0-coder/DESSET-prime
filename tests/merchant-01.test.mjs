@@ -16,7 +16,7 @@ for(const dir of ["","dist/"]){
  assert.match(html,/cuando estén aprobados/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/form-action 'none'/);
- assert.doesNotMatch(html,/<(?:form|input|script|iframe)\b/i);
+ assert.doesNotMatch(html.replace('<script defer src="./scripts/app.js"></script>',""),/<(?:form|input|script|iframe)\b/i);
  assert.ok(html.includes('href="./registro-'+page+'.html"'));
  assert.ok(html.includes('href="./styles-audiences.css"'));
  assert.ok(!home.includes("styles-audiences.css"));
