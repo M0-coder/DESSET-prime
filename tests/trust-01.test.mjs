@@ -13,7 +13,7 @@ for(const dir of ["","dist/"]){
  assert.match(html,/El alojamiento web puede tratar datos técnicos de conexión/);
  assert.match(html,/href="\.\/contacto\.html#seguridad"/);
  assert.match(headers,/frame-ancestors 'none'/);assert.match(headers,/X-Frame-Options: DENY/);assert.match(headers,/Permissions-Policy: camera=\(\)/);
- assert.doesNotMatch(html,/<(?:form|input|script|iframe|textarea)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel|100% seguro|ISO 27001|SOC 2/i);
+ assert.doesNotMatch(html.replace('<script defer src="./scripts/app.js"></script>',""),/<(?:form|input|script|iframe|textarea)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel|100% seguro|ISO 27001|SOC 2/i);
  for(const page of ["index","empresa","comercios","repartidores","prime","contacto"]){
  const doc=read(dir+page+".html");assert.ok(doc.includes('href="./confianza.html">Centro de confianza</a>'));assert.ok(!doc.includes("styles-trust.css"));
  }

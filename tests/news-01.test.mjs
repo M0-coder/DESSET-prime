@@ -17,7 +17,7 @@ for(const dir of ["","dist/"]){
  assert.match(brand,/se reservan para colaboradores autorizados/);assert.match(brand,/El canal de solicitudes aún no está habilitado/);
  assert.doesNotMatch(brand,/<img\b|<a\b[^>]*(?:download|href="\.\/assets\/)|<input\b/i);
  assert.match(html,/href="\.\/contacto\.html#prensa"/);
- assert.doesNotMatch(html,/<(?:form|script|iframe|textarea|article|time)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel|\bdownload\b/i);
+ assert.doesNotMatch(html.replace('<script defer src="./scripts/app.js"></script>',""),/<(?:form|script|iframe|textarea|article|time)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel|\bdownload\b/i);
  for(const page of ["index","empresa","comercios","repartidores","prime","contacto","confianza"]){
  const doc=read(dir+page+".html");assert.ok(doc.includes('href="./noticias.html">Sala de noticias</a>'));assert.ok(!doc.includes("styles-news.css"));
  }

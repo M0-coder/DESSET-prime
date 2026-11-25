@@ -12,10 +12,10 @@
 .apps-page .apps-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0;border:1px solid #ddd;border-radius:12px;padding:clamp(16px,3vw,26px);overflow-wrap:anywhere}
 .apps-page .apps-card h2,.apps-page .apps-card p{margin:0}
 .apps-page .apps-icon{display:grid;place-items:center;width:56px;height:56px;border-radius:12px;background:#111;color:white;flex:none}
-.apps-page .apps-icon-business{background:#1551d8}
+.apps-page .apps-icon-business{background:#073bbc}
 .apps-page .apps-icon svg{width:30px;height:30px}
 .apps-page .apps-status{border-top:1px solid #ddd;margin-top:auto;padding-top:14px;width:100%}
-.apps-page a{display:inline-block;color:#1551d8;min-height:44px;align-content:center;font-weight:650;text-decoration:underline;text-underline-offset:3px}
+.apps-page a{display:inline-block;color:#073bbc;min-height:44px;align-content:center;font-weight:650;text-decoration:underline;text-underline-offset:3px}
 .apps-page .apps-muted,.apps-page [data-app-download]{color:#555;font-size:14px}
 .apps-page .apps-safety{border-top:1px solid #ddd;margin-top:32px;padding-top:20px}
 .apps-page .apps-safety h2{font-size:20px}
@@ -28,5 +28,5 @@
 .apps-page .apps-states{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;border-top:1px solid #ddd;padding-top:16px;margin:8px 0}
 .apps-page .apps-states dt{font-weight:650}
 .apps-page .apps-states dd{margin:0;color:#555}
-.apps-page :focus-visible{outline:3px solid #1551d8;outline-offset:3px}
+.apps-page :focus-visible{outline:3px solid #073bbc;outline-offset:3px}
 @media(max-width:700px){.apps-page .apps-grid{grid-template-columns:1fr}.apps-page .apps-states{grid-template-columns:1fr;gap:6px}.apps-page .apps-states dd{margin-bottom:8px}}
