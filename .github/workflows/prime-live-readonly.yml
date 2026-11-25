@@ -1,0 +1,54 @@
+name: DESSET Prime - public production verification ONLY (NO DEPLOY)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/prime-live-readonly.yml'
+  workflow_dispatch:
+    inputs:
+      deployed_sha:
+        description: 'Exact SHA already deployed on Cloudflare (no publication)'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  verify-public:
+    name: Rebuild deployed SHA and verify both public hosts (GET only)
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'prime-live-verify-60'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      AUDITED_SHA: ${{ inputs.deployed_sha || '0c39d00af1f5401710bbc00b52147b108f563968' }}
+    steps:
+      - name: Checkout reviewed verifier
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: verifier
+          persist-credentials: false
+      - name: Checkout already deployed release
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ env.AUDITED_SHA }}
+          path: release
+          persist-credentials: false
+      - name: Exact Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22.16.0'
+      - name: Verify deployed source identity and recreate its package
+        working-directory: release
+        run: |
+          set -euo pipefail
+          [[ "$AUDITED_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$AUDITED_SHA"
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build:site
+          npm run verify:site
+          node scripts/prime-rights-license-audit.mjs "$PWD/dist"
+          node scripts/prime-manual-cutover-package.mjs "$PWD/dist" "$AUDITED_SHA" NOINDEX "$RUNNER_TEMP/prime-live-public" "$RUNNER_TEMP/prime-live-proof"
+          node scripts/verify-prime-manual-package.mjs "$RUNNER_TEMP/prime-live-public" "$RUNNER_TEMP/prime-live-proof/prime-manual-release-package.json" "$AUDITED_SHA" NOINDEX
+      - name: Independent public HTTPS audit (GET only, no Cloudflare credentials)
+        run: |
+          set -euo pipefail
+          node verifier/scripts/prime-live-verification.mjs "$RUNNER_TEMP/prime-live-public" "$RUNNER_TEMP/prime-live-proof/prime-manual-release-package.json"
