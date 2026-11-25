@@ -14,7 +14,7 @@ function fixture(t,seoPolicy='NOINDEX',src=dist){
  return {parent,outputDir,evidenceDir,report};
 }
 test('NOINDEX release shape preserves source and blocks crawling',t=>{
- const f=fixture(t);assert.equal(f.report.package_files,47);
+ const f=fixture(t);assert.equal(f.report.package_files,49);
  assert.equal(f.report.production_deployed,false);assert.equal(f.report.production_authorized,false);
  assert.match(readFileSync(join(f.outputDir,'index.html'),'utf8'),/name="robots" content="noindex,nofollow"/);
  assert.equal(readFileSync(join(f.outputDir,'robots.txt'),'utf8'),'User-agent: *\nDisallow: /\n');
@@ -38,7 +38,7 @@ test('INDEX release shape has explicit canonical, OG, robots and sitemap',t=>{
 test('all non-SEO brand assets and security content are original bytes',t=>{
  const f=fixture(t,'INDEX'),original=JSON.parse(readFileSync(join(dist,'site-manifest.json'),'utf8'));
  for(const item of original.files){
-   if(['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','_headers'].includes(item.path))continue;
+   if(['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','_headers'].includes(item.path))continue;
    assert.deepEqual(readFileSync(join(f.outputDir,item.path)),readFileSync(join(dist,item.path)),item.path);
  }
  assert.match(readFileSync(join(f.outputDir,'_headers'),'utf8'),/Content-Security-Policy/);

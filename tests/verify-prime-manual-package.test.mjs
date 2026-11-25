@@ -16,7 +16,7 @@ function fixture(t,seo='NOINDEX'){
 }
 test('manual NOINDEX package validates independently for each file',t=>{
  const f=fixture(t);const r=verifyManualPackage(f);
- assert.equal(r.result,'PASS');assert.equal(r.files,47);assert.equal(r.production_deployed,false);
+ assert.equal(r.result,'PASS');assert.equal(r.files,49);assert.equal(r.production_deployed,false);
 });
 test('explicit INDEX package validates independently for each file',t=>{
  const f=fixture(t,'INDEX');assert.equal(verifyManualPackage(f).result,'PASS');

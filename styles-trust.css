@@ -1,0 +1,27 @@
+/* TRUST-01: scoped institutional trust center, independent of service pages. */
+.trust-page{background:#fff;color:#111}
+.trust-page .tr-inner{max-width:1040px;margin:auto;padding-inline:var(--edge,24px)}
+.trust-page .tr-hero{background:#111d35;color:#fff;padding-block:clamp(32px,5vw,72px)}
+.trust-page .tr-hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,320px);align-items:center;gap:24px}
+.trust-page .tr-kicker{font-size:12px;letter-spacing:.12em;font-weight:700;color:#b9ccef}
+.trust-page h1{font-family:var(--ds-type-display);font-size:clamp(32px,5vw,64px);font-weight:800;line-height:1.12;letter-spacing:-.035em;margin:16px 0;overflow-wrap:break-word;color:#fff}
+.trust-page .tr-hero p:not(.tr-kicker){color:#dce5f5;line-height:1.6;font-size:clamp(16px,1.6vw,20px);margin:0}
+.trust-page .tr-art{display:block;width:100%;height:auto;max-width:320px;margin:auto}
+.trust-page .tr-scope{padding-block:32px 24px}
+.trust-page h2{font-size:clamp(22px,2.6vw,30px);line-height:1.25;margin:0 0 14px}
+.trust-page .tr-scope p,.trust-page .tr-item p{font-size:16px;color:#414141;line-height:1.65;max-width:75ch;margin:0 0 14px}
+.trust-page .tr-directory{padding-bottom:clamp(32px,5vw,64px)}
+.trust-page .tr-item{border-bottom:1px solid #d8dce2}
+.trust-page .tr-item:first-child{border-top:1px solid #d8dce2}
+.trust-page summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;padding:16px 0;font-size:clamp(17px,1.7vw,21px);font-weight:700;line-height:1.45;cursor:pointer}
+.trust-page summary::-webkit-details-marker{display:none}
+.trust-page summary span{color:#1551d8;font-size:24px;line-height:1;flex-shrink:0}
+.trust-page details[open] summary span{transform:rotate(45deg)}
+.trust-page summary:focus-visible,.trust-page a:focus-visible{outline:3px solid #1551d8;outline-offset:3px}
+.trust-page summary:hover{color:#1551d8}
+.trust-page .tr-item div{padding-bottom:20px}
+.trust-page .tr-item a{display:inline-block;color:#1551d8;text-decoration:underline;padding-block:8px}
+.tr-footer{background:#f1f5fa;border-top:1px solid #d8dce2;padding:24px var(--edge,24px)}
+.tr-footer a{color:#1551d8;font-size:24px;font-weight:650;text-decoration:none}
+.tr-footer p{font-size:12px;color:#565656;margin:12px 0 0}
+@media(max-width:700px){.trust-page .tr-hero-grid{grid-template-columns:minmax(0,1fr)}.trust-page .tr-art{max-width:200px}}

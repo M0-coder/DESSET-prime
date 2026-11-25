@@ -66,7 +66,7 @@ export function prepareReleaseEvidence({dist, sourceSha, gitSha, previousDeploym
     b=preparePrimeHosting({dist,sourceSha,mode:'LOCAL_REHEARSAL_ONLY'});
     assert(JSON.stringify(a.report.assets)===JSON.stringify(b.report.assets),'two independent packaging passes yielded different output bytes');
     assert(a.report.source_manifest_sha256===b.report.source_manifest_sha256,'original manifest differs across packaging passes');
-    assert(a.report.original_files===43 && a.report.staged_files===46,'unexpected Prime package inventory');
+    assert(a.report.original_files===45 && a.report.staged_files===48,'unexpected Prime package inventory');
     const packageReport={
       schema:'desset-prime-release-evidence-v1',
       origin_repository:target.repository, origin_sha:sourceSha,
