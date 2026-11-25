@@ -1,0 +1,97 @@
+{
+  "schema": "desset-app-distribution-v1",
+  "policy": "closed",
+  "queryCountry": "PE",
+  "apps": [
+    {
+      "id": "clientes",
+      "audience": "Clientes",
+      "officialName": null,
+      "activation": "not_enabled",
+      "coverage": [],
+      "qr": null,
+      "platforms": {
+        "android": {
+          "status": "not_published",
+          "verified": false,
+          "storeId": null,
+          "developer": null,
+          "compatibility": null,
+          "url": null,
+          "countries": [],
+          "evidence": []
+        },
+        "ios": {
+          "status": "not_published",
+          "verified": false,
+          "storeId": null,
+          "developer": null,
+          "compatibility": null,
+          "url": null,
+          "countries": [],
+          "evidence": []
+        }
+      }
+    },
+    {
+      "id": "comercios",
+      "audience": "Comercios",
+      "officialName": null,
+      "activation": "not_enabled",
+      "coverage": [],
+      "qr": null,
+      "platforms": {
+        "android": {
+          "status": "not_published",
+          "verified": false,
+          "storeId": null,
+          "developer": null,
+          "compatibility": null,
+          "url": null,
+          "countries": [],
+          "evidence": []
+        },
+        "ios": {
+          "status": "not_published",
+          "verified": false,
+          "storeId": null,
+          "developer": null,
+          "compatibility": null,
+          "url": null,
+          "countries": [],
+          "evidence": []
+        }
+      }
+    },
+    {
+      "id": "repartidores",
+      "audience": "Repartidores",
+      "officialName": null,
+      "activation": "not_enabled",
+      "coverage": [],
+      "qr": null,
+      "platforms": {
+        "android": {
+          "status": "not_published",
+          "verified": false,
+          "storeId": null,
+          "developer": null,
+          "compatibility": null,
+          "url": null,
+          "countries": [],
+          "evidence": []
+        },
+        "ios": {
+          "status": "not_published",
+          "verified": false,
+          "storeId": null,
+          "developer": null,
+          "compatibility": null,
+          "url": null,
+          "countries": [],
+          "evidence": []
+        }
+      }
+    }
+  ]
+}

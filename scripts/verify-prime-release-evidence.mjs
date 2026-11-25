@@ -1,3 +1,4 @@
+import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 /** Offline independent verifier for the extracted, NOT-authorized Prime candidate. */
 import {readFileSync,readdirSync,lstatSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -14,9 +15,9 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(/^[a-f0-9]{40}$/.test(expectedSha)&&info.origin_sha===expectedSha&&info.checkout_sha===expectedSha,'SHA mismatch');
  check(info.release_authorized===false&&info.release_decision==='NO-GO','not an offline-only candidate');
  check(info.noindex===true&&info.robots_disallow_all===true,'indexing policy changed');
- check(info.original_files===62&&info.staged_files===65,'package shape mismatch');
+ check(info.original_files===67&&info.staged_files===70,'package shape mismatch');
  check(info.repeated_packaging_identical===true&&info.independently_compiled_twice===false,'evidence claims changed');
- check(Array.isArray(info.files)&&info.files.length===65,'missing per-asset manifest');
+ check(Array.isArray(info.files)&&info.files.length===70,'missing per-asset manifest');
  check(sha(Buffer.from(JSON.stringify(info.files)))===info.artifacts_sha256,'manifest checksum mismatch');
  const expected=new Map(),actual=new Set();let total=0;
  for(const f of info.files){
@@ -66,12 +67,13 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  for(const name of ["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){const p=readFileSync(join(publicDir,name+'.html'),'utf8');check(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Rider onboarding canonical or indexing gate: '+name);}
  const company=readFileSync(join(publicDir,'empresa.html'),'utf8');
  check(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or noindex changed');
+ for(const name of appPages){const p=readFileSync(join(publicDir,name+'.html'),'utf8');assertClosedAppPage(p,name);check(p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'App directory canonical missing: '+name);}
  const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');
  const site=readFileSync(join(publicDir,'sitemap.xml'),'utf8');
  check(html.includes('name="robots" content="noindex,nofollow"')&&robots==='User-agent: *\nDisallow: /\n','dangerous indexing state');
  check(html.includes('rel="canonical" href="https://desset.lat/"')&&!site.includes('<loc>'),'release SEO gate not explicit');
  for(const part of ['proveedores','comercios','consumidores','operadores-logisticos']){const path='assets/ecosistema-'+part+'.webp';check(html.includes('./'+path)&&expected.has(path),'participant asset missing: '+part);}
- check(readFileSync(join(publicDir,'scripts/service-state.js'),'utf8').includes('applicationDistribution:"not_published"'),'apps erroneously enabled');
+ assertClosedDistribution(readFileSync(join(publicDir,"scripts/service-state.js"),"utf8"));
  return {result:'PASS',origin_sha:info.origin_sha,files:expected.size,bytes:total,release_authorized:false,release_decision:'NO-GO'};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){

@@ -1,3 +1,4 @@
+import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 /**
  * Generate a RELEASE-SHAPED static folder from the native DESSET Prime artifact.
  * This never deploys; publishing is exclusively a gated workflow action.
@@ -11,7 +12,7 @@ import {preparePrimeHosting} from './prime-hosting-candidate.mjs';
 import {generateThirdPartyNotices} from './prime-third-party-notices.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const sha256=b=>createHash('sha256').update(b).digest('hex');
-const requiredSpecial=['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','registro-comercios.html','incorporacion-comercios.html','registro-repartidores.html','incorporacion-repartidores.html','capacitacion-repartidores.html','styles-onboarding.css','styles-audiences.css','styles-prime.css','styles-contact.css','styles-trust.css','styles-news.css','styles-careers.css','_headers','robots.txt','sitemap.xml','404.html','THIRD-PARTY-NOTICES.txt',
+const requiredSpecial=['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','registro-comercios.html','incorporacion-comercios.html','registro-repartidores.html','incorporacion-repartidores.html','capacitacion-repartidores.html','aplicaciones.html','aplicaciones-clientes.html','aplicaciones-comercios.html','aplicaciones-repartidores.html','styles-onboarding.css','styles-applications.css','styles-audiences.css','styles-prime.css','styles-contact.css','styles-trust.css','styles-news.css','styles-careers.css','_headers','robots.txt','sitemap.xml','404.html','THIRD-PARTY-NOTICES.txt',
  'fonts/LICENSE-Inter-OFL.txt','fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt'];
 const assert=(condition,message)=>{if(!condition)throw Error('NO-GO: '+message)};
 const canonical='https://desset.lat/';
@@ -64,7 +65,7 @@ export function preparePrimeCutoverPackage({dist,sourceSha,seoPolicy,outputDir,e
      if(st.isDirectory())scan(full,rel);else{assert(st.isFile(),'Not a regular file in package');paths.push(rel);}
    }
   }scan(output);
-  assert(paths.length===66&&paths.every(x=>expected.has(x)),'Unexpected candidate inventory');
+  assert(paths.length===71&&paths.every(x=>expected.has(x)),'Unexpected candidate inventory');
   for(const path of requiredSpecial)assert(paths.includes(path),'Missing required static host policy '+path);
   const modifiable=new Set(['index.html','_headers','robots.txt','sitemap.xml','THIRD-PARTY-NOTICES.txt']);
   const inventory=paths.sort().map(path=>{
@@ -96,6 +97,7 @@ export function preparePrimeCutoverPackage({dist,sourceSha,seoPolicy,outputDir,e
   for(const name of ["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){const p=readFileSync(join(output,name+'.html'),'utf8');assert(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Rider onboarding canonical or indexing gate: '+name);}
   const company=readFileSync(join(output,'empresa.html'),'utf8');
   assert(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page must remain noindex independently of homepage policy');
+ for(const name of appPages){const p=readFileSync(join(output,name+'.html'),'utf8');assertClosedAppPage(p,name);assert(p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'App directory canonical missing: '+name);}
   const outHtml=readFileSync(htmlPath,'utf8');
   assert(outHtml.includes('rel="canonical" href="'+canonical+'"'),'Canonical absent');
   assert(outHtml.includes('property="og:image" content="https://desset.lat/assets/desset-hero-entrega-dos-espejos.webp"'),'OG image missing');

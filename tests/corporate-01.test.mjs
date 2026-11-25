@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import {createHash} from "node:crypto";
 const root=new URL("../",import.meta.url),read=p=>readFileSync(new URL(p,root),"utf8");
-const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html"];
+const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html","aplicaciones.html","aplicaciones-clientes.html","aplicaciones-comercios.html","aplicaciones-repartidores.html"];
 const approved=new Map(JSON.parse(read("config/prime-social-owner-attestation.json")).exact_channels.map(c=>[c.url,c.platform]));
 for(const dir of ["","dist/"]){
  test("Corporate links resolve in "+(dir||"source"),()=>{
@@ -13,7 +13,7 @@ for(const dir of ["","dist/"]){
    for(const m of doc.matchAll(/<a\b[^>]*href="([^"]+)"/g)){
     const href=m[1];
     if(href.startsWith("https://")){assert.ok(approved.has(href));continue}
-    const match=href.match(/^(?:\.\/(index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios|registro-repartidores|incorporacion-repartidores|capacitacion-repartidores)\.html)?(?:#([a-z0-9-]+))?$/);
+    const match=href.match(/^(?:\.\/(index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios|registro-repartidores|incorporacion-repartidores|capacitacion-repartidores|aplicaciones|aplicaciones-clientes|aplicaciones-comercios|aplicaciones-repartidores)\.html)?(?:#([a-z0-9-]+))?$/);
     assert.ok(match,"Unapproved route "+href);
     const target=docs[match[1]?match[1]+".html":name];
     assert.ok(target);
@@ -21,7 +21,7 @@ for(const dir of ["","dist/"]){
    }
   }
   for(const [name,doc] of Object.entries(docs)){
-   if(["registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html"].includes(name)){assert.doesNotMatch(doc,/footer-social|data-footer-channel|https:\/\//);assert.match(doc,/<p>© 2026 DESSET\. Todos los derechos reservados\.<\/p>/);continue;}
+   if(["registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html","aplicaciones.html","aplicaciones-clientes.html","aplicaciones-comercios.html","aplicaciones-repartidores.html"].includes(name)){assert.doesNotMatch(doc,/footer-social|data-footer-channel|https:\/\//);assert.match(doc,/<p>© 2026 DESSET\. Todos los derechos reservados\.<\/p>/);continue;}
    if(name==="en.html"){assert.doesNotMatch(doc,/footer-social|data-footer-channel|https:\/\//);assert.match(doc,/<p>© 2026 DESSET\. All rights reserved\.<\/p>/);continue;}
    if(name==="contacto.html"||name==="confianza.html"||name==="noticias.html"||name==="talento.html"){assert.doesNotMatch(doc,/footer-social|data-footer-channel|https:\/\//);assert.match(doc,/<p>© 2026 DESSET\. Todos los derechos reservados\.<\/p>/);continue;}
    const footer=doc.match(/<nav class="footer-social"[^>]*>([\s\S]*?)<\/nav>/)?.[1];assert.ok(footer);

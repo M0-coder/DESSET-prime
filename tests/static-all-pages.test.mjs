@@ -6,19 +6,21 @@ import {join} from "node:path";
 import {fileURLToPath} from "node:url";
 import {spawnSync} from "node:child_process";
 const root=fileURLToPath(new URL("../",import.meta.url));
-const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html"];
+const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html","aplicaciones.html","aplicaciones-clientes.html","aplicaciones-comercios.html","aplicaciones-repartidores.html"];
 test("Static gate scans every institutional page and rejects representative violations",()=>{
  const dir=mkdtempSync(join(tmpdir(),"desset-static-all-"));
  try{
- const names=[...pages,"_headers","styles.css","styles-typography.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","styles-onboarding.css","assets","fonts","scripts"," .github".trim()];
+ const names=[...pages,"_headers","styles.css","styles-typography.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","styles-onboarding.css","styles-applications.css","assets","fonts","scripts"," .github".trim()];
  for(const name of names)cpSync(join(root,name),join(dir,name),{recursive:true});
  const run=()=>spawnSync(process.execPath,[join(dir,"scripts/static-gate.mjs")],{encoding:"utf8"});
  const ok=run();assert.equal(ok.status,0,ok.stderr);
  assert.deepEqual(JSON.parse(readFileSync(join(dir,"reports/quality/static.json"),"utf8")).pages_checked,pages);
  const cases=[
+ ["aplicaciones.html",s=>s.replace("</main>",'<a href="https://untrusted.example/app">Descarga</a></main>'),"Unapproved public distribution control"],
+ ["aplicaciones-clientes.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
  ["registro-repartidores.html",s=>s.replace('type="text" disabled','type="text"'),"Enabled data entry in inactive preview"],
  ["incorporacion-repartidores.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
- ["capacitacion-repartidores.html",s=>s.replace("form-action 'none'","form-action *"),"Missing or weakened local CSP"],
+ ["capacitacion-repartidores.html","aplicaciones.html","aplicaciones-clientes.html","aplicaciones-comercios.html","aplicaciones-repartidores.html",s=>s.replace("form-action 'none'","form-action *"),"Missing or weakened local CSP"],
  ["en.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
  ["talento.html",s=>s.replace("</head>",'<script src="https://untrusted.example/a.js"></script></head>'),"Nonlocal DOM resource"],
  ["noticias.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],

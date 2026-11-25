@@ -830,6 +830,23 @@ try{
    }
   }
  }
+ // APP-DISTRIBUTION-01 closed directory: actual responsive DOM and manual controls.
+ for(const root of ["","dist/"]){
+  for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
+   await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   for(const page of ["aplicaciones","aplicaciones-clientes","aplicaciones-comercios","aplicaciones-repartidores"]){
+    await call("Page.navigate",{url:pathToFileURL(resolve(root+page+".html")).href});
+    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.apps-page')"),"app directory render");
+    const a=await js(`(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,panels:document.querySelectorAll("[data-app-role]").length,downloads:[...document.querySelectorAll("[data-app-download]")].every(e=>e.textContent==="Descarga no disponible."),links:document.querySelectorAll("[data-app-links] a, a[download], form, iframe").length,country:document.querySelector("[data-app-country]").value,buttons:document.querySelectorAll("[data-app-platform]").length}))()`);
+    if(a.scroll>a.width+2||a.panels!==(page==="aplicaciones"?3:1)||!a.downloads||a.links||a.country!=="PE"||a.buttons!==(page==="aplicaciones"?0:3))report.failures.push("APP-DISTRIBUTION "+root+page+w+": "+JSON.stringify(a));
+    if(page!=="aplicaciones"){
+     const manual=await js(`(()=>{document.querySelector('[data-app-platform="ios"]').click();const country=document.querySelector("[data-app-country]");country.value="OTHER";country.dispatchEvent(new Event("change"));return {selected:document.querySelector('[data-app-platform="ios"]').getAttribute("aria-pressed"),hidden:document.querySelector("[data-app-links]").hidden,count:document.querySelectorAll("[data-app-links] a").length}})()`);
+     if(manual.selected!=="true"||!manual.hidden||manual.count)report.failures.push("APP-DISTRIBUTION manual selection "+root+page+w);
+    }
+    await capture((root?"dist-":"source-")+page+"-"+w+"px.png",true);
+   }
+  }
+ }
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
  await writeFile(join(output,"audit.json"),JSON.stringify(report,null,2));
