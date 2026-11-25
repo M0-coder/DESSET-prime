@@ -44,7 +44,7 @@ function makeLocalTexture(pattern,registry){
   const grd=ctx.createLinearGradient(0,0,256,256);
   grd.addColorStop(0,"#ffffff");grd.addColorStop(.6,"#e4ecff");grd.addColorStop(1,"#f7fbff");
   ctx.fillStyle=grd;ctx.fillRect(0,0,256,256);
-  ctx.lineWidth=1;ctx.strokeStyle="rgba(15,34,88,.10)";
+  ctx.lineWidth=1;ctx.strokeStyle="rgba(0,0,0,.10)";
   for(let x=0;x<256;x+=17){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+4,256);ctx.stroke()}
  }else if(pattern==="tile"){
   ctx.fillStyle="#f7eee0";ctx.fillRect(0,0,256,256);
@@ -58,13 +58,13 @@ function makeLocalTexture(pattern,registry){
  }else if(pattern==="ribbed"){
   ctx.fillStyle="#eaf1ff";ctx.fillRect(0,0,256,256);
   for(let x=0;x<256;x+=16){
-   ctx.fillStyle=x%32===0?"rgba(26,46,88,.17)":"rgba(255,255,255,.55)";
+   ctx.fillStyle=x%32===0?"rgba(0,0,0,.17)":"rgba(255,255,255,.55)";
    ctx.fillRect(x,0,4,256);
   }
  }else{
   ctx.fillStyle="#e1e5ea";ctx.fillRect(0,0,256,256);
   for(let x=10;x<256;x+=22)for(let y=10;y<256;y+=22){
-   ctx.fillStyle="rgba(20,31,48,.23)";ctx.beginPath();
+   ctx.fillStyle="rgba(0,0,0,.23)";ctx.beginPath();
    ctx.arc(x,y,3,0,2*Math.PI);ctx.fill();
   }
  }

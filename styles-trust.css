@@ -1,7 +1,7 @@
 /* TRUST-01: scoped institutional trust center, independent of service pages. */
 .trust-page{background:#fff;color:#111}
 .trust-page .tr-inner{max-width:1040px;margin:auto;padding-inline:var(--edge,24px)}
-.trust-page .tr-hero{background:#111d35;color:#fff;padding-block:clamp(32px,5vw,72px)}
+.trust-page .tr-hero{background:#000000;color:#fff;padding-block:clamp(32px,5vw,72px)}
 .trust-page .tr-hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,320px);align-items:center;gap:24px}
 .trust-page .tr-kicker{font-size:12px;letter-spacing:.12em;font-weight:700;color:#b9ccef}
 .trust-page h1{font-family:var(--ds-type-display);font-size:clamp(32px,5vw,64px);font-weight:800;line-height:1.12;letter-spacing:-.035em;margin:16px 0;overflow-wrap:break-word;color:#fff}

@@ -10,7 +10,7 @@
 .v5-city-stage {
   position:relative; display:block; isolation:isolate; overflow:hidden;
   margin:8px 0 18px; width:100%; border:1px solid rgba(230,239,255,.28);
-  background:#f4f8fe; color:#162943;
+  background:#f4f8fe; color:#111111;
   box-shadow:0 18px 42px rgba(21,81,216,.09);
 }
 .v5-city-stage:before {
@@ -26,10 +26,10 @@
 .v5-stage-world { position:relative; aspect-ratio:1752/897; min-height:265px; overflow:hidden; background:#f4f8fe; }
 /* This image-free, accessible fallback is visible without WebGL or with reduced motion.
    WebGL hides it only after a verified GPU frame has been drawn. */
-.v6-static-fallback{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.7vw,18px);padding:clamp(18px,4vw,46px);text-align:center;background:radial-gradient(ellipse at 55% 35%,rgba(21,81,216,.08),transparent 58%),#f4f8fe;color:#162943}
+.v6-static-fallback{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.7vw,18px);padding:clamp(18px,4vw,46px);text-align:center;background:radial-gradient(ellipse at 55% 35%,rgba(21,81,216,.08),transparent 58%),#f4f8fe;color:#111111}
 .v6-static-fallback__eyebrow{color:#1551d8;font-size:clamp(10px,1vw,14px);font-weight:800;letter-spacing:.14em}
 .v6-static-fallback__headline{font-size:clamp(20px,3.1vw,48px);line-height:1.1;letter-spacing:-.025em;max-width:850px}
-.v6-static-fallback__note{margin:0;max-width:550px;color:#445a77;font-size:clamp(12px,1.3vw,16px);line-height:1.5}
+.v6-static-fallback__note{margin:0;max-width:550px;color:#444444;font-size:clamp(12px,1.3vw,16px);line-height:1.5}
 
 /* Higher specificity than legacy .ecosystem-board img (max-width:900/max-height:420).
    Prevent letterboxing: render must occupy the intended responsive frame. */
@@ -82,13 +82,13 @@
 .v5-city-stage[data-v6-state="active"] .v6-three-mount {opacity:1;pointer-events:auto;}
 .v5-city-stage[data-v6-state="active"] .v6-static-fallback {opacity:0;pointer-events:none;visibility:hidden;}
 .v6-three-toolbar {
- position:relative;z-index:7;background:#f4f8fe;color:#162943;
+ position:relative;z-index:7;background:#f4f8fe;color:#111111;
  border-top:1px solid #d4e1f2;padding:10px clamp(12px,2vw,22px);
 }
 .v6-three-controls {display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
 .v6-three-controls[hidden],.v6-enable-webgl[hidden] {display:none!important;}
 .v6-three-controls button,.v6-enable-webgl {
- background:#fff;color:#162943;
+ background:#fff;color:#111111;
  border:1px solid #c8d7ec;min-height:44px;
  border-radius:4px;padding:9px 14px;font:700 12px/1.3 inherit;
  cursor:pointer;white-space:normal;touch-action:manipulation;
@@ -129,7 +129,7 @@
 }
 .v63-story-detail{
  grid-column:1;
- color:#445a77;font:500 12px/1.45 system-ui,sans-serif;
+ color:#444444;font:500 12px/1.45 system-ui,sans-serif;
 }
 .v63-story-progress{
  grid-column:2;grid-row:1/3;align-self:center;
@@ -181,7 +181,7 @@
 .v65-load-status[hidden]{display:none!important;}
 .v65-load-status{
  display:block;padding:10px 12px;margin-bottom:10px;
- color:#162943;background:#eff5ff;
+ color:#111111;background:#eff5ff;
  border-left:3px solid #ffc62f;
  font:700 12px/1.45 system-ui,sans-serif;
 }
@@ -239,20 +239,20 @@
 /* LOGISTICS-3D-02 / simulated digital-twin UI
  * HTML overlays keep small data labels legible without costly GPU text textures.
  * Never imply real fleet tracking or production orders. */
-.logistics-hud{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;visibility:hidden;color:#162943}
+.logistics-hud{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;visibility:hidden;color:#111111}
 .v5-city-stage[data-v6-state="active"] .logistics-hud{opacity:1;visibility:visible}
 .logistics-hud__brand{position:absolute;top:4.6%;right:4.2%;display:flex;gap:8px;align-items:center;
- font:800 clamp(9px,.92vw,13px)/1.2 "Plus Jakarta Sans",system-ui,sans-serif;letter-spacing:.11em;color:#214579;
+ font:800 clamp(9px,.92vw,13px)/1.2 "Plus Jakarta Sans",system-ui,sans-serif;letter-spacing:.11em;color:#111111;
  background:rgba(255,255,255,.72);border:1px solid rgba(98,145,205,.25);
- border-radius:100px;padding:9px 13px;box-shadow:0 6px 25px rgba(23,48,85,.08)}
+ border-radius:100px;padding:9px 13px;box-shadow:0 6px 25px rgba(0,0,0,.08)}
 .logistics-hud__demo{font:800 9px/1 system-ui,sans-serif;letter-spacing:.07em;background:#e9f7ff;
  color:#1253a6;border-radius:7px;padding:5px 7px}
 .logistics-hud__beacon{width:7px;height:7px;border-radius:50%;background:#18bd91;box-shadow:0 0 0 4px rgba(24,189,145,.16)}
 .logistics-hud__card{position:absolute;box-sizing:border-box;width:clamp(160px,18vw,246px);
  padding:clamp(11px,1.35vw,18px);display:grid;gap:7px;
  border:1px solid rgba(255,255,255,.95);border-radius:15px;
- background:rgba(255,255,255,.94);color:#1b314b;
- box-shadow:0 20px 50px rgba(45,81,139,.15),0 2px 11px rgba(33,87,151,.06);
+ background:rgba(255,255,255,.94);color:#111111;
+ box-shadow:0 20px 50px rgba(0,0,0,.15),0 2px 11px rgba(0,0,0,.06);
  font:500 clamp(10px,.90vw,12px)/1.35 "Plus Jakarta Sans",system-ui,sans-serif;
  transform:perspective(700px) rotateX(3deg) rotateY(-7deg)}
 .logistics-hud__card strong{font-weight:800;font-size:clamp(12px,1.1vw,15px);line-height:1.2;letter-spacing:-.025em}
@@ -260,7 +260,7 @@
 .logistics-hud__card--docks{right:4%;left:auto;top:30%;width:clamp(170px,17vw,235px)}
 .logistics-hud__card--notice{display:none}
 .logistics-hud__status{display:grid;grid-template-columns:8px 1fr auto;align-items:center;gap:7px;border-top:1px solid #e8eff7;padding-top:6px}
-.logistics-hud__status b{font-weight:800;color:#295b88}
+.logistics-hud__status b{font-weight:800;color:#111111}
 .logistics-hud__dot{display:inline-block;width:7px;height:7px;flex:none;border-radius:50%;background:#1abd8e}
 .logistics-hud__dot--green{background:#17bb89}.logistics-hud__dot--blue{background:#448ad9}.logistics-hud__dot--orange{background:#ff9f39}
 .logistics-hud__card p{font-size:clamp(10px,.87vw,12px);line-height:1.5;margin:0;color:#5a7290}
@@ -277,7 +277,7 @@
 }
 @media(max-width:800px){
  .logistics-hud__brand{top:3.6%;right:4%;font-size:9px;padding:6px 9px}
- .logistics-hud__card{font-size:10px;padding:10px;box-shadow:0 8px 24px rgba(42,79,139,.13)}
+ .logistics-hud__card{font-size:10px;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,.13)}
  .logistics-hud__card .logistics-hud__eyebrow{font-size:8px}
 }
 @media(max-width:430px){
