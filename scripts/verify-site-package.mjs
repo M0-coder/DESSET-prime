@@ -12,7 +12,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length>=18&&manifest.files.length<=49,"unexpected file count");
+check(manifest.files.length>=18&&manifest.files.length<=50,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -40,6 +40,8 @@ const news=await readFile(resolve(dist,"noticias.html"),"utf8");
 check(expected.has("noticias.html")&&news.includes('name="robots" content="noindex,nofollow"'),"News page absent or indexing changed");
 const careers=await readFile(resolve(dist,"talento.html"),"utf8");
 check(expected.has("talento.html")&&careers.includes('name="robots" content="noindex,nofollow"'),"Careers page absent or indexing changed");
+const english=await readFile(resolve(dist,"en.html"),"utf8");
+check(expected.has("en.html")&&english.includes('name="robots" content="noindex,nofollow"'),"English page absent or indexing changed");
 const merchant=await readFile(resolve(dist,"comercios.html"),"utf8");
 check(expected.has("comercios.html")&&merchant.includes('name="robots" content="noindex,nofollow"'),"Merchant page absent or indexing changed");
 check(expected.has("empresa.html")&&company.includes('name="robots" content="noindex,nofollow"'),"Company page absent or indexing changed");
