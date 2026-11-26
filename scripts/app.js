@@ -37,24 +37,21 @@ if(typeof window!=="undefined"&&typeof document.getElementById==="function"){
  selectNewsCategory();window.addEventListener("hashchange",selectNewsCategory);
 }
 
-// VIDEO-02: one brief decorative motion preview, no looping or visible pause controls.
+// VIDEO-03: continuous decorative loops while visible; no added visual controls.
 if(typeof window!=="undefined"&&typeof document.querySelectorAll==="function"){
  const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)");
  for(const video of document.querySelectorAll("#soluciones .service-video")){
-  let started=false,finished=false,timer,observer;
-  const stop=()=>{finished=true;if(timer!==undefined)window.clearTimeout(timer);video.pause();observer?.disconnect();};
-  const begin=()=>{if(started||finished||document.hidden||reduced?.matches)return;
-   started=true;video.muted=true;video.loop=false;
-   timer=window.setTimeout(stop,4800);
-   video.src=video.dataset.src;
-   try{video.play()?.catch(stop);}catch{stop();}
+  let visible=false;
+  const sync=()=>{
+   if(!visible||document.hidden||reduced?.matches){video.pause();return;}
+   video.muted=true;video.loop=true;
+   if(!video.getAttribute("src"))video.src=video.dataset.src;
+   try{video.play()?.catch(()=>{});}catch{}
   };
-  video.addEventListener("ended",stop);
-  document.addEventListener("visibilitychange",()=>{if(document.hidden&&started)stop();});
-  reduced?.addEventListener?.("change",()=>{if(reduced.matches&&started)stop();});
+  document.addEventListener("visibilitychange",sync);
+  reduced?.addEventListener?.("change",sync);
   if(typeof window.IntersectionObserver==="function"){
-   observer=new window.IntersectionObserver(entries=>{if(entries[0]?.isIntersecting)begin();else if(started)stop();},{threshold:.15});
-   observer.observe(video);
+   new window.IntersectionObserver(entries=>{visible=!!entries[0]?.isIntersecting;sync();},{threshold:.15}).observe(video);
   }
  }
 }
