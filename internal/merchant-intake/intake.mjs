@@ -2,27 +2,8 @@
 import {createHash,randomUUID} from "node:crypto";
 import {readFileSync} from "node:fs";
 import {DatabaseSync} from "node:sqlite";
-const fields=["business_name","category","department","province","district","address","contact_name","phone","email"];
-export const interestLevels=Object.freeze(["ready","soon","evaluating","information"]);
-const optionalFields=["postal_code","interest_level","contact_pronunciation"];
-const allowedCategories=new Set(["restaurant","grocery","bakery","specialty","pharmacy","other"]);
-export function validateMerchantInput(input){
- if(!input||typeof input!=="object"||Object.keys(input).some(k=>!fields.includes(k)&&!optionalFields.includes(k)&&k!=="observations"))throw Error("INVALID_FIELDS");
- const data={};
- for(const key of fields){
-  if(typeof input[key]!=="string")throw Error("INVALID_FIELD");
-  const v=input[key].trim();
-  if(!v||v.length>200||/[\u0000-\u001f\u007f]/.test(v))throw Error("INVALID_FIELD");
-  data[key]=v;
- }
- if(!allowedCategories.has(data.category)||!/^\+51[0-9]{9}$/.test(data.phone)||! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))throw Error("INVALID_CONTACT_OR_CATEGORY");
- data.email=data.email.toLowerCase();
- if(input.observations!==undefined){if(typeof input.observations!=="string"||input.observations.length>1000||/[\u0000-\u001f\u007f]/.test(input.observations))throw Error("INVALID_FIELD");const note=input.observations.trim();if(note)data.observations=note;}
- if(input.postal_code!==undefined){if(typeof input.postal_code!=="string"||!/^\d{5}$/.test(input.postal_code))throw Error("INVALID_POSTAL_CODE");data.postal_code=input.postal_code;}
- if(input.interest_level!==undefined){if(!interestLevels.includes(input.interest_level))throw Error("INVALID_INTEREST_LEVEL");data.interest_level=input.interest_level;}
- if(input.contact_pronunciation!==undefined){if(typeof input.contact_pronunciation!=="string"||input.contact_pronunciation.length>200||/[\u0000-\u001f\u007f]/.test(input.contact_pronunciation))throw Error("INVALID_FIELD");const v=input.contact_pronunciation.trim();if(v)data.contact_pronunciation=v;}
- return data;
-}
+import {merchantFields as fields,optionalFields,validateMerchantInput} from "../merchant-common/validation.mjs";
+export {validateMerchantInput,interestLevels} from "../merchant-common/validation.mjs";
 const now=()=>new Date().toISOString();
 const identity=d=>createHash("sha256").update(JSON.stringify(["business_name","department","province","district","address"].map(k=>d[k].normalize("NFKC").toLowerCase().trim().replace(/\s+/g," ")))).digest("hex");
 function admin(actor){if(!actor||actor.role!=="merchant-reviewer"||typeof actor.id!=="string"||!actor.id.trim())throw Error("FORBIDDEN");}
