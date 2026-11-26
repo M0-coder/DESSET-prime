@@ -1,6 +1,7 @@
 // Public registration candidate only; no administrative routes or activation handler in this block.
 import {RIDER_ORIGIN,fields,riderGate,createDraft,editDraft,submitDraft,newSession,csrfToken} from "./intake.mjs";
 import {locationControl,territoryScript} from "../merchant-common/location-ui.mjs";
+import {riderAdmin} from "./admin.mjs";
 const headers={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow","Content-Security-Policy":"default-src 'none'; script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com; style-src 'self'; font-src 'self'; img-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fail=(status,publicCode)=>Object.assign(Error(publicCode),{status,publicCode});
@@ -21,9 +22,10 @@ function form(data,csrf,siteKey,error=""){
 }
 async function body(req){if((req.headers.get("content-type")??"").split(";")[0]!=="application/x-www-form-urlencoded"||!req.body)throw fail(415,"CONTENT_TYPE");const reader=req.body.getReader(),dec=new TextDecoder("utf-8",{fatal:true});let bytes=0,s="";try{while(true){const r=await reader.read();if(r.done)break;bytes+=r.value.length;if(bytes>8192){await reader.cancel();throw fail(413,"BODY_LIMIT");}s+=dec.decode(r.value,{stream:true});}s+=dec.decode();}finally{reader.releaseLock();}const p=new URLSearchParams(s);if(new Set(p.keys()).size!==[...p.keys()].length)throw fail(400,"INVALID_FIELDS");return Object.fromEntries(p);}
 async function challenge(token,env,fetcher){if(typeof token!=="string"||!token||token.length>2048)throw fail(400,"CHALLENGE_INVALID");const r=await fetcher("https://challenges.cloudflare.com/turnstile/v0/siteverify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({secret:env.TURNSTILE_SECRET,response:token}),redirect:"error",signal:AbortSignal.timeout(5000)});if(!r.ok)throw fail(503,"CHALLENGE_UNAVAILABLE");const v=await r.json();if(v.success!==true||v.hostname!=="repartidores.desset.lat"||v.action!=="rider_intake")throw fail(403,"CHALLENGE_INVALID");}
-export async function handleRider(req,env,ui=null,fetcher=fetch){
+export async function handleRider(req,env,ui=null,fetcher=fetch,ctx=null){
  try{const url=new URL(req.url);if(url.origin!==RIDER_ORIGIN||env.SERVICE_ORIGIN!==RIDER_ORIGIN)throw fail(403,"HOST");
  if(req.method==="POST"&&(req.headers.get("Origin")!==url.origin||req.headers.get("Sec-Fetch-Site")==="cross-site"))throw fail(403,"ORIGIN");
+ if(url.pathname==="/admin"||url.pathname.startsWith("/admin/"))return await riderAdmin(req,env,ctx,fetcher,headers,body);
  await riderGate(env);
  if(!env.TURNSTILE_SECRET||!/^[A-Za-z0-9_-]{10,100}$/.test(env.TURNSTILE_SITE_KEY??"")||!env.RIDER_LIMIT)throw fail(503,"UNAVAILABLE");
  if(req.method==="GET"&&url.pathname.startsWith("/assets/")){const path=url.pathname.slice(8).split("?")[0];if(path==="territory.js")return new Response(territoryScript,{headers:{...headers,"Content-Type":"text/javascript; charset=utf-8"}});if(path==="rider-form.css")return new Response(".onboarding-page .ob-submit:not(:disabled){cursor:pointer;background:#073BBC;color:#fff}",{headers:{...headers,"Content-Type":"text/css; charset=utf-8"}});const a=ui?.assets?.[path];if(!a||!Object.hasOwn(ui.assets,path))throw fail(404,"NOT_FOUND");return new Response(Uint8Array.from(atob(a.base64),c=>c.charCodeAt(0)),{headers:{...headers,"Content-Type":a.type}});}
