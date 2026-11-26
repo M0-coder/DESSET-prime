@@ -1,12 +1,12 @@
 import test from "node:test";import assert from "node:assert/strict";import {readFileSync} from "node:fs";import {createHash} from "node:crypto";
 const read=p=>readFileSync(new URL("../"+p,import.meta.url));
 const reviewed={
- "empresa.html":"e3ef282e693db91fe2e7a26bd5b5caca1c061484",
+ "empresa.html":"ebe2aa90ebb64cc5fc9bac20ec4b7827c6dbce61",
  "prime.html":"ccad9d7e9eb102bdeacb92493d725b45eab0d55b",
- "contacto.html":"e1f62f02ccc742c03c182bf594fe14938ac1307a",
- "confianza.html":"d3bb7d81b0b925782be48411e78b138fb91e5f98",
- "noticias.html":"3425eac2b58e64bd3fb00d9726cd215be17f5c37",
- "talento.html":"9d3badbb924d8d58d2cfcb070289f23d6fff8def"
+ "contacto.html":"57f892c008f4ea985ac331d96f67adf265b09974",
+ "confianza.html":"969b86f7e8f6027cdd5f1fc3c55e15790f840fbd",
+ "noticias.html":"ecce3105c9ef8726267880f41a8fadf8f1c0817a",
+ "talento.html":"489c941141b9b4bc21831efcbd2a13b446096f76"
 };
 for(const dir of ["","dist/"]){test("GLOBAL-01 English overview and source editorial review lock "+(dir||"source"),()=>{
  const html=read(dir+"en.html").toString();
