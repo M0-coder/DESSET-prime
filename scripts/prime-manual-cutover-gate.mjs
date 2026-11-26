@@ -79,6 +79,13 @@ export function reviewHomeTalentPhoto(media){
  if(d?.status!=='owner-supplied-and-approved-preview'||d.scope!=='PHOTO-05; homepage talent illustration only'||d.source!=='direct owner instruction in the project conversation'||d.date!=='2026-11-26'||d.source_page_reviewed_on!=='2026-11-26'||d.general_license_terms_reviewed_on!=='2026-11-26'||d.remote_original_binary_comparison!==false||d.independent_legal_verification!==false||d.exclusive_ownership_claim!==false||!['path','sha256','source_id','license','license_url'].every(k=>d.asset?.[k]===a[k]))return rejected;
  return {accepted:true,basis:'source-page-and-license-reviewed',individual_source_verified:false,release_authorized:false};
 }
+export function reviewRiderHeroPhoto(media){
+ const rejected={accepted:false,basis:'pending',individual_source_verified:false,release_authorized:false};
+ const a=media?.rider_hero_photo,d=a?.selection;
+ if(!a||a.path!=='assets/repartidores-hero-original.jpg'||a.sha256!=='6a8a00bb029a440050ea93497efc61ff52687c9c1d4a895e1c46204e47018ebe'||a.bytes!==123996||a.width!==1024||a.height!==1280||a.claim!=='owner-supplied'||a.source!=='conversation-upload'||a.verification!=='owner-supplied-and-approved-use'||a.license!=='Owner-authorized website use; independent rights not verified'||a.release_authorized!==false||a.usage!=='Illustrative portrait; not actual DESSET operations or personnel.'||typeof a.alt!=='string'||!a.alt.trim())return rejected;
+ if(d?.status!=='owner-supplied-and-approved-use'||d.date!=='2026-11-26'||d.scope!=='PHOTO-06; Repartidores institutional hero only'||d.source!=='direct owner instruction in the project conversation'||d.independent_legal_verification!==false||d.exclusive_ownership_claim!==false||d.asset?.path!==a.path||d.asset?.sha256!==a.sha256)return rejected;
+ return {accepted:true,basis:'owner-supplied-and-approved-use',individual_source_verified:false,release_authorized:false};
+}
 export function validateReleaseIntent({repository,ref,event,expectedSha,checkoutSha,previousId,seoPolicy,target}){
  const err=[];
  mark(err,repository===target?.repository,'Wrong GitHub repository');
@@ -126,13 +133,15 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    if(!talentReview.accepted)throw Error('PHOTO-01: scoped photographic rights review required before production');
    const homeTalentReview=reviewHomeTalentPhoto(media);
    if(!homeTalentReview.accepted)throw Error('PHOTO-05: scoped homepage photograph review required before production');
+   const riderReview=reviewRiderHeroPhoto(media);
+   if(!riderReview.accepted)throw Error('PHOTO-06: scoped rider portrait usage review required before production');
    const merchantReview=reviewMerchantHeroPhoto(media);
    if(!merchantReview.accepted)throw Error('PHOTO-02: scoped photographic source and usage review required before production');
    const e=process.env;
    const out=validateReleaseIntent({repository:e.GITHUB_REPOSITORY,ref:e.GITHUB_REF,event:e.GITHUB_EVENT_NAME,
      expectedSha:e.RELEASE_SHA,checkoutSha:e.GITHUB_SHA,previousId:e.PREVIOUS_DEPLOYMENT_ID,
      seoPolicy:e.SEO_POLICY,target});
-   console.log(JSON.stringify({...out,selected_media_review:mediaReview,talent_media_review:talentReview,home_talent_media_review:homeTalentReview,merchant_hero_media_review:merchantReview}));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
+   console.log(JSON.stringify({...out,selected_media_review:mediaReview,talent_media_review:talentReview,home_talent_media_review:homeTalentReview,merchant_hero_media_review:merchantReview,rider_hero_media_review:riderReview}));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
   }else if(task==='cloudflare'){
    const [projectPath,domainPath]=process.argv.slice(3);
    const out=validateCloudflareSnapshot({projectResponse:JSON.parse(readFileSync(projectPath,'utf8')),

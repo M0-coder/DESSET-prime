@@ -18,9 +18,10 @@ function fixture(t){
  for(const path of primePhotos)map[path]='approved '+path;
  map['assets/talento-cultura.webp']='approved talent photo';
  map['assets/talento-equipo.webp']='approved homepage talent photo';
+ map['assets/repartidores-hero-original.jpg']='approved rider portrait';
  map['assets/comercios-hero-minimercado.webp']='approved merchant hero photo';
  const assets=Object.entries(map).map(([path,value])=>{const b=Buffer.from(value);mkdirSync(dirname(join(dir,path)),{recursive:true});writeFileSync(join(dir,path),b);return {path,bytes:b.length,sha256:hash(b)}});
- const reportPath=join(root,'report.json');writeFileSync(reportPath,JSON.stringify({schema:'desset-prime-manual-release-package-v1',seo_policy:'NOINDEX',production_authorized:false,production_deployed:false,package_files:72,assets,assets_manifest_sha256:hash(Buffer.from(JSON.stringify(assets)))}));
+ const reportPath=join(root,'report.json');writeFileSync(reportPath,JSON.stringify({schema:'desset-prime-manual-release-package-v1',seo_policy:'NOINDEX',production_authorized:false,production_deployed:false,package_files:73,assets,assets_manifest_sha256:hash(Buffer.from(JSON.stringify(assets)))}));
  const requests=[],logs=[];
  const mock=(url,opts)=>{requests.push([url,opts.method]);const p=new URL(url).pathname;const k=p==='/'?'index.html':p==='/empresa'?'empresa.html':p==='/comercios'?'comercios.html':p==='/repartidores'?'repartidores.html':p==='/prime'?'prime.html':p==='/contacto'?'contacto.html':p==='/confianza'?'confianza.html':p==='/noticias'?'noticias.html':p==='/talento'?'talento.html':p==='/en'?'en.html':p==='/registro-comercios'?'registro-comercios.html':p==='/incorporacion-comercios'?'incorporacion-comercios.html':p==='/registro-repartidores'?'registro-repartidores.html':p==='/incorporacion-repartidores'?'incorporacion-repartidores.html':p==='/capacitacion-repartidores'?'capacitacion-repartidores.html':p==='/aplicaciones'?'aplicaciones.html':p==='/aplicaciones-clientes'?'aplicaciones-clientes.html':p==='/aplicaciones-comercios'?'aplicaciones-comercios.html':p==='/aplicaciones-repartidores'?'aplicaciones-repartidores.html':p==='/__desset_prime_missing_path__'?'404.html':p.slice(1);return new Response(map[k]??'missing',{status:k==='404.html'?404:200,headers:{'content-type':'text/html','content-security-policy':"default-src 'self'",'x-content-type-options':'nosniff'}})};
  return {opts:{publicDir:dir,reportPath,request:mock,attempts:2,delay:0,log:l=>logs.push(l)},requests,logs,mock};
@@ -56,7 +57,7 @@ test('actual generated NOINDEX package is accepted, and all six photographs are 
  const publicDir=join(root,'public'),evidenceDir=join(root,'evidence');
  const dist=fileURLToPath(new URL('../dist/',import.meta.url));
  const report=preparePrimeCutoverPackage({dist,sourceSha:'0c39d00af1f5401710bbc00b52147b108f563968',seoPolicy:'NOINDEX',outputDir:publicDir,evidenceDir});
- assert.equal(report.package_files,72);
+ assert.equal(report.package_files,73);
  const reportPath=join(evidenceDir,'prime-manual-release-package.json');
  const requests=[],map=new Map(report.assets.map(a=>[a.path,readFileSync(join(publicDir,a.path))]));
  const request=(url,opts)=>{

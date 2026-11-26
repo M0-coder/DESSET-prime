@@ -82,3 +82,5 @@ test("tampered selected photograph is rejected without claiming third-party owne
 });
 
 test('PHOTO-05 modified homepage photo is rejected',t=>{const copy=copyDist(t);writeFileSync(join(copy,'assets/talento-equipo.webp'),'changed');assert.throws(()=>checkAssetRightsAndLicenses({...opts,dist:copy}),/NO-GO/);});
+
+test('PHOTO-06 modified original rider photograph rejected',t=>{const copy=copyDist(t);writeFileSync(join(copy,'assets/repartidores-hero-original.jpg'),'changed');assert.throws(()=>checkAssetRightsAndLicenses({...opts,dist:copy}),/NO-GO/);});
