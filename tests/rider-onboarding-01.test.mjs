@@ -19,12 +19,18 @@ for(const dir of ["","dist/"]){
  const reg=read(dir+pages[0]+".html");
  assert.equal((reg.match(/<fieldset disabled/g)||[]).length,2);
  assert.match(reg,/no se envía ni almacena información/);
+ assert.doesNotMatch(reg,/Opciones ilustrativas|Modelo de prerregistro|<option>(?:Lima|Huaura|Huacho)<\/option>/i);
  assert.doesNotMatch(reg,/\btype="file"|id="(?:dni|cuenta-bancaria|licencia|foto)"/);
  for(const v of ["Bicicleta","Motocicleta","Automóvil"])assert.ok(reg.includes("<option>"+v+"</option>"));
  });
  test("Rider guide and training explicitly distinguish approval from activation "+(dir||"source"),()=>{
  const guide=read(dir+pages[1]+".html"),training=read(dir+pages[2]+".html");
- assert.equal((guide.match(/<li><h2>/g)||[]).length,5);
+ assert.equal((guide.match(/<li><h2>/g)||[]).length,7);
+ assert.match(guide,/Contratación y condiciones/);
+ assert.match(guide,/Configuración del acceso/);
+ assert.match(guide,/bolsa térmica/);
+ assert.match(guide,/medio de cobro/);
+ assert.match(guide,/href="\.\/aplicaciones-repartidores\.html"/);
  assert.match(guide,/disponibilidad de demanda/);
  assert.match(guide,/No envíes documentos de identidad/);
  assert.equal((training.match(/<details>/g)||[]).length,5);
