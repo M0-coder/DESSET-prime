@@ -33,7 +33,7 @@ test("primary business narrative remains intelligible without decorative microco
  }
  assert.equal((html.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,4);
  assert.doesNotMatch(html,/class="trust-ledger"/);
- assert.equal((html.match(/class="role" role="listitem"/g)||[]).length,4);
+ assert.equal((html.match(/class="role" role="listitem"/g)||[]).length,0);
  assert.match(html,/Comercio digital, pedidos y entregas de última milla\./);
  assert.match(html,/Paquetería, transporte y distribución de mercancías\./);
  assert.doesNotMatch(html,/Área complementaria del modelo logístico|Un ecosistema, experiencias conectadas/);

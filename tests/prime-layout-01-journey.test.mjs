@@ -13,7 +13,7 @@ test("ECOSYSTEM-PARTICIPANTS-01 one ordered four-photo ecosystem separate from 3
  assert.equal((vision.match(/<picture class="v03-photo-story">/g)||[]).length,4);
  for(const path of photos){assert.ok(vision.includes('src="./'+path+'"'));assert.ok(!scene.includes(path))}
  assert.doesNotMatch(scene,/motion-story-unit|v03-photo-story|ecosistema-(?:proveedores|comercios|consumidores|operadores-logisticos)\.webp/);
- assert.ok(scene.includes('class="v4-architecture-details"'));
+ assert.ok(!scene.includes('class="v4-architecture-details"'));
  for(const cls of ["v6-three-mount","v63-tour","v6-pause"]){assert.ok(!scene.includes('class="'+cls+'"'));assert.ok(read("prime.html").includes('class="'+cls+'"'));}
 });
 test("Four distinct local WebP photos and truthful explanatory copy",()=>{

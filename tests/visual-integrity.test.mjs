@@ -32,7 +32,7 @@ test("bright red stays an approved brand accent, while small text on red is dark
  assert.ok(ratio(token("ink"),token("red"))>=4.5);
  assert.doesNotMatch(css,/\.audiences \.audience:nth-child\(2\) \.audience-no/);
 });
-test("DESSET blue service rail has four accessible, substantive benefits and responsive geometry",()=>{
+test("DESSET gold service rail has four substantive benefits and responsive geometry; owner-selected low-contrast foreground",()=>{
  const rail=html.split('<div class="v4-hero-rail" role="list" aria-label="Áreas de servicios de DESSET">')[1]?.split("\n    </section>")[0]||"";
  assert.ok(rail.length>600,"Accessible service rail must exist in hero");
  assert.equal((rail.match(/class="v4-rail-item" role="listitem"/g)||[]).length,4);
@@ -45,18 +45,16 @@ test("DESSET blue service rail has four accessible, substantive benefits and res
  ])assert.ok(rail.includes('<strong>'+heading+'</strong><p>'+copy+'</p>'),heading+" exact approved description missing");
  assert.doesNotMatch(rail,/FUTURO|seguimiento en tiempo real|entregas activas/i);
  assert.match(heroCss,/#inicio \.v4-hero-rail\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
- assert.match(heroCss,/background:#073bbc;color:#fff;white-space:normal/);
+ assert.match(heroCss,/background:var\(--yellow\);color:#fff;white-space:normal/);
  assert.match(heroCss,/@media\(max-width:860px\)\{#inicio \.v4-hero-rail\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.match(heroCss,/@media\(max-width:520px\)\{#inicio \.v4-rail-item\{display:block/);
- assert.ok(ratio("#E2EBFF","#073BBC")>=4.5,"Small text must meet WCAG AA on brand blue");
- assert.ok(ratio("#FFFFFF","#073BBC")>=4.5,"Heading contrast must meet WCAG AA");
+ assert.ok(ratio("#E2EBFF","#FFC62F")<4.5,"Document owner-selected foreground contrast below WCAG AA; not an accessibility PASS");
+ assert.ok(ratio("#FFFFFF","#FFC62F")<4.5,"Document owner-selected white-on-gold contrast exception; do not claim WCAG AA");
 });
-test("technical diagrams and four roles are one opt-in view, not repeated clutter",()=>{
- const detail=html.match(/<details class="v4-architecture-details">([\s\S]*?)<\/details>/);
- assert.ok(detail,"Technical accordion must exist");
- assert.doesNotMatch(detail[1],/roles-geometry-|<picture|<img|<svg/);
- assert.match(detail[1],/class="roles" role="list"/);
- assert.equal((detail[1].match(/class="role" role="listitem"/g)||[]).length,4);
- assert.equal((html.match(/class="roles" role="list"/g)||[]).length,1);
- assert.match(css,/\.v4-architecture-details summary:focus-visible/);
+test("Obsolete technical accordion is removed from HTML, not hidden",()=>{
+ assert.doesNotMatch(html,/v4-architecture-details|ecosystem-board v4-flow-board|class="roles" role="list"/);
+ assert.match(html,/href="\.\/prime\.html#modelo"/);
+ assert.match(heroCss,/#inicio \.v4-hero-rail\{[^\n]*background:var\(--yellow\);color:#fff/);
+ assert.match(heroCss,/#inicio \.v4-rail-item strong\{display:block;color:#fff/);
+ assert.match(heroCss,/#inicio \.v4-rail-item p\{margin:5px 0 0;color:#e2ebff/);
 });

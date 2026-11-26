@@ -11,7 +11,7 @@ test("ANIM-02 approved real-world photo, 2 mirrors disclosure, official identity
  assert.match(html,/mochila negra y motocicleta de dos espejos/);
  assert.match(html,/Hablemos de tu negocio/);
  assert.match(html,/deliver-assets-mark\.png/);
- assert.match(html,/Representación conceptual/);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/Representación conceptual/);
  assert.doesNotMatch(html,/IDEAS EN ACCIÓN/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
