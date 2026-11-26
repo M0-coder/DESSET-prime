@@ -79,3 +79,14 @@ test("MOBILE-01 follows approved compact visual reference",()=>{
  assert.match(html,/<nav class="mobile-footer" aria-label="Mapa del sitio móvil">/);
  assert.equal((html.match(/class="mobile-corporate-icon"/g)||[]).length,2);
 });
+
+test("MOBILE-PERF-01 removes critical hero compositing only at phone widths",()=>{
+ const perf=heroCss.split("/* MOBILE-PERF-01:")[1];
+ assert.ok(perf);
+ assert.match(perf,/@media\(max-width:700px\)/);
+ assert.match(perf,/#inicio \.prime-photo-surface,#inicio \.prime-photo-image\{/);
+ assert.match(perf,/animation:none!important;transform:none!important;clip-path:none!important;/);
+ assert.match(perf,/filter:none!important;opacity:1!important;will-change:auto/);
+ assert.doesNotMatch(perf,/display:none|visibility:hidden|\.v6-|\.v5-city/);
+ assert.match(heroCss,/#inicio \.prime-photo-image\{animation:anim02-focus 2\.05s/);
+});

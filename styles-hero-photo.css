@@ -175,3 +175,15 @@ body:has(#inicio){--ds-60-surface:#fff}
  #empresa-destacada.institutional-home .institutional-home-grid,#soluciones .solutions-grid,#vision .statement-journey .motion-story-grid.ecosystem-participants,#negocios.audiences .audience-grid--compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
  #empresa-destacada .institutional-home-link{overflow-wrap:anywhere}
 }
+
+/* MOBILE-PERF-01: paint the critical mobile hero immediately, without
+   entry delays, filter/clip animation or large composited shadows.
+   Desktop choreography, final layout and all Prime 3D behavior remain intact. */
+@media(max-width:700px){
+ #inicio .motion-line__inner,#inicio .hero-lead,#inicio .hero-actions,
+ #inicio .prime-photo-surface,#inicio .prime-photo-image{
+  animation:none!important;transform:none!important;clip-path:none!important;
+  filter:none!important;opacity:1!important;will-change:auto
+ }
+ #inicio .prime-photo-surface{box-shadow:0 8px 20px rgba(14,25,47,.12)}
+}
