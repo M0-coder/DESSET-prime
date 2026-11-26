@@ -28,6 +28,9 @@ for(const dir of ["","dist/"]){
  assert.equal((guide.match(/<li><h2>/g)||[]).length,7);
  assert.match(guide,/Contratación y condiciones/);
  assert.match(guide,/Configuración del acceso/);
+ assert.match(guide,/bolsa térmica/);
+ assert.match(guide,/medio de cobro/);
+ assert.match(guide,/href="\.\/aplicaciones-repartidores\.html"/);
  assert.match(guide,/disponibilidad de demanda/);
  assert.match(guide,/No envíes documentos de identidad/);
  assert.equal((training.match(/<details>/g)||[]).length,5);

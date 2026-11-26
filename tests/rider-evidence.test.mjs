@@ -1,5 +1,5 @@
 import test from "node:test";import assert from "node:assert/strict";import {DatabaseSync} from "node:sqlite";import {readFileSync} from "node:fs";
-import {provisionRider,markEligible,changeRiderAccount,riderSnapshot,accountDetails} from "../internal/rider-onboarding/operations.mjs";
+import {recordPreparation,provisionRider,markEligible,changeRiderAccount,riderSnapshot,accountDetails} from "../internal/rider-onboarding/operations.mjs";
 import {VERSION,courseHash,questions,grade} from "../internal/rider-onboarding/course.mjs";
 import {issueTraining,viewTraining,submitTraining,trainingHistory,revokeTraining} from "../internal/rider-onboarding/training.mjs";
 import {RIDER_ORIGIN} from "../internal/rider-onboarding/intake.mjs";import {handleRider} from "../internal/rider-onboarding/worker.mjs";
@@ -28,9 +28,14 @@ test("Rider document and signed contract guards cannot be bypassed by stage upda
  assert.throws(()=>db.exec("UPDATE rider_reviews SET stage='ELIGIBLE',version=4,actor_id='synthetic',evidence_ref='synthetic'"),/ELIGIBILITY_NOT_IMPLEMENTED/);
  assert.equal((await handleRider(new Request(RIDER_ORIGIN+"/capacitacion"),e)).status,503);
  db.exec(readFileSync(new URL("../internal/rider-onboarding/migrations/0004-rider-accounts.sql",import.meta.url),"utf8"));
- const ready={...e,RIDER_APP_POLICY_VERIFIED:"true"};
+ db.exec(readFileSync(new URL("../internal/rider-onboarding/migrations/0005-rider-preparation.sql",import.meta.url),"utf8"));
+ const ready={...e,RIDER_APP_POLICY_VERIFIED:"true",RIDER_PAYOUT_POLICY_VERIFIED:"true"};
  await assert.rejects(markEligible(ready,actor,{id,version:"3",evidence:"SYNTHETIC-READY"}),/RIDER_EVIDENCE_EXPIRED_OR_MISSING/);
  await provisionRider(ready,actor,{id,subject:"SYNTHETIC-APP-901",evidence:"SYNTHETIC-PROVISION"});
+ await assert.rejects(markEligible(ready,actor,{id,version:"3",evidence:"SYNTHETIC-READY"}),/RIDER_EVIDENCE_EXPIRED_OR_MISSING/);
+ const prep={id,phone:"yes",vehicle:"yes",bag:"yes",equipmentRef:"SYNTHETIC-EQUIPMENT",payoutRef:"SYNTHETIC-PAYOUT"};
+ await assert.rejects(recordPreparation(ready,actor,{...prep,bag:"no"}),/PREPARATION_REQUIRED/);
+ await recordPreparation(ready,actor,prep);
  assert.equal(await markEligible(ready,actor,{id,version:"3",evidence:"SYNTHETIC-READY"}),"ELIGIBLE");
  assert.equal((await accountDetails(ready,id)).account.status,"READY");
  const activation={id,version:"0",from:"READY",to:"ACTIVE",reason:"SYNTHETIC-ACTIVATE",authorization:"account-approval"};
@@ -38,7 +43,7 @@ test("Rider document and signed contract guards cannot be bypassed by stage upda
  assert.throws(()=>db.exec("UPDATE rider_accounts SET status='ACTIVE',version=1,authorization_ref='forged'"),/ACTIVATION_DENIED/);
  // Local isolated fixture only: simulate production bindings to test the authorized path.
  db.exec("UPDATE rider_runtime SET environment='production',activation_enabled=1,authorization_ref='owner-approval'");
- const live={...ready,ENVIRONMENT:"production",RIDER_ACTIVATION_ENABLED:"true",RIDER_POLICY_VERIFIED:"true",RIDER_OPERATIONS_VERIFIED:"true",RIDER_APP_INTEGRATION_ENABLED:"true",LAUNCH_AUTHORIZATION_REF:"owner-approval",RIDER_ACTIVATION_AUTHORIZATION_REF:"account-approval"};
+ const live={...ready,ENVIRONMENT:"production",RIDER_DOCUMENTS_ENVIRONMENT:"production",RIDER_ACTIVATION_ENABLED:"true",RIDER_POLICY_VERIFIED:"true",RIDER_OPERATIONS_VERIFIED:"true",RIDER_APP_INTEGRATION_ENABLED:"true",LAUNCH_AUTHORIZATION_REF:"owner-approval",RIDER_ACTIVATION_AUTHORIZATION_REF:"account-approval"};
  await assert.rejects(changeRiderAccount(live,actor,{...activation,authorization:"wrong"}),/ACTIVATION_DENIED/);
  assert.equal(await changeRiderAccount(live,actor,activation),"ACTIVE");
  assert.equal((await riderSnapshot(live,id,"SYNTHETIC-APP-901")).enabled,true);

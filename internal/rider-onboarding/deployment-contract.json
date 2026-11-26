@@ -15,7 +15,8 @@
     "RIDER_ACTIVATION_ENABLED": "false",
     "RIDER_OPERATIONS_VERIFIED": "false",
     "RIDER_POLICY_VERIFIED": "false",
-    "TERRITORY_VERIFIED": "false"
+    "TERRITORY_VERIFIED": "false",
+    "RIDER_PAYOUT_POLICY_VERIFIED": "false"
   },
   "rpc": {
     "entrypoint": "RiderIntegration",
