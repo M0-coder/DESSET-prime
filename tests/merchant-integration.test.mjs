@@ -46,7 +46,7 @@ test("D1 adapter full field persistence, replay, conflict and closed HTTP",async
  assert.equal((await (await submit(request(),env,fetcher)).json()).id,result.id);
  await assert.rejects(submit(request({...input,observations:"Synthetic changed"}),env,fetcher),/REQUEST_CONFLICT/);
  await assert.rejects(submit(request(input,"synthetic-key-000000002"),env,fetcher),/REQUEST_CONFLICT/);
- assert.equal(db.prepare("SELECT count(*) n FROM merchant_requests").get().n,1);assert.equal(typeof worker.scheduled,"undefined");
+ assert.equal(db.prepare("SELECT count(*) n FROM merchant_requests").get().n,1);assert.equal(typeof worker.scheduled,"function");
 });
 test("Approval is not activation: ordered, audited synthetic progression",async t=>{
  const {db,env}=dbFixture(t,true);

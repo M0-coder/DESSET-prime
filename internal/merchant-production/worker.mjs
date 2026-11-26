@@ -1,10 +1,12 @@
 // MERCHANT-PRODUCTION-01. Cloudflare Worker candidate, not deployed.
 // Explicit bindings and database flags must both be enabled by authorized operators.
-// MERCHANT-ACCESS-01: staging-only HTTP entrypoint; public intake and scheduled sending hard-disabled.
+// Production and staging share code, but hostnames, DBs, authorization and notification delivery remain isolated.
 import {merchantFields as fields,validateMerchantInput} from "../merchant-common/validation.mjs";
 import {resolveTerritory} from "../merchant-common/territory.mjs";
 import {createRegistrationShell,createRegistrationRenderer,validateRegistrationForm,privateStyle,privateAdminStyle} from "../merchant-common/registration-view.mjs";
 import {territoryScript} from "../merchant-common/location-ui.mjs";
+import {originFor,productionGate,PRODUCTION_ORIGIN} from "./production-gates.mjs";
+export {PRODUCTION_ORIGIN};
 import {reconcileNotification,changeAccountStatus,accountHistory,notificationHistory} from "./operations.mjs";
 export const STAGING_ORIGIN="https://desset-merchant-staging.morimil-pabfelon.workers.dev";
 const sec={"Cache-Control":"no-store","Content-Security-Policy":"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'","X-Content-Type-Options":"nosniff","Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"};
@@ -68,7 +70,7 @@ export async function turnstile(token,env,fetcher=fetch){
  if(!r.ok)throw fail(503,"CHALLENGE_UNAVAILABLE");const v=await r.json();if(v.success!==true||v.hostname!==env.TURNSTILE_HOST||v.action!=="merchant_intake")throw fail(403,"CHALLENGE_INVALID");
 }
 export async function submit(req,env,fetcher=fetch){
- const s=await state(env);
+ const s=env.ENVIRONMENT==="production"?await productionGate(env,"intake"):await state(env);
  if(env.INTAKE_ENABLED!=="true"||s.intake_enabled!==1||!s.privacy_version||env.PRIVACY_VERSION!==s.privacy_version)throw fail(503,"INTAKE_DISABLED");
  if(!env.INTAKE_LIMIT||!req.headers.get("CF-Connecting-IP"))throw fail(503,"UNAVAILABLE");
  if(!(await env.INTAKE_LIMIT.limit({key:req.headers.get("CF-Connecting-IP")})).success)throw fail(429,"RATE_LIMIT");
@@ -83,8 +85,8 @@ async function persistRequest(env,d,b,draft=null){
  const id=crypto.randomUUID(),at=Date.now();
  try{
  // The database trigger creates the outbox in the same statement. Runtime gate checked at write time.
- const gate=draft?"EXISTS (SELECT 1 FROM merchant_runtime WHERE id=1 AND environment='staging' AND intake_enabled=0 AND notification_enabled=0 AND activation_enabled=0) AND EXISTS (SELECT 1 FROM merchant_drafts WHERE key_hash=? AND actor_id=? AND request_key=? AND expires_at>? AND receipt_id IS NULL)":"EXISTS (SELECT 1 FROM merchant_runtime WHERE id=1 AND environment=? AND intake_enabled=1 AND privacy_version=?)";
- const gateArgs=draft?[draft.keyHash,draft.actor,b.requestKey,at]:[b.environment,b.privacyVersion];
+ const gate=draft&&b.environment==="production"?"EXISTS (SELECT 1 FROM merchant_runtime WHERE id=1 AND environment='production' AND intake_enabled=1 AND privacy_version=? AND launch_authorization_ref=?) AND EXISTS (SELECT 1 FROM merchant_drafts WHERE key_hash=? AND actor_id=? AND request_key=? AND expires_at>? AND receipt_id IS NULL)":draft?"EXISTS (SELECT 1 FROM merchant_runtime WHERE id=1 AND environment='staging' AND intake_enabled=0 AND notification_enabled=0 AND activation_enabled=0) AND EXISTS (SELECT 1 FROM merchant_drafts WHERE key_hash=? AND actor_id=? AND request_key=? AND expires_at>? AND receipt_id IS NULL)":b.environment==="production"?"EXISTS (SELECT 1 FROM merchant_runtime WHERE id=1 AND environment=? AND intake_enabled=1 AND privacy_version=? AND launch_authorization_ref=?)":"EXISTS (SELECT 1 FROM merchant_runtime WHERE id=1 AND environment=? AND intake_enabled=1 AND privacy_version=?)";
+ const gateArgs=draft?(b.environment==="production"?[b.privacyVersion,env.LAUNCH_AUTHORIZATION_REF,draft.keyHash,draft.actor,b.requestKey,at]:[draft.keyHash,draft.actor,b.requestKey,at]):(b.environment==="production"?[b.environment,b.privacyVersion,env.LAUNCH_AUTHORIZATION_REF]:[b.environment,b.privacyVersion]);
  const result=await env.DB.prepare("INSERT INTO merchant_requests(id,request_key,payload_hash,identity_hash,business_name,category,department,province,district,address,contact_name,phone,email,observations,postal_code,interest_level,contact_pronunciation,ubigeo,privacy_version,created_at) SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? WHERE "+gate+" ON CONFLICT(request_key) DO NOTHING RETURNING id").bind(id,b.requestKey,hash,identity,...fields.map(k=>d[k]),d.observations??null,d.postal_code,d.interest_level,d.contact_pronunciation??null,d.ubigeo,b.privacyVersion,at,...gateArgs).first();
  if(result?.id===id)return json({id,replayed:false},201);
  }catch(e){if(String(e.message).includes("UNIQUE constraint failed: merchant_requests.identity_hash"))throw fail(409,"REQUEST_CONFLICT");throw e;}
@@ -160,15 +162,65 @@ async function adminMerchant(req,env,actor,csrf,url,ui){
  return uiHtml(view.received(result.id),response.status);
 }
 
+// Public assets are only the same allowlisted assets already packed for private UI.
+function publicAsset(path,ui){
+ if(path==="merchant-registration.css")return new Response(privateStyle,{headers:{...sec,"Content-Type":"text/css; charset=utf-8"}});
+ if(path==="merchant-territory.js")return new Response(territoryScript,{headers:{...sec,"Content-Type":"text/javascript; charset=utf-8"}});
+ const a=ui?.assets?.[path];if(!a||!Object.hasOwn(ui.assets,path))throw fail(404,"NOT_FOUND");
+ return new Response(Uint8Array.from(atob(a.base64),c=>c.charCodeAt(0)),{headers:{...sec,"Content-Type":a.type}});
+}
+const publicCsp=uiHeaders["Content-Security-Policy"].replace("script-src 'self'","script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com");
+const browserCookie=req=>{const m=(req.headers.get("Cookie")??"").match(/(?:^|;\s*)__Host-desset-merchant=([a-f0-9]{64})(?:;|$)/);return m?.[1]??null;};
+async function publicMerchant(req,env,url,ui,fetcher){
+ const s=await productionGate(env,"intake");
+ if(!ui?.template||!env.TURNSTILE_SECRET||env.TURNSTILE_HOST!==url.hostname||!/^[A-Za-z0-9_-]{10,100}$/.test(env.TURNSTILE_SITE_KEY??"")||!env.INTAKE_LIMIT)throw fail(503,"UNAVAILABLE");
+ const home="/registro-comercios.html",prefix="/merchant/assets/",base="/merchant";
+ if(req.method==="GET"&&url.pathname.startsWith(prefix))return publicAsset(url.pathname.slice(prefix.length),ui);
+ const ip=req.headers.get("CF-Connecting-IP");
+ if(!ip||!(await env.INTAKE_LIMIT.limit({key:ip})).success)throw fail(429,"RATE_LIMIT");
+ const cookie=browserCookie(req)||(req.method==="GET"?randomHex():null);
+ if(!cookie)throw fail(403,"SESSION_REQUIRED");
+ const actor="browser:"+await digest(cookie),csrf=await digest("merchant-public-v1:"+cookie);
+ const view=createRegistrationRenderer({shell:createRegistrationShell(ui.template,home,prefix,prefix+"merchant-registration.css",true),localPath:home,routeBase:base,scriptPath:prefix+"merchant-territory.js",csrf,production:true,privacyUrl:env.PRIVACY_URL,siteKey:env.TURNSTILE_SITE_KEY});
+ const render=(value,status=200)=>new Response(value,{status,headers:{...uiHeaders,"Content-Security-Policy":publicCsp,"Content-Type":"text/html; charset=utf-8","Set-Cookie":"__Host-desset-merchant="+cookie+"; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=1800"}});
+ if(req.method==="GET"&&url.pathname===home)return render(view.form());
+ if(req.method!=="POST"||![base+"/confirm",base+"/edit",base+"/submit"].includes(url.pathname))throw fail(404,"NOT_FOUND");
+ const data=await body(req,"application/x-www-form-urlencoded");
+ if(data.csrf!==csrf)throw fail(403,"CSRF");delete data.csrf;
+ const at=Date.now();
+ if(url.pathname===base+"/confirm"){
+  const token=data["cf-turnstile-response"];delete data["cf-turnstile-response"];
+  let input;try{input=validateRegistrationForm(data,{synthetic:false});}catch(e){return render(view.form({},e.message),400);}
+  await turnstile(token,env,fetcher);
+  await env.DB.prepare("DELETE FROM merchant_drafts WHERE expires_at<=? AND EXISTS (SELECT 1 FROM merchant_runtime WHERE id=1 AND environment='production' AND intake_enabled=1 AND privacy_version=? AND launch_authorization_ref=?)").bind(at,s.privacy_version,env.LAUNCH_AUTHORIZATION_REF).run();
+  const key=randomHex(),keyHash=await digest(key),requestKey=randomHex();
+  const result=await env.DB.prepare("INSERT INTO merchant_drafts(key_hash,actor_id,request_key,payload_json,expires_at) SELECT ?,?,?,?,? WHERE (SELECT count(*) FROM merchant_drafts WHERE actor_id=?)<4 AND (SELECT count(*) FROM merchant_drafts)<512 AND EXISTS (SELECT 1 FROM merchant_runtime WHERE id=1 AND environment='production' AND intake_enabled=1 AND privacy_version=? AND launch_authorization_ref=?) RETURNING key_hash").bind(keyHash,actor,requestKey,JSON.stringify({input,privacyVersion:s.privacy_version}),at+900000,actor,s.privacy_version,env.LAUNCH_AUTHORIZATION_REF).first();
+  if(result?.key_hash!==keyHash)throw fail(429,"DRAFT_CAPACITY");
+  return render(view.confirmation(input,key));
+ }
+ if(!exact(data,["draft"])||!/^[a-f0-9]{64}$/.test(data.draft??""))throw fail(400,"DRAFT_EXPIRED");
+ const keyHash=await digest(data.draft);
+ const d=await env.DB.prepare("SELECT request_key,payload_json,receipt_id FROM merchant_drafts WHERE key_hash=? AND actor_id=? AND expires_at>?").bind(keyHash,actor,at).first();
+ if(!d)throw fail(400,"DRAFT_EXPIRED");if(d.receipt_id)return render(view.received(d.receipt_id));
+ const payload=JSON.parse(d.payload_json);if(payload.privacyVersion!==s.privacy_version)throw fail(409,"PRIVACY_VERSION_CHANGED");
+ if(url.pathname===base+"/edit"){
+  const r=await env.DB.prepare("DELETE FROM merchant_drafts WHERE key_hash=? AND actor_id=? AND expires_at>? AND receipt_id IS NULL RETURNING key_hash").bind(keyHash,actor,at).first();
+  if(!r)throw fail(409,"DRAFT_EXPIRED");return render(view.form({...payload.input,email_confirm:payload.input.email}));
+ }
+ const response=await persistRequest(env,normalizeComplete(payload.input),{requestKey:d.request_key,privacyVersion:s.privacy_version,environment:"production"},{keyHash,actor});
+ return render(view.received((await response.json()).id),response.status);
+}
+
 export async function handle(req,env,ctx,fetcher=fetch,now=Math.floor(Date.now()/1000),ui=null){
- try{const url=new URL(req.url);if(env.ENVIRONMENT!=="staging"||env.SERVICE_ORIGIN!==STAGING_ORIGIN||url.origin!==STAGING_ORIGIN||url.protocol!=="https:")throw fail(403,"HOST");
- if(req.method==="POST"&&(req.headers.get("Origin")!==STAGING_ORIGIN||req.headers.get("Sec-Fetch-Site")==="cross-site"))throw fail(403,"ORIGIN");
- // No runtime flag or D1 mutation can open public intake in this release.
- if(url.pathname==="/api/intake")throw fail(503,"INTAKE_DISABLED");
+ try{const url=new URL(req.url),origin=originFor(env);if(url.origin!==origin||url.protocol!=="https:")throw fail(403,"HOST");
+ if(req.method==="POST"&&(req.headers.get("Origin")!==origin||req.headers.get("Sec-Fetch-Site")==="cross-site"))throw fail(403,"ORIGIN");
+ if(url.pathname==="/api/intake"){if(env.ENVIRONMENT!=="production")throw fail(503,"INTAKE_DISABLED");await productionGate(env,"intake");if(req.method!=="POST")throw fail(405,"METHOD");return await submit(req,env,fetcher);}
+ if(url.pathname==="/registro-comercios.html"||url.pathname.startsWith("/merchant/")){if(env.ENVIRONMENT!=="production")throw fail(503,"INTAKE_DISABLED");return await publicMerchant(req,env,url,ui,fetcher); }
  if(url.pathname==="/admin"||url.pathname.startsWith("/admin/")){
  const {actor,csrf}=await authorize(req,env,ctx,fetcher,now);
  const runtime=await state(env);
- if(runtime.environment!=="staging"||runtime.intake_enabled!==0||runtime.notification_enabled!==0||runtime.activation_enabled!==0)throw fail(503,"STAGING_NOT_ISOLATED");
+ if(runtime.environment==="staging"&&(runtime.intake_enabled!==0||runtime.notification_enabled!==0||runtime.activation_enabled!==0))throw fail(503,"STAGING_NOT_ISOLATED");
+ if(env.ENVIRONMENT==="production"&&(url.pathname==="/admin/merchant"||url.pathname.startsWith("/admin/merchant/")))throw fail(404,"NOT_FOUND");
  if(url.pathname==="/admin/merchant"||url.pathname.startsWith("/admin/merchant/")||url.pathname.startsWith("/admin/assets/"))return await adminMerchant(req,env,actor,csrf,url,ui);
  if(req.method==="GET"&&(url.pathname==="/admin"||url.pathname==="/admin/api/requests")){const offset=Number(url.searchParams.get("offset")??0),status=url.searchParams.get("status")||null,reference=url.searchParams.get("id")||null,rows=await list(env,offset,status,reference);return url.pathname==="/admin"?panel(rows,offset,csrf,status,reference):json({requests:rows});}
  if(req.method==="GET"&&url.pathname==="/admin/api/history"){const id=url.searchParams.get("id");if(!uuid(id))throw fail(400,"INVALID_REFERENCE");return json({account:await accountHistory(env,id),notifications:await notificationHistory(env,id)});}
@@ -182,15 +234,17 @@ export async function handle(req,env,ctx,fetcher=fetch,now=Math.floor(Date.now()
 }
 // No provider idempotency guarantee assumed: ambiguous acceptance requires human reconciliation, never automatic duplicate delivery.
 export async function notifyOne(env,at=Date.now()){
- const s=await state(env);
+ if(env.ENVIRONMENT!=="production")return "DISABLED";
+ let s;try{s=await productionGate(env,"notification");}catch(e){if(e.status===503)return "DISABLED";throw e;}
  if(env.NOTIFICATIONS_ENABLED!=="true"||s.notification_enabled!==1||!env.EMAIL||!env.NOTIFY_FROM||!env.NOTIFY_TO)return "DISABLED";
  await env.DB.prepare("UPDATE merchant_notification_outbox SET status='NEEDS_REVIEW',lease_token=NULL,lease_until=NULL WHERE status='SENDING' AND lease_until<=?").bind(at).run();
  const token=crypto.randomUUID();
- const r=await env.DB.prepare("UPDATE merchant_notification_outbox SET status='SENDING',attempts=attempts+1,lease_token=?,lease_until=? WHERE request_id=(SELECT request_id FROM merchant_notification_outbox WHERE status='PENDING' AND next_attempt_at<=? ORDER BY next_attempt_at,created_at,request_id LIMIT 1) AND status='PENDING' AND EXISTS (SELECT 1 FROM merchant_runtime WHERE id=1 AND notification_enabled=1 AND environment=?) RETURNING request_id").bind(token,at+300000,at,s.environment).first();
+ const r=await env.DB.prepare("UPDATE merchant_notification_outbox SET status='SENDING',attempts=attempts+1,lease_token=?,lease_until=? WHERE request_id=(SELECT request_id FROM merchant_notification_outbox WHERE status='PENDING' AND next_attempt_at<=? ORDER BY next_attempt_at,created_at,request_id LIMIT 1) AND status='PENDING' AND EXISTS (SELECT 1 FROM merchant_runtime WHERE id=1 AND notification_enabled=1 AND environment=? AND launch_authorization_ref=?) RETURNING request_id").bind(token,at+300000,at,s.environment,env.LAUNCH_AUTHORIZATION_REF).first();
  if(!r)return "EMPTY";
- let messageId;try{const receipt=await env.EMAIL.send({from:env.NOTIFY_FROM,to:env.NOTIFY_TO,subject:"DESSET — Nueva solicitud de comercio",text:"Referencia: "+r.request_id+"\nRevise la solicitud en el panel privado de DESSET."});if(typeof receipt?.messageId==="string"&&receipt.messageId.length>0)messageId=receipt.messageId;}catch{/* Do not expose provider errors or retry an ambiguous delivery. */}
+ let messageId;try{await productionGate(env,"notification");const receipt=await env.EMAIL.send({from:env.NOTIFY_FROM,to:env.NOTIFY_TO,subject:"DESSET — Nueva solicitud de comercio",text:"Referencia: "+r.request_id+"\nRevise la solicitud en el panel privado de DESSET."});if(typeof receipt?.messageId==="string"&&receipt.messageId.length>0)messageId=receipt.messageId;}catch{/* Do not expose provider errors or retry an ambiguous delivery. */}
  const result=await env.DB.prepare("UPDATE merchant_notification_outbox SET status=?,lease_token=NULL,lease_until=NULL,sent_at=?,provider_message_id=? WHERE request_id=? AND status='SENDING' AND lease_token=?").bind(messageId?"SENT":"NEEDS_REVIEW",messageId?Date.now():null,messageId??null,r.request_id,token).run();
  return result.meta.changes===1?(messageId?"SENT":"NEEDS_REVIEW"):"LEASE_LOST";
 }
-// Deliberately no scheduled handler or public intake dispatch in this staging-only release.
-export default {fetch(req,env,ctx){return handle(req,env,ctx);}};
+// Bounded drain; staging never sends even if configuration flags are forged.
+export async function scheduledNotifications(env){if(env.ENVIRONMENT!=="production")return {processed:0};let processed=0;for(let i=0;i<5;i++){const result=await notifyOne(env);if(["DISABLED","EMPTY","LEASE_LOST"].includes(result))break;processed++;}return {processed};}
+export default {fetch(req,env,ctx){return handle(req,env,ctx);},scheduled(controller,env,ctx){ctx.waitUntil(scheduledNotifications(env));}};

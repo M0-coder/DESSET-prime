@@ -56,7 +56,7 @@ test("public intake and scheduled notifications remain hard-disabled even with e
  const f=fixture(t);f.db.exec("UPDATE merchant_runtime SET privacy_version='TEST-v1',intake_enabled=1,notification_enabled=1");
  const env={...f.env,INTAKE_ENABLED:"true",NOTIFICATIONS_ENABLED:"true"};
  for(const method of ["GET","POST","PUT","DELETE"])assert.equal((await invoke(request("/api/intake",{method,headers:{Origin:STAGING_ORIGIN}}),env)).status,503);
- assert.equal(typeof worker.scheduled,"undefined");assert.equal(f.reads(),0);
+ assert.equal(typeof worker.scheduled,"function");let scheduled;worker.scheduled({},env,{waitUntil(p){scheduled=p;}});assert.deepEqual(await scheduled,{processed:0});assert.equal(f.reads(),0);
  assert.equal((await invoke(request(),env)).status,503);
  assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_requests").get().n,1);
 });
