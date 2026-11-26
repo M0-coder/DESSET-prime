@@ -11,6 +11,6 @@ for(const dir of ["","dist/"])test("Prime exclusively owns the logistics scene; 
  assert.ok(flow);assert.match(flow,/Cada movimiento cuenta/);assert.equal((flow.match(/class="v6-three-mount"/g)||[]).length,1);
  assert.match(flow,/v6-static-fallback/);assert.match(flow,/v63-tour/);assert.match(flow,/simulaciones/);
  assert.match(prime,/src="\.\/scripts\/v5-cinematic\.js"/);
- assert.match(home,/id="desset-prime-heading"/);
+ assert.doesNotMatch(home,/<section class="ecosystem"|id="desset-prime-heading"|class="prime-3d-heading"/);assert.match(home,/class="service-body" id="ecosistema"/);
  assert.match(prime,/name="robots" content="noindex,nofollow"/);
 });

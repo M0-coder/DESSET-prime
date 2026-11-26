@@ -26,14 +26,14 @@ test("Seven redundant editorial blocks are removed from the actual HTML, not hid
   assert.doesNotMatch(html,/data-v64-tour-launch/);
 });
 
-test("Prime has eight uniquely named sections and working in-page links",()=>{
+test("Prime has seven uniquely named sections and working in-page links",()=>{
   const sections=[...html.matchAll(/<section\b[^>]*>/g)].map(m=>m[0]);
-  assert.equal(sections.length,8);
-  assert.equal((html.match(/<\/section>/g)||[]).length,8);
-  for(const id of ["inicio","vision","empresa-destacada","noticias-destacadas","soluciones","ecosistema","talento-destacado","negocios"])
+  assert.equal(sections.length,7);
+  assert.equal((html.match(/<\/section>/g)||[]).length,7);
+  for(const id of ["inicio","vision","empresa-destacada","noticias-destacadas","soluciones","talento-destacado","negocios"])
     assert.ok(sections.some(s=>s.includes('id="'+id+'"')),"Section missing: "+id);
   assert.equal((html.match(/id="contacto"/g)||[]).length,1,"Contact anchor remains unique");
-  for(const id of ["soluciones","ecosistema","negocios"])
+  for(const id of ["soluciones","negocios"])
     assert.match(sections.find(s=>s.includes('id="'+id+'"')),/aria-label="[^"]+"/);
   const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
   for(const match of html.matchAll(/\bhref="#([^"]+)"/g))

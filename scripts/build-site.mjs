@@ -32,7 +32,7 @@ if(!vision.includes('class="v4-flow motion-story statement-journey"')||
  scene.includes("motion-story-unit")||scene.includes('class="v6-three-mount"')||!primeScene.includes('class="v6-three-mount"'))
  throw Error("PRIME-LAYOUT-01: missing four approved participants in statement or scene contains duplicate cards.");
 
-if(!original.includes('id="ecosistema"')||original.includes('class="v6-three-mount"')||original.includes("roles-geometry-")||original.includes('class="v4-architecture-details"')||original.includes('class="ecosystem-board')||
+if(!original.includes('class="service-body" id="ecosistema"')||original.includes('<section class="ecosystem"')||original.includes('class="prime-3d-heading"')||original.includes('class="v6-three-mount"')||original.includes("roles-geometry-")||original.includes('class="v4-architecture-details"')||original.includes('class="ecosystem-board')||
  !primeScene.includes('class="v6-three-mount"')||
  !primeScene.includes('class="v63-tour"')||
  !original.includes('name="robots" content="noindex,nofollow"'))

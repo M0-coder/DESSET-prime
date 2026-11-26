@@ -15,7 +15,7 @@ test("V5.4 keyboard landmarks and visible focus have source contracts",()=>{
  assert.match(html,/class="skip-link" href="#contenido"/);
  assert.match(html,/<main id="contenido">/);
  assert.match(html,/aria-controls="main-nav" aria-expanded="false"/);
- assert.doesNotMatch(html,/class="v4-architecture-details"/);assert.match(html,/class="prime-model-link" href="\.\/prime\.html#modelo"/);
+ assert.doesNotMatch(html,/class="v4-architecture-details"/);assert.match(html,/class="prime-service-cta" href="\.\/prime\.html"/);
  assert.match(css,/\.menu-button:focus-visible/);
  assert.match(css,/\.v4-architecture-details summary:focus-visible/);
  assert.match(browser,/Input\.dispatchKeyEvent/);

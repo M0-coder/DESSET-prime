@@ -14,7 +14,7 @@ test("V4: portada comercial editorial con mensaje legible, CTA reales y sin oper
  assert.doesNotMatch(head,/v4-hero-declaration|COMERCIO · TECNOLOGÍA · LOGÍSTICA/);
  assert.match(head,/href="#contacto"/);
  assert.doesNotMatch(head,/href="#ecosistema"/);
- assert.match(html,/id="ecosistema" aria-label="Funciones del ecosistema DESSET"/);
+ assert.match(html,/class="service-body" id="ecosistema"/);assert.doesNotMatch(html,/<section class="ecosystem"/);
  assert.match(head,/v4-motion-canvas/);
  assert.doesNotMatch(head,/roles-geometry-v2\.svg|system-illustration|Cuatro funciones conectadas/);
  assert.doesNotMatch(head,/Huacho|clientes activos|seguimiento en tiempo real|descarga la app|operación en vivo/i);
