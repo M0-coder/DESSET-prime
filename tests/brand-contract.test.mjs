@@ -37,7 +37,7 @@ test("navegación, accesibilidad y seguridad de vista previa",()=>{
 test("sin dependencia de hojas duplicadas, marca ficticia ni imágenes de stock",()=>{
  const stylesheets=[...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map(match=>match[1]);
  const mainCss=readFileSync(new URL("../styles.css",import.meta.url));
- assert.deepEqual(stylesheets,["./styles.css?v="+gitBlob(mainCss),"./styles-v5.css","./styles-system.css","./styles-hero-photo.css","./styles-visual02.css","./styles-typography.css"],"Only the six exact, audited, local stylesheets are permitted, including separately licensed typography");
+ assert.deepEqual(stylesheets,["./styles.css?v="+gitBlob(mainCss),"./styles-v5.css","./styles-system.css","./styles-hero-photo.css","./styles-visual02.css","./styles-typography.css","./styles-service-video.css"],"Only the seven exact, audited, local stylesheets are permitted, including separately licensed typography");
  assert.doesNotMatch(css,/\.art-center\{|\.hero-art\{|@keyframes arrive/);
  assert.doesNotMatch(html,/https?:\/\/images\./);
 });

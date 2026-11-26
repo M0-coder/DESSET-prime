@@ -37,7 +37,8 @@ test("V4.5 chooses IntersectionObserver once, never drives scroll positions, and
  assert.match(photoCss,/@media\(prefers-reduced-motion:no-preference\)/);
  assert.match(photoCss,/@media\(prefers-reduced-motion:reduce\)/);
  assert.doesNotMatch(script,/addEventListener\(["']scroll|setInterval|setTimeout|requestAnimationFrame|scrollTo|localStorage|fetch\s*\(/);
- assert.doesNotMatch(html,/<video\b|<canvas\b|<iframe\b|<form\b/i);
+ assert.doesNotMatch(html,/<canvas\b|<iframe\b|<form\b/i);
+ const services=html.match(/<section class="solutions"[^>]*>[\s\S]*?<\/section>/)[0];assert.equal((html.match(/<video\b/g)||[]).length,2);assert.equal((services.match(/<video\b/g)||[]).length,2);assert.doesNotMatch(services,/<video[^>]*\sautoplay\b/);
 });
 
 test("V4.5 enlarges typography while keeping narrow-phone and semantic link fallbacks",()=>{

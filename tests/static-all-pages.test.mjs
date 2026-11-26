@@ -10,7 +10,7 @@ const pages=["index.html","empresa.html","comercios.html","repartidores.html","p
 test("Static gate scans every institutional page and rejects representative violations",()=>{
  const dir=mkdtempSync(join(tmpdir(),"desset-static-all-"));
  try{
- const names=[...pages,"_headers","styles.css","styles-typography.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","styles-onboarding.css","styles-applications.css","assets","fonts","scripts"," .github".trim()];
+ const names=[...pages,"_headers","styles.css","styles-typography.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-service-video.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","styles-onboarding.css","styles-applications.css","assets","fonts","scripts"," .github".trim()];
  for(const name of names)cpSync(join(root,name),join(dir,name),{recursive:true});
  const run=()=>spawnSync(process.execPath,[join(dir,"scripts/static-gate.mjs")],{encoding:"utf8"});
  const ok=run();assert.equal(ok.status,0,ok.stderr);
@@ -28,7 +28,8 @@ test("Static gate scans every institutional page and rejects representative viol
  ["talento.html",s=>s.replace("</head>",'<script src="https://untrusted.example/a.js"></script></head>'),"Nonlocal DOM resource"],
  ["noticias.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
  ["confianza.html",s=>s.replace("form-action 'none'","form-action *"),"Missing or weakened local CSP"],
- ["contacto.html",s=>s.replace("</main>",'<form></form></main>'),"Unauthorized form/iframe/video"],
+ ["contacto.html",s=>s.replace("</main>",'<form></form></main>'),"Unauthorized form/iframe"],
+ ["contacto.html",s=>s.replace("</main>",'<video src="./assets/servicio-desset.mp4"></video></main>'),"Unauthorized video"],
  ["prime.html",s=>s.replace("</main>",'<a href="#absent-anchor">Broken</a></main>'),"Broken in-page navigation anchor"]
  ];
  for(const item of cases){
