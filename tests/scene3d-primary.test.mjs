@@ -23,7 +23,8 @@ test("SCENE3D-01 hides redundant controls and retains functional route/pause/fal
  assert.match(read("prime.html"),/class="v63-tour" type="button"/);
  assert.match(read("prime.html"),/class="v6-pause" type="button"/);
  assert.doesNotMatch(css,/\.v6-three-controls \[data-v6-camera/);
- assert.match(css,/\.v5-city-stage\[data-v6-autostart="enabled"\] \.v6-enable-webgl/);
+ assert.doesNotMatch(css,/\.v5-city-stage\[data-v6-autostart="enabled"\] \.v6-enable-webgl/);
+ assert.match(loader,/showUnavailable\("WebGL2 no está disponible/);
  assert.match(read("prime.html"),/class="v6-static-fallback"/);
  assert.match(read("prime.html"),/aria-label="Simulación logística conceptual de DESSET prime"/);
  assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);

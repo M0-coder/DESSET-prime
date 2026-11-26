@@ -227,7 +227,7 @@
 
 /* SCENE3D-01 — 3D main viewport experience with WebP fallback preserved. */
 .v6-three-controls button[hidden] {display:none!important}
-.v5-city-stage[data-v6-autostart="enabled"] .v6-enable-webgl {display:none!important}
+/* The loader hides the start button only during an actual load or active scene. */
 .v6-three-controls {display:flex;flex-wrap:wrap;gap:10px}
 .v6-three-controls .v63-tour,.v6-three-controls .v6-pause {flex:0 1 auto}
 @media(max-width:800px){
