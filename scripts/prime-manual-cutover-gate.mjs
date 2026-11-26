@@ -51,6 +51,16 @@ export function reviewPrimePageMedia(media){
   return a.claim==='ai-generated-owner-selected'&&a.source==='conversation-upload'&&a.license==='AI-generated; ownership not independently verified'&&a.license_url===null&&a.verification==='owner-selected'&&a.source_id==='owner-approved-2026-11-25';
  });
 }
+// PHOTO-01: scoped owner confirmation is not independent source verification.
+export function reviewTalentPhoto(media){
+ const rejected={accepted:false,basis:'pending',individual_source_verified:false,release_authorized:false};
+ const a=media?.talent_photo;
+ if(!a||a.path!=='assets/talento-cultura.webp'||a.source_id!=='4990531'||a.source!=='https://www.pexels.com/photo/4990531/'||a.claim!=='third-party'||a.license!=='Pexels License'||a.license_url!=='https://www.pexels.com/license/'||a.release_authorized!==false||!/^[a-f0-9]{64}$/.test(a.sha256)||!Number.isSafeInteger(a.bytes)||a.bytes<=0||a.bytes>230000||a.usage!=='Illustrative collaboration; not actual DESSET employees.')return rejected;
+ if(a.verification==='individual-source-verified')return {accepted:true,basis:'individual-source-verified',individual_source_verified:true,release_authorized:false};
+ const d=a.owner_attestation;
+ if(a.verification!=='individual-source-pending'||d?.status!=='owner-attested-free-download'||d.scope!=='PHOTO-01; illustrative website use of this specific photo only'||d.source!=='direct owner instruction in the project conversation'||typeof d.statement!=='string'||!d.statement.trim()||!/^\d{4}-\d{2}-\d{2}$/.test(d.date)||!/^\d{4}-\d{2}-\d{2}$/.test(d.general_license_terms_reviewed_on)||d.individual_source_verification!==false||d.independent_legal_verification!==false||d.exclusive_ownership_claim!==false||!['path','sha256','source_id','license','license_url'].every(k=>d.asset?.[k]===a[k]))return rejected;
+ return {accepted:true,basis:'owner-attested-free-download',individual_source_verified:false,release_authorized:false};
+}
 export function validateReleaseIntent({repository,ref,event,expectedSha,checkoutSha,previousId,seoPolicy,target}){
  const err=[];
  mark(err,repository===target?.repository,'Wrong GitHub repository');
@@ -94,12 +104,13 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    const mediaReview=reviewSelectedMedia(media);
    if(!mediaReview.accepted)throw Error('Selected photographs require a valid scoped review before production');
    if(!reviewPrimePageMedia(media))throw Error('Prime page photographs require a valid individual inventory before production');
-   if(media.talent_photo?.path!=='assets/talento-cultura.webp'||media.talent_photo.verification!=='individual-source-verified')throw Error('PHOTO-01: individual Pexels source review required before production');
+   const talentReview=reviewTalentPhoto(media);
+   if(!talentReview.accepted)throw Error('PHOTO-01: scoped photographic rights review required before production');
    const e=process.env;
    const out=validateReleaseIntent({repository:e.GITHUB_REPOSITORY,ref:e.GITHUB_REF,event:e.GITHUB_EVENT_NAME,
      expectedSha:e.RELEASE_SHA,checkoutSha:e.GITHUB_SHA,previousId:e.PREVIOUS_DEPLOYMENT_ID,
      seoPolicy:e.SEO_POLICY,target});
-   console.log(JSON.stringify({...out,selected_media_review:mediaReview}));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
+   console.log(JSON.stringify({...out,selected_media_review:mediaReview,talent_media_review:talentReview}));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
   }else if(task==='cloudflare'){
    const [projectPath,domainPath]=process.argv.slice(3);
    const out=validateCloudflareSnapshot({projectResponse:JSON.parse(readFileSync(projectPath,'utf8')),

@@ -195,6 +195,24 @@
     "license_url": "https://www.pexels.com/license/",
     "verification": "individual-source-pending",
     "release_authorized": false,
-    "usage": "Illustrative collaboration; not actual DESSET employees."
+    "usage": "Illustrative collaboration; not actual DESSET employees.",
+    "owner_attestation": {
+      "status": "owner-attested-free-download",
+      "date": "2026-11-26",
+      "scope": "PHOTO-01; illustrative website use of this specific photo only",
+      "statement": "El usuario confirma que descargó esta fotografía de Pexels cuando indicaba descarga gratis y autoriza su uso en DESSET.",
+      "source": "direct owner instruction in the project conversation",
+      "general_license_terms_reviewed_on": "2026-11-26",
+      "individual_source_verification": false,
+      "independent_legal_verification": false,
+      "exclusive_ownership_claim": false,
+      "asset": {
+        "path": "assets/talento-cultura.webp",
+        "sha256": "7f6c27b84b918769e6539796775a303a5df21a1839266964fdc291fa18dbab54",
+        "source_id": "4990531",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/"
+      }
+    }
   }
 }
