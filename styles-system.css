@@ -211,6 +211,10 @@ h1,h2,h3,h4 {text-wrap:balance;}
 .institutional-home-more{display:inline-flex;align-items:center;min-height:44px;margin-top:12px;color:var(--ds-30-blue);font-weight:700;text-underline-offset:3px}
 .institutional-home-news{background:var(--ds-60-surface)}
 .institutional-home-empty{border-top:1px solid var(--ds-stroke);padding-top:12px}
+.institutional-home-policy{margin-inline-start:18px}
+.institutional-news-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:12px}
+.institutional-news-links a{display:inline-flex;align-items:center;min-height:44px;color:var(--ds-30-blue);font-weight:650;text-underline-offset:3px}
+@media(max-width:700px){.institutional-home-policy{margin-inline-start:0;margin-inline-end:12px}}
 @media(min-width:961px){.site-header .main-nav{gap:clamp(8px,1.3vw,24px)}}
 @media(max-width:960px){
  .js-enabled .site-header .main-nav[data-open="true"]{max-height:calc(100dvh - 74px);overflow-y:auto}
