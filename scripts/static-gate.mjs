@@ -54,7 +54,7 @@ for(const [i,s] of js.entries()){
 }
 assert(styles.every(s=>!/@import\b|url\(\s*['"]?https?:/i.test(s)),"Remote CSS dependency");
 assert(!/\b(?:pages:\s*write|id-token:\s*write)\b/.test(read(".github/workflows/preview-checks.yml")),"CI write token permission");
-const budget={html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:14000,hero_css_bytes:9500,visual02_css_bytes:8200,audiences_css_bytes:4500,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,onboarding_css_bytes:4000,applications_css_bytes:5000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000};
+const budget={html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:14000,hero_css_bytes:13500,visual02_css_bytes:8200,audiences_css_bytes:4500,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,onboarding_css_bytes:4000,applications_css_bytes:5000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000};
 const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
  typography_css_bytes:statSync(resolve(root,"styles-typography.css")).size,
  v5_css_bytes:statSync(resolve(root,"styles-v5.css")).size,

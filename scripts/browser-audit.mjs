@@ -167,6 +167,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  })};
  const footerNav=document.querySelector(".corporate-footer");
  const footerLayout={columns:getComputedStyle(footerNav).gridTemplateColumns.trim().split(/\\s+/).length,links:[...footerNav.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=viewport+2,height:e.getBoundingClientRect().height})),groups:[...footerNav.querySelectorAll("strong")].map(e=>e.textContent),social:[...document.querySelectorAll(".footer-social a")].map(e=>({label:e.getAttribute("aria-label"),height:e.getBoundingClientRect().height,width:e.getBoundingClientRect().width})),center:getComputedStyle(document.querySelector(".footer-social")).justifyContent,copyright:document.querySelector(".site-footer>p").textContent};
+ const mobileGeometry={header:document.querySelector(".site-header").getBoundingClientRect().height,heroCTA:document.querySelector("#inicio .hero-cta").getBoundingClientRect().height,heroCTAWidth:document.querySelector("#inicio .hero-cta").getBoundingClientRect().width,heroColumn:document.querySelector("#inicio .v4-hero-type").clientWidth,photoRatio:photo.width/photo.height,corporateColumns:getComputedStyle(document.querySelector("#empresa-destacada .institutional-home-grid")).gridTemplateColumns.trim().split(/\\s+/).length};
  const typeSizes={
   heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
   serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
@@ -205,7 +206,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    heroCtaInk:style("#inicio .hero-cta").color,
    heroPhotoFallbackBg:style("#inicio .prime-photo-surface").backgroundColor
   };
- return {decorativeArrowCount:[...document.querySelectorAll("a,button,summary")].filter(e=>/[↗→➜]/.test(e.textContent)).length,viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,participantLayout,servicesLayout,partnerLayout,footerLayout,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:!!document.querySelector('.v4-architecture-details,.ecosystem-board,.v4-flow-board,section.ecosystem,.prime-3d-heading'),obsoleteServices:!!document.querySelector('.future-services')},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ return {decorativeArrowCount:[...document.querySelectorAll("a,button,summary")].filter(e=>/[↗→➜]/.test(e.textContent)).length,viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,participantLayout,servicesLayout,partnerLayout,footerLayout,mobileGeometry,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:!!document.querySelector('.v4-architecture-details,.ecosystem-board,.v4-flow-board,section.ecosystem,.prime-3d-heading'),obsoleteServices:!!document.querySelector('.future-services')},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
@@ -253,15 +254,15 @@ async function viewport(width,height,reduce=false,entry=URL){
  const participants=diag.participantLayout;
  const expectedParticipantTitles=["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"];
  const expectedParticipantFiles=["./assets/ecosistema-proveedores.webp","./assets/ecosistema-comercios.webp","./assets/ecosistema-consumidores.webp","./assets/ecosistema-operadores-logisticos.webp"];
- if(participants.columns!==(width<=480?1:width<=1000?2:4)||!participants.headingAbove||participants.left< -2||participants.right>diag.viewport+2||
+ if(participants.columns!==(width<390?1:width<=1000?2:4)||!participants.headingAbove||participants.left< -2||participants.right>diag.viewport+2||
   participants.obsoleteNote||participants.cards.length!==4||
   participants.cards.some((c,i)=>c.title!==expectedParticipantTitles[i]||c.src!==expectedParticipantFiles[i]||!c.alt||c.lazy!=="lazy"||!c.inside||!c.fits||Math.abs(c.photoRatio-1.5)>.03||c.fit!=="cover"||c.titleFont<17||c.copyFont<14))
   fails.push("ECOSYSTEM-PARTICIPANTS-01 responsive layout, card order or text clipping: "+JSON.stringify(participants));
   const services=diag.servicesLayout;
-  if(!services.sheetLoaded||!services.revision?.startsWith("./styles.css?v=")||services.surface!=="rgb(245, 245, 245)"||services.gap!==(width<=700?12:16)||!services.headingAbsent||services.label!=="Servicios y aplicaciones DESSET"||services.columns!==(width<=700?1:2)||services.cards.length!==2||
+  if(!services.sheetLoaded||!services.revision?.startsWith("./styles.css?v=")||services.surface!=="rgb(245, 245, 245)"||services.gap!==(width<=700?12:16)||!services.headingAbsent||services.label!=="Servicios y aplicaciones DESSET"||services.columns!==(width<390?1:2)||services.cards.length!==2||
    services.cards.map(c=>c.brand).join("|")!=="DESSET|DESSET prime"||
    services.cards.map(c=>c.service).join("|")!=="Comercio y delivery|Logística integral"||
-   services.cards.some(c=>!c.visible||!c.inside||!c.fits||!c.centered||!c.primeStack||c.brandHeight<100||c.copyFont<15||c.copy.length<30)||
+   services.cards.some(c=>!c.visible||!c.inside||!c.fits||!c.centered||!c.primeStack||c.brandHeight<(width<=700?76:100)||c.copyFont<15||c.copy.length<30)||
    services.cards.some(c=>c.borderWidth!=="1px"||c.radius!==12||c.shadow!=="none"||c.divider!=="1px"||!c.alignedCopy||c.bottomSpace>70+(c.cta?0:62)||c.height>350)||
    !services.cards[0].cta||services.cards[0].cta.href!=="./aplicaciones.html"||services.cards[0].cta.label!=="Más información"||services.cards[0].cta.accessible!=="Más información sobre las aplicaciones DESSET"||services.cards[0].cta.height<48||!services.cards[0].cta.fullWidth||!services.cards[0].cta.inside||!services.cards[0].cta.fit||services.cards[0].cta.background!==pureWhite||services.cards[0].cta.color!==brandBlue||services.cards[0].cta.gap<10||!services.cards[1].cta||services.cards[1].cta.href!=="./prime.html"||services.cards[1].cta.label!=="Más información"||services.cards[1].cta.accessible!=="Más información sobre DESSET prime"||services.cards[1].cta.height<48||!services.cards[1].cta.fullWidth||!services.cards[1].cta.inside||!services.cards[1].cta.fit||services.cards[1].cta.background!==brandBlue||services.cards[1].cta.color!==pureWhite||services.cards[1].cta.gap<10||
    services.cards[0].background!=="rgb(7, 59, 188)"||services.cards[0].borderColor!=="rgb(7, 59, 188)"||services.cards[0].descriptionColor!=="rgb(255, 255, 255)"||
@@ -273,7 +274,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  const partners=diag.partnerLayout;
  const cl=partners.closing;
  if(!cl.joined||cl.background!==pureWhite||cl.headerBackground!=="rgba(0, 0, 0, 0)"||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(0, 0, 0)|rgb(7, 59, 188)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
-  if(partners.columns!==(width<=700?1:2)||partners.gap!==(width<=700?12:16)||partners.cards.length!==2||
+  if(partners.columns!==(width<390?1:2)||partners.gap!==(width<=700?12:16)||partners.cards.length!==2||
    partners.cards.map(c=>c.title).join("|")!=="Comercios|Repartidores"||
    partners.cards.map(c=>c.label).join("|")!=="Más información|Más información"||
    partners.cards.map(c=>c.accessibleLabel).join("|")!=="Más información para comercios|Más información para repartidores"||
@@ -282,8 +283,10 @@ async function viewport(width,height,reduce=false,entry=URL){
    Math.abs(partners.cards[0].height-partners.cards[1].height)>2)
     fails.push("Partner cards responsive parity: "+JSON.stringify(partners));
   if(width<=700){
+   const g=diag.mobileGeometry;
+   if(Math.abs(g.header-64)>1||g.heroCTA<48||Math.abs(g.heroCTAWidth-g.heroColumn)>2||Math.abs(g.photoRatio-1.6)>.04||g.corporateColumns!==(width<390?1:2))fails.push("MOBILE-01 compact geometry: "+JSON.stringify(g));
    if(!diag.menuLabel?.startsWith("Menú"))fails.push("Mobile menu accessible name must include visible Menú label: "+diag.menuLabel);
-  if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<28||diag.typeSizes.storyTitle<(width<=480?20:17))fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
+  if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<28||diag.typeSizes.storyTitle<(width<390?20:17))fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
  report.viewports.push({width,height,reduce,source:entry===URL?"source":"dist",...diag,failures:fails});
  report.failures.push(...fails.map(x=>width+": "+x));
@@ -430,7 +433,7 @@ try{
    report.tests.push({name:"PRIME-LAYOUT-01 desktop: heading above four documentary photographs",leanDesktop});
   await capture("desktop-lean-statement.png");
  assert.equal(d.logo.length>=2,true,"Expected original unchanged DESSET mark in header and visual composition");
- for(const [w,h] of [[1920,1080],[1180,820],[1100,850],[1024,768],[961,900],[960,900],[861,900],[860,900],[768,900],[700,900],[699,900],[430,932],[390,844],[320,700]]){
+ for(const [w,h] of [[1920,1080],[1180,820],[1100,850],[1024,768],[961,900],[960,900],[861,900],[860,900],[768,900],[700,900],[699,900],[430,932],[390,844],[360,800],[320,700]]){
   await viewport(w,h);
   await verifySharedNavigation("","index",w);
   if(w===1920||w===1024){
@@ -441,7 +444,7 @@ try{
    // Simulate a script-unavailable page in the loaded DOM. This exercises
    // the exact no-JS CSS selector without needing a second browser session.
    const fallback=await js('(()=>{const root=document.documentElement;root.classList.remove("js-enabled");const nav=document.querySelector(".main-nav"),btn=document.querySelector(".menu-button"),header=document.querySelector(".site-header");const p={navDisplay:getComputedStyle(nav).display,menuDisplay:getComputedStyle(btn).display,headerHeight:header.getBoundingClientRect().height,links:[...nav.querySelectorAll("a:not(.nav-submenu a)")].map(a=>({text:a.textContent.trim(),height:a.getBoundingClientRect().height}))};root.classList.add("js-enabled");p.headerHeightAfter=header.getBoundingClientRect().height;return p})()');
-   if(fallback.navDisplay!=="flex"||fallback.menuDisplay!=="none"||fallback.headerHeight<70||Math.abs(fallback.headerHeight-fallback.headerHeightAfter)>1||fallback.links.length<4||fallback.links.some(l=>l.height<42))
+   if(fallback.navDisplay!=="flex"||fallback.menuDisplay!=="none"||fallback.headerHeight<64||Math.abs(fallback.headerHeight-fallback.headerHeightAfter)>1||fallback.links.length<4||fallback.links.some(l=>l.height<42))
      report.failures.push("V6.8 no-JS mobile navigation failed: "+JSON.stringify(fallback));
    report.tests.push({name:"V6.8 resilient mobile navigation without JavaScript "+w,fallback});
    const radius=await js('(()=>({pitch:parseFloat(getComputedStyle(document.querySelector(".business-pitch")).borderTopLeftRadius),screen:document.documentElement.clientWidth}))()');
@@ -472,7 +475,7 @@ try{
     await js('document.querySelector("#vision").scrollIntoView({block:"center",behavior:"instant"})');
     await sleep(160);
      const leanMobile=await js("(()=>{const x=document.querySelector(\"#vision\"),b=x.querySelector(\".statement-body\"),h=x.querySelector(\"h2\"),j=x.querySelector(\".statement-journey\"),t=h.getBoundingClientRect(),r=j.getBoundingClientRect(),last=h.querySelector(\".statement-last\").getBoundingClientRect(),cards=[...j.querySelectorAll(\".motion-story-unit\")];return {children:b.children.length,cols:getComputedStyle(j.querySelector(\".ecosystem-participants\")).gridTemplateColumns.split(\" \").length,left:t.left,right:t.right,titleRight:last.right,titleBottom:t.bottom,journeyTop:r.top,journeyLeft:r.left,journeyRight:r.right,storyCards:cards.length,photos:cards.map(c=>c.querySelector(\"img\").getBoundingClientRect().width),viewport:document.documentElement.clientWidth,duplicates:x.querySelectorAll(\".statement-side,.trust-ledger\").length,font:parseFloat(getComputedStyle(h).fontSize),scrollWidth:document.documentElement.scrollWidth,empty3d:!document.querySelector(\"#ecosistema .motion-story-unit\")}})()");
-     if(leanMobile.children!==2||leanMobile.cols!==1||leanMobile.storyCards!==4||!leanMobile.empty3d||leanMobile.duplicates!==0||leanMobile.left< -2||leanMobile.journeyRight>leanMobile.viewport+2||leanMobile.titleRight>leanMobile.viewport+2||leanMobile.titleBottom>leanMobile.journeyTop+2||leanMobile.photos.some(w=>w<70)||leanMobile.scrollWidth>leanMobile.viewport+2||leanMobile.font<30)report.failures.push("PRIME-LAYOUT-01 mobile journey clips or overlaps heading: "+JSON.stringify(leanMobile));
+     if(leanMobile.children!==2||leanMobile.cols!==2||leanMobile.storyCards!==4||!leanMobile.empty3d||leanMobile.duplicates!==0||leanMobile.left< -2||leanMobile.journeyRight>leanMobile.viewport+2||leanMobile.titleRight>leanMobile.viewport+2||leanMobile.titleBottom>leanMobile.journeyTop+2||leanMobile.photos.some(w=>w<70)||leanMobile.scrollWidth>leanMobile.viewport+2||leanMobile.font<30)report.failures.push("PRIME-LAYOUT-01 mobile journey clips or overlaps heading: "+JSON.stringify(leanMobile));
      report.tests.push({name:"PRIME-LAYOUT-01 mobile: four approved photos and text fully visible",leanMobile});
     await capture("mobile-lean-statement.png");
    await js("document.querySelector('.menu-button').click()");
@@ -574,7 +577,7 @@ try{
  report.tests.push({name:"V5.4 Chromium accessibility tree structural smoke",accessible});
  // Verify the exact deployable package as well as the working source, on all three device classes.
  const packaged=pathToFileURL(resolve("dist/index.html")).href;
- for(const [w,h] of [[1440,900],[768,900],[390,844]]){
+ for(const [w,h] of [[1440,900],[768,900],[430,932],[390,844],[360,800],[320,700]]){
   const result=await viewport(w,h,false,packaged);
   await verifySharedNavigation("dist/","index",w);
   const source=report.viewports.find(v=>v.source==="source"&&v.width===w&&!v.reduce);
@@ -611,7 +614,7 @@ try{
    await js('document.querySelector("#empresa-destacada").scrollIntoView({block:"start",behavior:"instant"})');
    await sleep(150);
    const hierarchy=await js(`(()=>{const grid=document.querySelector("#empresa-destacada .institutional-home-grid"),cards=[...grid.querySelectorAll("article")],strip=document.querySelector(".institutional-recent"),sections=[...document.querySelectorAll("main>section")];return {order:sections.map(e=>e.id).join("|"),recent:strip.previousElementSibling?.id==="inicio"&&strip.nextElementSibling?.id==="empresa-destacada",columns:getComputedStyle(grid).gridTemplateColumns.trim().split(/\\s+/).length,headings:cards.map(e=>e.querySelector("h3").textContent),fit:cards.every(e=>e.scrollWidth<=e.clientWidth+2&&e.getBoundingClientRect().width>0),investors:cards[1]?.querySelector('a[href="./empresa.html#inversores"]')?.getBoundingClientRect().height>=44}})()`);
-   if(hierarchy.order!=="inicio|empresa-destacada|noticias-destacadas|soluciones|vision|talento-destacado|negocios"||!hierarchy.recent||hierarchy.columns!==(w<=700?1:2)||hierarchy.headings.join("|")!=="Empresa|Inversores"||!hierarchy.fit||!hierarchy.investors)report.failures.push("VISUAL-HIERARCHY-01 "+label+": "+JSON.stringify(hierarchy));
+   if(hierarchy.order!=="inicio|empresa-destacada|noticias-destacadas|soluciones|vision|talento-destacado|negocios"||!hierarchy.recent||hierarchy.columns!==(w<390?1:2)||hierarchy.headings.join("|")!=="Empresa|Inversores"||!hierarchy.fit||!hierarchy.investors)report.failures.push("VISUAL-HIERARCHY-01 "+label+": "+JSON.stringify(hierarchy));
    if(w===1440||w===390)await capture((root?"dist-":"source-")+"hierarchy-"+w+"px.png");
    report.tests.push({name:"VISUAL-HIERARCHY-01 "+label,hierarchy});
   }

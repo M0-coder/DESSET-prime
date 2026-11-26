@@ -107,3 +107,50 @@
 body:has(#inicio){--ds-60-surface:#fff}
 #empresa-destacada,#talento-destacado,#soluciones.solutions,body:has(#inicio) .site-footer{background:#f5f5f5}
 #vision.statement[id="vision"],#negocios.audiences{background:#fff}
+
+/* MOBILE-01: homepage only, preserve content, routes and desktop. */
+@media(max-width:700px){
+ body:has(#inicio){--edge:clamp(16px,4.5vw,24px)}
+ body:has(#inicio) .site-header{height:64px}
+ body:has(#inicio) .site-header .main-nav{top:100%}
+ .js-enabled body:has(#inicio) .site-header .main-nav[data-open="true"]{max-height:calc(100dvh - 64px)}
+ #inicio.hero[data-variant="v4"]{padding-top:12px}
+ #inicio .v4-hero-composition{padding:10px 0 20px;gap:18px}
+ #inicio .v4-hero-bottom{gap:14px}
+ #inicio .motion-headline{margin-bottom:14px}
+ #inicio .hero-actions,#inicio .hero-cta{width:100%}
+ #inicio .hero-cta{min-height:48px}
+ #inicio .prime-photo-surface{aspect-ratio:1.6;border-radius:14px}
+ #inicio .v4-hero-rail{padding:12px var(--edge);gap:10px 0}
+ #inicio .v4-rail-item{display:flex;flex-direction:column;gap:4px;padding:6px 9px}
+ #inicio .v4-rail-item svg{width:24px;height:24px;margin:0}
+ #inicio .v4-rail-item strong{letter-spacing:0}
+ body:has(#inicio) .institutional-recent{padding-block:6px}
+ #empresa-destacada.institutional-home,#noticias-destacadas.institutional-home,#talento-destacado.institutional-home,#soluciones.solutions,#vision.statement[id="vision"],#negocios.audiences{padding-block:24px}
+ .institutional-home h2{margin-bottom:14px}
+ #empresa-destacada.institutional-home .institutional-home-link{padding:12px}
+ #empresa-destacada.institutional-home h3{font-size:20px}
+ #empresa-destacada .institutional-quicklinks{margin-top:6px;padding-top:4px}
+ #soluciones.solutions .solutions-grid .service{padding:12px}
+ #soluciones .service .service-body h3{min-height:76px;font-size:28px}
+ #soluciones .service .service-body strong{padding-top:10px;font-size:16px}
+ #soluciones .service .service-body p{margin:8px 0 12px;line-height:1.45}
+ #soluciones .service .service-body a{margin-top:auto;padding:8px;min-height:48px;overflow-wrap:anywhere}
+ #vision .statement-body.ecosystem-participants-body>h2{margin-bottom:16px}
+ #vision .statement-journey .motion-story-grid.ecosystem-participants{gap:18px 12px}
+ #vision .statement-journey .motion-story-unit.ecosystem-participant h3{margin:8px 0 4px}
+ #negocios #contacto.contact{margin-bottom:16px}
+ #negocios.audiences .audience-grid--compact>article{padding:14px!important}
+ #negocios.audiences .partner-icon{width:30px;height:30px;margin-bottom:12px}
+ #negocios.audiences .audience-grid--compact>article h3{font-size:21px;margin-bottom:8px;overflow-wrap:anywhere}
+ #negocios.audiences .audience-grid--compact>article p{margin-bottom:14px;line-height:1.45}
+ #negocios.audiences .audience-grid--compact>article a{padding:8px;overflow-wrap:anywhere}
+ body:has(#inicio) .site-footer{padding-block:20px}
+ body:has(#inicio) .corporate-footer{gap:12px 16px}
+}
+@media(min-width:390px) and (max-width:700px){
+ #empresa-destacada.institutional-home .institutional-home-grid,#soluciones .solutions-grid,#vision .statement-journey .motion-story-grid.ecosystem-participants,#negocios.audiences .audience-grid--compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ #empresa-destacada .institutional-home-link{overflow-wrap:anywhere}
+ #soluciones .service .service-body strong{min-height:52px}
+ #vision .statement-journey .motion-story-unit.ecosystem-participant h3{font-size:17px;overflow-wrap:anywhere}
+}
