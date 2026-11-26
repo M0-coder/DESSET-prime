@@ -45,7 +45,10 @@ test("Production evidence is durable, quarantined, verified and required before 
  assert.equal(await approvedProfile(env,id),null);await assert.rejects(advance("CONFIGURATION_VERIFIED","READY_FOR_ACTIVATION"),/PROFILE_APPROVAL_REQUIRED/);
  await reviewProfile(env,actor,{id,version:"3",decision:"APPROVED",evidence:"synthetic-approval-v3"});
  await assert.rejects(advance("CONFIGURATION_VERIFIED","READY_FOR_ACTIVATION"),/DIRECT_CONFORMITY_REQUIRED/);
- const invite=await issueAcceptance(env,actor,{id,purpose:"PROFILE",deliveryRef:"verified-contact-602"});assert.equal((await acceptanceView(env,invite.code)).profileVersion,3);await decideAcceptance(env,invite.code,"ACCEPTED");
+ const invite=await issueAcceptance(env,actor,{id,purpose:"PROFILE",deliveryRef:"verified-contact-602"});const parallel=await issueAcceptance(env,actor,{id,purpose:"PROFILE",deliveryRef:"verified-contact-603"});assert.equal((await acceptanceView(env,invite.code)).profileVersion,3);
+ await assert.rejects(acceptanceView(env,invite.code,invite.expires),/INVALID_CODE/);
+ const revoked=await issueAcceptance(env,actor,{id,purpose:"PROFILE",deliveryRef:"verified-contact-604"});await revokeAcceptance(env,revoked.id,id);await assert.rejects(acceptanceView(env,revoked.code),/INVALID_CODE/);
+ await decideAcceptance(env,invite.code,"ACCEPTED");await assert.rejects(decideAcceptance(env,parallel.code,"CORRECTIONS_REQUIRED"),/INVALID_CODE/);await assert.rejects(issueAcceptance(env,actor,{id,purpose:"PROFILE",deliveryRef:"verified-contact-605"}),/ACCEPTANCE_FINAL/);
  assert.ok((await listAcceptances(env,id)).some(x=>x.decision==="ACCEPTED"&&x.profile_version===3));
  await advance("CONFIGURATION_VERIFIED","READY_FOR_ACTIVATION");
  await assert.rejects(editProfile(env,actor,{id,version:"3",operation:"DETAILS",name:"locked"}),/PROFILE_LOCKED/);
