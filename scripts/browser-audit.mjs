@@ -351,7 +351,7 @@ try{
  await sleep(2050);
  await capture("desktop-final.png");
  
-  const v5Cover=await js('(()=>({mode:document.documentElement.dataset.v5Mode,overlayAbsent:!document.querySelector(".v5-hero-refraction"),stage:!!document.querySelector(".v5-city-stage,.v6-three-mount"),diagram:!!document.querySelector(".roles-diagram-responsive"),link:!!document.querySelector("a[href=\\\"./prime.html#modelo\\\"]"),noPoster:!document.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),contactLight:!!document.querySelector(".v5-contact-light")}))()');
+  const v5Cover=await js('(()=>({mode:document.documentElement.dataset.v5Mode,overlayAbsent:!document.querySelector(".v5-hero-refraction"),stage:!!document.querySelector(".v5-city-stage,.v6-three-mount"),diagram:!!document.querySelector(".roles-diagram-responsive"),link:!!document.querySelector("#ecosistema .prime-service-cta"),noPoster:!document.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),contactLight:!!document.querySelector(".v5-contact-light")}))()');
   if(v5Cover.mode!=="ready"||!v5Cover.overlayAbsent||v5Cover.stage||v5Cover.diagram||!v5Cover.link||!v5Cover.noPoster||v5Cover.contactLight)report.failures.push("Home must not mount logistics WebGL or old diagram: "+JSON.stringify(v5Cover));
   report.tests.push({name:"Home is free of logistics 3D and obsolete diagram",v5Cover});
    // Capture full page after activation without any poster image.

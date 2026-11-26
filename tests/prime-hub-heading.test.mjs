@@ -10,7 +10,7 @@ for(const dir of ["","dist/"])test("Redundant Prime chapter removed; existing se
  assert.match(card,/<h3>DESSET <span>prime<\/span><\/h3>/);
  assert.match(css,/#soluciones \.service--prime h3\{color:#073bbc\}/);
  assert.match(read(dir+"styles.css"),/#soluciones \.service--prime h3 span\{display:block;color:#073bbc;font-size:\.56em\}/);
- assert.match(home,/href="\.\/prime\.html#modelo">Cómo funciona/);
+ assert.match(home,/href="#ecosistema">Cómo funciona/);
  assert.match(card,/class="prime-service-cta" href="\.\/prime\.html"/);
  assert.match(prime,/id="modelo"/);assert.match(prime,/class="v6-three-mount"/);assert.match(prime,/class="v6-three-controls"/);
 });

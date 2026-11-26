@@ -22,7 +22,7 @@ test("truthful service and conceptual 3D disclosures remain without redundant th
  const flow=html.match(/<section class="ecosystem"[\s\S]*?<\/section>/)?.[0]||"";
  const statement=html.match(/<section class="statement"[\s\S]*?<\/section>/)?.[0]||"";
  const prime=readFileSync(new URL("../prime.html",import.meta.url),"utf8");
- assert.ok(!flow&&html.includes('./prime.html#modelo')&&statement.length>1000&&prime.includes('id="modelo"'),"Redundant chapter absent; participant statement and Prime model remain");
+ assert.ok(!flow&&html.includes('class="prime-service-cta" href="./prime.html"')&&statement.length>1000&&prime.includes('id="modelo"'),"Redundant chapter absent; participant statement and Prime model remain");
  assert.doesNotMatch(flow,/v6-three-mount|v6-static-fallback/);
  assert.match(prime,/class="v6-three-mount"/);
  assert.match(prime,/aria-label="Simulación logística conceptual de DESSET prime"/);
