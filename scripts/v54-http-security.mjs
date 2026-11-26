@@ -55,7 +55,7 @@ async function check(){
  const mainBytes=currentCss?Buffer.from(await currentCss.arrayBuffer()):Buffer.alloc(0);
  const cssBlob=createHash("sha1").update("blob "+mainBytes.length+"\0").update(mainBytes).digest("hex");
  record("CSS served with correct MIME and exact versioned main stylesheet bytes",css.status===200&&css.headers.get("content-type")?.startsWith("text/css")&&currentCss?.status===200&&currentCss.headers.get("content-type")?.startsWith("text/css")&&cssBlob===cssRef?.[2]);
- const blocked=["/.git/config","/.github/workflows/preview-checks.yml","/scripts/local-preview.mjs","/docs/V5.3-RELEASE-GATE.md","/%2e%2e/%2e%2e/secret.env","/package.json"];
+ const blocked=["/assets/roles-geometry-es.svg","/assets/roles-geometry-mobile-es.svg","/assets/roles-geometry-v2.svg","/.git/config","/.github/workflows/preview-checks.yml","/scripts/local-preview.mjs","/docs/V5.3-RELEASE-GATE.md","/%2e%2e/%2e%2e/secret.env","/package.json"];
  for(const path of blocked){
   const resp=await fetch(host+path,{signal:AbortSignal.timeout(5000)});
   record("Forbidden route "+path,resp.status===404);

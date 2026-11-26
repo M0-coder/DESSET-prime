@@ -15,9 +15,9 @@ function copyDist(t){
  const temp=mkdtempSync(join(tmpdir(),'prime-asset-audit-test-'));t.after(()=>rmSync(temp,{recursive:true,force:true}));
  const copy=join(temp,'dist');cpSync(dist,copy,{recursive:true});return copy;
 }
-test('14 owner-declared active original media are individually SHA-256 verified',()=>{
+test('12 owner-declared active original media are individually SHA-256 verified',()=>{
  const r=checkAssetRightsAndLicenses(opts);
- assert.equal(r.outcome,'PASS');assert.equal(r.assets_checked,14);
+ assert.equal(r.outcome,'PASS');assert.equal(r.assets_checked,12);assert.equal(r.archived_media_checked,2);assert.ok(r.archived_media.every(a=>a.scope==='source-only'));assert.ok(!r.assets.some(a=>a.path.startsWith('assets/roles-geometry-')));
  assert.equal(r.legal_title_independently_verified,false);
  assert.equal(r.prime_page_media_checked,6);assert.equal(r.prime_page_media.filter(a=>a.claim==='third-party').length,1);assert.equal(r.selected_media_checked,4);assert.equal(r.individual_license_review_complete,false);
  assert.equal(r.selected_media_review.basis,'owner-attested-free-download');

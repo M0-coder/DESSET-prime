@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {readFileSync} from "node:fs";
+import {readFileSync,existsSync} from "node:fs";
 const root=new URL("../",import.meta.url);
 const read=p=>readFileSync(new URL(p,root),"utf8");
 const html=read("index.html");
@@ -25,8 +25,7 @@ test("V6.8 diagrams are Spanish in both pixels and accessibility descriptions",(
  for(const label of ["CLIENTES","COMERCIOS","REPARTO","CONTROL","ELEGIR","PREPARAR","ENTREGAR","SUPERVISAR"])
   assert.ok(mobileDiagram.includes(">"+label+"</text>"),"Mobile label not legible/translated: "+label);
  assert.doesNotMatch(mobileDiagram,/CUSTOMER|BUSINESS|RIDER/);
- assert.equal(read("dist/assets/roles-geometry-mobile-es.svg"),mobileDiagram);
- assert.equal(read("dist/assets/roles-geometry-es.svg"),diagram);
+ for(const name of ["roles-geometry-es.svg","roles-geometry-mobile-es.svg","roles-geometry-v2.svg"])assert.ok(!existsSync(new URL("dist/assets/"+name,root)));
  assert.match(original,/>CUSTOMER<\/text>/);
  assert.doesNotMatch(html,/src="\.\/assets\/roles-geometry-es\.svg"/);
 });
@@ -49,11 +48,11 @@ test("V6.8 navigation works progressively when scripts fail or are disabled",()=
 });
 
 test("V6.8 signed inventory records every updated static asset",()=>{
- for(const path of ["assets/roles-geometry-es.svg","assets/roles-geometry-mobile-es.svg","styles-system.css","scripts/app.js"]){
+ for(const path of ["styles-system.css","scripts/app.js"]){
   const found=pack.files.find(x=>x.path===path);
   assert.ok(found&&found.bytes>0,"Package omits "+path);
  }
- assert.ok(!pack.files.some(x=>x.path==="assets/roles-geometry-v2.svg"),"Do not ship the original English SVG");
+ assert.ok(!pack.files.some(x=>/^assets\/roles-geometry-/.test(x.path)),"Retired diagrams must not ship");
  assert.equal(pack.noindex,true);
  assert.equal(pack.domain,"none");
  assert.match(html,/name="robots" content="noindex,nofollow"/);

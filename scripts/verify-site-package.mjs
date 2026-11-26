@@ -13,7 +13,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length===67,"unexpected file count");
+check(manifest.files.length===65,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -106,7 +106,7 @@ const availability=await readFile(resolve(dist,"scripts/service-state.js"),"utf8
 assertClosedDistribution(availability);
 check(!/data-service-access|data-service-status|data-app-links|APLICACIONES DESSET|Acceso público no habilitado/.test(html),"Obsolete application availability panel in packaged site");
 check(!/<a\b[^>]*href=["']https?:\/\/(?:play\.google\.com|apps\.apple\.com)(?:[\/:?#"']|$)/i.test(html),"Unapproved application store link in packaged site");
-check(expected.has("assets/roles-geometry-es.svg")&&!expected.has("assets/roles-geometry-v2.svg"),"Only localized diagram may be distributed; sealed original remains source-only");
+check([...expected].every(path=>!/^assets\/roles-geometry-(?:v2|es|mobile-es)\.svg$/.test(path)),"Retired role diagrams must be source-only");
 check(![...expected].some(x=>x.endsWith(".md")||x.includes("workflow")||x.includes("package")||x.includes("node_modules")), "development files in static site");
 async function inventory(path=""){
  const entries=await readdir(resolve(dist,path),{withFileTypes:true});

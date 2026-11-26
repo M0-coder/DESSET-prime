@@ -31,7 +31,7 @@ function verifyManifest(dist){
  const dstat=lstatSync(dist);assert(dstat.isDirectory()&&!dstat.isSymbolicLink(),'dist must be a normal directory');
  const raw=readFileSync(join(dist,'site-manifest.json'));const m=JSON.parse(raw.toString('utf8'));
  assert(m.schema==='desset-prime-static-web-package-v1'&&m.entrypoint==='index.html'&&m.domain==='none'&&m.noindex===true,'source package must remain Prime noindex');
- assert(Array.isArray(m.files)&&m.files.length===67,'unexpected Prime asset count');
+ assert(Array.isArray(m.files)&&m.files.length===65,'unexpected Prime asset count');
  const paths=new Set();let size=0;
  for(const f of m.files){
   assert(safeName(f.path)&&!paths.has(f.path),'unsafe or duplicate asset: '+f.path);
