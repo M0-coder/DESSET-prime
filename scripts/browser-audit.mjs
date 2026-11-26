@@ -71,7 +71,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  await call("Page.navigate",{url:entry});
  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.hero--motion')"),"page render");
  await js('document.fonts.ready');
- // PRIME-COLOR-02 must sample the final opaque CTA, not a partial CSS
+ // PRIME-COLOR-03 must sample the final opaque CTA, not a partial CSS
  // background transition. Fail closed if it never becomes fully opaque.
  await until(async()=>await js(`(()=>{
    const el=document.querySelector("#inicio .hero-cta");
@@ -215,12 +215,12 @@ async function viewport(width,height,reduce=false,entry=URL){
   const palette=diag.palette;
   // The final computed color is checked only after the background settles.
   // Never accept a semi-transparent or differently colored CTA as a PASS.
-  const limeChannels=palette.heroCTA.match(/^rgba?\(205,\s*252,\s*138(?:,\s*([\d.]+))?\)$/);
-  const exactLime=!!limeChannels&&(limeChannels[1]===undefined||
-   (Number(limeChannels[1])>=.9999&&Number(limeChannels[1])<=1));
+  const blueChannels=palette.heroCTA.match(/^rgba?\(7,\s*59,\s*188(?:,\s*([\d.]+))?\)$/);
+  const exactBlue=!!blueChannels&&(blueChannels[1]===undefined||
+   (Number(blueChannels[1])>=.9999&&Number(blueChannels[1])<=1));
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
-   !exactLime||palette.businessCTA!==brandBlue||
+   !exactBlue||palette.businessCTA!==brandBlue||
    palette.statementAccent!==brandBlue||palette.stageSummaryArrow!==expectedOriginal||
    palette.threeTourButton!==pureWhite||palette.threePauseButton!==pureWhite||
    palette.stageFrame!==paleBlue||palette.stageToolbar!==paleBlue||
@@ -231,11 +231,11 @@ async function viewport(width,height,reduce=false,entry=URL){
    palette.institutionalInk!=="#000000"||
    palette.stageInk!=="#111111"||palette.stageDesignInk!=="#111111"||palette.stageInheritedColor!=="rgb(17, 17, 17)"||
    palette.heroHeadingColor!=="rgb(0, 0, 0)"||
-   palette.heroCtaInk!=="rgb(0, 0, 0)"||
+   palette.heroCtaInk!==pureWhite||
    palette.heroPhotoFallbackBg!==paleBlue||
    palette.brandNameInk!=="rgb(0, 0, 0)"||
    palette.footerBrandInk!==brandBlue||palette.footerCopyInk!=="rgb(86, 86, 86)")
-   fails.push("PRIME-COLOR-02: only the hero CTA may be lime; brand yellow preserved, page surfaces pale and 3D controls white: "+JSON.stringify(palette));
+   fails.push("PRIME-COLOR-03: hero CTA must use institutional blue with white text; brand yellow preserved, page surfaces pale and 3D controls white: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.heroFit.typeLeft<diag.heroFit.compositionLeft-2 ||
     diag.heroFit.rows.length!==2 ||
