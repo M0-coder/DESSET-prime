@@ -9,13 +9,19 @@ for(const dir of ["","dist/"])test("COMPANY-02 modular directory, legacy anchors
  assert.match(hub,/<main class="company-page company-hub"/);
  const routes=[...hub.matchAll(/<section id="[^"]+" class="co-card">[\s\S]*?<a href="\.\/([a-z-]+\.html)">/g)].map(x=>x[1]);
  assert.deepEqual(routes,companyFiles);
+ const photos=[...hub.matchAll(/<span class="co-art co-photo"[^>]*><img src="\.\/([^"]+)"/g)].map(x=>x[1]);
+ assert.deepEqual(photos,["assets/desset-hero-entrega-dos-espejos.webp","assets/scene-choose.webp","assets/scene-prepare.webp"]);
+ const originals=JSON.parse(read("config/prime-original-assets.json")).assets;
+ for(const path of photos)assert.ok(originals.some(a=>a.path===path&&a.claim==="owner-declared"));
+ assert.doesNotMatch(hub,/<span class="co-art"[^>]*><svg/);
+ for(const [id,route] of Object.entries({areas:"perfil-corporativo","informacion-corporativa":"perfil-corporativo",proposito:"mision-vision-valores",valores:"mision-vision-valores"}))assert.ok(hub.includes('id="'+id+'" href="./'+route+'.html#'+id+'"'));
  for(const [id,route] of Object.entries(anchors)){
   assert.equal((hub.match(new RegExp('id="'+id+'"','g'))||[]).length,1,"legacy anchor "+id);
   assert.ok(read(dir+route+".html").includes('id="'+id+'"'),"detail anchor "+id);
  }
  for(const route of companyRoutes){
   const doc=read(dir+route+".html");assert.match(doc,/<main class="company-page company-detail"/);
-  assert.ok(doc.includes("<h1>"+companyTitles[route]+"</h1>"));
+  assert.ok(doc.includes("<h1>"+companyTitles[route]+"</h1>"));assert.ok([...doc.matchAll(/<h2[^>]*>([^<]+)<\/h2>/g)].every(x=>x[1].trim().replace(/[.]$/,"")!==companyTitles[route]),"Repeated title: "+route);
   assert.ok(doc.includes('href="./'+companyCss+'"'));
   assert.ok(doc.includes('href="./empresa.html">Volver a Empresa</a>'));
   assert.match(doc,/name="robots" content="noindex,nofollow"/);
