@@ -10,7 +10,7 @@ export function originFor(env){
 }
 // The owner supplies the exact reviewed legal text and its SHA-256, not a placeholder.
 export async function approvedPrivacyNotice(env){
- if(env.ENVIRONMENT!=="production"||env.PRIVACY_POLICY_VERIFIED!=="true"||env.PRIVACY_URL!==PRIVACY_URL||!validRef(env.PRIVACY_VERSION)||typeof env.PRIVACY_NOTICE!=="string"||env.PRIVACY_NOTICE.trim().length<200||new TextEncoder().encode(env.PRIVACY_NOTICE).length>5000||!/^[a-f0-9]{64}$/.test(env.PRIVACY_NOTICE_SHA256??""))throw closed(503,"PRIVACY_OR_TERRITORY_NOT_READY");
+ if(env.ENVIRONMENT!=="production"||env.PRIVACY_POLICY_VERIFIED!=="true"||env.PRIVACY_URL!==PRIVACY_URL||typeof env.PRIVACY_VERSION!=="string"||!/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/.test(env.PRIVACY_VERSION)||typeof env.PRIVACY_NOTICE!=="string"||env.PRIVACY_NOTICE.trim().length<200||new TextEncoder().encode(env.PRIVACY_NOTICE).length>5000||!/^[a-f0-9]{64}$/.test(env.PRIVACY_NOTICE_SHA256??""))throw closed(503,"PRIVACY_OR_TERRITORY_NOT_READY");
  const digest=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(env.PRIVACY_NOTICE))),x=>x.toString(16).padStart(2,"0")).join("");
  if(digest!==env.PRIVACY_NOTICE_SHA256)throw closed(503,"PRIVACY_OR_TERRITORY_NOT_READY");
  return {version:env.PRIVACY_VERSION,text:env.PRIVACY_NOTICE};
