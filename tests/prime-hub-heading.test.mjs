@@ -13,13 +13,13 @@ function contrast(a,b){const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.
 test("PRIME-HUB-01: chapter title and owner-specified English message appear outside the 3D canvas",()=>{
  const section=html.split('<section class="ecosystem" id="ecosistema"')[1]?.split("</section>")[0];
  assert.ok(section,"Ecosystem section absent");
- assert.match(section,/<h2 id="desset-prime-heading">DESSET PRIME<\/h2>/);
- assert.match(section,/<p><strong>FROM HUB TO DOOR<\/strong> fulfillment, dispatch, and last-mile delivery working as one system\.<\/p>/);
- assert.ok(section.indexOf('class="prime-3d-heading"')<section.indexOf('class="v5-city-stage"'),"Title must remain visible when WebGL is active");
+ assert.match(section,/<h2 id="desset-prime-heading">DESSET prime<\/h2>/);
+ assert.match(section,/Paquetería, distribución y tecnología logística/);
+ const model=read("prime.html").match(/<section class="pr-flow" id="modelo">[\s\S]*?<\/section>/)?.[0];assert.ok(model&&model.indexOf("Cada movimiento cuenta.")<model.indexOf('class="v5-city-stage"'));assert.doesNotMatch(section,/v5-city-stage/);
  assert.match(section,/aria-labelledby="desset-prime-heading"/);
- assert.match(section,/class="v6-three-mount" aria-hidden="true"/);
- assert.match(section,/class="v6-three-controls"/);
- assert.match(section,/Los camiones y los indicadores son simulaciones/);
+ assert.match(model,/class="v6-three-mount" aria-hidden="true"/);
+ assert.match(model,/class="v6-three-controls"/);
+ assert.match(model,/Los camiones y los indicadores son simulaciones/);
 });
 test("PRIME-HUB-01: DESSET blue title, blue-ink English text and mobile-friendly scale",()=>{
  assert.match(css,/#ecosistema \.prime-3d-heading h2\{margin:0;color:#1551d8/);

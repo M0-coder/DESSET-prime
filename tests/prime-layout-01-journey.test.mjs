@@ -13,14 +13,15 @@ test("ECOSYSTEM-PARTICIPANTS-01 one ordered four-photo ecosystem separate from 3
  assert.equal((vision.match(/<picture class="v03-photo-story">/g)||[]).length,4);
  for(const path of photos){assert.ok(vision.includes('src="./'+path+'"'));assert.ok(!scene.includes(path))}
  assert.doesNotMatch(scene,/motion-story-unit|v03-photo-story|ecosistema-(?:proveedores|comercios|consumidores|operadores-logisticos)\.webp/);
- for(const cls of ["v6-three-mount","v63-tour","v6-pause","v4-architecture-details"])assert.ok(scene.includes('class="'+cls+'"'));
+ assert.ok(scene.includes('class="v4-architecture-details"'));
+ for(const cls of ["v6-three-mount","v63-tour","v6-pause"]){assert.ok(!scene.includes('class="'+cls+'"'));assert.ok(read("prime.html").includes('class="'+cls+'"'));}
 });
 test("Four distinct local WebP photos and truthful explanatory copy",()=>{
  for(const path of photos)assert.equal(vision.split('src="./'+path+'"').length-1,1);
  assert.doesNotMatch(vision,/scene-(?:choose|prepare|move)\.(?:webp|svg)/);
  for(const copy of ["Productos y abastecimiento para los negocios.","Canales de venta, gestión de pedidos y acceso a clientes.","Acceso a productos, negocios y servicios.","Recogida, transporte y distribución de mercancías."])assert.ok(vision.includes(copy));
  assert.doesNotMatch(vision,/Modelo de servicios en desarrollo\.|ecosystem-participants-note|<h3>CONSUMIDORES<\/h3>/);
- assert.match(scene,/Renderización gráfica conceptual de DESSET/);
+ assert.match(read("prime.html"),/Simulación logística conceptual de DESSET prime/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
 test("Heading above four cards, two on tablet, one on narrow screens, no hiding or remote assets",()=>{

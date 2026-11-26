@@ -19,7 +19,7 @@ test("V6.8 diagrams are Spanish in both pixels and accessibility descriptions",(
  assert.doesNotMatch(diagram,/\bCUSTOMER\b|\bBUSINESS\b|\bRIDER\b/i);
  assert.match(diagram,/<desc id="d">Los clientes solicitan, los comercios preparan, los repartidores entregan y el control supervisa/);
  assert.match(html,/Diagrama conceptual de cuatro funciones: clientes eligen, comercios preparan, reparto entrega y control supervisa/);
- assert.match(html,/<source media="\(max-width:700px\)" srcset="\.\/assets\/roles-geometry-mobile-es\.svg"/);
+ assert.doesNotMatch(html,/<source media="\(max-width:700px\)" srcset="\.\/assets\/roles-geometry-mobile-es\.svg"/);
  assert.match(mobileDiagram,/viewBox="0 0 360 392"/);
  for(const label of ["CLIENTES","COMERCIOS","REPARTO","CONTROL","ELEGIR","PREPARAR","ENTREGAR","SUPERVISAR"])
   assert.ok(mobileDiagram.includes(">"+label+"</text>"),"Mobile label not legible/translated: "+label);
@@ -27,7 +27,7 @@ test("V6.8 diagrams are Spanish in both pixels and accessibility descriptions",(
  assert.equal(read("dist/assets/roles-geometry-mobile-es.svg"),mobileDiagram);
  assert.equal(read("dist/assets/roles-geometry-es.svg"),diagram);
  assert.match(original,/>CUSTOMER<\/text>/);
- assert.match(html,/src="\.\/assets\/roles-geometry-es\.svg"/);
+ assert.doesNotMatch(html,/src="\.\/assets\/roles-geometry-es\.svg"/);
 });
 
 test("V6.8 navigation works progressively when scripts fail or are disabled",()=>{

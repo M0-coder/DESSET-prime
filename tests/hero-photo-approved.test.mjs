@@ -9,8 +9,8 @@ test('HERO-PHOTO-01 official brand and direct commerce CTA are retained',()=>{
  assert.match(html,/Hablemos de tu negocio/);
  assert.match(html,/class="motion-line v4-headline-a"><span class="motion-line__inner">AUMENTA EL VALOR<\/span>/);assert.match(html,/class="motion-line v4-headline-b"><span class="motion-line__inner">A TU TIEMPO<\/span>/);
  assert.doesNotMatch(html,/data-v64-tour-launch/);
- assert.match(html,/class="v5-city-stage"/);
- assert.match(html,/class="v63-tour"/);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v5-city-stage"/);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v63-tour"/);
  assert.doesNotMatch(html,/IDEAS<\/span>|ACCIÓN<\/span>|cuaderno/i);
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/);
  assert.match(html,/aria-label="Escena conceptual:/);
