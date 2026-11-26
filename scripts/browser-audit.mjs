@@ -183,6 +183,13 @@ async function viewport(width,height,reduce=false,entry=URL){
    businessCTA:style("#negocios .business-pitch-cta").backgroundColor,
    statementAccent:style("#vision h2 span").color,
    statementBackground:style("#vision").backgroundColor,
+   homeHeader:style(".site-header").backgroundColor,
+   homeRecent:style(".institutional-recent").backgroundColor,
+   homeCorporate:style("#empresa-destacada").backgroundColor,
+   homeCorporateCard:style("#empresa-destacada .institutional-home-link").backgroundColor,
+   homeNews:style("#noticias-destacadas").backgroundColor,
+   homeTalent:style("#talento-destacado").backgroundColor,
+   homeHero:style("#inicio").backgroundColor,
    footerBackground:style(".site-footer").backgroundColor,
    navContactBackground:style(".main-nav .nav-contact").backgroundColor,
    primeHeadingColor:style("#soluciones .service--prime h3").color,
@@ -214,8 +221,9 @@ async function viewport(width,height,reduce=false,entry=URL){
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
    !exactBlue||palette.businessCTA!==brandBlue||
-   palette.statementAccent!==brandBlue||palette.statementBackground!==paleBlue||
-   palette.footerBackground!=="rgb(241, 245, 250)"||palette.navContactBackground!==pureWhite||
+   palette.statementAccent!==brandBlue||palette.statementBackground!==pureWhite||
+   palette.homeHeader!==pureWhite||palette.homeRecent!==pureWhite||palette.homeCorporate!=="rgb(245, 245, 245)"||palette.homeCorporateCard!==pureWhite||palette.homeNews!==pureWhite||palette.homeTalent!=="rgb(245, 245, 245)"||palette.homeHero!=="rgb(247, 245, 238)"||
+   palette.footerBackground!=="rgb(245, 245, 245)"||palette.navContactBackground!==pureWhite||
    palette.primeHeadingColor!==brandBlue||palette.primeSubtitleColor!==brandBlue||
    palette.institutionalInk!=="#000000"||
    palette.stageInk!=="#111111"||palette.stageDesignInk!=="#111111"||palette.stageInheritedColor!=="rgb(17, 17, 17)"||
@@ -224,7 +232,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    palette.heroPhotoFallbackBg!==paleBlue||
    palette.brandNameInk!=="rgb(0, 0, 0)"||
    palette.footerBrandInk!==brandBlue||palette.footerCopyInk!=="rgb(86, 86, 86)")
-   fails.push("PRIME-COLOR-03: hero CTA must use institutional blue with white text; brand yellow preserved, page surfaces pale and 3D controls white: "+JSON.stringify(palette));
+   fails.push("PRIME-COLOR-03: hero CTA must use institutional blue with white text; brand yellow preserved, home surfaces neutral and 3D controls white: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.heroFit.typeLeft<diag.heroFit.compositionLeft-2 ||
     diag.heroFit.rows.length!==2 ||
@@ -236,7 +244,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
- if(diag.railItems.length!==4||diag.railItems.some(i=>!i.visible||!i.inside||!i.textFits||!i.icon||i.fontPx<12||i.titleInk!=="rgb(255, 255, 255)"||i.copyInk!=="rgb(226, 235, 255)"||i.iconInk!=="rgb(255, 255, 255)")||
+ if(diag.railItems.length!==4||diag.railItems.some(i=>!i.visible||!i.inside||!i.textFits||!i.icon||i.fontPx<12||i.titleInk!=="rgb(0, 0, 0)"||i.copyInk!=="rgb(34, 34, 34)"||i.iconInk!=="rgb(0, 0, 0)")||
     diag.railDisplay.background!==expectedOriginal||diag.railDisplay.role!=="list"||diag.railDisplay.ariaHidden!==null||
     diag.railDisplay.columns!==(width<=860?2:4)||
    (diag.railDisplay.left>2||diag.railDisplay.left< -16)||
@@ -250,7 +258,7 @@ async function viewport(width,height,reduce=false,entry=URL){
   participants.cards.some((c,i)=>c.title!==expectedParticipantTitles[i]||c.src!==expectedParticipantFiles[i]||!c.alt||c.lazy!=="lazy"||!c.inside||!c.fits||Math.abs(c.photoRatio-1.5)>.03||c.fit!=="cover"||c.titleFont<17||c.copyFont<14))
   fails.push("ECOSYSTEM-PARTICIPANTS-01 responsive layout, card order or text clipping: "+JSON.stringify(participants));
   const services=diag.servicesLayout;
-  if(!services.sheetLoaded||!services.revision?.startsWith("./styles.css?v=")||services.surface!=="rgb(244, 248, 254)"||services.gap!==(width<=700?12:16)||!services.headingAbsent||services.label!=="Servicios y aplicaciones DESSET"||services.columns!==(width<=700?1:2)||services.cards.length!==2||
+  if(!services.sheetLoaded||!services.revision?.startsWith("./styles.css?v=")||services.surface!=="rgb(245, 245, 245)"||services.gap!==(width<=700?12:16)||!services.headingAbsent||services.label!=="Servicios y aplicaciones DESSET"||services.columns!==(width<=700?1:2)||services.cards.length!==2||
    services.cards.map(c=>c.brand).join("|")!=="DESSET|DESSET prime"||
    services.cards.map(c=>c.service).join("|")!=="Comercio y delivery|Logística integral"||
    services.cards.some(c=>!c.visible||!c.inside||!c.fits||!c.centered||!c.primeStack||c.brandHeight<100||c.copyFont<15||c.copy.length<30)||
@@ -264,7 +272,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  if(diag.footerLayout.columns!==2||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==14||diag.footerLayout.links.map(x=>x.href).join("|")!=="./empresa.html#quienes-somos|./empresa.html#mision-vision|./empresa.html#valores|#soluciones|./prime.html|./aplicaciones.html|./comercios.html|./repartidores.html|./contacto.html|./confianza.html|./noticias.html|./talento.html|./en.html|./empresa.html#informacion-corporativa"||diag.footerLayout.links.some(x=>!x.inside||x.height<24)||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
  const partners=diag.partnerLayout;
  const cl=partners.closing;
- if(!cl.joined||cl.background!=="rgb(244, 248, 254)"||cl.headerBackground!=="rgba(0, 0, 0, 0)"||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(0, 0, 0)|rgb(7, 59, 188)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
+ if(!cl.joined||cl.background!==pureWhite||cl.headerBackground!=="rgba(0, 0, 0, 0)"||cl.align!=="center"||cl.words.join("|")!=="LAS BUENAS CONEXIONES|COMIENZAN AQUÍ"||cl.colors.join("|")!=="rgb(0, 0, 0)|rgb(7, 59, 188)"||!cl.decorAbsent||cl.cardFonts.some(f=>f<=cl.font))fails.push("CONTACT-03 unified closing hierarchy: "+JSON.stringify(cl));
   if(partners.columns!==(width<=700?1:2)||partners.gap!==(width<=700?12:16)||partners.cards.length!==2||
    partners.cards.map(c=>c.title).join("|")!=="Comercios|Repartidores"||
    partners.cards.map(c=>c.label).join("|")!=="Más información|Más información"||
@@ -320,7 +328,7 @@ try{
  report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
  const visual02=await js('(()=>{const q=s=>document.querySelector(s);const cs=s=>getComputedStyle(q(s));return {cssLoaded:[...document.styleSheets].some(x=>x.href?.endsWith("/styles-visual02.css")),heroPhoto:q("#inicio .prime-photo-image")?.getAttribute("src"),heroLogo:q(".site-header .brand-mark")?.getAttribute("src"),heroCTA:q("#inicio .hero-cta")?.getAttribute("href"),businessShadow:cs("#negocios .business-pitch").boxShadow,serviceTop:cs("#soluciones .service--main").borderTopWidth,trustBg:cs("#vision").backgroundColor,mobileSafe:document.documentElement.scrollWidth<=document.documentElement.clientWidth+2}})()');
  if(!visual02.cssLoaded||!visual02.heroPhoto?.endsWith("desset-hero-entrega-dos-espejos.webp")||!visual02.heroLogo?.endsWith("deliver-assets-mark.png")||visual02.heroCTA!=="#contacto"||
-   visual02.serviceTop!=="1px"||visual02.trustBg!=="rgb(244, 248, 254)"||!visual02.mobileSafe)
+   visual02.serviceTop!=="1px"||visual02.trustBg!=="rgb(255, 255, 255)"||!visual02.mobileSafe)
   report.failures.push("VISUAL-02 institutional editorial consistency regression: "+JSON.stringify(visual02));
  report.tests.push({name:"VISUAL-02 corporate style, approved hero and responsive safety",visual02});
 

@@ -15,7 +15,7 @@ test("VISUAL-A11Y-01 neutral black text does not replace brand blue",()=>{
  assert.match(typography,/#vision\.statement\{background:#f4f8fe;color:#000000\}/);
  assert.match(mainCss,/--blue:#073BBC/);
  assert.match(hero,/#inicio \.v4-headline-b\{color:#073bbc\}/);
- assert.match(hero,/#inicio \.v4-hero-rail\{[^\n]*background:var\(--yellow\);color:#fff/);
+ assert.match(hero,/#inicio \.v4-hero-rail\{[^\n]*background:var\(--yellow\);color:#000/);
  assert.match(system,/\.site-footer>span,\.site-footer>p\{color:#343434\}/);
 });
 test("VISUAL-A11Y-01 no cropped DESSET service band at wide viewports",()=>{
