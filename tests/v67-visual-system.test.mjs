@@ -68,7 +68,7 @@ test("V6.7 updated four-participant ecosystem",()=>{
  assert.ok(flow[0].includes("Participantes del modelo de servicios DESSET"));
  assert.ok(!flow[0].includes("ORGANIZAR")&&!flow[0].includes("MOVER"));
  assert.ok(flow[0].includes("Productos y abastecimiento para los negocios."));
- assert.ok(html.includes("las funciones de clientes, comercios, repartidores y control"));
+ assert.ok(!html.includes("las funciones de clientes, comercios, repartidores y control"));
  assert.ok(!html.includes("la arquitectura de Customer, Business, Rider"));
  assert.ok(!storyboard.includes('title:"01 /')&&!storyboard.includes('title:"02 /'));
  assert.ok(storyboard.includes('El servicio todavía no está activo.'));

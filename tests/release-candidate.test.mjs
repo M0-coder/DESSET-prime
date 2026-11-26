@@ -76,7 +76,7 @@ test("V4.3: static assets bounded and CSS has no unclosed blocks/comments",()=>{
 
 test("Public controls have no decorative arrows and partner buttons share one visual contract",()=>{
  for(const m of html.matchAll(/<(a|button|summary)\b[^>]*>([\s\S]*?)<\/\1>/g))assert.doesNotMatch(m[2],/[↗→➜]/);
- assert.match(html,/class="disclosure-indicator"/);
+ assert.doesNotMatch(html,/class="disclosure-indicator"/);
  assert.match(css,/\.v4-architecture-details\[open\] summary \.disclosure-indicator/);
  assert.match(css,/#negocios\.audiences \.audience-grid--compact>article a\{[^}]*background:#073bbc;color:#fff/);
 });
