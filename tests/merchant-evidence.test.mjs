@@ -1,5 +1,6 @@
 import test from "node:test";import assert from "node:assert/strict";import {DatabaseSync} from "node:sqlite";import {readFileSync} from "node:fs";
 import {uploadDocument,reviewDocument,downloadDocument,saveConfiguration,listEvidence,merchantAccountSnapshot} from "../internal/merchant-production/evidence.mjs";
+import {changeAccountStatus} from "../internal/merchant-production/operations.mjs";
 import {advanceOnboarding,handle,PRODUCTION_ORIGIN} from "../internal/merchant-production/worker.mjs";
 import {issueAcceptance,acceptanceView,decideAcceptance,revokeAcceptance,listAcceptances} from "../internal/merchant-production/acceptance.mjs";
 import {recordContact,editProfile,reviewProfile,uploadProfileMedia,approvedProfile,getPreparation,commercialMessage} from "../internal/merchant-production/profile.mjs";
@@ -57,6 +58,18 @@ test("Production evidence is durable, quarantined, verified and required before 
  assert.throws(()=>db.exec("UPDATE merchant_accounts SET status='ACTIVE',version=version+1,authorization_ref='forged'"));
  await assert.rejects(uploadDocument(env,actor,{id,kind:"RUC",bytes}),/EVIDENCE_LOCKED/);
  assert.equal(objects.size,5);
+ // Real schema and approved evidence; synthetic activation only in this in-memory production fixture.
+ db.exec("UPDATE merchant_runtime SET activation_enabled=1,launch_authorization_ref='owner-approval-601'");
+ const operational={...env,SERVICE_ORIGIN:PRODUCTION_ORIGIN,ACTIVATION_ENABLED:"true",PRODUCTION_POLICY_VERIFIED:"true",COMMERCIAL_POLICY_VERIFIED:"true",APP_INTEGRATION_ENABLED:"true",LAUNCH_AUTHORIZATION_REF:"owner-approval-601",ACTIVATION_AUTHORIZATION_REF:"account-approval-601"};
+ await changeAccountStatus(operational,actor,{id,from:"READY",to:"ACTIVE",version:0,reason:"Synthetic activation",authorization:"account-approval-601"});
+ assert.equal((await merchantAccountSnapshot(operational,id)).enabled,true);
+ for(const patch of [{ACTIVATION_ENABLED:"false"},{PRODUCTION_POLICY_VERIFIED:"false"},{COMMERCIAL_POLICY_VERIFIED:"false"},{APP_INTEGRATION_ENABLED:"false"},{LAUNCH_AUTHORIZATION_REF:"different-ref"},{SERVICE_ORIGIN:"https://other.invalid"}])assert.equal((await merchantAccountSnapshot({...operational,...patch},id)).enabled,false);
+ db.exec("UPDATE merchant_runtime SET activation_enabled=0");
+ assert.equal((await merchantAccountSnapshot(operational,id)).enabled,false);
+ assert.equal((await merchantAccountSnapshot(operational,id)).status,"ACTIVE");
+ db.exec("UPDATE merchant_runtime SET activation_enabled=1");
+ await changeAccountStatus(operational,actor,{id,from:"ACTIVE",to:"SUSPENDED",version:1,reason:"Synthetic suspension"});
+ assert.equal((await merchantAccountSnapshot(operational,id)).enabled,false);
 });
 test("Object integrity mismatch prevents verification",async t=>{
  const {objects,env}=fixture(t),bytes=new TextEncoder().encode("%PDF-1.7\nDESSET-SYNTHETIC\n%%EOF");
