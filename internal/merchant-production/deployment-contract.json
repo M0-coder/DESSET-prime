@@ -25,7 +25,24 @@
       "cronAfterAuthorizedDeployment": [
         "*/5 * * * *"
       ],
-      "appEntrypoint": "MerchantIntegration"
+      "appEntrypoint": "MerchantIntegration",
+      "institutionalRedirect": {
+        "ref": "desset_merchant_registration",
+        "description": "DESSET commercial registration — authorized launch only",
+        "enabled": false,
+        "expression": "(http.host in {\"desset.lat\" \"www.desset.lat\"} and http.request.method in {\"GET\" \"HEAD\"} and http.request.uri.path in {\"/registro-comercios.html\" \"/registro-comercios\"})",
+        "action": "redirect",
+        "action_parameters": {
+          "from_value": {
+            "target_url": {
+              "value": "https://comercios.desset.lat/registro-comercios.html"
+            },
+            "status_code": 302,
+            "preserve_query_string": false
+          }
+        }
+      },
+      "privacyUrl": "https://comercios.desset.lat/privacidad-comercios.html"
     }
   },
   "initialFlags": {
@@ -61,7 +78,9 @@
     "NOTIFY_FROM",
     "NOTIFY_TO",
     "LAUNCH_AUTHORIZATION_REF",
-    "ACTIVATION_AUTHORIZATION_REF"
+    "ACTIVATION_AUTHORIZATION_REF",
+    "PRIVACY_NOTICE",
+    "PRIVACY_NOTICE_SHA256"
   ],
   "noAutomaticDeployment": true
 }

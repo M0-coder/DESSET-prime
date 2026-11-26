@@ -11,7 +11,7 @@ async function context(env,id,approved=false){
  const s=await env.DB?.prepare("SELECT environment,intake_enabled,notification_enabled,activation_enabled FROM merchant_runtime WHERE id=1").first();
  if(!s||s.environment!==env.ENVIRONMENT||!["production","staging"].includes(s.environment))throw fail(503,"UNAVAILABLE");
  if(s.environment==="staging"&&(s.intake_enabled!==0||s.notification_enabled!==0||s.activation_enabled!==0))throw fail(503,"STAGING_NOT_ISOLATED");
- const row=await env.DB.prepare("SELECT r.id,r.business_name,r.status,n.stage FROM merchant_requests r LEFT JOIN merchant_onboarding n ON n.request_id=r.id WHERE r.id=?").bind(id).first();
+ const row=await env.DB.prepare("SELECT r.id,r.business_name,r.status,r.email,r.phone,n.stage FROM merchant_requests r LEFT JOIN merchant_onboarding n ON n.request_id=r.id WHERE r.id=?").bind(id).first();
  if(!row)throw fail(404,"NOT_FOUND");if(approved&&row.status!=="APPROVED")throw fail(409,"NOT_APPROVED");return row;
 }
 const blank=()=>({name:"",description:"",logo:null,hours:days.map(()=>null),products:[]});
@@ -20,6 +20,10 @@ async function current(env,id){
  return r?{version:r.version,profile:JSON.parse(r.payload_json)}:{version:0,profile:blank()};
 }
 async function mediaRows(env,id){return (await env.DB.prepare("SELECT id,mime,sha256,size_bytes FROM merchant_profile_media WHERE request_id=? ORDER BY created_at,id").bind(id).all()).results;}
+export function commercialMessage(request){
+ const text=request.status==="REJECTED"?"Hemos concluido la evaluación de tu solicitud. Nuestro equipo puede orientarte sobre el resultado.":request.stage==="READY_FOR_ACTIVATION"?"Tu establecimiento ha completado la preparación comercial. El inicio de operaciones está sujeto a la autorización y disponibilidad del servicio.":request.status==="APPROVED"?"Hemos revisado tu solicitud. Nuestro equipo continuará contigo la documentación y preparación de tu establecimiento.":"Hemos recibido tu solicitud de incorporación. Nuestro equipo revisará la información y se comunicará contigo para continuar.";
+ return {subject:"DESSET — Incorporación comercial",body:"Hola,\n\n"+text+"\n\nReferencia de solicitud: "+request.id+"\n\nEquipo DESSET"};
+}
 export async function getPreparation(env,id){
  const request=await context(env,id),contacts=(await env.DB.prepare("SELECT channel,outcome,notes,actor_id,created_at FROM merchant_contact_events WHERE request_id=? ORDER BY created_at DESC,id DESC LIMIT 100").bind(id).all()).results;
  const p=await current(env,id),media=await mediaRows(env,id),review=await env.DB.prepare("SELECT decision,evidence_ref,actor_id,created_at FROM merchant_profile_reviews WHERE request_id=? AND version=?").bind(id,p.version).first();

@@ -1,4 +1,4 @@
-import {days} from "./profile.mjs";
+import {days,commercialMessage} from "./profile.mjs";
 const e=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const h=(k,v)=>'<input type="hidden" name="'+e(k)+'" value="'+e(v)+'">';
 const input=(label,k,v="",type="text",required=true)=>'<label>'+e(label)+' <input name="'+e(k)+'" type="'+e(type)+'" value="'+e(v)+'"'+(required?' required':'')+'></label>';
@@ -10,7 +10,9 @@ export function preparationPage(data,csrf){
  const choices=[["","Selecciona una imagen"],...media.map((m,i)=>[m.id,"Imagen "+(i+1)])];
  const form=(action,fields,label)=>'<form method="post" action="/admin/'+action+'">'+fields+'<button>'+label+'</button></form>';
  const channel={PHONE:"Teléfono",EMAIL:"Correo",MEETING:"Reunión",OTHER:"Otro"},outcome={CONTACTED:"Contactado",NO_ANSWER:"Sin respuesta",FOLLOW_UP:"Seguimiento pendiente",DECLINED:"No interesado"};
- let html='<p><a href="/admin?id='+encodeURIComponent(id)+'">Volver a solicitud</a></p><h2>'+e(request.business_name)+'</h2><h2>Seguimiento comercial</h2>'+form("contact",base+select("Canal","channel",Object.entries(channel))+select("Resultado","outcome",Object.entries(outcome))+'<label>Notas <textarea name="notes" maxlength="1000"></textarea></label>',"Registrar contacto")+contacts.map(c=>'<article><p>'+e(channel[c.channel])+' · '+e(outcome[c.outcome])+' · '+e(new Date(c.created_at).toISOString())+'</p><p>'+e(c.notes)+'</p></article>').join("");
+ const message=commercialMessage(request);
+ const email=typeof request.email==="string"&&/^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+$/.test(request.email)?'mailto:'+encodeURIComponent(request.email)+'?subject='+encodeURIComponent(message.subject)+'&body='+encodeURIComponent(message.body):null;
+ let html='<p><a href="/admin?id='+encodeURIComponent(id)+'">Volver a solicitud</a></p><h2>'+e(request.business_name)+'</h2><h2>Seguimiento comercial</h2><p>Contacto: '+e(request.phone)+' · '+e(request.email)+'</p><label>Comunicación correspondiente al estado actual <textarea readonly rows="7">'+e(message.body)+'</textarea></label>'+(email?'<p><a href="'+e(email)+'">Abrir correo para el comercio</a></p>':"")+'<p>Registra el resultado después de comunicarte. Abrir el correo no acredita su envío.</p>'+form("contact",base+select("Canal","channel",Object.entries(channel))+select("Resultado","outcome",Object.entries(outcome))+'<label>Notas <textarea name="notes" maxlength="1000"></textarea></label>',"Registrar contacto")+contacts.map(c=>'<article><p>'+e(channel[c.channel])+' · '+e(outcome[c.outcome])+' · '+e(new Date(c.created_at).toISOString())+'</p><p>'+e(c.notes)+'</p></article>').join("");
  if(request.status!=="APPROVED")return html;
  const locked=request.stage==="READY_FOR_ACTIVATION";
  html+='<h2>Ficha comercial</h2><p>Versión '+version+' · '+e(review?.decision==="APPROVED"?"Conformidad registrada":review?.decision==="CORRECTIONS_REQUIRED"?"Correcciones solicitadas":"Pendiente de revisión")+'</p>';

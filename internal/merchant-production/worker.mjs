@@ -5,7 +5,7 @@ import {merchantFields as fields,validateMerchantInput} from "../merchant-common
 import {resolveTerritory} from "../merchant-common/territory.mjs";
 import {createRegistrationShell,createRegistrationRenderer,validateRegistrationForm,privateStyle,privateAdminStyle} from "../merchant-common/registration-view.mjs";
 import {territoryScript} from "../merchant-common/location-ui.mjs";
-import {originFor,productionGate,PRODUCTION_ORIGIN} from "./production-gates.mjs";
+import {originFor,productionGate,PRODUCTION_ORIGIN,approvedPrivacyNotice} from "./production-gates.mjs";
 export {PRODUCTION_ORIGIN};
 import {reconcileNotification,changeAccountStatus,accountHistory,notificationHistory} from "./operations.mjs";
 import {uploadDocument,listEvidence,downloadDocument,reviewDocument,saveConfiguration} from "./evidence.mjs";
@@ -292,6 +292,7 @@ async function adminAcceptance(req,env,actor,csrf,url){
 export async function handle(req,env,ctx,fetcher=fetch,now=Math.floor(Date.now()/1000),ui=null){
  try{const url=new URL(req.url),origin=originFor(env);if(url.origin!==origin||url.protocol!=="https:")throw fail(403,"HOST");
  if(req.method==="POST"&&(req.headers.get("Origin")!==origin||req.headers.get("Sec-Fetch-Site")==="cross-site"))throw fail(403,"ORIGIN");
+ if(url.pathname==="/privacidad-comercios.html"&&req.method==="GET"){const p=await approvedPrivacyNotice(env);return new Response('<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DESSET — Aviso de privacidad de comercios</title><main><h1>Aviso de privacidad de comercios</h1><p>Versión: '+esc(p.version)+'</p>'+p.text.split(/\\n/).filter(Boolean).map(x=>'<p>'+esc(x)+'</p>').join("")+'<p><a href="/registro-comercios.html">Volver a la solicitud</a></p></main></html>',{headers:{...sec,"Content-Type":"text/html; charset=utf-8"}});}
  if(url.pathname==="/conformidad"||url.pathname.startsWith("/conformidad/"))return await merchantAcceptance(req,env,url,ui);
  if(url.pathname==="/api/intake"){if(env.ENVIRONMENT!=="production")throw fail(503,"INTAKE_DISABLED");await productionGate(env,"intake");if(req.method!=="POST")throw fail(405,"METHOD");return await submit(req,env,fetcher);}
  if(url.pathname==="/registro-comercios.html"||url.pathname.startsWith("/merchant/")){if(env.ENVIRONMENT!=="production")throw fail(503,"INTAKE_DISABLED");return await publicMerchant(req,env,url,ui,fetcher); }
@@ -323,7 +324,9 @@ export async function notifyOne(env,at=Date.now()){
  const token=crypto.randomUUID();
  const r=await env.DB.prepare("UPDATE merchant_notification_outbox SET status='SENDING',attempts=attempts+1,lease_token=?,lease_until=? WHERE request_id=(SELECT request_id FROM merchant_notification_outbox WHERE status='PENDING' AND next_attempt_at<=? ORDER BY next_attempt_at,created_at,request_id LIMIT 1) AND status='PENDING' AND EXISTS (SELECT 1 FROM merchant_runtime WHERE id=1 AND notification_enabled=1 AND environment=? AND launch_authorization_ref=?) RETURNING request_id").bind(token,at+300000,at,s.environment,env.LAUNCH_AUTHORIZATION_REF).first();
  if(!r)return "EMPTY";
- let messageId;try{await productionGate(env,"notification");const receipt=await env.EMAIL.send({from:env.NOTIFY_FROM,to:env.NOTIFY_TO,subject:"DESSET — Nueva solicitud de comercio",text:"Referencia: "+r.request_id+"\nRevise la solicitud en el panel privado de DESSET."});if(typeof receipt?.messageId==="string"&&receipt.messageId.length>0)messageId=receipt.messageId;}catch{/* Do not expose provider errors or retry an ambiguous delivery. */}
+ // A gate closing before invocation is a known non-send; do not label it ambiguous.
+ try{await productionGate(env,"notification");}catch(e){if(e.status!==503)throw e;const r2=await env.DB.prepare("UPDATE merchant_notification_outbox SET status='PENDING',attempts=attempts-1,lease_token=NULL,lease_until=NULL WHERE request_id=? AND status='SENDING' AND lease_token=?").bind(r.request_id,token).run();return r2.meta.changes===1?"DISABLED":"LEASE_LOST";}
+ let messageId;try{const receipt=await env.EMAIL.send({from:env.NOTIFY_FROM,to:env.NOTIFY_TO,subject:"DESSET — Nueva solicitud de comercio",text:"Referencia: "+r.request_id+"\nRevise la solicitud en el panel privado de DESSET."});if(typeof receipt?.messageId==="string"&&receipt.messageId.length>0)messageId=receipt.messageId;}catch{/* Do not expose provider errors or retry an ambiguous delivery. */}
  const result=await env.DB.prepare("UPDATE merchant_notification_outbox SET status=?,lease_token=NULL,lease_until=NULL,sent_at=?,provider_message_id=? WHERE request_id=? AND status='SENDING' AND lease_token=?").bind(messageId?"SENT":"NEEDS_REVIEW",messageId?Date.now():null,messageId??null,r.request_id,token).run();
  return result.meta.changes===1?(messageId?"SENT":"NEEDS_REVIEW"):"LEASE_LOST";
 }

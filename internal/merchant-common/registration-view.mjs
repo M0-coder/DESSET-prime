@@ -22,7 +22,7 @@ export function createRegistrationShell(template,localPath,assetPrefix="/",cssPa
   return template.replace(/<main class="onboarding-page" id="contenido">[\s\S]*?<\/main>/,()=>main)
    .replace("form-action 'none'","form-action 'self'")
    .replace("script-src 'self'",production?"script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com":"script-src 'self'")
-   .replace(/href="\.\/(?:index|comercios|incorporacion-comercios)\.html"/g,'href="'+localPath+'"')
+   .replace(/href="\.\/(index|comercios|incorporacion-comercios)\.html"/g,(_,page)=>'href="'+(production?"https://desset.lat/"+(page==="index"?"":page+".html"):localPath)+'"')
    .replace(/\b(href|src)="\.\/(?!\.\/)/g,'$1="'+assetPrefix)
    .replace("</head>",'<link rel="stylesheet" href="'+cssPath+'"></head>');
  };

@@ -2,7 +2,8 @@ import test from "node:test";import assert from "node:assert/strict";import {Dat
 import {uploadDocument,reviewDocument,downloadDocument,saveConfiguration,listEvidence,merchantAccountSnapshot} from "../internal/merchant-production/evidence.mjs";
 import {advanceOnboarding,handle,PRODUCTION_ORIGIN} from "../internal/merchant-production/worker.mjs";
 import {issueAcceptance,acceptanceView,decideAcceptance,revokeAcceptance,listAcceptances} from "../internal/merchant-production/acceptance.mjs";
-import {recordContact,editProfile,reviewProfile,uploadProfileMedia,approvedProfile} from "../internal/merchant-production/profile.mjs";
+import {recordContact,editProfile,reviewProfile,uploadProfileMedia,approvedProfile,getPreparation,commercialMessage} from "../internal/merchant-production/profile.mjs";
+import {preparationPage} from "../internal/merchant-production/profile-view.mjs";
 const id="00000000-0000-4000-8000-000000000601",actor="reviewer";
 function fixture(t){
  const db=new DatabaseSync(":memory:");t.after(()=>db.close());db.exec("PRAGMA foreign_keys=ON");
@@ -64,3 +65,5 @@ test("Object integrity mismatch prevents verification",async t=>{
 });
 
 test("Direct confirmation remains closed without launch authorization",async t=>{const {env}=fixture(t);const r=await handle(new Request(PRODUCTION_ORIGIN+"/conformidad"),{...env,SERVICE_ORIGIN:PRODUCTION_ORIGIN},null);assert.equal(r.status,503);});
+
+test("Manual contact is a real status message, never claims automatic delivery",async t=>{const {env}=fixture(t);const data=await getPreparation(env,id),message=commercialMessage(data.request),page=preparationPage(data,"csrf");assert.match(message.body,/Hemos revisado tu solicitud/);assert.ok(message.body.includes(id));assert.match(page,/Abrir correo para el comercio/);assert.match(page,/no acredita su envío/);assert.match(page,/mailto:/);await recordContact(env,actor,{id,channel:"EMAIL",outcome:"CONTACTED",notes:"Synthetic contact"});assert.equal((await getPreparation(env,id)).contacts.length,1);});
