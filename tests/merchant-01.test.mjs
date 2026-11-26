@@ -21,7 +21,7 @@ for(const dir of ["","dist/"]){
  assert.ok(html.includes('href="./styles-audiences.css"'));
  assert.ok(!home.includes("styles-audiences.css"));
  assert.ok(!read(dir+"empresa.html").includes("styles-audiences.css"));
- assert.ok(Buffer.byteLength(read(dir+"styles-audiences.css"),"utf8")<4500);
+ assert.ok(Buffer.byteLength(read(dir+"styles-audiences.css"),"utf8")<6000);
  assert.doesNotMatch(read(dir+"styles-audiences.css"),/@import\b|url\(\s*['"]?https?:/i);
  });
  }

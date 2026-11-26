@@ -61,6 +61,16 @@ export function reviewTalentPhoto(media){
  if(a.verification!=='individual-source-pending'||d?.status!=='owner-attested-free-download'||d.scope!=='PHOTO-01; illustrative website use of this specific photo only'||d.source!=='direct owner instruction in the project conversation'||typeof d.statement!=='string'||!d.statement.trim()||!/^\d{4}-\d{2}-\d{2}$/.test(d.date)||!/^\d{4}-\d{2}-\d{2}$/.test(d.general_license_terms_reviewed_on)||d.individual_source_verification!==false||d.independent_legal_verification!==false||d.exclusive_ownership_claim!==false||!['path','sha256','source_id','license','license_url'].every(k=>d.asset?.[k]===a[k]))return rejected;
  return {accepted:true,basis:'owner-attested-free-download',individual_source_verified:false,release_authorized:false};
 }
+// PHOTO-02: the supplied filename identifies the source; approval is for illustrative use only.
+export function reviewMerchantHeroPhoto(media){
+ const rejected={accepted:false,basis:'pending',individual_source_verified:false,release_authorized:false};
+ const a=media?.merchant_hero_photo;
+ if(!a||a.path!=='assets/comercios-hero-minimercado.webp'||a.source_id!=='31487467'||a.source!=='https://www.pexels.com/photo/31487467/'||a.claim!=='third-party'||a.license!=='Pexels License'||a.license_url!=='https://www.pexels.com/license/'||a.release_authorized!==false||!/^[a-f0-9]{64}$/.test(a.sha256)||!Number.isSafeInteger(a.bytes)||a.bytes<=0||a.bytes>210000||a.width!==1800||a.height!==1200||a.usage!=='Illustrative storefront; no endorsement or affiliation implied.')return rejected;
+ if(a.verification==='individual-source-verified')return {accepted:true,basis:'individual-source-verified',individual_source_verified:true,release_authorized:false};
+ const d=a.selection;
+ if(a.verification!=='source-identified-from-upload-filename'||d?.status!=='owner-supplied-and-approved-preview'||d.scope!=='PHOTO-02; illustrative website use of this specific photo only'||d.source!=='direct owner instruction in the project conversation'||!/^\d{4}-\d{2}-\d{2}$/.test(d.date)||!/^\d{4}-\d{2}-\d{2}$/.test(d.general_license_terms_reviewed_on)||d.individual_source_verification!==false||d.independent_legal_verification!==false||d.exclusive_ownership_claim!==false||!['path','sha256','source_id','license','license_url'].every(k=>d.asset?.[k]===a[k]))return rejected;
+ return {accepted:true,basis:'owner-supplied-and-approved-preview',individual_source_verified:false,release_authorized:false};
+}
 export function validateReleaseIntent({repository,ref,event,expectedSha,checkoutSha,previousId,seoPolicy,target}){
  const err=[];
  mark(err,repository===target?.repository,'Wrong GitHub repository');
@@ -106,11 +116,13 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    if(!reviewPrimePageMedia(media))throw Error('Prime page photographs require a valid individual inventory before production');
    const talentReview=reviewTalentPhoto(media);
    if(!talentReview.accepted)throw Error('PHOTO-01: scoped photographic rights review required before production');
+   const merchantReview=reviewMerchantHeroPhoto(media);
+   if(!merchantReview.accepted)throw Error('PHOTO-02: scoped photographic source and usage review required before production');
    const e=process.env;
    const out=validateReleaseIntent({repository:e.GITHUB_REPOSITORY,ref:e.GITHUB_REF,event:e.GITHUB_EVENT_NAME,
      expectedSha:e.RELEASE_SHA,checkoutSha:e.GITHUB_SHA,previousId:e.PREVIOUS_DEPLOYMENT_ID,
      seoPolicy:e.SEO_POLICY,target});
-   console.log(JSON.stringify({...out,selected_media_review:mediaReview,talent_media_review:talentReview}));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
+   console.log(JSON.stringify({...out,selected_media_review:mediaReview,talent_media_review:talentReview,merchant_hero_media_review:merchantReview}));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
   }else if(task==='cloudflare'){
    const [projectPath,domainPath]=process.argv.slice(3);
    const out=validateCloudflareSnapshot({projectResponse:JSON.parse(readFileSync(projectPath,'utf8')),
