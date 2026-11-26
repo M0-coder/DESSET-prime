@@ -22,7 +22,7 @@ test("truthful service and conceptual 3D disclosures remain without redundant th
  const flow=html.match(/<section class="ecosystem"[\s\S]*?<\/section>/)?.[0]||"";
  const statement=html.match(/<section class="statement"[\s\S]*?<\/section>/)?.[0]||"";
  const prime=readFileSync(new URL("../prime.html",import.meta.url),"utf8");
- assert.ok(flow.includes('./prime.html#modelo')&&statement.length>1000&&prime.includes('id="modelo"'),"Home participant statement and Prime model must remain");
+ assert.ok(!flow&&html.includes('class="prime-service-cta" href="./prime.html"')&&statement.length>1000&&prime.includes('id="modelo"'),"Redundant chapter absent; participant statement and Prime model remain");
  assert.doesNotMatch(flow,/v6-three-mount|v6-static-fallback/);
  assert.match(prime,/class="v6-three-mount"/);
  assert.match(prime,/aria-label="Simulación logística conceptual de DESSET prime"/);
@@ -47,14 +47,14 @@ test("contact profiles carry owner declaration, not platform-admin proof or DM r
  assert.doesNotMatch(html,/<form\b|<input\b/i);
 });
 
-test("eight-section hierarchy and mobile typography remain after deleting redundant trust ledger",()=>{
- assert.equal((html.match(/<section\b/g)||[]).length,8);
+test("seven-section hierarchy and mobile typography remain after deleting redundant trust ledger",()=>{
+ assert.equal((html.match(/<section\b/g)||[]).length,7);
  const s1=html.indexOf('id="vision"'),s2=html.indexOf('id="soluciones"'),s3=html.indexOf('id="ecosistema"');
- assert.ok(0<s2 && s2<s1 && s1<s3);
+ assert.ok(0<s2 && s2<s3 && s3<s1);
  assert.match(css,/\.statement-body\{display:grid;grid-template-columns:minmax\(0,1fr\)/);
  assert.match(css,/@media\(max-width:700px\)/);
  assert.match(css,/\.statement h2\{font-size:clamp\(31px,9vw,60px\)/);
  assert.doesNotMatch(css,/\.trust-ledger(?:-grid|-item)?\b/);
- for(const id of ["soluciones","ecosistema","negocios"])
+ for(const id of ["soluciones","negocios"])
   assert.match(html,new RegExp('id="'+id+'" aria-label="[^"]+"'));
 });

@@ -61,7 +61,7 @@ check(vision.includes('class="v4-flow motion-story statement-journey"')&&
  (vision.match(/class="motion-story-unit motion-story-unit--/g)||[]).length===4&&
  !scene.includes("motion-story-unit")&&!scene.includes('class="v6-three-mount"')&&prime.includes('class="v6-three-mount"'),
  "PRIME-LAYOUT-01 include four participant photos without duplicating or damaging 3D scene");
-check(html.includes('id="ecosistema"')&&!html.includes("roles-geometry-")&&!html.includes('class="v4-architecture-details"')&&!html.includes('class="ecosystem-board')&&
+check(html.includes('class="service-body" id="ecosistema"')&&!html.includes('<section class="ecosystem"')&&!html.includes('class="prime-3d-heading"')&&!html.includes("roles-geometry-")&&!html.includes('class="v4-architecture-details"')&&!html.includes('class="ecosystem-board')&&
  !html.includes('data-v64-tour-launch'),"3D section landmark or duplicate hero CTA regression");
 check(!html.includes('class="v6-three-mount"')&&prime.includes('class="v63-tour"')&&prime.includes('class="v6-three-mount"'),"3D tour must be mounted only in Prime");
 check(html.includes('name="robots" content="noindex,nofollow"'),"noindex absent");

@@ -101,3 +101,6 @@
 @media (max-width:860px){
  #inicio .motion-headline{font-size:clamp(22px,9.5cqw,75px)}
 }
+
+/* Owner-approved homepage Prime wordmark: both lines use institutional blue. */
+#soluciones .service--prime h3{color:#073bbc}

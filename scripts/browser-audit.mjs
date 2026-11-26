@@ -185,8 +185,8 @@ async function viewport(width,height,reduce=false,entry=URL){
    statementBackground:style("#vision").backgroundColor,
    footerBackground:style(".site-footer").backgroundColor,
    navContactBackground:style(".main-nav .nav-contact").backgroundColor,
-   primeHeadingColor:style("#desset-prime-heading").color,
-   primeSubtitleColor:style("#ecosistema .prime-3d-heading p").color,
+   primeHeadingColor:style("#soluciones .service--prime h3").color,
+   primeSubtitleColor:style("#soluciones .service--prime h3 span").color,
    brandNameInk:style(".site-header .brand-name").color,
    footerBrandInk:style(".footer-brand").color,
    footerCopyInk:style(".site-footer>p").color,
@@ -198,7 +198,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    heroCtaInk:style("#inicio .hero-cta").color,
    heroPhotoFallbackBg:style("#inicio .prime-photo-surface").backgroundColor
   };
- return {decorativeArrowCount:[...document.querySelectorAll("a,button,summary")].filter(e=>/[↗→➜]/.test(e.textContent)).length,viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,participantLayout,servicesLayout,partnerLayout,footerLayout,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:!!document.querySelector('.v4-architecture-details,.ecosystem-board,.v4-flow-board'),obsoleteServices:!!document.querySelector('.future-services')},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ return {decorativeArrowCount:[...document.querySelectorAll("a,button,summary")].filter(e=>/[↗→➜]/.test(e.textContent)).length,viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,participantLayout,servicesLayout,partnerLayout,footerLayout,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:!!document.querySelector('.v4-architecture-details,.ecosystem-board,.v4-flow-board,section.ecosystem,.prime-3d-heading'),obsoleteServices:!!document.querySelector('.future-services')},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
@@ -216,7 +216,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    !exactBlue||palette.businessCTA!==brandBlue||
    palette.statementAccent!==brandBlue||palette.statementBackground!==paleBlue||
    palette.footerBackground!=="rgb(241, 245, 250)"||palette.navContactBackground!==pureWhite||
-   palette.primeHeadingColor!=="rgb(21, 81, 216)"||palette.primeSubtitleColor!=="rgb(17, 17, 17)"||
+   palette.primeHeadingColor!==brandBlue||palette.primeSubtitleColor!==brandBlue||
    palette.institutionalInk!=="#000000"||
    palette.stageInk!=="#111111"||palette.stageDesignInk!=="#111111"||palette.stageInheritedColor!=="rgb(17, 17, 17)"||
    palette.heroHeadingColor!=="rgb(0, 0, 0)"||
@@ -294,7 +294,7 @@ try{
  const motionMode=await js("document.documentElement.dataset.motionSystem");
  if(motionMode!=="ready")report.failures.push("Intersection motion system unavailable: "+String(motionMode));
  report.tests.push({name:"Progressive motion system active",mode:motionMode});
- const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),flow:!!document.querySelector("#ecosistema .prime-model-link"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
+ const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),flow:!!document.querySelector("#ecosistema .prime-service-cta"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
  if(!heroQuality.headline?.includes("AUMENTA EL VALOR")||!heroQuality.headline?.includes("A TU TIEMPO")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
  report.tests.push({name:"V4 motion/design contract",heroQuality});
  const heroPhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");const f=document.querySelector("#inicio .prime-photo-surface");return {loaded:!!x?.complete&&x.naturalWidth===1671&&x.naturalHeight===941,src:x?.getAttribute("src"),logo:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),oldText:document.querySelector("#inicio")?.textContent?.includes("IDEAS EN ACCIÓN"),ratio:f?.getBoundingClientRect().width/f?.getBoundingClientRect().height}})()');
@@ -351,7 +351,7 @@ try{
  await sleep(2050);
  await capture("desktop-final.png");
  
-  const v5Cover=await js('(()=>({mode:document.documentElement.dataset.v5Mode,overlayAbsent:!document.querySelector(".v5-hero-refraction"),stage:!!document.querySelector(".v5-city-stage,.v6-three-mount"),diagram:!!document.querySelector(".roles-diagram-responsive"),link:!!document.querySelector("a[href=\\\"./prime.html#modelo\\\"]"),noPoster:!document.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),contactLight:!!document.querySelector(".v5-contact-light")}))()');
+  const v5Cover=await js('(()=>({mode:document.documentElement.dataset.v5Mode,overlayAbsent:!document.querySelector(".v5-hero-refraction"),stage:!!document.querySelector(".v5-city-stage,.v6-three-mount"),diagram:!!document.querySelector(".roles-diagram-responsive"),link:!!document.querySelector("#ecosistema .prime-service-cta"),noPoster:!document.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),contactLight:!!document.querySelector(".v5-contact-light")}))()');
   if(v5Cover.mode!=="ready"||!v5Cover.overlayAbsent||v5Cover.stage||v5Cover.diagram||!v5Cover.link||!v5Cover.noPoster||v5Cover.contactLight)report.failures.push("Home must not mount logistics WebGL or old diagram: "+JSON.stringify(v5Cover));
   report.tests.push({name:"Home is free of logistics 3D and obsolete diagram",v5Cover});
    // Capture full page after activation without any poster image.
@@ -475,12 +475,12 @@ try{
    const after=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),focused:document.activeElement===document.querySelector('.menu-button')})");
    if(after.expanded!=="false"||!after.focused)report.failures.push("Escape did not close and focus mobile menu");
    report.tests.push({name:"mobile navigation + Escape",menu,after});
-   const removedPanel=await js('(()=>({absent:!document.querySelector(".v4-architecture-details,.ecosystem-board,.v4-flow-board"),link:!!document.querySelector("#ecosistema .prime-model-link")}))()');
+   const removedPanel=await js('(()=>({absent:!document.querySelector(".v4-architecture-details,.ecosystem-board,.v4-flow-board,section.ecosystem,.prime-3d-heading"),link:!!document.querySelector("#ecosistema .prime-service-cta")}))()');
    if(!removedPanel.absent||!removedPanel.link)report.failures.push("Retired accordion must be absent and Prime model link retained: "+JSON.stringify(removedPanel));
    report.tests.push({name:"Mobile retired accordion absent",removedPanel});
    if(await js('!!document.querySelector(".v5-city-stage,.v6-three-mount")'))report.failures.push("390px home unexpectedly mounts 3D");
    // Capture full page after activation without any poster image.
-   const wholePageClosed=await js('(()=>({technical:!!document.querySelector(".v4-architecture-details,.ecosystem-board,.v4-flow-board"),obsoleteServices:!!document.querySelector(".future-services")}))()');
+   const wholePageClosed=await js('(()=>({technical:!!document.querySelector(".v4-architecture-details,.ecosystem-board,.v4-flow-board,section.ecosystem,.prime-3d-heading"),obsoleteServices:!!document.querySelector(".future-services")}))()');
    if(wholePageClosed.technical||wholePageClosed.obsoleteServices)report.failures.push("390px full-page screenshot would misrepresent removed panel state: "+JSON.stringify(wholePageClosed));
    report.tests.push({name:"390px full-page capture: technical disclosure ABSENT, services visible",wholePageClosed});
    await capture("mobile-full.png",true);
@@ -493,7 +493,7 @@ try{
    
    if(await js('!!document.querySelector(".v5-city-stage,.v6-three-mount")'))report.failures.push("320px home unexpectedly mounts 3D");
    // Capture full page after activation without any poster image.
-   const narrowPageClosed=await js('(()=>({technical:!!document.querySelector(".v4-architecture-details,.ecosystem-board,.v4-flow-board"),obsoleteServices:!!document.querySelector(".future-services")}))()');
+   const narrowPageClosed=await js('(()=>({technical:!!document.querySelector(".v4-architecture-details,.ecosystem-board,.v4-flow-board,section.ecosystem,.prime-3d-heading"),obsoleteServices:!!document.querySelector(".future-services")}))()');
    if(narrowPageClosed.technical||narrowPageClosed.obsoleteServices)report.failures.push("320px full-page screenshot would misrepresent removed panel state: "+JSON.stringify(narrowPageClosed));
    report.tests.push({name:"320px full-page capture: technical disclosure ABSENT, services visible",narrowPageClosed});
    await capture("mobile-320-full.png",true);
@@ -550,9 +550,9 @@ try{
   report.failures.push("V5.4 keyboard Escape does not restore menu focus: "+JSON.stringify(keyboardMenuClosed));
  report.tests.push({name:"V5.4 keyboard menu Enter and Escape",keyboardMenuOpen,keyboardMenuClosed});
 
- await js('document.querySelector("#ecosistema .prime-model-link").focus()');
- const primeLinkKeyboard=await js('(()=>{const e=document.querySelector("#ecosistema .prime-model-link");return {focused:e===document.activeElement,focusVisible:e.matches(":focus-visible"),href:e.getAttribute("href")}})()');
- if(!primeLinkKeyboard.focused||!primeLinkKeyboard.focusVisible||primeLinkKeyboard.href!=="./prime.html#modelo")report.failures.push("Prime model link keyboard access failed: "+JSON.stringify(primeLinkKeyboard));
+ await js('document.querySelector("#ecosistema .prime-service-cta").focus()');
+ const primeLinkKeyboard=await js('(()=>{const e=document.querySelector("#ecosistema .prime-service-cta");return {focused:e===document.activeElement,focusVisible:e.matches(":focus-visible"),href:e.getAttribute("href")}})()');
+ if(!primeLinkKeyboard.focused||!primeLinkKeyboard.focusVisible||primeLinkKeyboard.href!=="./prime.html")report.failures.push("Prime model link keyboard access failed: "+JSON.stringify(primeLinkKeyboard));
  report.tests.push({name:"V5.4 keyboard Prime model link",primeLinkKeyboard});
 
  await call("Accessibility.enable");
@@ -603,7 +603,7 @@ try{
    await js('document.querySelector("#empresa-destacada").scrollIntoView({block:"start",behavior:"instant"})');
    await sleep(150);
    const hierarchy=await js(`(()=>{const grid=document.querySelector("#empresa-destacada .institutional-home-grid"),cards=[...grid.querySelectorAll("article")],strip=document.querySelector(".institutional-recent"),sections=[...document.querySelectorAll("main>section")];return {order:sections.map(e=>e.id).join("|"),recent:strip.previousElementSibling?.id==="inicio"&&strip.nextElementSibling?.id==="empresa-destacada",columns:getComputedStyle(grid).gridTemplateColumns.trim().split(/\\s+/).length,headings:cards.map(e=>e.querySelector("h3").textContent),fit:cards.every(e=>e.scrollWidth<=e.clientWidth+2&&e.getBoundingClientRect().width>0),investors:cards[1]?.querySelector('a[href="./empresa.html#inversores"]')?.getBoundingClientRect().height>=44}})()`);
-   if(hierarchy.order!=="inicio|empresa-destacada|noticias-destacadas|soluciones|vision|ecosistema|talento-destacado|negocios"||!hierarchy.recent||hierarchy.columns!==(w<=700?1:2)||hierarchy.headings.join("|")!=="Empresa|Inversores"||!hierarchy.fit||!hierarchy.investors)report.failures.push("VISUAL-HIERARCHY-01 "+label+": "+JSON.stringify(hierarchy));
+   if(hierarchy.order!=="inicio|empresa-destacada|noticias-destacadas|soluciones|vision|talento-destacado|negocios"||!hierarchy.recent||hierarchy.columns!==(w<=700?1:2)||hierarchy.headings.join("|")!=="Empresa|Inversores"||!hierarchy.fit||!hierarchy.investors)report.failures.push("VISUAL-HIERARCHY-01 "+label+": "+JSON.stringify(hierarchy));
    if(w===1440||w===390)await capture((root?"dist-":"source-")+"hierarchy-"+w+"px.png");
    report.tests.push({name:"VISUAL-HIERARCHY-01 "+label,hierarchy});
   }

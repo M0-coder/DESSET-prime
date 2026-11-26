@@ -6,7 +6,7 @@ const audit=read("scripts/browser-audit.mjs");
 for(const dir of ["","dist/"])test("Retired technical accordion is physically absent, not hidden: "+(dir||"source"),()=>{
  const html=read(dir+"index.html");
  assert.doesNotMatch(html,/v4-architecture-details|ecosystem-board v4-flow-board|Explorar las funciones de clientes/);
- assert.match(html,/href="\.\/prime\.html#modelo"/);
+ assert.match(html,/class="prime-service-cta" href="\.\/prime\.html"/);
  assert.doesNotMatch(html,/<details class="future-services"/);
 });
 test("Responsive and keyboard QA validates the remaining Prime link",()=>{

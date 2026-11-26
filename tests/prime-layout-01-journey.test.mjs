@@ -4,7 +4,7 @@ import {readFileSync} from "node:fs";
 const root=new URL("../",import.meta.url),read=p=>readFileSync(new URL(p,root),"utf8");
 const html=read("index.html"),css=read("styles.css"),sealed=read("styles-visual02.css");
 const slice=(tag)=>{const i=html.indexOf(tag);assert.ok(i>=0,"Section missing: "+tag);const j=html.indexOf("</section>",i);assert.ok(j>i);return html.slice(i,j)};
-const vision=slice('<section class="statement" id="vision"'),scene=slice('<section class="ecosystem" id="ecosistema"');
+const vision=slice('<section class="statement" id="vision"'),scene=html.match(/<section class="ecosystem"[\s\S]*?<\/section>/)?.[0]||"";
 const photos=["assets/ecosistema-proveedores.webp","assets/ecosistema-comercios.webp","assets/ecosistema-consumidores.webp","assets/ecosistema-operadores-logisticos.webp"];
 test("ECOSYSTEM-PARTICIPANTS-01 one ordered four-photo ecosystem separate from 3D",()=>{
  assert.match(vision,/<h2 id="vision-title">NO ES SOLO <span>ENTREGAR<\/span><br><strong class="statement-last">ES CONECTAR<\/strong><\/h2>/);
@@ -13,7 +13,7 @@ test("ECOSYSTEM-PARTICIPANTS-01 one ordered four-photo ecosystem separate from 3
  assert.equal((vision.match(/<picture class="v03-photo-story">/g)||[]).length,4);
  for(const path of photos){assert.ok(vision.includes('src="./'+path+'"'));assert.ok(!scene.includes(path))}
  assert.doesNotMatch(scene,/motion-story-unit|v03-photo-story|ecosistema-(?:proveedores|comercios|consumidores|operadores-logisticos)\.webp/);
- assert.ok(!scene.includes('class="v4-architecture-details"'));
+ assert.equal(scene,"","Redundant section must not exist in DOM");
  for(const cls of ["v6-three-mount","v63-tour","v6-pause"]){assert.ok(!scene.includes('class="'+cls+'"'));assert.ok(read("prime.html").includes('class="'+cls+'"'));}
 });
 test("Four distinct local WebP photos and truthful explanatory copy",()=>{
