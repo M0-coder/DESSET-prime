@@ -215,6 +215,41 @@
       }
     }
   },
+  "home_talent_photo": {
+    "path": "assets/talento-equipo.webp",
+    "sha256": "af5fa1c4e7f2ee1455d65cadf10531aa71147dcac779dd3dbbde9dc67d3d5434",
+    "bytes": 62380,
+    "width": 1200,
+    "height": 900,
+    "alt": "Cuatro personas se sujetan las muñecas en un gesto de colaboración.",
+    "claim": "third-party",
+    "author": "krakenimages",
+    "source": "https://unsplash.com/photos/team-members-gripping-wrists-in-unity-gesture-Y5bvRlcCx8k",
+    "source_id": "Y5bvRlcCx8k",
+    "license": "Unsplash License",
+    "license_url": "https://unsplash.com/license",
+    "verification": "source-page-and-license-reviewed",
+    "release_authorized": false,
+    "usage": "Illustrative teamwork; not actual DESSET employees.",
+    "selection": {
+      "status": "owner-supplied-and-approved-preview",
+      "date": "2026-11-26",
+      "scope": "PHOTO-05; homepage talent illustration only",
+      "source": "direct owner instruction in the project conversation",
+      "source_page_reviewed_on": "2026-11-26",
+      "general_license_terms_reviewed_on": "2026-11-26",
+      "remote_original_binary_comparison": false,
+      "independent_legal_verification": false,
+      "exclusive_ownership_claim": false,
+      "asset": {
+        "path": "assets/talento-equipo.webp",
+        "sha256": "af5fa1c4e7f2ee1455d65cadf10531aa71147dcac779dd3dbbde9dc67d3d5434",
+        "source_id": "Y5bvRlcCx8k",
+        "license": "Unsplash License",
+        "license_url": "https://unsplash.com/license"
+      }
+    }
+  },
   "merchant_hero_photo": {
     "path": "assets/comercios-hero-minimercado.webp",
     "sha256": "e38fc8cef5a94d5113aea720b10847280ee50e1f71e2a6ed4b8f08422613306b",

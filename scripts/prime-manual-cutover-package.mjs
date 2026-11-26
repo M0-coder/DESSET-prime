@@ -65,7 +65,7 @@ export function preparePrimeCutoverPackage({dist,sourceSha,seoPolicy,outputDir,e
      if(st.isDirectory())scan(full,rel);else{assert(st.isFile(),'Not a regular file in package');paths.push(rel);}
    }
   }scan(output);
-  assert(paths.length===71&&paths.every(x=>expected.has(x)),'Unexpected candidate inventory');
+  assert(paths.length===72&&paths.every(x=>expected.has(x)),'Unexpected candidate inventory');
   for(const path of requiredSpecial)assert(paths.includes(path),'Missing required static host policy '+path);
   const modifiable=new Set(['index.html','_headers','robots.txt','sitemap.xml','THIRD-PARTY-NOTICES.txt']);
   const inventory=paths.sort().map(path=>{

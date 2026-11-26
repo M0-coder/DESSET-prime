@@ -41,7 +41,7 @@ if(!loader.includes('activationObserver.observe(stage)')||
  !loader.includes('threeStart?.addEventListener("click",loadThree)')||
  !loader.includes('./assets/v6-three.bundle.js'))
  throw Error("Viewport-activated 3D scene is not connected to bundled WebGL or manual fallback.");
-if(files.length!==67)throw Error("Too many release files for DESSET Prime: "+files.length);
+if(files.length!==68)throw Error("Too many release files for DESSET Prime: "+files.length);
 for(const path of files){
  if(path.split("/").includes("..") || !(path==="assets/v6-three.bundle.js" || /^(?:(?:index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios|registro-repartidores|incorporacion-repartidores|capacitacion-repartidores|aplicaciones|aplicaciones-clientes|aplicaciones-comercios|aplicaciones-repartidores)\.html|styles(?:-v5|-system|-hero-photo|-visual02|-typography|-audiences|-prime|-contact|-trust|-news|-careers|-onboarding|-applications)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb)|fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2|fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt)$/.test(path)))
    throw Error("Unexpected package path: "+path);

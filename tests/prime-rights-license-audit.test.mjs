@@ -20,6 +20,7 @@ test('12 owner-declared active original media are individually SHA-256 verified'
  assert.equal(r.outcome,'PASS');assert.equal(r.assets_checked,12);assert.equal(r.archived_media_checked,2);assert.ok(r.archived_media.every(a=>a.scope==='source-only'));assert.ok(!r.assets.some(a=>a.path.startsWith('assets/roles-geometry-')));
  assert.equal(r.legal_title_independently_verified,false);
  assert.equal(r.merchant_hero_media.path,'assets/comercios-hero-minimercado.webp');assert.equal(r.merchant_hero_media.claim,'third-party');assert.equal(r.merchant_hero_media_review.individual_source_verified,false);assert.equal(r.merchant_hero_media_review.basis,'owner-supplied-and-approved-preview');
+ assert.equal(r.home_talent_media.path,'assets/talento-equipo.webp');assert.equal(r.home_talent_media.claim,'third-party');assert.equal(r.home_talent_media_review.accepted,true);assert.equal(r.home_talent_media_review.release_authorized,false);
  assert.equal(r.talent_media.path,'assets/talento-cultura.webp');assert.equal(r.talent_media.claim,'third-party');assert.equal(r.talent_media.individual_source_verified,false);assert.equal(r.talent_media_review.basis,'owner-attested-free-download');assert.equal(r.talent_media_review.release_authorized,false);
  assert.equal(r.prime_page_media_checked,6);assert.equal(r.prime_page_media.filter(a=>a.claim==='third-party').length,1);assert.equal(r.selected_media_checked,4);assert.equal(r.individual_license_review_complete,false);
  assert.equal(r.selected_media_review.basis,'owner-attested-free-download');
@@ -79,3 +80,5 @@ test("tampered selected photograph is rejected without claiming third-party owne
  writeFileSync(join(copy,'assets/ecosistema-proveedores.webp'),'changed');
  assert.throws(()=>checkAssetRightsAndLicenses({...opts,dist:copy}),/NO-GO/);
 });
+
+test('PHOTO-05 modified homepage photo is rejected',t=>{const copy=copyDist(t);writeFileSync(join(copy,'assets/talento-equipo.webp'),'changed');assert.throws(()=>checkAssetRightsAndLicenses({...opts,dist:copy}),/NO-GO/);});
