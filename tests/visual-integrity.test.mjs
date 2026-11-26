@@ -54,7 +54,7 @@ test("DESSET blue service rail has four accessible, substantive benefits and res
 test("Obsolete technical accordion is removed from HTML, not hidden",()=>{
  assert.doesNotMatch(html,/v4-architecture-details|ecosystem-board v4-flow-board|class="roles" role="list"/);
  assert.match(html,/href="\.\/prime\.html#modelo"/);
- assert.match(heroCss,/#inicio \.v4-hero-rail\{[^\n]*background:var\(--yellow\);color:#000000/);
- assert.match(heroCss,/#inicio \.v4-rail-item strong\{display:block;color:#000000/);
- assert.match(heroCss,/#inicio \.v4-rail-item p\{margin:5px 0 0;color:#000000/);
+ assert.match(heroCss,/#inicio \.v4-hero-rail\{[^\n]*background:var\(--yellow\);color:#fff/);
+ assert.match(heroCss,/#inicio \.v4-rail-item strong\{display:block;color:#fff/);
+ assert.match(heroCss,/#inicio \.v4-rail-item p\{margin:5px 0 0;color:#e2ebff/);
 });

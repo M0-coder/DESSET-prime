@@ -236,7 +236,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
- if(diag.railItems.length!==4||diag.railItems.some(i=>!i.visible||!i.inside||!i.textFits||!i.icon||i.fontPx<12||i.titleInk!=="rgb(0, 0, 0)"||i.copyInk!=="rgb(0, 0, 0)"||i.iconInk!=="rgb(0, 0, 0)")||
+ if(diag.railItems.length!==4||diag.railItems.some(i=>!i.visible||!i.inside||!i.textFits||!i.icon||i.fontPx<12||i.titleInk!=="rgb(255, 255, 255)"||i.copyInk!=="rgb(226, 235, 255)"||i.iconInk!=="rgb(255, 255, 255)")||
     diag.railDisplay.background!==expectedOriginal||diag.railDisplay.role!=="list"||diag.railDisplay.ariaHidden!==null||
     diag.railDisplay.columns!==(width<=860?2:4)||
    (diag.railDisplay.left>2||diag.railDisplay.left< -16)||
