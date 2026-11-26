@@ -86,6 +86,16 @@ export function reviewRiderHeroPhoto(media){
  if(d?.status!=='owner-supplied-and-approved-use'||d.date!=='2026-11-26'||d.scope!=='PHOTO-06; Repartidores institutional hero only'||d.source!=='direct owner instruction in the project conversation'||d.independent_legal_verification!==false||d.exclusive_ownership_claim!==false||d.asset?.path!==a.path||d.asset?.sha256!==a.sha256)return rejected;
  return {accepted:true,basis:'owner-supplied-and-approved-use',individual_source_verified:false,release_authorized:false};
 }
+// VIDEO-01: scoped owner attestation, not independent license verification or deployment approval.
+export function reviewServiceVideos(media){
+ const rejected={accepted:false,basis:'pending',individual_source_verified:false,release_authorized:false};
+ const v=media?.service_videos,d=v?.owner_attestation;
+ const approved=[{"path":"assets/servicio-desset.mp4","sha256":"592dd2d37d778a57d784195bd866d168243e973f3890064aab11c73e63d68bbc","bytes":1175493,"kind":"video","source_filename":"Fccyaq.mp4"},{"path":"assets/servicio-prime.mp4","sha256":"dcca0f7554c7e3267e141d8f4bdb19acde67f8628932b374ccad0962c19c2081","bytes":1620138,"kind":"video","source_filename":"23232-333604632.mp4"},{"path":"assets/servicio-desset-poster.webp","sha256":"c59181261f58aa6337eb1139e1e814222d1fc6657759795db7fc2a0b788d6733","bytes":10072,"kind":"poster","derived_from":"assets/servicio-desset.mp4"},{"path":"assets/servicio-prime-poster.webp","sha256":"ce1ed66071c700d3a921df00e668571403e6300c33192d7bff426d355c430a3c","bytes":41806,"kind":"poster","derived_from":"assets/servicio-prime.mp4"}];
+ if(v?.scope!=='VIDEO-01; approved owner-supplied visual preview only'||v.source!=='conversation-upload'||v.verification!=='owner-attested-free-use'||v.release_authorized!==false||v.independent_legal_verification!==false||!Array.isArray(v.assets)||v.assets.length!==approved.length)return rejected;
+ if(d?.status!=='owner-attested-free-use'||d.scope!==v.scope||!/^\d{4}-\d{2}-\d{2}$/.test(d.date)||d.source!=='direct owner instruction in the project conversation'||typeof d.statement!=='string'||!d.statement.trim()||d.individual_source_verification!==false||d.independent_legal_verification!==false||d.exclusive_ownership_claim!==false||!Array.isArray(d.assets)||d.assets.length!==approved.length)return rejected;
+ for(const expected of approved){const a=v.assets.filter(x=>x?.path===expected.path),b=d.assets.filter(x=>x?.path===expected.path);if(a.length!==1||b.length!==1||!Object.keys(expected).every(k=>a[0][k]===expected[k])||!['path','sha256','bytes','kind'].every(k=>b[0][k]===expected[k]))return rejected;}
+ return {accepted:true,basis:'owner-attested-free-use',individual_source_verified:false,release_authorized:false};
+}
 export function validateReleaseIntent({repository,ref,event,expectedSha,checkoutSha,previousId,seoPolicy,target}){
  const err=[];
  mark(err,repository===target?.repository,'Wrong GitHub repository');
@@ -133,7 +143,8 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    if(!talentReview.accepted)throw Error('PHOTO-01: scoped photographic rights review required before production');
    const homeTalentReview=reviewHomeTalentPhoto(media);
    if(!homeTalentReview.accepted)throw Error('PHOTO-05: scoped homepage photograph review required before production');
-   if(media.service_videos?.verification!=="source-page-and-license-reviewed")throw Error("VIDEO-01: source and usage rights must be verified before production");
+   const serviceReview=reviewServiceVideos(media);
+   if(!serviceReview.accepted)throw Error("VIDEO-01: scoped usage rights declaration required before production");
    const riderReview=reviewRiderHeroPhoto(media);
    if(!riderReview.accepted)throw Error('PHOTO-06: scoped rider portrait usage review required before production');
    const merchantReview=reviewMerchantHeroPhoto(media);
@@ -142,7 +153,7 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    const out=validateReleaseIntent({repository:e.GITHUB_REPOSITORY,ref:e.GITHUB_REF,event:e.GITHUB_EVENT_NAME,
      expectedSha:e.RELEASE_SHA,checkoutSha:e.GITHUB_SHA,previousId:e.PREVIOUS_DEPLOYMENT_ID,
      seoPolicy:e.SEO_POLICY,target});
-   console.log(JSON.stringify({...out,selected_media_review:mediaReview,talent_media_review:talentReview,home_talent_media_review:homeTalentReview,merchant_hero_media_review:merchantReview,rider_hero_media_review:riderReview}));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
+   console.log(JSON.stringify({...out,selected_media_review:mediaReview,talent_media_review:talentReview,home_talent_media_review:homeTalentReview,merchant_hero_media_review:merchantReview,rider_hero_media_review:riderReview,service_video_media_review:serviceReview}));if(out.result!=='READY-FOR-LIVE-PREFLIGHT')process.exitCode=2;
   }else if(task==='cloudflare'){
    const [projectPath,domainPath]=process.argv.slice(3);
    const out=validateCloudflareSnapshot({projectResponse:JSON.parse(readFileSync(projectPath,'utf8')),

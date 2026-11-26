@@ -8,7 +8,7 @@ import {createHash} from 'node:crypto';
 import {join,resolve,dirname,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {checkPrimeFonts} from './prime-font-licenses.mjs';
-import {reviewSelectedMedia,reviewPrimePageMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto,reviewRiderHeroPhoto} from './prime-manual-cutover-gate.mjs';
+import {reviewSelectedMedia,reviewPrimePageMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto,reviewRiderHeroPhoto,reviewServiceVideos} from './prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const requireSafe=(okay,reason)=>{if(!okay)throw Error('NO-GO: '+reason)};
@@ -76,6 +76,7 @@ export function checkAssetRightsAndLicenses({
  expected.set(rider.path,rider.sha256);
  const service=selected.service_videos;
  requireSafe(service?.scope==="VIDEO-01; approved owner-supplied visual preview only"&&service.source==="conversation-upload"&&service.release_authorized===false&&service.independent_legal_verification===false&&Array.isArray(service.assets)&&service.assets.length===4,"invalid service video registry");
+ requireSafe(reviewServiceVideos(selected).accepted,'invalid scoped VIDEO-01 rights declaration');
  const serviceByPath=new Map();
  for(const x of service.assets){requireSafe(["assets/servicio-desset.mp4","assets/servicio-prime.mp4","assets/servicio-desset-poster.webp","assets/servicio-prime-poster.webp"].includes(x.path)&&!expected.has(x.path)&&/^[a-f0-9]{64}$/.test(x.sha256)&&Number.isSafeInteger(x.bytes)&&x.bytes>0,"invalid service media");expected.set(x.path,x.sha256);serviceByPath.set(x.path,x);}
 
@@ -128,7 +129,7 @@ export function checkAssetRightsAndLicenses({
   owner_declaration_status:'owner-declared',legal_title_independently_verified:false,
   assets_checked:verified.length,assets:verified,archived_media_checked:archived.length,archived_media:archived,
   merchant_hero_media:{...merchant,individual_source_verified:merchant.verification==='individual-source-verified'},merchant_hero_media_review:reviewMerchantHeroPhoto(selected),
-  service_video_media:{...service,publication_blocked:true},
+  service_video_media:{...service,individual_source_verified:false},service_video_media_review:reviewServiceVideos(selected),
   rider_hero_media:{...rider,individual_source_verified:false},rider_hero_media_review:reviewRiderHeroPhoto(selected),
    home_talent_media:{...homeTalent,individual_source_verified:false},home_talent_media_review:reviewHomeTalentPhoto(selected),
   talent_media:{...talent,individual_source_verified:talent.verification==='individual-source-verified'},talent_media_review:reviewTalentPhoto(selected),
