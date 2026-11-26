@@ -47,7 +47,7 @@ test("INK-REMOVAL-01: actual source colors were replaced, never masked by extra 
  assert.match(diagram,/<rect x="18" y="221"[^>]+fill="#1551D8"/);
  assert.match(diagram,/<text x="267" y="96" fill="#1551D8">COMERCIOS<\/text>/);
  assert.match(diagram,/<text x="267" y="297" fill="#1551D8">CONTROL<\/text>/);
- assert.match(read("index.html"),/<h2 id="desset-prime-heading">DESSET prime<\/h2>/);
+ assert.doesNotMatch(read("index.html"),/id="desset-prime-heading"|<section class="ecosystem"/);assert.match(read("index.html"),/<h3>DESSET <span>prime<\/span><\/h3>/);
  assert.match(read("prime.html"),/Cada movimiento cuenta/);
 });
 test("INK-REMOVAL-01: the revised mobile SVG is registered with its exact asset SHA256",()=>{

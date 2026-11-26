@@ -61,7 +61,7 @@ test("V6.7 updated four-participant ecosystem",()=>{
  const flow=html.match(/<section class="statement" id="vision"[\s\S]*?<\/section>/);
  assert.match(flow?.[0]||"",/<div class="v4-flow motion-story statement-journey"/);
  const scene=html.match(/<section class="ecosystem" id="ecosistema"[\s\S]*?<\/section>/);
- assert.ok(scene&&!scene[0].includes('class="v4-flow motion-story"'),"3D area has no storytelling photo grid");
+ assert.equal(scene,null,"Redundant home 3D chapter is absent");
  assert.ok(flow,"No complete four-participant flow");
  const titles=[...flow[0].matchAll(/<h3>(.*?)<\/h3>/g)].map(x=>x[1]);
  assert.deepEqual(titles,["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"]);

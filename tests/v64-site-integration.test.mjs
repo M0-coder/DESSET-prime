@@ -26,7 +26,7 @@ test("V6.4 viewport starts Three.js GLBs in the ecosystem; guided-tour control r
  assert.ok(read("dist/prime.html").includes('aria-label="Simulación logística conceptual de DESSET prime"'));
  assert.ok(html.includes('id="ecosistema"'));
  assert.ok(html.includes('class="v4-flow motion-story statement-journey"'));
- assert.ok(html.indexOf('class="v4-flow motion-story statement-journey"')<html.indexOf('id="ecosistema"'));
+ assert.ok(html.indexOf('id="ecosistema"')<html.indexOf('class="v4-flow motion-story statement-journey"'));assert.doesNotMatch(html,/<section class="ecosystem"/);
  assert.ok(!html.includes('class="v6-three-mount" aria-hidden="true"'));assert.ok(read("dist/prime.html").includes('class="v6-three-mount" aria-hidden="true"'));
  assert.ok(!html.includes('class="v63-tour"'));assert.ok(read("dist/prime.html").includes('class="v63-tour"'));
  assert.ok(loader.includes('activationObserver.observe(stage)'));
