@@ -188,6 +188,43 @@ h1,h2,h3,h4 {text-wrap:balance;}
 .company-page .history-timeline h4{font-size:18px;line-height:1.35;margin:0 0 8px}
 .company-page .history-timeline p{margin:0;color:#414141}
 
+/* CORPORATE-HOME-01: scoped navigation and editorial sections. */
+.main-nav .nav-group{display:flex;align-items:center;position:relative;gap:4px}
+.main-nav .nav-expand{display:none}
+.js-enabled .main-nav .nav-expand{display:inline-grid;place-items:center;width:28px;height:44px;flex:none;background:transparent;border:0;color:var(--ds-30-blue);cursor:pointer;padding:0}
+.nav-expand span{width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
+.nav-expand[aria-expanded="true"] span{transform:rotate(225deg)}
+.nav-expand:focus-visible,.institutional-home a:focus-visible{outline:2px solid var(--ds-30-blue);outline-offset:3px}
+.main-nav .nav-submenu[hidden]{display:none}
+.main-nav .nav-submenu{position:absolute;top:100%;left:0;min-width:210px;max-width:300px;display:grid;padding:8px;background:var(--ds-60-surface);border:1px solid var(--ds-stroke);border-radius:var(--ds-radius-compact);box-shadow:0 12px 28px #00000014}
+.main-nav .nav-submenu a{display:flex;align-items:center;min-height:44px;padding:8px 10px;white-space:normal}
+.main-nav .nav-submenu a:hover,.main-nav .nav-submenu a:focus-visible{background:#f4f8fe}
+.institutional-home{padding:clamp(40px,5vw,80px) var(--edge);background:#f4f8fe;color:#000000;border-top:1px solid var(--ds-stroke)}
+.institutional-home-inner{max-width:1400px;margin:0 auto}
+.institutional-home h2{font-family:var(--ds-type-display);font-size:clamp(26px,3vw,44px);line-height:1.12;margin:0 0 24px;font-weight:800}
+.institutional-home p{font-size:15px;line-height:1.6;color:var(--ds-copy);margin:0 0 12px;max-width:65ch}
+.institutional-home-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.institutional-home-link{display:block;padding:22px;border:1px solid var(--ds-stroke);border-radius:var(--ds-radius-compact);background:var(--ds-60-surface);text-decoration:none;color:inherit}
+.institutional-home-link h3{font-size:clamp(18px,1.6vw,23px);margin:0 0 10px}
+.institutional-home-link p{margin:0}
+.institutional-home-link:hover{border-color:var(--ds-30-blue)}
+.institutional-home-more{display:inline-flex;align-items:center;min-height:44px;margin-top:12px;color:var(--ds-30-blue);font-weight:700;text-underline-offset:3px}
+.institutional-home-news{background:var(--ds-60-surface)}
+.institutional-home-empty{border-top:1px solid var(--ds-stroke);padding-top:12px}
+.institutional-home-policy{margin-inline-start:18px}
+.institutional-news-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:12px}
+.institutional-news-links a{display:inline-flex;align-items:center;min-height:44px;color:var(--ds-30-blue);font-weight:650;text-underline-offset:3px}
+@media(max-width:700px){.institutional-home-policy{margin-inline-start:0;margin-inline-end:12px}}
+@media(min-width:961px){.site-header .main-nav{gap:clamp(8px,1.3vw,24px)}}
+@media(max-width:960px){
+ .js-enabled .site-header .main-nav[data-open="true"]{max-height:calc(100dvh - 74px);overflow-y:auto}
+ .main-nav .nav-group{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0}
+ .js-enabled .main-nav .nav-expand{width:44px}
+ .main-nav .nav-submenu{position:static;grid-column:1/-1;min-width:0;max-width:none;box-shadow:none;margin:0 0 6px 12px;padding:0 8px}
+ .main-nav .nav-submenu a{font-size:15px;padding:10px 8px}
+}
+@media(max-width:700px){.institutional-home-grid{grid-template-columns:minmax(0,1fr)}.institutional-home-link{padding:18px}.institutional-home{content-visibility:auto;contain-intrinsic-size:auto 260px}#empresa-destacada{contain-intrinsic-size:auto 520px}}
+
 /* WEB-CLOSE-04: tablet navigation only; no scene or content layout changes. */
 @media(min-width:701px) and (max-width:960px){
  .site-header .main-nav{position:absolute;top:100%;left:0;right:0;display:flex;flex-wrap:wrap;gap:0 18px;padding:10px var(--edge);background:var(--ds-60-surface);border-bottom:1px solid var(--ds-stroke)}

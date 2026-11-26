@@ -24,11 +24,17 @@
     </a>
     <button class="menu-button" aria-controls="main-nav" aria-expanded="false" aria-label="Menú — abrir navegación" type="button">Menú <span aria-hidden="true">+</span></button>
     <nav class="main-nav" id="main-nav" aria-label="Navegación principal">
-      <a href="./empresa.html">Empresa</a>
-      <a href="./index.html#soluciones">Servicios</a>
+      <div class="nav-group">
+        <a href="./empresa.html">Empresa</a><button class="nav-expand" type="button" aria-expanded="false" aria-controls="nav-empresa" aria-label="Opciones de Empresa"><span aria-hidden="true"></span></button>
+        <div class="nav-submenu" id="nav-empresa" hidden><a href="./empresa.html#quienes-somos">Quiénes somos</a><a href="./empresa.html#mensaje-direccion">Mensaje de la dirección</a><a href="./empresa.html#mision-vision">Misión y visión</a><a href="./empresa.html#valores">Valores</a><a href="./empresa.html#principios-actuacion">Principios de actuación</a><a href="./empresa.html#gobierno-responsabilidad">Gobierno y responsabilidad</a><a href="./empresa.html#historia">Historia corporativa</a><a href="./confianza.html">Centro de confianza</a><a href="./empresa.html#informacion-corporativa">Información corporativa</a></div>
+      </div>
+      <div class="nav-group">
+        <a href="./index.html#soluciones">Servicios</a><button class="nav-expand" type="button" aria-expanded="false" aria-controls="nav-servicios" aria-label="Opciones de Servicios"><span aria-hidden="true"></span></button>
+        <div class="nav-submenu" id="nav-servicios" hidden><a href="./prime.html">DESSET prime</a><a href="./index.html#ecosistema">Cómo funciona</a><a href="./index.html#negocios">Para quiénes</a><a href="./comercios.html">Comercios</a><a href="./repartidores.html">Repartidores</a></div>
+      </div>
       <a href="./aplicaciones.html">Aplicaciones</a>
-      <a href="./index.html#ecosistema">Cómo funciona</a>
-      <a href="./index.html#negocios">Para quiénes</a>
+      <a href="./noticias.html" aria-current="page">Noticias</a>
+      <a href="./talento.html">Talento</a>
       <a class="nav-contact" href="./contacto.html">Canales DESSET</a>
     </nav>
   </header>

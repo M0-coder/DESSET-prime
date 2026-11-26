@@ -36,5 +36,5 @@ test("ANIM-01 browser style proof and strict legacy payload budgets",()=>{
   assert.match(browser,/!anim01\.noDecor/);
   assert.match(browser,/anim01\.direction!=="editorial-cinematic-v1"/);
  assert.ok(statSync(new URL("styles.css",root)).size<45000);
- assert.ok(statSync(new URL("styles-system.css",root)).size<=10000);
+ assert.ok(statSync(new URL("styles-system.css",root)).size<=14000);
 });

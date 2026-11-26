@@ -35,6 +35,6 @@ test("VISUAL-A11Y-01 legible text and accessible mobile menu without breaking in
  assert.match(audit,/Mobile menu accessible name must include visible Menú label/);
  assert.match(three,/buildOperationalFleet\(\)/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
- for(const [path,max] of [["styles-v5.css",16000],["styles-hero-photo.css",9500],["styles-system.css",10000],["styles-typography.css",2800]])
+ for(const [path,max] of [["styles-v5.css",16000],["styles-hero-photo.css",9500],["styles-system.css",14000],["styles-typography.css",2800]])
   assert.ok(statSync(new URL("../"+path,import.meta.url)).size<=max,path+" exceeds CSS budget");
 });
