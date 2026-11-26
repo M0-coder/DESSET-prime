@@ -31,6 +31,7 @@ test("Private form reuses exact public assets, confirms, edits, submits and repl
  const f=await fixture(t,true),r=await f.get("/registro-comercios.html");assert.equal(r.status,200);
  assert.match(r.headers.get("content-security-policy"),/form-action 'self'/);
  assert.equal(r.headers.get("cache-control"),"no-store");
+ assert.equal(r.headers.get("referrer-policy"),"same-origin");
  const html=await r.text();assert.match(html,/<h1>Registra tu comercio\.<\/h1>/);
  assert.match(html,/name="email_confirm" required/);assert.match(html,/name="postal_code" required/);assert.match(html,/name="interest_level" required/);assert.match(html,/name="contact_pronunciation"/);assert.match(html,/action="\/merchant\/confirm"/);
  assert.doesNotMatch(html,/<fieldset disabled|<script\b/);
@@ -39,9 +40,13 @@ test("Private form reuses exact public assets, confirms, edits, submits and repl
  }
  assert.equal((await f.get("/internal/merchant-intake/schema.sql")).status,404);
  assert.equal((await f.post("/merchant/confirm",input,"https://untrusted.invalid")).status,403);
+ assert.equal((await f.post("/merchant/confirm",input,"null")).status,403);
  for(const change of [{email_confirm:"other@example.invalid"},{consent:"no"},{email:"real@example.com",email_confirm:"real@example.com"},{category:"unknown"},{district:"unknown"},{extra:"unexpected"},{postal_code:"1234"},{postal_code:"123456"},{postal_code:""},{interest_level:"unknown"},{interest_level:""}])assert.equal((await f.post("/merchant/confirm",{...input,...change})).status,400);
  assert.equal(f.store.list(actor).length,0);
  const c=await f.post("/merchant/confirm",input);assert.equal(c.status,200);const preview=await c.text(),d=draft(preview);
+ assert.doesNotMatch(preview,/\b(?:href|src)="\.\//);
+ assert.match(preview,/href="\/styles\.css\?v=/);
+ assert.match(preview,/src="\/assets\/deliver-assets-mark\.png"/);
  assert.match(preview,/Revisa tu información/);assert.match(preview,/Synthetic &lt;shop&gt;/);
  assert.match(preview,/&lt;script&gt;literal&lt;\/script&gt; \$&amp;/);assert.doesNotMatch(preview,/<script>/);
  assert.equal(f.store.list(actor).length,0);

@@ -26,6 +26,7 @@ function shell(main){
  return template.replace(/<main class="onboarding-page" id="contenido">[\s\S]*?<\/main>/,()=>main)
  .replace("form-action 'none'","form-action 'self'")
  .replace(/href="\.\/(?:index|comercios|incorporacion-comercios)\.html"/g,'href="'+localPath+'"')
+ .replace(/\b(href|src)="\.\/(?!\.\/)/g,'$1="/')
  .replace("</head>",'<link rel="stylesheet" href="/merchant-registration.css"></head>');
 }
 export const privateStyle=".onboarding-page .ob-submit:not(:disabled){background:#073BBC;color:#fff;cursor:pointer}.onboarding-page .ob-submit:focus-visible{outline:3px solid #000;outline-offset:3px}.onboarding-page .ob-error{border-left:4px solid #B42419;padding:12px;color:#B42419}.onboarding-page .ob-review dt{font-weight:750}.onboarding-page .ob-review dd{margin:4px 0 16px;overflow-wrap:anywhere}";

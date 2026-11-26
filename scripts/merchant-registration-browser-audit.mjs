@@ -17,7 +17,12 @@ export async function auditPrivateMerchant({call,js,until,capture,report}){
   store=openMerchantIntake(databasePath);
   const actor={id:"browser-test-reviewer",role:"merchant-reviewer"};
   const ready=async(path,selector)=>{
-   await until(async()=>await js("document.readyState==='complete' && location.origin==="+JSON.stringify(server.origin)+" && location.pathname==="+JSON.stringify(path)+" && !!document.querySelector("+JSON.stringify(selector)+")"),"merchant synthetic "+path);
+   try{
+    await until(async()=>await js("document.readyState==='complete' && location.origin==="+JSON.stringify(server.origin)+" && location.pathname==="+JSON.stringify(path)+" && !!document.querySelector("+JSON.stringify(selector)+")"),"merchant synthetic "+path);
+   }catch(e){
+    const state=await js("(()=>{let error=null;try{const b=JSON.parse(document.body.innerText);if(typeof b.error==='string'&&/^[A-Z_]{1,50}$/.test(b.error))error=b.error}catch{}return {sameOrigin:location.origin==="+JSON.stringify(server.origin)+",path:location.pathname,ready:document.readyState,error,formCount:document.forms.length,hasAlert:!!document.querySelector('[role=alert]')}})()").catch(()=>({unavailable:true}));
+    throw Error("Private browser navigation to "+path+" failed: "+JSON.stringify(state),{cause:e});
+   }
    await js("document.fonts.ready.then(()=>true)");
   };
   const navigate=async(path,selector)=>{
@@ -34,6 +39,7 @@ export async function auditPrivateMerchant({call,js,until,capture,report}){
    assert.ok(state.scroll<=state.viewport+2,label+" horizontal overflow");
    assert.equal(state.visible,true,label+" controls out of bounds");
    assert.equal(state.fonts,"loaded");
+   assert.equal(await js("Array.from(document.querySelectorAll('link[rel=stylesheet]')).every(l=>!!l.sheet) && document.querySelector('.brand-mark').naturalWidth>0"),true,label+" styles or logo not loaded");
    return state;
   };
   const refs=[];

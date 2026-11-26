@@ -9,7 +9,7 @@ const digest=v=>createHash("sha256").update(v).digest("hex");
 const token=()=>randomBytes(32).toString("hex");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fail=(status,code)=>Object.assign(Error(code),{status,code});
-const headers={"Cache-Control":"no-store","Content-Security-Policy":"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'","X-Content-Type-Options":"nosniff","Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"};
+const headers={"Cache-Control":"no-store","Content-Security-Policy":"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'","X-Content-Type-Options":"nosniff","Referrer-Policy":"same-origin","X-Robots-Tag":"noindex, nofollow"};
 const send=(res,status,body,type="application/json; charset=utf-8",extra={})=>{res.writeHead(status,{...headers,"Content-Type":type,...extra});res.end(type.startsWith("application/json")?JSON.stringify(body):body);};
 const page=(res,body,status=200)=>send(res,status,'<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>DESSET | Incorporación interna de ensayo</title><main><h1>DESSET — Ensayo privado</h1>'+body+'</main></html>',"text/html; charset=utf-8");
 async function readBody(req,kind){
