@@ -81,7 +81,7 @@ test("MOBILE-01 follows approved compact visual reference",()=>{
 });
 
 test("MOBILE-PERF-01 removes critical hero compositing only at phone widths",()=>{
- const perf=heroCss.split("/* MOBILE-PERF-01:")[1];
+ const perf=heroCss.split("/* MOBILE-PERF-01:")[1]?.split("/* PHOTO-01:")[0];
  assert.ok(perf);
  assert.match(perf,/@media\(max-width:700px\)/);
  assert.match(perf,/#inicio \.prime-photo-surface,#inicio \.prime-photo-image\{/);
