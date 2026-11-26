@@ -3,7 +3,7 @@ import {createServer} from "node:http";
 import {randomBytes,createHash,scrypt,timingSafeEqual} from "node:crypto";
 import {promisify} from "node:util";
 import {openMerchantIntake} from "./intake.mjs";
-import {createRegistration,registrationAsset,privateStyle} from "./registration.mjs";
+import {createRegistration,registrationAsset,privateStyle,privateAdminStyle} from "./registration.mjs";
 const derive=promisify(scrypt);
 const digest=v=>createHash("sha256").update(v).digest("hex");
 const token=()=>randomBytes(32).toString("hex");
@@ -11,7 +11,7 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const fail=(status,code)=>Object.assign(Error(code),{status,code});
 const headers={"Cache-Control":"no-store","Content-Security-Policy":"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'","X-Content-Type-Options":"nosniff","Referrer-Policy":"same-origin","X-Robots-Tag":"noindex, nofollow"};
 const send=(res,status,body,type="application/json; charset=utf-8",extra={})=>{res.writeHead(status,{...headers,"Content-Type":type,...extra});res.end(type.startsWith("application/json")?JSON.stringify(body):body);};
-const page=(res,body,status=200)=>send(res,status,'<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>DESSET | Incorporación interna de ensayo</title><main><h1>DESSET — Ensayo privado</h1>'+body+'</main></html>',"text/html; charset=utf-8");
+const page=(res,body,status=200)=>send(res,status,'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>DESSET | Incorporación interna de ensayo</title><link rel="stylesheet" href="/styles-typography.css"><link rel="stylesheet" href="/merchant-registration.css"></head><body class="merchant-admin"><main><div class="admin-brand"><img src="/assets/deliver-assets-mark.png" alt="" width="46" height="35">DESSET</div><h1>DESSET — Ensayo privado</h1>'+body+'</main></body></html>',"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"});
 async function readBody(req,kind){
  if((req.headers["content-type"]??"").split(";")[0].trim()!==kind)throw fail(415,"CONTENT_TYPE");
  let bytes=0,parts=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>8192)throw fail(413,"BODY_LIMIT");parts.push(chunk);}
@@ -45,7 +45,7 @@ export async function startSyntheticIntake({databasePath,credential,syntheticEna
    if(url.origin!==origin)throw fail(403,"HOST");
    if(req.method==="POST"&&req.headers.origin!==origin)throw fail(403,"ORIGIN");
    if(req.method==="GET"&&path==="/registro-comercios.html"){const r=registration.get();return send(res,r.status,r.html,"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; form-action "+(syntheticEnabled===true?"'self'":"'none'")+"; frame-ancestors 'none'; base-uri 'none'"});}
-   if(req.method==="GET"&&path==="/merchant-registration.css")return send(res,200,privateStyle,"text/css; charset=utf-8");
+   if(req.method==="GET"&&path==="/merchant-registration.css")return send(res,200,privateStyle+privateAdminStyle,"text/css; charset=utf-8");
    if(req.method==="GET"){const asset=registrationAsset(path);if(asset)return send(res,200,asset.body,asset.type);}
    if(req.method==="POST"&&["/merchant/confirm","/merchant/edit","/merchant/submit"].includes(path)){if(syntheticEnabled!==true)throw fail(503,"INTAKE_DISABLED");rate("registration",60,60000);const b=await readBody(req,"application/x-www-form-urlencoded");const r=registration.post(path,b);return send(res,r.status,r.html,"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"});}
    if(req.method==="GET"&&path==="/login")return page(res,'<form method="post" action="/login"><label>Contraseña de ensayo <input type="password" name="password" required maxlength="256" autocomplete="current-password"></label><button>Ingresar</button></form>');

@@ -58,6 +58,7 @@ export async function auditPrivateMerchant({call,js,until,capture,report}){
    assert.equal(store.list(actor).length,before,"Confirmation must not persist");
    assert.equal(await js("document.querySelector('.ob-review').textContent.includes('15136') && document.querySelector('.ob-review').textContent.includes('Estoy evaluando la incorporación')"),true);
    const confirmation=await fit("Confirmation "+w);
+   assert.equal(await js("(()=>{const e=document.querySelector('.ob-edit');return !!e&&e.getBoundingClientRect().height>=48&&getComputedStyle(e).borderTopStyle==='solid'})()"),true,"Edit button minimum target and style "+w);
    await capture("merchant-private-confirmation-"+w+".png",true);
    await submit("/merchant/edit","/merchant/edit","form[action='/merchant/confirm']");
    assert.equal(await js("document.querySelector('[name=postal_code]').value==='15136' && document.querySelector('[name=interest_level]').value==='evaluating'"),true);
@@ -84,6 +85,7 @@ export async function auditPrivateMerchant({call,js,until,capture,report}){
   await submit("/login","/admin","main article");
   const admin=await js("(()=>({rows:document.querySelectorAll('main article').length,text:document.querySelector('main').textContent}))()");
   assert.equal(admin.rows,4);
+  assert.equal(await js("(()=>{const m=document.querySelector('.merchant-admin');return !!m&&document.documentElement.scrollWidth<=document.documentElement.clientWidth+2&&[...document.querySelectorAll('main button')].every(e=>e.getBoundingClientRect().height>=48)&&[...document.querySelectorAll('link[rel=stylesheet]')].every(l=>!!l.sheet)&&document.querySelector('.admin-brand img').naturalWidth>0})()"),true,"Admin design and controls");
   for(const ref of refs)assert.ok(admin.text.includes(ref));
   assert.ok(admin.text.includes("15136")&&admin.text.includes("evaluating")&&admin.text.includes("Synthetic name"));
   await capture("merchant-private-admin-1440.png",true);

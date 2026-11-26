@@ -38,6 +38,8 @@ test("Private form reuses exact public assets, confirms, edits, submits and repl
  for(const path of ["styles.css","styles-system.css","styles-typography.css","styles-onboarding.css","assets/deliver-assets-mark.png","fonts/inter-latin-variable.woff2","fonts/plus-jakarta-sans-latin-variable.woff2"]){
   const a=await f.get("/"+path);assert.equal(a.status,200);assert.deepEqual(Buffer.from(await a.arrayBuffer()),read(path));
  }
+ const privateCss=await (await f.get("/merchant-registration.css")).text();assert.match(privateCss,/\.onboarding-page \.ob-edit\{/);assert.match(privateCss,/\.merchant-admin article\{/);assert.match(privateCss,/min-height:48px/);
+ const login=await f.get("/login");assert.match(login.headers.get("content-security-policy"),/style-src 'self'/);assert.match(await login.text(),/class="merchant-admin"/);
  assert.equal((await f.get("/internal/merchant-intake/schema.sql")).status,404);
  assert.equal((await f.post("/merchant/confirm",input,"https://untrusted.invalid")).status,403);
  assert.equal((await f.post("/merchant/confirm",input,"null")).status,403);
@@ -47,7 +49,7 @@ test("Private form reuses exact public assets, confirms, edits, submits and repl
  assert.doesNotMatch(preview,/\b(?:href|src)="\.\//);
  assert.match(preview,/href="\/styles\.css\?v=/);
  assert.match(preview,/src="\/assets\/deliver-assets-mark\.png"/);
- assert.match(preview,/Revisa tu información/);assert.match(preview,/Synthetic &lt;shop&gt;/);
+ assert.match(preview,/Revisa tu información/);assert.match(preview,/<button class="ob-edit" type="submit">Corregir información<\/button>/);assert.match(preview,/Synthetic &lt;shop&gt;/);
  assert.match(preview,/&lt;script&gt;literal&lt;\/script&gt; \$&amp;/);assert.doesNotMatch(preview,/<script>/);
  assert.equal(f.store.list(actor).length,0);
  const e=await f.post("/merchant/edit",{draft:d});assert.equal(e.status,200);assert.match(await e.text(),/value="Synthetic &lt;shop&gt;"/);
