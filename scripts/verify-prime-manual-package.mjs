@@ -19,7 +19,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  const want=new Map(),seen=new Set();
  for(const a of m.assets){
   check(typeof a.path==='string'&&(/^[a-z0-9_.\/-]+$/.test(a.path)||a.path==='THIRD-PARTY-NOTICES.txt'||/^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(a.path))&&!a.path.startsWith('/')&&
-    !a.path.split('/').some(s=>!s||s==='.'||s==='..')&&!want.has(a.path),'Unsafe or repeated path');
+    !a.path.split('/').some(s=>!s||s==='.'||s==='..')&&!want.has(a.path)&&!/^assets\/roles-geometry-/.test(a.path),'Unsafe, retired or repeated path');
   check(Number.isSafeInteger(a.bytes)&&a.bytes>0&&/^[a-f0-9]{64}$/.test(a.sha256),'Invalid expected file hash');
   want.set(a.path,a);
  }
@@ -31,7 +31,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
    else {check(stat.isFile()&&!seen.has(rel),'Not a regular file: '+rel);seen.add(rel);}
   }
  }
- scan(publicDir);check(seen.size===71,'Unexpected file count');
+ scan(publicDir);check(seen.size===69,'Unexpected file count');
  for(const path of seen)check(want.has(path),'Unexpected file: '+path);
  for(const [path,spec] of want){
   check(seen.has(path),'Missing file: '+path);
