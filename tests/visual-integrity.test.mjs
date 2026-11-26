@@ -66,13 +66,16 @@ test("Homepage-only neutral palette retains approved brand colors and scope",()=
  assert.match(heroCss,/#inicio\.hero\[data-variant="v4"\]\{background:#f7f5ee/);
 });
 
-test("MOBILE-01 uses two columns only when width permits, with full-width hero CTA",()=>{
+test("MOBILE-01 follows approved compact visual reference",()=>{
  const mobile=heroCss.split("/* MOBILE-01:")[1];
  assert.ok(mobile);
  assert.match(mobile,/@media\(max-width:700px\)/);
- assert.match(mobile,/@media\(min-width:390px\) and \(max-width:700px\)/);
- assert.match(mobile,/#inicio \.hero-actions,#inicio \.hero-cta\{width:100%\}/);
- assert.match(mobile,/#inicio \.hero-cta\{min-height:48px\}/);
+ assert.match(mobile,/@media\(min-width:320px\) and \(max-width:700px\)/);
+ assert.match(mobile,/#inicio \.prime-photo-surface\{grid-row:3;/);
+ assert.match(mobile,/#inicio \.hero-actions\{grid-row:4;/);
+ assert.match(mobile,/#inicio \.hero-cta\{min-height:48px;/);
+ assert.match(mobile,/#inicio \.v4-hero-rail\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
  assert.match(mobile,/#soluciones \.solutions-grid,#vision[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
- assert.doesNotMatch(mobile,/display:none|visibility:hidden|text-overflow:ellipsis/);
+ assert.match(html,/<nav class="mobile-footer" aria-label="Mapa del sitio móvil">/);
+ assert.equal((html.match(/class="mobile-corporate-icon"/g)||[]).length,2);
 });

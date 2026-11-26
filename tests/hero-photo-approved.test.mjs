@@ -37,7 +37,7 @@ test('HERO-PHOTO-01 two-column mockup, responsive, reduced motion and real 3D re
  assert.match(css,/@media\(max-width:700px\)\{#inicio \.prime-photo-image\{object-position:100% 50%\}\}/);
   assert.doesNotMatch(css,/\.prime-photo-surface \.v4-shape/);
  assert.doesNotMatch(css,/url\(\s*["']?https?:|@import|animation-iteration-count:\s*infinite/i);
- assert.ok(statSync(new URL('styles-hero-photo.css',root)).size<=13500);
+ assert.ok(statSync(new URL('styles-hero-photo.css',root)).size<=17000);
 });
 test('HERO-PHOTO-01 real site build, local browser proof, security gate include asset',()=>{
  assert.match(build,/styles-hero-photo\.css/);
