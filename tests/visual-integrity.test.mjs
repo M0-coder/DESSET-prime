@@ -32,7 +32,7 @@ test("bright red stays an approved brand accent, while small text on red is dark
  assert.ok(ratio(token("ink"),token("red"))>=4.5);
  assert.doesNotMatch(css,/\.audiences \.audience:nth-child\(2\) \.audience-no/);
 });
-test("DESSET gold service rail has four substantive benefits and responsive geometry; owner-selected low-contrast foreground",()=>{
+test("DESSET gold service rail has four substantive benefits and responsive geometry; approved high-contrast foreground",()=>{
  const rail=html.split('<div class="v4-hero-rail" role="list" aria-label="Áreas de servicios de DESSET">')[1]?.split("\n    </section>")[0]||"";
  assert.ok(rail.length>600,"Accessible service rail must exist in hero");
  assert.equal((rail.match(/class="v4-rail-item" role="listitem"/g)||[]).length,4);
@@ -45,16 +45,23 @@ test("DESSET gold service rail has four substantive benefits and responsive geom
  ])assert.ok(rail.includes('<strong>'+heading+'</strong><p>'+copy+'</p>'),heading+" exact approved description missing");
  assert.doesNotMatch(rail,/FUTURO|seguimiento en tiempo real|entregas activas/i);
  assert.match(heroCss,/#inicio \.v4-hero-rail\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
- assert.match(heroCss,/background:var\(--yellow\);color:#fff;white-space:normal/);
+ assert.match(heroCss,/background:var\(--yellow\);color:#000;white-space:normal/);
  assert.match(heroCss,/@media\(max-width:860px\)\{#inicio \.v4-hero-rail\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.match(heroCss,/@media\(max-width:520px\)\{#inicio \.v4-rail-item\{display:block/);
- assert.ok(ratio("#E2EBFF","#FFC62F")<4.5,"Document owner-selected foreground contrast below WCAG AA; not an accessibility PASS");
- assert.ok(ratio("#FFFFFF","#FFC62F")<4.5,"Document owner-selected white-on-gold contrast exception; do not claim WCAG AA");
+ assert.ok(ratio("#222222","#FFC62F")>=4.5,"Gold strip body copy must meet WCAG AA text contrast");
+ assert.ok(ratio("#000000","#FFC62F")>=4.5,"Gold strip headings must meet WCAG AA text contrast");
 });
 test("Obsolete technical accordion is removed from HTML, not hidden",()=>{
  assert.doesNotMatch(html,/v4-architecture-details|ecosystem-board v4-flow-board|class="roles" role="list"/);
  assert.match(html,/class="prime-service-cta" href="\.\/prime\.html"/);
- assert.match(heroCss,/#inicio \.v4-hero-rail\{[^\n]*background:var\(--yellow\);color:#fff/);
- assert.match(heroCss,/#inicio \.v4-rail-item strong\{display:block;color:#fff/);
- assert.match(heroCss,/#inicio \.v4-rail-item p\{margin:5px 0 0;color:#e2ebff/);
+ assert.match(heroCss,/#inicio \.v4-hero-rail\{[^\n]*background:var\(--yellow\);color:#000/);
+ assert.match(heroCss,/#inicio \.v4-rail-item strong\{display:block;color:#000/);
+ assert.match(heroCss,/#inicio \.v4-rail-item p\{margin:5px 0 0;color:#222/);
+});
+
+test("Homepage-only neutral palette retains approved brand colors and scope",()=>{
+ assert.match(heroCss,/body:has\(#inicio\)\{--ds-60-surface:#fff\}/);
+ assert.match(heroCss,/#empresa-destacada,#talento-destacado,#soluciones\.solutions,body:has\(#inicio\) \.site-footer\{background:#f5f5f5\}/);
+ assert.match(heroCss,/#vision\.statement\[id="vision"\],#negocios\.audiences\{background:#fff\}/);
+ assert.match(heroCss,/#inicio\.hero\[data-variant="v4"\]\{background:#f7f5ee/);
 });
