@@ -2,22 +2,8 @@
 import {createHash,randomUUID} from "node:crypto";
 import {readFileSync} from "node:fs";
 import {DatabaseSync} from "node:sqlite";
-const fields=["business_name","category","department","province","district","address","contact_name","phone","email"];
-const allowedCategories=new Set(["restaurant","grocery","bakery","specialty","pharmacy","other"]);
-function clean(input){
- if(!input||typeof input!=="object"||Object.keys(input).some(k=>!fields.includes(k)&&k!=="observations"))throw Error("INVALID_FIELDS");
- const data={};
- for(const key of fields){
-  if(typeof input[key]!=="string")throw Error("INVALID_FIELD");
-  const v=input[key].trim();
-  if(!v||v.length>200||/[\u0000-\u001f\u007f]/.test(v))throw Error("INVALID_FIELD");
-  data[key]=v;
- }
- if(!allowedCategories.has(data.category)||!/^\+51[0-9]{9}$/.test(data.phone)||! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))throw Error("INVALID_CONTACT_OR_CATEGORY");
- data.email=data.email.toLowerCase();
- if(input.observations!==undefined){if(typeof input.observations!=="string"||input.observations.length>1000||/[\u0000-\u001f\u007f]/.test(input.observations))throw Error("INVALID_FIELD");const note=input.observations.trim();if(note)data.observations=note;}
- return data;
-}
+import {merchantFields as fields,optionalFields,validateMerchantInput} from "../merchant-common/validation.mjs";
+export {validateMerchantInput,interestLevels} from "../merchant-common/validation.mjs";
 const now=()=>new Date().toISOString();
 const identity=d=>createHash("sha256").update(JSON.stringify(["business_name","department","province","district","address"].map(k=>d[k].normalize("NFKC").toLowerCase().trim().replace(/\s+/g," ")))).digest("hex");
 function admin(actor){if(!actor||actor.role!=="merchant-reviewer"||typeof actor.id!=="string"||!actor.id.trim())throw Error("FORBIDDEN");}
@@ -26,13 +12,13 @@ export function openMerchantIntake(path,policy={enabled:false,privacyVersion:nul
  db.exec("PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;");
  db.exec(readFileSync(new URL("./schema.sql",import.meta.url),"utf8"));
  function tx(fn){db.exec("BEGIN IMMEDIATE");try{const r=fn();db.exec("COMMIT");return r;}catch(e){db.exec("ROLLBACK");throw e;}}
- try{tx(()=>{if(!db.prepare("PRAGMA table_info(merchant_requests)").all().some(c=>c.name==="observations"))db.exec("ALTER TABLE merchant_requests ADD COLUMN observations TEXT");if(!db.prepare("PRAGMA table_info(merchant_notification_outbox)").all().some(c=>c.name==="next_attempt_at"))db.exec("ALTER TABLE merchant_notification_outbox ADD COLUMN next_attempt_at INTEGER NOT NULL DEFAULT 0");for(const row of db.prepare("SELECT id,business_name,department,province,district,address FROM merchant_requests WHERE id NOT IN (SELECT request_id FROM merchant_identity_keys)").all())db.prepare("INSERT INTO merchant_identity_keys(identity_hash,request_id) VALUES (?,?)").run(identity(row),row.id);});}catch(e){db.close();throw e;}
+ try{tx(()=>{if(!db.prepare("PRAGMA table_info(merchant_requests)").all().some(c=>c.name==="observations"))db.exec("ALTER TABLE merchant_requests ADD COLUMN observations TEXT");for(const column of optionalFields)if(!db.prepare("PRAGMA table_info(merchant_requests)").all().some(c=>c.name===column))db.exec("ALTER TABLE merchant_requests ADD COLUMN "+column+" TEXT");if(!db.prepare("PRAGMA table_info(merchant_notification_outbox)").all().some(c=>c.name==="next_attempt_at"))db.exec("ALTER TABLE merchant_notification_outbox ADD COLUMN next_attempt_at INTEGER NOT NULL DEFAULT 0");for(const row of db.prepare("SELECT id,business_name,department,province,district,address FROM merchant_requests WHERE id NOT IN (SELECT request_id FROM merchant_identity_keys)").all())db.prepare("INSERT INTO merchant_identity_keys(identity_hash,request_id) VALUES (?,?)").run(identity(row),row.id);});}catch(e){db.close();throw e;}
  return {
   submit(input,{requestKey,privacyVersion,consent}={}){
    if(policy.enabled!==true||!policy.privacyVersion)throw Error("INTAKE_DISABLED");
    if(consent!==true||privacyVersion!==policy.privacyVersion)throw Error("PRIVACY_REQUIRED");
    if(typeof requestKey!=="string"||! /^[A-Za-z0-9_-]{16,100}$/.test(requestKey))throw Error("INVALID_REQUEST_KEY");
-   const d=clean(input),hash=createHash("sha256").update(JSON.stringify([d,privacyVersion])).digest("hex");
+   const d=validateMerchantInput(input),hash=createHash("sha256").update(JSON.stringify([d,privacyVersion])).digest("hex");
    return tx(()=>{
     const old=db.prepare("SELECT id,payload_hash FROM merchant_requests WHERE request_key=?").get(requestKey);
     if(old){if(old.payload_hash!==hash)throw Error("IDEMPOTENCY_CONFLICT");return {id:old.id,replayed:true};}
@@ -40,13 +26,13 @@ export function openMerchantIntake(path,policy={enabled:false,privacyVersion:nul
     if(db.prepare("SELECT request_id FROM merchant_identity_keys WHERE identity_hash=?").get(fingerprint))throw Error("DUPLICATE_BUSINESS");
     const id=randomUUID(),at=now();
     db.prepare("INSERT INTO merchant_requests (id,request_key,payload_hash,business_name,category,department,province,district,address,contact_name,phone,email,privacy_version,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)").run(id,requestKey,hash,...fields.map(k=>d[k]),privacyVersion,at);
-    db.prepare("UPDATE merchant_requests SET observations=? WHERE id=?").run(d.observations??null,id);
+    db.prepare("UPDATE merchant_requests SET observations=?,postal_code=?,interest_level=?,contact_pronunciation=? WHERE id=?").run(d.observations??null,d.postal_code??null,d.interest_level??null,d.contact_pronunciation??null,id);
     db.prepare("INSERT INTO merchant_identity_keys(identity_hash,request_id) VALUES (?,?)").run(fingerprint,id);
     db.prepare("INSERT INTO merchant_notification_outbox (request_id,created_at) VALUES (?,?)").run(id,at);
     return {id,replayed:false};
    });
   },
-  list(actor,offset=0){admin(actor);if(!Number.isSafeInteger(offset)||offset<0)throw Error("INVALID_OFFSET");return db.prepare("SELECT id,business_name,category,department,province,district,address,contact_name,phone,email,observations,status,created_at FROM merchant_requests ORDER BY created_at,id LIMIT 100 OFFSET ?").all(offset);},
+  list(actor,offset=0){admin(actor);if(!Number.isSafeInteger(offset)||offset<0)throw Error("INVALID_OFFSET");return db.prepare("SELECT id,business_name,category,department,province,district,address,contact_name,phone,email,observations,postal_code,interest_level,contact_pronunciation,status,created_at FROM merchant_requests ORDER BY created_at,id LIMIT 100 OFFSET ?").all(offset);},
   history(actor,id){admin(actor);return db.prepare("SELECT actor_id,decision,created_at FROM merchant_review_events WHERE request_id=? ORDER BY id").all(id);},
   notificationState(actor,id){admin(actor);return db.prepare("SELECT status,attempts,sent_at FROM merchant_notification_outbox WHERE request_id=?").get(id)??null;},
   review(actor,id,decision){admin(actor);if(!["APPROVED","REJECTED"].includes(decision))throw Error("INVALID_DECISION");return tx(()=>{

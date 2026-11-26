@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import {auditPrivateMerchant} from "./merchant-registration-browser-audit.mjs";
 import {spawn} from "node:child_process";
 import {readFile, writeFile, mkdir, mkdtemp, rm} from "node:fs/promises";
 import {join, resolve} from "node:path";
@@ -876,6 +877,7 @@ try{
    }
   }
  }
+ await auditPrivateMerchant({call,js,until,capture,report});
 }catch(e){report.failures.push("runner: "+String(e.stack||e));}
 finally{
  await writeFile(join(output,"audit.json"),JSON.stringify(report,null,2));

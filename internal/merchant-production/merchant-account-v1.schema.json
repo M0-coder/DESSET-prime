@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DESSET MerchantIntegration v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "merchantId",
+    "status",
+    "version",
+    "enabled",
+    "currency",
+    "commissionBps",
+    "serviceMinutes",
+    "termsVersion"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "merchantId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "status": {
+      "enum": [
+        "READY",
+        "ACTIVE",
+        "SUSPENDED",
+        "DEACTIVATED"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "currency": {
+      "const": "PEN"
+    },
+    "commissionBps": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1350
+    },
+    "serviceMinutes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 180
+    },
+    "termsVersion": {
+      "type": "string"
+    }
+  }
+}

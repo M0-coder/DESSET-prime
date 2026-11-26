@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS merchant_requests (
  business_name TEXT NOT NULL, category TEXT NOT NULL, department TEXT NOT NULL,
  province TEXT NOT NULL, district TEXT NOT NULL, address TEXT NOT NULL,
  contact_name TEXT NOT NULL, phone TEXT NOT NULL, email TEXT NOT NULL,
+ postal_code TEXT, interest_level TEXT, contact_pronunciation TEXT,
  privacy_version TEXT NOT NULL, created_at TEXT NOT NULL,
  status TEXT NOT NULL DEFAULT 'PENDING' CHECK(status IN ('PENDING','APPROVED','REJECTED'))
 );
