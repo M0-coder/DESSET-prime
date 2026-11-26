@@ -10,7 +10,7 @@ for(const dir of ["","dist/"])test("COMPANY-02 modular directory, legacy anchors
  const routes=[...hub.matchAll(/<section id="[^"]+" class="co-card">[\s\S]*?<a href="\.\/([a-z-]+\.html)">/g)].map(x=>x[1]);
  assert.deepEqual(routes,companyFiles);
  const photos=[...hub.matchAll(/<span class="co-art co-photo"[^>]*><img src="\.\/([^"]+)"/g)].map(x=>x[1]);
- assert.deepEqual(photos,["assets/desset-hero-entrega-dos-espejos.webp","assets/scene-choose.webp","assets/scene-prepare.webp"]);
+ assert.deepEqual(photos,["assets/desset-hero-entrega-dos-espejos.webp","assets/scene-choose.webp","assets/scene-prepare.webp"]);assert.equal((hub.match(/loading="eager" decoding="sync"/g)||[]).length,3,"Corporate directory photos must load and decode without deferred offscreen capture");
  const originals=JSON.parse(read("config/prime-original-assets.json")).assets;
  for(const path of photos)assert.ok(originals.some(a=>a.path===path&&a.claim==="owner-declared"));
  assert.doesNotMatch(hub,/<span class="co-art"[^>]*><svg/);

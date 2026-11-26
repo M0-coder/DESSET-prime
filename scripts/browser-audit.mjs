@@ -636,8 +636,17 @@ try{
    const company=await js(`(()=>{const v=document.documentElement.clientWidth,n=document.querySelector(".corporate-footer");return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.trim().split(/\\s+/).length,links:[...n.querySelectorAll("a:not(.nav-submenu a)")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=v+2})),home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content}})()`);
    if(company.title!=="Empresa"||company.sections.join("|")!=="mensaje-direccion|quienes-somos|mision-vision|principios-actuacion|gobierno-responsabilidad|historia|inversores"||company.scroll>company.width+2||company.columns!==2||company.links.length!==14||!company.links.some(x=>x.href==="./aplicaciones.html")||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
    await js('window.scrollTo({top:0,behavior:"instant"})');
-   await js('[...document.querySelectorAll(".co-photo img")].forEach(i=>i.loading="eager")');
-   await until(async()=>await js('[...document.querySelectorAll(".co-photo img")].every(i=>i.complete&&i.naturalWidth>0)'),"company directory photos loaded");
+   await until(async()=>await js('[...document.querySelectorAll(".co-photo img")].length===3&&[...document.querySelectorAll(".co-photo img")].every(i=>i.complete&&i.naturalWidth>0&&i.loading==="eager")'),"company directory photos loaded");
+   await js('Promise.all([...document.querySelectorAll(".co-photo img")].map(i=>i.decode())).then(()=>true)');
+   for(const id of ["quienes-somos","mision-vision","principios-actuacion"]){
+    await js('document.querySelector("#'+id+' .co-photo").scrollIntoView({block:"center",behavior:"instant"})');
+    await js('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(true))))');
+    const photo=await js(`(()=>{const i=document.querySelector("#${id} .co-photo img"),r=i.getBoundingClientRect(),s=getComputedStyle(i);return {loaded:i.complete&&i.naturalWidth>0&&i.naturalHeight>0,visible:r.top>=0&&r.bottom<=innerHeight+2&&r.width>0&&r.left>=0&&r.right<=innerWidth+2&&s.visibility==="visible"&&s.display!=="none"&&Number(s.opacity)>0}})()`);
+    if(!photo.loaded||!photo.visible)report.failures.push("COMPANY-02 viewport photo "+root+id+w+": "+JSON.stringify(photo));
+    await capture((root?"dist-":"source-")+"company-photo-"+id+"-"+w+"px.png");
+   }
+   await js('window.scrollTo({top:0,behavior:"instant"})');
+   await js('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(true))))');
    await capture((root?"dist-":"source-")+"company-"+w+"px.png",true);
    const hub=await js(`(()=>{const g=document.querySelector(".co-directory"),cards=[...g.querySelectorAll(".co-card")];return {links:cards.map(c=>c.querySelector("a").getAttribute("href")),columns:getComputedStyle(g).gridTemplateColumns.trim().split(/\\s+/).length,fit:cards.every(c=>c.scrollWidth<=c.clientWidth+2&&c.getBoundingClientRect().width>0)}})()`);
    if(hub.links.join("|")!==companyRoutes.map(x=>"./"+x+".html").join("|")||hub.columns!==(w<=700?1:2)||!hub.fit)report.failures.push("COMPANY-02 directory "+root+w+": "+JSON.stringify(hub));
