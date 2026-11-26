@@ -134,3 +134,14 @@
 /* PRIME-COLOR-02 — the ONLY lime element approved is the main hero CTA.
  * Preserve the previous exact institutional palette and the 3D exhibit. */
 #inicio .hero-cta,#inicio .hero-cta:hover{background:#CDFC8A}
+
+/* VISUAL-HIERARCHY-01: homepage-only composition; existing tokens. */
+.institutional-recent{display:flex;align-items:center;justify-content:space-between;gap:12px 24px;padding:10px var(--edge);border-bottom:1px solid var(--ds-stroke);background:var(--ds-60-surface)}
+.institutional-recent a,.institutional-quicklinks a{color:var(--ds-30-blue);min-height:44px;display:inline-flex;align-items:center;font-size:14px;text-underline-offset:3px}
+#empresa-destacada{padding-block:clamp(28px,4vw,56px)}
+#empresa-destacada .institutional-home-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+#empresa-destacada .institutional-home-link{padding:clamp(18px,3vw,36px)}
+#empresa-destacada h3{font-size:clamp(24px,2.6vw,36px)}
+.institutional-quicklinks{display:flex;flex-wrap:wrap;gap:0 16px;border-top:1px solid var(--ds-stroke);margin-top:12px;padding-top:6px}
+#noticias-destacadas,#talento-destacado{padding-block:clamp(24px,3vw,48px)}
+@media(max-width:700px){#empresa-destacada .institutional-home-grid{grid-template-columns:minmax(0,1fr)}.institutional-recent{align-items:flex-start;flex-direction:column;gap:0}}
