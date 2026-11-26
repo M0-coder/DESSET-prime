@@ -71,7 +71,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  await call("Page.navigate",{url:entry});
  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.hero--motion')"),"page render");
  await js('document.fonts.ready');
- // PRIME-COLOR-02 must sample the final opaque CTA, not a partial CSS
+ // PRIME-COLOR-03 must sample the final opaque CTA, not a partial CSS
  // background transition. Fail closed if it never becomes fully opaque.
  await until(async()=>await js(`(()=>{
    const el=document.querySelector("#inicio .hero-cta");
@@ -215,12 +215,12 @@ async function viewport(width,height,reduce=false,entry=URL){
   const palette=diag.palette;
   // The final computed color is checked only after the background settles.
   // Never accept a semi-transparent or differently colored CTA as a PASS.
-  const limeChannels=palette.heroCTA.match(/^rgba?\(205,\s*252,\s*138(?:,\s*([\d.]+))?\)$/);
-  const exactLime=!!limeChannels&&(limeChannels[1]===undefined||
-   (Number(limeChannels[1])>=.9999&&Number(limeChannels[1])<=1));
+  const blueChannels=palette.heroCTA.match(/^rgba?\(7,\s*59,\s*188(?:,\s*([\d.]+))?\)$/);
+  const exactBlue=!!blueChannels&&(blueChannels[1]===undefined||
+   (Number(blueChannels[1])>=.9999&&Number(blueChannels[1])<=1));
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
-   !exactLime||palette.businessCTA!==brandBlue||
+   !exactBlue||palette.businessCTA!==brandBlue||
    palette.statementAccent!==brandBlue||palette.stageSummaryArrow!==expectedOriginal||
    palette.threeTourButton!==pureWhite||palette.threePauseButton!==pureWhite||
    palette.stageFrame!==paleBlue||palette.stageToolbar!==paleBlue||
@@ -231,11 +231,11 @@ async function viewport(width,height,reduce=false,entry=URL){
    palette.institutionalInk!=="#000000"||
    palette.stageInk!=="#111111"||palette.stageDesignInk!=="#111111"||palette.stageInheritedColor!=="rgb(17, 17, 17)"||
    palette.heroHeadingColor!=="rgb(0, 0, 0)"||
-   palette.heroCtaInk!=="rgb(0, 0, 0)"||
+   palette.heroCtaInk!==pureWhite||
    palette.heroPhotoFallbackBg!==paleBlue||
    palette.brandNameInk!=="rgb(0, 0, 0)"||
    palette.footerBrandInk!==brandBlue||palette.footerCopyInk!=="rgb(86, 86, 86)")
-   fails.push("PRIME-COLOR-02: only the hero CTA may be lime; brand yellow preserved, page surfaces pale and 3D controls white: "+JSON.stringify(palette));
+   fails.push("PRIME-COLOR-03: hero CTA must use institutional blue with white text; brand yellow preserved, page surfaces pale and 3D controls white: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.heroFit.typeLeft<diag.heroFit.compositionLeft-2 ||
     diag.heroFit.rows.length!==2 ||
@@ -638,7 +638,7 @@ try{
  async function verifySharedNavigation(root,page,w){
   const state=await js(`(()=>{const n=document.querySelector(".main-nav"),b=document.querySelector(".menu-button"),f=document.querySelector(".corporate-footer"),v=document.documentElement.clientWidth;if(!n||!b||!f)return null;const brand=document.querySelector(".site-header .brand"),name=brand?.querySelector(".brand-name"),mark=brand?.querySelector(".brand-mark");if(!brand||!name||!mark)return null;const br=Math.max(brand.getBoundingClientRect().right,name.getBoundingClientRect().right,mark.getBoundingClientRect().right),navVisible=getComputedStyle(n).display!=="none",other=navVisible?n.querySelector("a:not(.nav-submenu a)"):b,links=[...n.querySelectorAll("a:not(.nav-submenu a)")];return {geometry:br<=other.getBoundingClientRect().left+1&&(!navVisible||links.every((a,i)=>a.getBoundingClientRect().right<=v+2&&(!i||links[i-1].getBoundingClientRect().right<=a.getBoundingClientRect().left+1))),ready:document.documentElement.classList.contains("js-enabled"),nav:getComputedStyle(n).display,button:getComputedStyle(b).display,expanded:b.getAttribute("aria-expanded"),links:n.querySelectorAll("a:not(.nav-submenu a)").length,footer:f.querySelectorAll("a").length,inside:[...f.querySelectorAll("a")].every(a=>a.getBoundingClientRect().left>=0&&a.getBoundingClientRect().right<=v+2),overflow:document.documentElement.scrollWidth>v+2}})()`);
   const label=root+page+" "+w;
-  if(!state||!state.ready||state.links!==6||state.footer!==14||!state.inside||!state.geometry||state.overflow||state.expanded!=="false"){report.failures.push("WEB-CLOSE-02 initial "+label+": "+JSON.stringify(state));return;}
+  if(!state||!state.ready||state.links!==7||state.footer!==14||!state.inside||!state.geometry||state.overflow||state.expanded!=="false"){report.failures.push("WEB-CLOSE-02 initial "+label+": "+JSON.stringify(state));return;}
   if(w<=960){
    if(state.nav!=="none"||state.button==="none")report.failures.push("WEB-CLOSE-02 mobile initial "+label);
    const result=await js(`(()=>{const n=document.querySelector(".main-nav"),b=document.querySelector(".menu-button"),v=document.documentElement.clientWidth;b.click();const open=b.getAttribute("aria-expanded")==="true"&&getComputedStyle(n).display!=="none"&&[...n.querySelectorAll("a:not(.nav-submenu a)")].every(a=>a.getBoundingClientRect().left>=0&&a.getBoundingClientRect().right<=v+2&&a.getBoundingClientRect().height>=44);return open})()`);
@@ -650,6 +650,14 @@ try{
   // Preserve parent navigation checks and exercise both disclosures.
   const disclosure=await js(`(()=>{const n=document.querySelector(".main-nav"),b=document.querySelector(".menu-button"),groups=[...n.querySelectorAll(".nav-expand")],v=document.documentElement.clientWidth;if(groups.length!==2)return {ok:false};const mobile=getComputedStyle(b).display!=="none";if(mobile)b.click();const [first,second]=groups;first.click();const p=document.getElementById(first.getAttribute("aria-controls"));const open=first.getAttribute("aria-expanded")==="true"&&!p.hidden&&[...p.querySelectorAll("a")].every(a=>a.getBoundingClientRect().height>=44&&a.getBoundingClientRect().right<=v+2);second.click();const exclusive=p.hidden&&second.getAttribute("aria-expanded")==="true";document.dispatchEvent(new KeyboardEvent("keydown",{key:"Escape",bubbles:true}));const closed=second.getAttribute("aria-expanded")==="false"&&document.activeElement===second;if(mobile)b.click();return {ok:open&&exclusive&&closed,open,exclusive,closed}})()`);
   if(!disclosure.ok)report.failures.push("CORPORATE-HOME-01 disclosure "+label+": "+JSON.stringify(disclosure));
+  if(page==="index"){
+   await js('document.querySelector("#empresa-destacada").scrollIntoView({block:"start",behavior:"instant"})');
+   await sleep(150);
+   const hierarchy=await js(`(()=>{const grid=document.querySelector("#empresa-destacada .institutional-home-grid"),cards=[...grid.querySelectorAll("article")],strip=document.querySelector(".institutional-recent"),sections=[...document.querySelectorAll("main>section")];return {order:sections.map(e=>e.id).join("|"),recent:strip.previousElementSibling?.id==="inicio"&&strip.nextElementSibling?.id==="empresa-destacada",columns:getComputedStyle(grid).gridTemplateColumns.trim().split(/\\s+/).length,headings:cards.map(e=>e.querySelector("h3").textContent),fit:cards.every(e=>e.scrollWidth<=e.clientWidth+2&&e.getBoundingClientRect().width>0),investors:cards[1]?.querySelector('a[href="./empresa.html#inversores"]')?.getBoundingClientRect().height>=44}})()`);
+   if(hierarchy.order!=="inicio|empresa-destacada|noticias-destacadas|soluciones|vision|ecosistema|talento-destacado|negocios"||!hierarchy.recent||hierarchy.columns!==(w<=700?1:2)||hierarchy.headings.join("|")!=="Empresa|Inversores"||!hierarchy.fit||!hierarchy.investors)report.failures.push("VISUAL-HIERARCHY-01 "+label+": "+JSON.stringify(hierarchy));
+   if(w===1440||w===390)await capture((root?"dist-":"source-")+"hierarchy-"+w+"px.png");
+   report.tests.push({name:"VISUAL-HIERARCHY-01 "+label,hierarchy});
+  }
   report.tests.push({name:"WEB-CLOSE-02 shared navigation "+label,state,disclosure});
  }
 
@@ -662,7 +670,7 @@ try{
    await js('document.fonts.ready');
    await verifySharedNavigation(root,"empresa",w);
    const company=await js(`(()=>{const v=document.documentElement.clientWidth,n=document.querySelector(".corporate-footer");return {title:document.querySelector("h1").textContent,sections:[...document.querySelectorAll("main section")].map(e=>e.id),width:v,scroll:document.documentElement.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.trim().split(/\\s+/).length,links:[...n.querySelectorAll("a:not(.nav-submenu a)")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=v+2})),home:document.querySelector("header .brand").getAttribute("href"),robots:document.querySelector('meta[name="robots"]').content}})()`);
-   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|mensaje-direccion|areas|historia|informacion-corporativa"||company.scroll>company.width+2||company.columns!==2||company.links.length!==14||!company.links.some(x=>x.href==="./aplicaciones.html")||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
+   if(company.title!=="Empresa"||company.sections.join("|")!=="quienes-somos|proposito|mision-vision|valores|mensaje-direccion|areas|historia|informacion-corporativa|inversores"||company.scroll>company.width+2||company.columns!==2||company.links.length!==14||!company.links.some(x=>x.href==="./aplicaciones.html")||company.links.some(x=>!x.inside)||company.home!=="./index.html"||company.robots!=="noindex,nofollow")report.failures.push("Company page "+root+w+": "+JSON.stringify(company));
    const message=await js(`(()=>{const e=document.querySelector("#mensaje-direccion");return {title:e.querySelector("h2").textContent,paragraphs:e.querySelectorAll("p").length,fit:e.scrollWidth<=e.clientWidth+2,visible:e.getBoundingClientRect().height>0}})()`);
    if(message.title!=="Mensaje de la dirección"||message.paragraphs!==4||!message.fit||!message.visible)report.failures.push("MESSAGE-01 "+root+w+": "+JSON.stringify(message));
    const history=await js(`(()=>{const e=document.querySelector("#historia"),items=[...e.querySelectorAll(".history-timeline li")];return {year:e.querySelector(".history-year").textContent,items:items.map(n=>n.querySelector("h4").textContent),fit:items.every(n=>n.getBoundingClientRect().left>=0&&n.getBoundingClientRect().right<=document.documentElement.clientWidth+2),ordered:items.every((n,i)=>!i||n.getBoundingClientRect().top>=items[i-1].getBoundingClientRect().bottom-1)}})()`);

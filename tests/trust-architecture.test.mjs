@@ -48,7 +48,7 @@ test("contact profiles carry owner declaration, not platform-admin proof or DM r
 test("eight-section hierarchy and mobile typography remain after deleting redundant trust ledger",()=>{
  assert.equal((html.match(/<section\b/g)||[]).length,8);
  const s1=html.indexOf('id="vision"'),s2=html.indexOf('id="soluciones"'),s3=html.indexOf('id="ecosistema"');
- assert.ok(0<s1 && s1<s2 && s2<s3);
+ assert.ok(0<s2 && s2<s1 && s1<s3);
  assert.match(css,/\.statement-body\{display:grid;grid-template-columns:minmax\(0,1fr\)/);
  assert.match(css,/@media\(max-width:700px\)/);
  assert.match(css,/\.statement h2\{font-size:clamp\(31px,9vw,60px\)/);

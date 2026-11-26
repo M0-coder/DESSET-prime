@@ -4,25 +4,25 @@ import {createHash} from "node:crypto";
 import {readFileSync,statSync} from "node:fs";
 const root=new URL("../",import.meta.url),read=path=>readFileSync(new URL(path,root),"utf8");
 const html=read("index.html"),css=read("styles-visual02.css"),audit=read("scripts/browser-audit.mjs");
-const marker="\n/* PRIME-COLOR-02",cut=css.indexOf(marker);
-const lime="#CDFC8A",oldGold="#FFC62F";
+const marker="\n/* PRIME-COLOR-03",cut=css.indexOf(marker);
+const blue="#073BBC",oldGold="#FFC62F";
 function luminance(hex){
  const rgb=hex.slice(1).match(/../g).map(v=>parseInt(v,16)/255);
  const c=rgb.map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);
  return c[0]*.2126+c[1]*.7152+c[2]*.0722;
 }
 function contrast(a,b){const x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
-test("Only Hablemos de tu negocio retains owner-approved #CDFC8A",()=>{
+test("Only the hero CTA receives the owner-approved institutional blue override",()=>{
  assert.ok(cut>0,"Narrow, append-only override required");
- assert.equal((css.match(/#CDFC8A/g)||[]).length,1,"No additional lime-colored element permitted");
- assert.match(css.slice(cut),/^\n\/\* PRIME-COLOR-02[\s\S]*?#inicio \.hero-cta,#inicio \.hero-cta:hover\{background:#CDFC8A\}\s*$/);
- assert.doesNotMatch(css.slice(cut),/:root|#ecosistema|\.business-pitch|\.v4-motion-canvas|--yellow|--ds-10-gold|--v02-gold|box-shadow/);
+ assert.doesNotMatch(css,/#cdfc8a/i,"The retired lime must not remain");
+ assert.match(css.slice(cut),/^\n\/\* PRIME-COLOR-03[\s\S]*?#inicio \.hero-cta,#inicio \.hero-cta:hover\{background:#073BBC;color:#FFFFFF;box-shadow:0 4px 0 rgba\(7,59,188,\.25\)\}\s*$/);
+ assert.doesNotMatch(css.slice(cut),/:root|#ecosistema|\.business-pitch|\.v4-motion-canvas|--yellow|--ds-10-gold|--v02-gold/);
  assert.match(html,/class="hero-cta" href="#contacto">Hablemos de tu negocio/);
  assert.equal(css.includes("PRIME-COLOR-01"),false,"Do not retain global lime overrides");
  assert.ok(statSync(new URL("styles-visual02.css",root)).size<=8200);
 });
 test("VISUAL-02 preserves the approved stylesheet except the explicitly authorized neutral and brand-blue edits",()=>{
- const revised=css.slice(0,cut);
+ const hierarchy=css.indexOf("\n/* VISUAL-HIERARCHY-01:");assert.ok(hierarchy>0&&hierarchy<cut);const revised=css.slice(0,hierarchy);
  assert.equal(revised.split("--v02-deep:#000000;").length,2,"Exactly one authorized black editorial token");
  assert.equal(revised.split("#ecosistema .ecosystem-board{background:#142239;").length,2,"Exactly one preserved visual component color");
  assert.equal(revised.split("--v02-blue:#073bbc;").length,2,"Exactly one authorized institutional blue token");
@@ -39,17 +39,17 @@ test("VISUAL-02 preserves the approved stylesheet except the explicitly authoriz
   ["scripts/v6-three.src.mjs",/gold:0xffc62f/]
  ])assert.match(read(path),pattern,"Original yellow missing: "+path);
 });
-test("The only lime CTA retains WCAG AA contrast and 3D markup remains unchanged",()=>{
- assert.ok(contrast("#000000",lime)>=4.5,"Neutral black ink must remain legible on lime");
+test("The blue CTA retains WCAG AA contrast and 3D markup remains unchanged",()=>{
+ assert.ok(contrast("#FFFFFF",blue)>=4.5,"White text must remain legible on institutional blue");
  assert.equal(oldGold,"#FFC62F");
  assert.match(html,/class="v6-three-mount"/);
  assert.match(html,/class="v63-tour"/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
-test("Browser QA enforces gold on other elements, green only in hero, and reproducible dist",()=>{
+test("Browser QA enforces gold on other elements, blue in hero, and reproducible dist",()=>{
  for(const key of ["heroCTA","businessCTA","statementAccent","stageSummaryArrow","threeTourButton","rootYellow","stageYellow","stageDesignGold","stageVisualGold"])
   assert.ok(audit.includes(key),"Missing computed-color measurement "+key);
- assert.match(audit,/PRIME-COLOR-02: only the hero CTA may be lime/);
+ assert.match(audit,/PRIME-COLOR-03: hero CTA must use institutional blue with white text/);
  assert.equal(read("dist/styles-visual02.css"),css,"Dist must match the source exactly");
  const manifest=JSON.parse(read("dist/site-manifest.json"));
  assert.equal(manifest.noindex,true);assert.equal(manifest.domain,"none");
@@ -62,7 +62,7 @@ test("Browser QA waits for the final opaque CTA instead of accepting a transient
  const sample=audit.indexOf("const palette={");
  assert.ok(settle>0&&sample>settle,"Color must settle BEFORE browser palette sampling");
  assert.match(audit,/return !match\|\|Number\(match\[1\]\)>=0\.9999/);
- assert.match(audit,/Number\(limeChannels\[1\]\)>=\.9999/);
- assert.doesNotMatch(audit,/Number\(limeChannels\[1\]\)>=\.99&&/,"Do not weaken final alpha threshold");
- assert.match(audit,/PRIME-COLOR-02: only the hero CTA may be lime/);
+ assert.match(audit,/Number\(blueChannels\[1\]\)>=\.9999/);
+ assert.doesNotMatch(audit,/Number\(blueChannels\[1\]\)>=\.99&&/,"Do not weaken final alpha threshold");
+ assert.match(audit,/PRIME-COLOR-03: hero CTA must use institutional blue with white text/);
 });
