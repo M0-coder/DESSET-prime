@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import {DatabaseSync} from "node:sqlite";
 import {readFileSync} from "node:fs";
 import worker,{handle,STAGING_ORIGIN} from "../internal/merchant-production/worker.mjs";
+import {loadMerchantUI,buildMerchantWorker} from "../internal/merchant-production/build-worker.mjs";
+const ui=loadMerchantUI();
 const now=1800000000, id="00000000-0000-4000-8000-000000000077";
 const email="reviewer@example.invalid",sub="synthetic-reviewer",aud="a".repeat(64),issuer="https://test.cloudflareaccess.com";
 const cfg={ENVIRONMENT:"staging",SERVICE_ORIGIN:STAGING_ORIGIN,ADMIN_POLICY_VERIFIED:"true",ACCESS_ISSUER:issuer,ACCESS_AUD:aud,ADMIN_SUBJECTS:sub,ADMIN_EMAIL:email};
@@ -15,9 +17,9 @@ const token=await sign();
 const fetcher=async url=>{assert.equal(url,issuer+"/cdn-cgi/access/certs");return Response.json({keys:[jwk]});};
 const context={access:{aud,getIdentity:async()=>({email})}};
 const request=(path="/admin",opts={})=>new Request((opts.origin??STAGING_ORIGIN)+path,{method:opts.method??"GET",headers:{...(opts.token===null?{}:{"Cf-Access-Jwt-Assertion":opts.token??token}),...opts.headers},body:opts.body});
-const invoke=(req,env=cfg,ctx=context,f=fetcher)=>handle(req,env,ctx,f,now);
+const invoke=(req,env=cfg,ctx=context,f=fetcher)=>handle(req,env,ctx,f,now,ui);
 function fixture(t){
- const db=new DatabaseSync(":memory:");t.after(()=>db.close());db.exec("PRAGMA foreign_keys=ON;");db.exec(readFileSync(new URL("../internal/merchant-production/schema.sql",import.meta.url),"utf8"));db.exec(readFileSync(new URL("../internal/merchant-production/migrations/0002-merchant-integration.sql",import.meta.url),"utf8"));
+ const db=new DatabaseSync(":memory:");t.after(()=>db.close());db.exec("PRAGMA foreign_keys=ON;");db.exec(readFileSync(new URL("../internal/merchant-production/schema.sql",import.meta.url),"utf8"));db.exec(readFileSync(new URL("../internal/merchant-production/migrations/0002-merchant-integration.sql",import.meta.url),"utf8"));db.exec(readFileSync(new URL("../internal/merchant-production/migrations/0003-merchant-drafts.sql",import.meta.url),"utf8"));
  db.prepare("INSERT INTO merchant_requests(id,request_key,payload_hash,identity_hash,business_name,category,department,province,district,address,contact_name,phone,email,observations,privacy_version,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").run(id,"synthetic-key","hash","identity","Synthetic <shop>","grocery","Lima","Huaura","Huacho","Synthetic address","Synthetic contact","+51900000000","synthetic@example.invalid","<script>bad</script>","TEST-v1",now);
  let reads=0;
  const DB={prepare(sql){reads++;const stmt=db.prepare(sql);const wrap=args=>({first:async()=>stmt.get(...args)??null,all:async()=>({results:stmt.all(...args)}),run:async()=>({meta:{changes:stmt.run(...args).changes}})});return {...wrap([]),bind:(...args)=>wrap(args)};}};
@@ -84,4 +86,37 @@ test("review CSRF, origin, token binding, identity and terminal audit",async t=>
 test("wrong D1 environment and disabled policy cannot read request data",async t=>{
  const f=fixture(t);assert.equal((await invoke(request(),{...f.env,ADMIN_POLICY_VERIFIED:"false"})).status,503);assert.equal(f.reads(),0);
  f.db.exec("UPDATE merchant_runtime SET environment='production'");assert.equal((await invoke(request(),f.env)).status,503);assert.equal(f.reads(),1);
+});
+
+test("Packaged Worker builds offline with pinned approved assets",async()=>{
+ const a=await buildMerchantWorker(),b=await buildMerchantWorker();
+ assert.equal(a,b);assert.ok(a.length>100000);assert.ok(!a.includes("node:fs"));assert.ok(!a.includes("node:sqlite"));
+});
+test("Private Worker form -> D1 draft -> edit -> receipt; public remains hard closed",async t=>{
+ const f=fixture(t);
+ const page=await invoke(request("/admin/merchant"),f.env);assert.equal(page.status,200);
+ assert.match(page.headers.get("content-security-policy"),/script-src 'self'/);
+ const html=await page.text(),csrf=html.match(/name="csrf" value="([a-f0-9]{64})"/)[1];
+ assert.match(html,/action="\/admin\/merchant\/confirm"/);
+ assert.match(html,/src="\/admin\/assets\/merchant-territory.js"/);
+ assert.equal((await invoke(request("/admin/assets/merchant-territory.js"),f.env)).status,200);
+ assert.equal((await invoke(request("/admin/assets/merchant-territory.js",{token:null}),f.env)).status,403);
+ const post=(path,body)=>invoke(request("/admin/merchant/"+path,{method:"POST",headers:{Origin:STAGING_ORIGIN,"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(body)}),f.env);
+ const input={business_name:"Synthetic Worker form",category:"restaurant",department:"Junín",province:"Chanchamayo",district:"Sangani",address:"Synthetic address 99",contact_name:"Synthetic contact",phone:"+51900000000",email:"worker@example.invalid",email_confirm:"WORKER@example.invalid",postal_code:"12345",interest_level:"evaluating",contact_pronunciation:"Synthetic name",observations:"Synthetic note",consent:"yes",csrf};
+ assert.equal((await post("confirm",{...input,csrf:"wrong"})).status,403);
+ assert.equal((await post("confirm",{...input,email:"real@example.com",email_confirm:"real@example.com"})).status,400);
+ const preview=await post("confirm",input);assert.equal(preview.status,200);const key=(await preview.text()).match(/name="draft" value="([a-f0-9]{64})"/)[1];
+ assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_requests").get().n,1);
+ assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_drafts").get().n,1);
+ const edit=await post("edit",{draft:key,csrf});assert.equal(edit.status,200);assert.match(await edit.text(),/Synthetic Worker form/);
+ assert.equal((await post("submit",{draft:key,csrf})).status,400);
+ const again=await post("confirm",input),newKey=(await again.text()).match(/name="draft" value="([a-f0-9]{64})"/)[1];
+ const receipt=await post("submit",{draft:newKey,csrf});assert.equal(receipt.status,201);assert.match(await receipt.text(),/Solicitud de ensayo recibida/);
+ const saved=f.db.prepare("SELECT id,ubigeo,postal_code,interest_level,contact_pronunciation FROM merchant_requests WHERE business_name='Synthetic Worker form'").get();
+ assert.equal(saved.ubigeo,"120307");assert.equal(saved.postal_code,"12345");assert.equal(saved.interest_level,"evaluating");assert.equal(saved.contact_pronunciation,"Synthetic name");
+ const draftRow=f.db.prepare("SELECT payload_json,receipt_id FROM merchant_drafts").get();assert.equal(draftRow.payload_json,null);assert.equal(draftRow.receipt_id,saved.id);
+ assert.equal((await post("submit",{draft:newKey,csrf})).status,200);
+ assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_requests").get().n,2);
+ assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_notification_outbox WHERE request_id=?").get(saved.id).n,1);
+ assert.equal((await invoke(request("/api/intake",{method:"POST",headers:{Origin:STAGING_ORIGIN}}),f.env)).status,503);
 });
