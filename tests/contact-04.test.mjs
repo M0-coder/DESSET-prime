@@ -7,7 +7,9 @@ for(const dir of ["","dist/"]){
  const html=read(dir+"contacto.html"),css=read(dir+"styles-contact.css");
  const ids=["alianzas","inversion","marketing","prensa","instituciones","profesionales","legal","seguridad","otras"];
  assert.deepEqual([...html.matchAll(/<details class="ct-item" id="([^"]+)">/g)].map(m=>m[1]),ids);
- assert.equal((html.match(/aún no está habilitado/g)||[]).length,9);
+ assert.equal((html.match(/La recepción de consultas aún no está habilitada/g)||[]).length,1);
+ assert.doesNotMatch(html,/El canal correspondiente aún no está habilitado/);
+ assert.match(html,/ninguna de estas áreas/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/form-action 'none'/);
  assert.doesNotMatch(html.replace('<script defer src="./scripts/app.js"></script>',""),/<(?:form|input|script|iframe|textarea)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel/i);

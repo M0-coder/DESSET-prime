@@ -21,7 +21,7 @@ test("Static gate scans every institutional page and rejects representative viol
  ["contacto.html",s=>s.replace('<script defer src="./scripts/app.js"></script>',''),"Only approved local navigation script permitted"],
  ["aplicaciones.html",s=>s.replace("</main>",'<a href="https://untrusted.example/app">Descarga</a></main>'),"Unapproved public distribution control"],
  ["aplicaciones-clientes.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
- ["registro-repartidores.html",s=>s.replace('type="text" disabled','type="text"'),"Enabled data entry in inactive preview"],
+ ["registro-repartidores.html",s=>s.replace("</main>",'<input type="text" disabled></main>'),"Data-entry control in informational preparation"],
  ["incorporacion-repartidores.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
  ["capacitacion-repartidores.html",s=>s.replace("form-action 'none'","form-action *"),"Missing or weakened local CSP"],
  ["en.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],

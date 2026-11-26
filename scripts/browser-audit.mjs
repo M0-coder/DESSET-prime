@@ -733,7 +733,7 @@ try{
    if(contact.title!=="Contacto institucional"||contact.scroll>contact.width+2||contact.items!==9||contact.closed||contact.forms||contact.social||!contact.fit)report.failures.push("CONTACT-04 "+root+w+": "+JSON.stringify(contact));
    await capture((root?"dist-":"source-")+"contacto-"+w+"px.png",true);
    await js('document.querySelector(".ct-item summary").click()');
-   if(!await js('document.querySelector(".ct-item").open && document.querySelector(".ct-item p").textContent.includes("aún no está habilitado")'))report.failures.push("CONTACT-04 disclosure failed");
+   if(!await js('document.querySelector(".ct-item").open && document.querySelector(".ct-item p").textContent.trim().length>0 && document.querySelector(".ct-status").textContent.includes("aún no está habilitada") && !document.querySelector(".ct-item p").textContent.includes("aún no está habilitado")'))report.failures.push("CONTACT-04 disclosure failed");
    if(!await js('document.querySelector("#alianzas").open && document.querySelector("#alianzas p").textContent.includes("tecnología e integraciones") && document.querySelector("#alianzas p").textContent.includes("viabilidad") && !document.querySelector("#alianzas form,#alianzas input,#alianzas a")'))report.failures.push("PARTNERS-01 scope or inactive channel mismatch");
    report.tests.push({name:"Contact directory "+root+w,contact});
   }
@@ -845,15 +845,15 @@ try{
   await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/empresa.html') && document.documentElement.lang==='es'"),"Spanish language return");
   report.tests.push({name:"Global language navigation "+root,pass:true});
  }
- // Merchant onboarding preview: responsive disabled fields and no collection.
+ // WEB-INTEGRITY-02: preparation guides, no data-entry controls or collection.
  for(const root of ["","dist/"]){
   for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
    await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
    for(const page of ["registro-comercios","incorporacion-comercios","registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){
     await call("Page.navigate",{url:pathToFileURL(resolve(root+page+".html")).href});
     await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.onboarding-page')"),"onboarding page");
-    const state=await js(`(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,forms:document.querySelectorAll("form,script,iframe").length,enabled:document.querySelectorAll("input:enabled,select:enabled,textarea:enabled,button:enabled").length,notice:document.querySelector(".ob-notice").textContent,fields:document.querySelectorAll("fieldset").length}))()`);
-    if(state.scroll>state.width+2||state.forms||state.enabled||(!state.notice.includes("actualmente")&&!state.notice.includes("aún no está habilitada"))||state.fields!==(page.startsWith("registro-")?2:0))report.failures.push("ONBOARDING "+root+page+w+": "+JSON.stringify(state));
+    const state=await js(`(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,forms:document.querySelectorAll("form,script,iframe").length,enabled:document.querySelectorAll("input:enabled,select:enabled,textarea:enabled,button:enabled").length,notice:document.querySelector(".ob-notice").textContent,fields:document.querySelectorAll("fieldset,input,select,textarea,button").length}))()`);
+    if(state.scroll>state.width+2||state.forms||state.enabled||(!state.notice.includes("actualmente")&&!state.notice.includes("aún no está habilitada"))||state.fields!==0)report.failures.push("ONBOARDING "+root+page+w+": "+JSON.stringify(state));
     await capture((root?"dist-":"source-")+page+"-"+w+"px.png",true);
    }
   }

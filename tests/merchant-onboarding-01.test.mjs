@@ -10,9 +10,10 @@ for(const dir of ["","dist/"])test("Merchant pre-registration is an explicitly i
  assert.match(merchant,/href="\.\/registro-comercios.html"/);
  assert.match(merchant,/href="\.\/incorporacion-comercios.html"/);
  assert.match(reg,/recepción de solicitudes aún no está habilitada/);
- for(const field of reg.matchAll(/<(?:input|select|textarea|button)\b[^>]*>/g))assert.match(field[0],/\bdisabled\b/);
- assert.equal((reg.match(/<fieldset disabled/g)||[]).length,2);
- assert.match(reg,/No se ha recibido ninguna solicitud/);
+ assert.doesNotMatch(reg,/<(?:fieldset|input|select|textarea|button)\b/i);
+ assert.match(reg,/no recoge, envía ni almacena información/);
+ assert.match(reg,/Preparar esta información no constituye una solicitud/);
+ assert.match(reg,/href="\.\/incorporacion-comercios\.html"/);
  assert.equal((guide.match(/<li><h2>/g)||[]).length,5);
  assert.match(guide,/No se reciben solicitudes actualmente/);
  assert.doesNotMatch(read(dir+"repartidores.html"),/registro-comercios|incorporacion-comercios|styles-onboarding/);
