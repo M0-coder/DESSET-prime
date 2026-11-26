@@ -15,7 +15,7 @@ test("Two direct commercial contact paths replace generic stakeholder cards",()=
  assert.match(cards[1][2],/<h3>Repartidores<\/h3>/);
  assert.doesNotMatch(section,/¿TU NEGOCIO|<h3>Personas|<h3>Aliados|business-pitch-body|Plantear una colaboración/);
  assert.match(html,/Comercio digital, pedidos y entregas de última milla\./);
- assert.match(html,/no representa una operación activa/i);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/No corresponde a pedidos ni entregas activas/i);
  assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/no procesa pedidos ni pagos\./i);
  assert.doesNotMatch(html,/más de [0-9]+ (?:comercios|clientes|repartidores)|entregas en tiempo real|compra ahora/i);
 });

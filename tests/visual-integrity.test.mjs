@@ -51,12 +51,10 @@ test("DESSET blue service rail has four accessible, substantive benefits and res
  assert.ok(ratio("#E2EBFF","#073BBC")>=4.5,"Small text must meet WCAG AA on brand blue");
  assert.ok(ratio("#FFFFFF","#073BBC")>=4.5,"Heading contrast must meet WCAG AA");
 });
-test("technical diagrams and four roles are one opt-in view, not repeated clutter",()=>{
- const detail=html.match(/<details class="v4-architecture-details">([\s\S]*?)<\/details>/);
- assert.ok(detail,"Technical accordion must exist");
- assert.doesNotMatch(detail[1],/roles-geometry-|<picture|<img|<svg/);
- assert.match(detail[1],/class="roles" role="list"/);
- assert.equal((detail[1].match(/class="role" role="listitem"/g)||[]).length,4);
- assert.equal((html.match(/class="roles" role="list"/g)||[]).length,1);
- assert.match(css,/\.v4-architecture-details summary:focus-visible/);
+test("Obsolete technical accordion is removed from HTML, not hidden",()=>{
+ assert.doesNotMatch(html,/v4-architecture-details|ecosystem-board v4-flow-board|class="roles" role="list"/);
+ assert.match(html,/href="\.\/prime\.html#modelo"/);
+ assert.match(heroCss,/#inicio \.v4-hero-rail\{[^\n]*background:var\(--yellow\);color:#000000/);
+ assert.match(heroCss,/#inicio \.v4-rail-item strong\{display:block;color:#000000/);
+ assert.match(heroCss,/#inicio \.v4-rail-item p\{margin:5px 0 0;color:#000000/);
 });

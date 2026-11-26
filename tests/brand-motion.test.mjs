@@ -32,9 +32,9 @@ test("V4: identidad visual original y movimiento finito + accesible",()=>{
   assert.equal((html.match(/src="\.\/assets\/deliver-assets-mark\.png"/g)||[]).length,1,"Only visible header mark; footer uses text wordmark");
 });
 test("V4: la secuencia cotidiana es visible y el diagrama técnico no domina la página",()=>{
- assert.match(html,/v4-flow-board/);
+ assert.doesNotMatch(html,/v4-flow-board/);
  for(const label of ["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"])assert.ok(html.includes("<h3>"+label+"</h3>"));
- assert.match(html,/<details class="v4-architecture-details">/);
+ assert.doesNotMatch(html,/<details class="v4-architecture-details">/);
  assert.doesNotMatch(html,/roles-geometry-(?:mobile-)?es\.svg/);
  assert.match(app,/event\.key==="Escape"/);
 });

@@ -122,7 +122,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    visible:style.display!=="none"&&style.visibility!=="hidden",
    inside:r.left>=railBox.left-2&&r.right<=railBox.right+2,
    textFits:!!title&&!!copy&&title.scrollWidth<=title.clientWidth+2&&copy.scrollWidth<=copy.clientWidth+2,
-   fontPx:parseFloat(copyStyle?.fontSize),icon:svg?.getAttribute("aria-hidden")==="true"};
+   fontPx:parseFloat(copyStyle?.fontSize),titleInk:getComputedStyle(title).color,copyInk:copyStyle.color,iconInk:getComputedStyle(svg).stroke,icon:svg?.getAttribute("aria-hidden")==="true"};
  });
  const railDisplay={background:getComputedStyle(rail).backgroundColor,
   columns:getComputedStyle(rail).gridTemplateColumns.trim().split(/\\s+/).length,
@@ -182,8 +182,6 @@ async function viewport(width,height,reduce=false,entry=URL){
    heroCTA:style("#inicio .hero-cta").backgroundColor,
    businessCTA:style("#negocios .business-pitch-cta").backgroundColor,
    statementAccent:style("#vision h2 span").color,
-   stageSummaryArrow:style("#ecosistema .v4-architecture-details summary span").color,
-   ecosystemBoard:style("#ecosistema .ecosystem-board").backgroundColor,
    statementBackground:style("#vision").backgroundColor,
    footerBackground:style(".site-footer").backgroundColor,
    navContactBackground:style(".main-nav .nav-contact").backgroundColor,
@@ -200,11 +198,11 @@ async function viewport(width,height,reduce=false,entry=URL){
    heroCtaInk:style("#inicio .hero-cta").color,
    heroPhotoFallbackBg:style("#inicio .prime-photo-surface").backgroundColor
   };
- return {decorativeArrowCount:[...document.querySelectorAll("a,button,summary")].filter(e=>/[↗→➜]/.test(e.textContent)).length,viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,participantLayout,servicesLayout,partnerLayout,footerLayout,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:document.querySelector('.v4-architecture-details')?.open,obsoleteServices:!!document.querySelector('.future-services')},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
+ return {decorativeArrowCount:[...document.querySelectorAll("a,button,summary")].filter(e=>/[↗→➜]/.test(e.textContent)).length,viewport,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,logo,text,heroFit,offscreen:nodes,railItems,railDisplay,typeSizes,palette,participantLayout,servicesLayout,partnerLayout,footerLayout,menuLabel:document.querySelector(".menu-button")?.getAttribute("aria-label"),disclosures:{technical:!!document.querySelector('.v4-architecture-details,.ecosystem-board,.v4-flow-board'),obsoleteServices:!!document.querySelector('.future-services')},navDisplay:getComputedStyle(document.querySelector('.main-nav')).display,animation:getComputedStyle(document.querySelector('.motion-line__inner')).animationName};
 })()`);
  const fails=[];
  if(diag.scrollWidth>width+2)fails.push("horizontal scroll "+diag.scrollWidth+" > "+width);
-  if(diag.disclosures.technical!==false||diag.disclosures.obsoleteServices)fails.push("Freshly navigated page: technical disclosure CLOSED; obsolete services absent: "+JSON.stringify(diag.disclosures));
+  if(diag.disclosures.technical!==false||diag.disclosures.obsoleteServices)fails.push("Freshly navigated page: technical disclosure ABSENT; obsolete services absent: "+JSON.stringify(diag.disclosures));
   const expectedOriginal="rgb(255, 198, 47)";
   const brandBlue="rgb(7, 59, 188)",pureWhite="rgb(255, 255, 255)",paleBlue="rgb(244, 248, 254)";
   const palette=diag.palette;
@@ -216,8 +214,7 @@ async function viewport(width,height,reduce=false,entry=URL){
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
    !exactBlue||palette.businessCTA!==brandBlue||
-   palette.statementAccent!==brandBlue||palette.stageSummaryArrow!==brandBlue||
-   palette.ecosystemBoard!==pureWhite||palette.statementBackground!==paleBlue||
+   palette.statementAccent!==brandBlue||palette.statementBackground!==paleBlue||
    palette.footerBackground!=="rgb(241, 245, 250)"||palette.navContactBackground!==pureWhite||
    palette.primeHeadingColor!=="rgb(21, 81, 216)"||palette.primeSubtitleColor!=="rgb(17, 17, 17)"||
    palette.institutionalInk!=="#000000"||
@@ -239,8 +236,8 @@ async function viewport(width,height,reduce=false,entry=URL){
  if(diag.logo.some(x=>x.loading!=="lazy"&&(!x.complete||x.naturalWidth===0)))fails.push("broken eager image");
  if(diag.offscreen.some(x=>!x.className.includes("skip-link") && !x.className.includes("hero-symbol-echoes") && !x.className.includes("hero-stage") && !x.className.includes("art-")))fails.push("element off-screen: "+JSON.stringify(diag.offscreen));
  if(reduce&&diag.animation!=="none")fails.push("reduced motion did not disable animation");
- if(diag.railItems.length!==4||diag.railItems.some(i=>!i.visible||!i.inside||!i.textFits||!i.icon||i.fontPx<12)||
-    diag.railDisplay.background!==brandBlue||diag.railDisplay.role!=="list"||diag.railDisplay.ariaHidden!==null||
+ if(diag.railItems.length!==4||diag.railItems.some(i=>!i.visible||!i.inside||!i.textFits||!i.icon||i.fontPx<12||i.titleInk!=="rgb(0, 0, 0)"||i.copyInk!=="rgb(0, 0, 0)"||i.iconInk!=="rgb(0, 0, 0)")||
+    diag.railDisplay.background!==expectedOriginal||diag.railDisplay.role!=="list"||diag.railDisplay.ariaHidden!==null||
     diag.railDisplay.columns!==(width<=860?2:4)||
    (diag.railDisplay.left>2||diag.railDisplay.left< -16)||
    (diag.railDisplay.right<diag.railDisplay.viewportRight-2||diag.railDisplay.right>diag.railDisplay.viewportRight+16))
@@ -297,7 +294,7 @@ try{
  const motionMode=await js("document.documentElement.dataset.motionSystem");
  if(motionMode!=="ready")report.failures.push("Intersection motion system unavailable: "+String(motionMode));
  report.tests.push({name:"Progressive motion system active",mode:motionMode});
- const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),flow:!!document.querySelector(".v4-flow-board"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
+ const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),flow:!!document.querySelector("#ecosistema .prime-model-link"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
  if(!heroQuality.headline?.includes("AUMENTA EL VALOR")||!heroQuality.headline?.includes("A TU TIEMPO")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
  report.tests.push({name:"V4 motion/design contract",heroQuality});
  const heroPhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");const f=document.querySelector("#inicio .prime-photo-surface");return {loaded:!!x?.complete&&x.naturalWidth===1671&&x.naturalHeight===941,src:x?.getAttribute("src"),logo:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),oldText:document.querySelector("#inicio")?.textContent?.includes("IDEAS EN ACCIÓN"),ratio:f?.getBoundingClientRect().width/f?.getBoundingClientRect().height}})()');
@@ -305,7 +302,7 @@ try{
     !heroPhoto.logo?.endsWith("deliver-assets-mark.png")||heroPhoto.oldText||heroPhoto.ratio<1.2||heroPhoto.ratio>2)
     report.failures.push("HERO-PHOTO-01 exact local render, original logo, conceptual disclosure failed: "+JSON.stringify(heroPhoto));
  report.tests.push({name:"HERO-PHOTO-01 exact local render, original logo, conceptual disclosure",heroPhoto});
- const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",board:".ecosystem-board",pitch:".business-pitch"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
+ const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",pitch:".business-pitch"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
  const decorDots=roundedUI.titles.filter(t=>t.endsWith("."));
  if(decorDots.length||Object.entries(roundedUI.radii).some(([,v])=>v<10))
    report.failures.push("V6.6 unexpected heading periods or missing rounded corners: "+JSON.stringify({decorDots,radii:roundedUI.radii}));
@@ -321,7 +318,7 @@ try{
     JSON.stringify(designSystem.steps)!==JSON.stringify(expectedSteps))
    report.failures.push("V6.7 computed 60-30-10 palette or four-participant narrative mismatch: "+JSON.stringify(designSystem));
  report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
- const visual02=await js('(()=>{const q=s=>document.querySelector(s);const cs=s=>getComputedStyle(q(s));return {cssLoaded:[...document.styleSheets].some(x=>x.href?.endsWith("/styles-visual02.css")),heroPhoto:q("#inicio .prime-photo-image")?.getAttribute("src"),heroLogo:q(".site-header .brand-mark")?.getAttribute("src"),heroCTA:q("#inicio .hero-cta")?.getAttribute("href"),businessShadow:cs("#negocios .business-pitch").boxShadow,storyBorder:cs("#ecosistema .ecosystem-board").borderTopColor,serviceTop:cs("#soluciones .service--main").borderTopWidth,trustBg:cs("#vision").backgroundColor,mobileSafe:document.documentElement.scrollWidth<=document.documentElement.clientWidth+2}})()');
+ const visual02=await js('(()=>{const q=s=>document.querySelector(s);const cs=s=>getComputedStyle(q(s));return {cssLoaded:[...document.styleSheets].some(x=>x.href?.endsWith("/styles-visual02.css")),heroPhoto:q("#inicio .prime-photo-image")?.getAttribute("src"),heroLogo:q(".site-header .brand-mark")?.getAttribute("src"),heroCTA:q("#inicio .hero-cta")?.getAttribute("href"),businessShadow:cs("#negocios .business-pitch").boxShadow,serviceTop:cs("#soluciones .service--main").borderTopWidth,trustBg:cs("#vision").backgroundColor,mobileSafe:document.documentElement.scrollWidth<=document.documentElement.clientWidth+2}})()');
  if(!visual02.cssLoaded||!visual02.heroPhoto?.endsWith("desset-hero-entrega-dos-espejos.webp")||!visual02.heroLogo?.endsWith("deliver-assets-mark.png")||visual02.heroCTA!=="#contacto"||
    visual02.serviceTop!=="1px"||visual02.trustBg!=="rgb(244, 248, 254)"||!visual02.mobileSafe)
   report.failures.push("VISUAL-02 institutional editorial consistency regression: "+JSON.stringify(visual02));
@@ -439,8 +436,8 @@ try{
    if(fallback.navDisplay!=="flex"||fallback.menuDisplay!=="none"||fallback.headerHeight<70||Math.abs(fallback.headerHeight-fallback.headerHeightAfter)>1||fallback.links.length<4||fallback.links.some(l=>l.height<42))
      report.failures.push("V6.8 no-JS mobile navigation failed: "+JSON.stringify(fallback));
    report.tests.push({name:"V6.8 resilient mobile navigation without JavaScript "+w,fallback});
-   const radius=await js('(()=>({board:parseFloat(getComputedStyle(document.querySelector(".ecosystem-board")).borderTopLeftRadius),pitch:parseFloat(getComputedStyle(document.querySelector(".business-pitch")).borderTopLeftRadius),screen:document.documentElement.clientWidth}))()');
-   if(radius.board<15||radius.pitch<17)report.failures.push("V6.6 mobile curves missing: "+JSON.stringify(radius));
+   const radius=await js('(()=>({pitch:parseFloat(getComputedStyle(document.querySelector(".business-pitch")).borderTopLeftRadius),screen:document.documentElement.clientWidth}))()');
+   if(radius.pitch<17)report.failures.push("V6.6 mobile curves missing: "+JSON.stringify(radius));
    report.tests.push({name:"V6.6 mobile curved surfaces "+w,radius});
   }
   if(w===390){
@@ -478,27 +475,14 @@ try{
    const after=await js("({expanded:document.querySelector('.menu-button').getAttribute('aria-expanded'),focused:document.activeElement===document.querySelector('.menu-button')})");
    if(after.expanded!=="false"||!after.focused)report.failures.push("Escape did not close and focus mobile menu");
    report.tests.push({name:"mobile navigation + Escape",menu,after});
-   const details=await js('document.querySelector(".v4-architecture-details")?.open');
-   if(details)report.failures.push("Technical roles should be collapsed by default");
-   await js('document.querySelector(".v4-architecture-details summary").click()');
-   const detailOpen=await js('(()=>{const d=document.querySelector(".v4-architecture-details");const cards=[...d.querySelectorAll(".role")];return {open:d.open,visible:cards.every(c=>c.getBoundingClientRect().height>40),roles:cards.length}})()');
-   if(!detailOpen.open||!detailOpen.visible||detailOpen.roles!==4)report.failures.push("Technical roles accordion failed: "+JSON.stringify(detailOpen));
-   await js('document.querySelector(".v4-architecture-details").scrollIntoView({block:"start",behavior:"instant"})');
-   await sleep(100);
-   const mobileDiagram=await js('(()=>{const d=document.querySelector(".v4-architecture-inner"),r=d.getBoundingClientRect();return {image:!!d.querySelector("picture,img,svg"),background:getComputedStyle(d).backgroundColor,width:r.width,viewport:document.documentElement.clientWidth,inside:r.left>=-2&&r.right<=document.documentElement.clientWidth+2}})()');
-   if(mobileDiagram.image||mobileDiagram.background!=="rgb(255, 255, 255)"||mobileDiagram.width<220||!mobileDiagram.inside)report.failures.push("Neutral mobile role panel failed: "+JSON.stringify(mobileDiagram));
-   report.tests.push({name:"Mobile role panel uses neutral background and no diagram",mobileDiagram});
-   await capture("mobile-architecture-expanded.png");
-   report.tests.push({name:"mobile technical detail expandable",detailOpen});
-   await js('document.querySelector(".v4-architecture-details summary").click()');
-   const detailsClosed=await js('document.querySelector(".v4-architecture-details").open === false');
-   if(!detailsClosed)report.failures.push("Technical details remained expanded after mobile accordion test");
-   report.tests.push({name:"Mobile technical accordion restored closed after testing",detailsClosed});
+   const removedPanel=await js('(()=>({absent:!document.querySelector(".v4-architecture-details,.ecosystem-board,.v4-flow-board"),link:!!document.querySelector("#ecosistema .prime-model-link")}))()');
+   if(!removedPanel.absent||!removedPanel.link)report.failures.push("Retired accordion must be absent and Prime model link retained: "+JSON.stringify(removedPanel));
+   report.tests.push({name:"Mobile retired accordion absent",removedPanel});
    if(await js('!!document.querySelector(".v5-city-stage,.v6-three-mount")'))report.failures.push("390px home unexpectedly mounts 3D");
    // Capture full page after activation without any poster image.
-   const wholePageClosed=await js('(()=>({technical:document.querySelector(".v4-architecture-details").open,obsoleteServices:!!document.querySelector(".future-services")}))()');
-   if(wholePageClosed.technical||wholePageClosed.obsoleteServices)report.failures.push("390px full-page screenshot would misrepresent default closed state: "+JSON.stringify(wholePageClosed));
-   report.tests.push({name:"390px full-page capture: technical disclosure CLOSED, services visible",wholePageClosed});
+   const wholePageClosed=await js('(()=>({technical:!!document.querySelector(".v4-architecture-details,.ecosystem-board,.v4-flow-board"),obsoleteServices:!!document.querySelector(".future-services")}))()');
+   if(wholePageClosed.technical||wholePageClosed.obsoleteServices)report.failures.push("390px full-page screenshot would misrepresent removed panel state: "+JSON.stringify(wholePageClosed));
+   report.tests.push({name:"390px full-page capture: technical disclosure ABSENT, services visible",wholePageClosed});
    await capture("mobile-full.png",true);
   }
   if(w===320){
@@ -509,9 +493,9 @@ try{
    
    if(await js('!!document.querySelector(".v5-city-stage,.v6-three-mount")'))report.failures.push("320px home unexpectedly mounts 3D");
    // Capture full page after activation without any poster image.
-   const narrowPageClosed=await js('(()=>({technical:document.querySelector(".v4-architecture-details").open,obsoleteServices:!!document.querySelector(".future-services")}))()');
-   if(narrowPageClosed.technical||narrowPageClosed.obsoleteServices)report.failures.push("320px full-page screenshot would misrepresent default closed state: "+JSON.stringify(narrowPageClosed));
-   report.tests.push({name:"320px full-page capture: technical disclosure CLOSED, services visible",narrowPageClosed});
+   const narrowPageClosed=await js('(()=>({technical:!!document.querySelector(".v4-architecture-details,.ecosystem-board,.v4-flow-board"),obsoleteServices:!!document.querySelector(".future-services")}))()');
+   if(narrowPageClosed.technical||narrowPageClosed.obsoleteServices)report.failures.push("320px full-page screenshot would misrepresent removed panel state: "+JSON.stringify(narrowPageClosed));
+   report.tests.push({name:"320px full-page capture: technical disclosure ABSENT, services visible",narrowPageClosed});
    await capture("mobile-320-full.png",true);
   }
   if([1024,768,430,390,320].includes(w)){
@@ -566,12 +550,10 @@ try{
   report.failures.push("V5.4 keyboard Escape does not restore menu focus: "+JSON.stringify(keyboardMenuClosed));
  report.tests.push({name:"V5.4 keyboard menu Enter and Escape",keyboardMenuOpen,keyboardMenuClosed});
 
- await js('document.querySelector(".v4-architecture-details summary").focus()');
- await pressKey("Enter","Enter",13);
- const detailsKeyboard=await js('(()=>{const d=document.querySelector(".v4-architecture-details"),e=d.querySelector("summary");return {open:d.open,focused:e===document.activeElement,focusVisible:e.matches(":focus-visible"),outlineWidth:getComputedStyle(e).outlineWidth}})()');
- if(!detailsKeyboard.open||!detailsKeyboard.focused||!detailsKeyboard.focusVisible||parseFloat(detailsKeyboard.outlineWidth)<2)
-  report.failures.push("V5.4 keyboard accordion Enter or focus failed: "+JSON.stringify(detailsKeyboard));
- report.tests.push({name:"V5.4 native keyboard disclosure",detailsKeyboard});
+ await js('document.querySelector("#ecosistema .prime-model-link").focus()');
+ const primeLinkKeyboard=await js('(()=>{const e=document.querySelector("#ecosistema .prime-model-link");return {focused:e===document.activeElement,focusVisible:e.matches(":focus-visible"),href:e.getAttribute("href")}})()');
+ if(!primeLinkKeyboard.focused||!primeLinkKeyboard.focusVisible||primeLinkKeyboard.href!=="./prime.html#modelo")report.failures.push("Prime model link keyboard access failed: "+JSON.stringify(primeLinkKeyboard));
+ report.tests.push({name:"V5.4 keyboard Prime model link",primeLinkKeyboard});
 
  await call("Accessibility.enable");
  const tree=await call("Accessibility.getFullAXTree");

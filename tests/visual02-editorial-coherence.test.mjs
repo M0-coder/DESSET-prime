@@ -14,7 +14,7 @@ test("VISUAL-02 leaves the approved photographic hero and real official identity
  assert.match(html,/motocicleta de dos espejos/);
  assert.match(html,/deliver-assets-mark\.png/);
  assert.match(html,/Hablemos de tu negocio/);
- assert.match(html,/Representación conceptual/);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/Representación conceptual/);
  assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.doesNotMatch(html,/IDEAS EN ACCIÓN|<form\b|<video\b/);

@@ -48,7 +48,7 @@ test("The blue CTA retains WCAG AA contrast and 3D markup remains unchanged",()=
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
 test("Browser QA enforces gold on other elements, blue in hero, and reproducible dist",()=>{
- for(const key of ["heroCTA","businessCTA","statementAccent","stageSummaryArrow","threeTourButton","rootYellow","stageYellow","stageDesignGold","stageVisualGold"])
+ for(const key of ["heroCTA","businessCTA","statementAccent","railDisplay","titleInk","threeTourButton","rootYellow","stageYellow","stageDesignGold","stageVisualGold"])
   assert.ok(audit.includes(key),"Missing computed-color measurement "+key);
  assert.match(audit,/PRIME-COLOR-03: hero CTA must use institutional blue with white text/);
  assert.equal(read("dist/styles-visual02.css"),css,"Dist must match the source exactly");
