@@ -8,11 +8,11 @@ import {createHash} from 'node:crypto';
 import {join,resolve,dirname,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {checkPrimeFonts} from './prime-font-licenses.mjs';
-import {reviewSelectedMedia,reviewPrimePageMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto} from './prime-manual-cutover-gate.mjs';
+import {reviewSelectedMedia,reviewPrimePageMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto,reviewRiderHeroPhoto} from './prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const requireSafe=(okay,reason)=>{if(!okay)throw Error('NO-GO: '+reason)};
-const isMedia=p=>/^assets\/[a-z0-9-]+\.(?:png|webp|svg|glb)$/.test(p);
+const isMedia=p=>p==='assets/repartidores-hero-original.jpg'||/^assets\/[a-z0-9-]+\.(?:png|webp|svg|glb)$/.test(p);
 export function checkAssetRightsAndLicenses({
   dist,register=JSON.parse(readFileSync(join(root,'config/prime-original-assets.json'),'utf8')),
   lock=JSON.parse(readFileSync(join(root,'package-lock.json'),'utf8')),
@@ -71,6 +71,9 @@ export function checkAssetRightsAndLicenses({
  const merchant=selected.merchant_hero_photo;
  requireSafe(reviewMerchantHeroPhoto(selected).accepted&&!expected.has(merchant.path),'invalid merchant hero photo registry');
  expected.set(merchant.path,merchant.sha256);
+ const rider=selected.rider_hero_photo;
+ requireSafe(reviewRiderHeroPhoto(selected).accepted&&!expected.has(rider.path),'invalid rider hero registry');
+ expected.set(rider.path,rider.sha256);
  const sources=source.files.filter(f=>isMedia(f.path));
  requireSafe(sources.length===expected.size,'unexpected original-media inventory');
  const verified=[],selectedVerified=[],primePageVerified=[];
@@ -90,6 +93,7 @@ export function checkAssetRightsAndLicenses({
   else if(entry.path===talent.path){requireSafe(bytes.length===talent.bytes&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid talent WebP');}
   else if(entry.path===homeTalent.path){requireSafe(bytes.length===homeTalent.bytes&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid home talent WebP');}
   else if(entry.path===merchant.path){requireSafe(bytes.length===merchant.bytes&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid merchant hero WebP');}
+  else if(entry.path===rider.path){requireSafe(bytes.length===rider.bytes&&bytes[0]===255&&bytes[1]===216&&bytes[bytes.length-2]===255&&bytes[bytes.length-1]===217,'invalid rider hero JPEG');}
   else verified.push({path:entry.path,bytes:entry.bytes,sha256:entry.sha256,claim:'owner-declared'});
  }
  requireSafe(archived.length===2&&verified.length===12&&verified.every(x=>expected.has(x.path))&&selectedVerified.length===4&&primePageVerified.length===6,'incomplete ownership or selected media registry');
@@ -118,7 +122,8 @@ export function checkAssetRightsAndLicenses({
   owner_declaration_status:'owner-declared',legal_title_independently_verified:false,
   assets_checked:verified.length,assets:verified,archived_media_checked:archived.length,archived_media:archived,
   merchant_hero_media:{...merchant,individual_source_verified:merchant.verification==='individual-source-verified'},merchant_hero_media_review:reviewMerchantHeroPhoto(selected),
-  home_talent_media:{...homeTalent,individual_source_verified:false},home_talent_media_review:reviewHomeTalentPhoto(selected),
+  rider_hero_media:{...rider,individual_source_verified:false},rider_hero_media_review:reviewRiderHeroPhoto(selected),
+   home_talent_media:{...homeTalent,individual_source_verified:false},home_talent_media_review:reviewHomeTalentPhoto(selected),
   talent_media:{...talent,individual_source_verified:talent.verification==='individual-source-verified'},talent_media_review:reviewTalentPhoto(selected),
   prime_page_media_checked:primePageVerified.length,prime_page_media:primePageVerified,
   selected_media_checked:selectedVerified.length,selected_media:selectedVerified,individual_license_review_complete:selected.individual_license_review_complete===true&&selectedVerified.filter(a=>a.claim==='third-party').every(a=>a.verification==='individual-source-verified'),

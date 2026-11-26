@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto} from '../scripts/prime-manual-cutover-gate.mjs';
+import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto,reviewRiderHeroPhoto} from '../scripts/prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const target=JSON.parse(readFileSync(root+'/config/prime-release-target.json','utf8'));
 const sha='a'.repeat(40);
@@ -147,3 +147,5 @@ test('PHOTO-05 homepage photo review is scoped and fail-closed',()=>{
  const fresh=copyMedia();assert.equal(reviewHomeTalentPhoto(fresh).accepted,true);assert.equal(reviewHomeTalentPhoto(fresh).release_authorized,false);
  for(const mutate of [x=>delete x.home_talent_photo.selection,x=>x.home_talent_photo.sha256='f'.repeat(64),x=>x.home_talent_photo.selection.exclusive_ownership_claim=true,x=>x.home_talent_photo.selection.remote_original_binary_comparison=true,x=>x.home_talent_photo.source_id='other',x=>x.home_talent_photo.release_authorized=true]){const bad=copyMedia();mutate(bad);assert.equal(reviewHomeTalentPhoto(bad).accepted,false);}
 });
+
+test('PHOTO-06 scoped original rider image only; no independent title or release claim',()=>{const x=copyMedia();assert.equal(reviewRiderHeroPhoto(x).accepted,true);assert.equal(reviewRiderHeroPhoto(x).release_authorized,false);for(const mutate of [m=>delete m.rider_hero_photo.selection,m=>m.rider_hero_photo.sha256='0'.repeat(64),m=>m.rider_hero_photo.selection.exclusive_ownership_claim=true,m=>m.rider_hero_photo.release_authorized=true]){const bad=copyMedia();mutate(bad);assert.equal(reviewRiderHeroPhoto(bad).accepted,false);}});

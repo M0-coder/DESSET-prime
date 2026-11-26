@@ -283,5 +283,31 @@
         "license_url": "https://www.pexels.com/license/"
       }
     }
+  },
+  "rider_hero_photo": {
+    "path": "assets/repartidores-hero-original.jpg",
+    "sha256": "6a8a00bb029a440050ea93497efc61ff52687c9c1d4a895e1c46204e47018ebe",
+    "bytes": 123996,
+    "width": 1024,
+    "height": 1280,
+    "alt": "Retrato ilustrativo de un repartidor con uniforme azul y casco; no representa personal operativo confirmado.",
+    "claim": "owner-supplied",
+    "source": "conversation-upload",
+    "license": "Owner-authorized website use; independent rights not verified",
+    "verification": "owner-supplied-and-approved-use",
+    "release_authorized": false,
+    "usage": "Illustrative portrait; not actual DESSET operations or personnel.",
+    "selection": {
+      "status": "owner-supplied-and-approved-use",
+      "date": "2026-11-26",
+      "scope": "PHOTO-06; Repartidores institutional hero only",
+      "source": "direct owner instruction in the project conversation",
+      "independent_legal_verification": false,
+      "exclusive_ownership_claim": false,
+      "asset": {
+        "path": "assets/repartidores-hero-original.jpg",
+        "sha256": "6a8a00bb029a440050ea93497efc61ff52687c9c1d4a895e1c46204e47018ebe"
+      }
+    }
   }
 }

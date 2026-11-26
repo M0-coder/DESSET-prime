@@ -7,7 +7,7 @@ for(const dir of ["","dist/"]){
  test("Audience page "+page+" presentation and institutional safety ("+(dir||"source")+")",()=>{
  const home=read(dir+"index.html"),html=read(dir+page+".html");
  assert.ok(home.includes('class="'+cta+'" href="./'+page+'.html"'));
- assert.ok(html.includes('<h1 id="audience-title">'+headline+'</h1>'));
+ assert.equal(html.match(/<h1 id="audience-title">([\s\S]*?)<\/h1>/)?.[1].replace(/<[^>]+>/g,''),headline);
  for(const id of ["presentacion","beneficios","modelo","incorporacion","preguntas","canales-oficiales"])assert.equal((html.match(new RegExp('id="'+id+'"','g'))||[]).length,1);
  assert.equal((html.match(/class="ap-card"/g)||[]).length,3);
  assert.equal((html.match(/class="ap-step"/g)||[]).length,4);
@@ -21,7 +21,7 @@ for(const dir of ["","dist/"]){
   assert.doesNotMatch(flow,/<strong>|Recorrido conceptual|class="ap-note"/);
   assert.match(read(dir+"styles-audiences.css"),/\.audience-page--comercios \.ap-step\{border-top:0;/);
   assert.match(html,/No se anuncia disponibilidad comercial activa en este sitio/);
- }else assert.match(html,/no representa una operación activa/);
+ }else {assert.match(html,/no representa una operación activa/);const hero=html.match(/<section class="ap-hero ap-hero--rider-photo"[^>]*>[\s\S]*?<\/section>/)[0];assert.ok(hero.includes('src="./assets/repartidores-hero-original.jpg"'));assert.doesNotMatch(hero,/<(?:p|figcaption)\b/);assert.equal((hero.match(/class="ap-button"/g)||[]).length,1);assert.match(hero,/href="#modelo">Conoce el modelo/);}
  assert.match(html,/cuando estén aprobados/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/form-action 'none'/);
@@ -30,7 +30,7 @@ for(const dir of ["","dist/"]){
  assert.ok(html.includes('href="./styles-audiences.css"'));
  assert.ok(!home.includes("styles-audiences.css"));
  assert.ok(!read(dir+"empresa.html").includes("styles-audiences.css"));
- assert.ok(Buffer.byteLength(read(dir+"styles-audiences.css"),"utf8")<6000);
+ assert.ok(Buffer.byteLength(read(dir+"styles-audiences.css"),"utf8")<8000);
  assert.doesNotMatch(read(dir+"styles-audiences.css"),/@import\b|url\(\s*['"]?https?:/i);
  });
  }

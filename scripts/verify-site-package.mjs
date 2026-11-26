@@ -13,7 +13,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length===68,"unexpected file count");
+check(manifest.files.length===69,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -73,6 +73,7 @@ for(const name of ["commerce","courier","destination"]){
  const bytes=await readFile(resolve(dist,path));
  check(bytes.toString("ascii",0,4)==="glTF"&&bytes.readUInt32LE(4)===2,"invalid GLB "+name);
 }
+check(expected.has("assets/repartidores-hero-original.jpg")&&rider.includes('src="./assets/repartidores-hero-original.jpg"'),"Rider hero photo missing");
 check(expected.has("assets/comercios-hero-minimercado.webp"),"Merchant hero photo missing");
 check(expected.has("assets/talento-cultura.webp")&&careers.includes('src="./assets/talento-cultura.webp"'),"Careers hero photo missing");
 check(expected.has("assets/talento-equipo.webp")&&html.includes('src="./assets/talento-equipo.webp"')&&!html.includes('src="./assets/talento-cultura.webp"'),"Homepage talent photo missing or incorrect");
