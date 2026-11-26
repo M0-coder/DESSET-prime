@@ -107,3 +107,83 @@
 body:has(#inicio){--ds-60-surface:#fff}
 #empresa-destacada,#talento-destacado,#soluciones.solutions,body:has(#inicio) .site-footer{background:#f5f5f5}
 #vision.statement[id="vision"],#negocios.audiences{background:#fff}
+
+/* MOBILE-01: approved compact editorial phone reference. */
+.mobile-corporate-icon,.mobile-footer{display:none}
+@media(max-width:700px){
+ body:has(#inicio){--edge:clamp(12px,4vw,24px)}
+ body:has(#inicio) .site-header{height:64px;min-height:64px}
+ html:not(.js-enabled) body:has(#inicio) .site-header{height:64px;min-height:64px}
+ body:has(#inicio) .site-header .main-nav{top:100%}
+ .js-enabled body:has(#inicio) .site-header .main-nav[data-open="true"]{max-height:calc(100dvh - 64px)}
+ body:has(#inicio) .menu-button{font-size:0;gap:0;min-width:44px;justify-content:center}
+ body:has(#inicio) .menu-button span{font-size:0;display:block;width:18px;height:10px;border-block:2px solid currentColor}
+ #inicio.hero[data-variant="v4"]{padding-top:0}
+ #inicio .v4-hero-composition{padding:16px 0 14px;gap:12px;grid-template-columns:minmax(0,1fr)}
+ #inicio .v4-hero-type,#inicio .v4-hero-bottom{display:contents}
+ #inicio.hero[data-variant="v4"] .motion-headline{grid-row:1;font-size:clamp(29px,7.5vw,48px);line-height:1.08;margin:0}
+ #inicio .v4-headline-a .motion-line__inner{max-width:8em;white-space:normal}
+ #inicio .hero-lead{grid-row:2;font-size:14px;line-height:1.45}
+ #inicio .prime-photo-surface{grid-row:3;aspect-ratio:1.6;border-radius:14px}
+ #inicio .hero-actions{grid-row:4;margin:0;display:flex}
+ #inicio .hero-actions,#inicio .hero-cta{width:100%}
+ #inicio .hero-cta{min-height:48px;padding:10px 8px}
+ #inicio .v4-hero-rail{grid-template-columns:repeat(4,minmax(0,1fr));padding:8px var(--edge);gap:0}
+ #inicio .v4-rail-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;text-align:center;border:0}
+ #inicio .v4-rail-item svg{width:22px;height:22px;margin:0}
+ #inicio .v4-rail-item strong{font-size:11px;letter-spacing:0;text-transform:lowercase}
+ #inicio .v4-rail-item strong::first-letter{text-transform:uppercase}
+ #inicio .v4-rail-item p,#vision .ecosystem-participant p,#negocios.audiences .audience-grid--compact>article p{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+ body:has(#inicio) .institutional-recent{padding-block:6px;flex-direction:row;align-items:center;gap:8px}
+ .institutional-recent strong{font-size:13px}
+ .institutional-recent a{font-size:12px;text-align:right}
+ #empresa-destacada.institutional-home,#noticias-destacadas.institutional-home,#talento-destacado.institutional-home,#soluciones.solutions,#vision.statement[id="vision"],#negocios.audiences{padding-block:16px}
+ .institutional-home h2{font-size:22px;margin-bottom:12px}
+ #empresa-destacada.institutional-home .institutional-home-link{padding:12px}
+ #empresa-destacada.institutional-home h3{font-size:17px;margin:0 0 4px}
+ #empresa-destacada .mobile-corporate-icon{display:block;width:22px;height:22px;color:#073bbc;margin-bottom:8px}
+ #empresa-destacada .institutional-home-link p,#empresa-destacada .institutional-quicklinks,#noticias-destacadas .institutional-home-inner>p,#noticias-destacadas .institutional-news-links,#talento-destacado .institutional-home-inner>p{display:none}
+ .institutional-home .institutional-home-more{margin-top:0;font-size:13px;min-height:44px}
+ #noticias-destacadas .institutional-home-more{display:flex;border-top:1px solid #d6d7d6;padding-top:8px}
+ #soluciones.solutions .solutions-grid .service{padding:10px}
+ #soluciones .service .service-body h3{min-height:64px;font-size:clamp(23px,5.8vw,32px)}
+ #soluciones .service .service-body strong{padding-top:8px;font-size:14px;min-height:44px}
+ #soluciones .service .service-body p{margin:6px 0 10px;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+ #soluciones .service .service-body a{margin-top:auto;padding:8px 4px;min-height:48px;font-size:12px;overflow-wrap:anywhere}
+ #vision .statement-body.ecosystem-participants-body>h2{font-size:clamp(25px,6vw,38px);line-height:1.2;margin-bottom:14px}
+ #vision .ecosystem-participants-body h2 span,#vision .ecosystem-participants-body .statement-last{display:block}
+ #vision .ecosystem-participants-body h2 br{display:none}
+ #vision .statement-journey .motion-story-grid.ecosystem-participants{gap:14px 12px}
+ #vision .statement-journey .motion-story-unit.ecosystem-participant h3{font-size:13px;line-height:1.25;margin:6px 0 0;overflow-wrap:anywhere;text-transform:lowercase}
+ #vision .statement-journey .motion-story-unit.ecosystem-participant h3::first-letter{text-transform:uppercase}
+ #negocios #contacto.contact{margin-bottom:14px}
+ #negocios #contacto.contact .closing-title{font-size:19px}
+ #negocios.audiences .audience-grid--compact>article{padding:10px!important}
+ #negocios.audiences .partner-icon{width:25px;height:25px;margin-bottom:8px}
+ #negocios.audiences .audience-grid--compact>article h3{font-size:20px;margin-bottom:8px;overflow-wrap:anywhere}
+ #negocios.audiences .audience-grid--compact>article a{padding:8px 4px;font-size:12px;overflow-wrap:anywhere}
+ body:has(#inicio) .site-footer{padding-block:18px}
+ body:has(#inicio) .corporate-footer{display:none}
+ body:has(#inicio) .mobile-footer{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px;border-top:1px solid #d8dce2;padding-block:8px}
+ .mobile-footer summary,.mobile-footer a{font-size:13px;line-height:1.4;min-height:44px;padding:8px 0;overflow-wrap:anywhere}
+ .mobile-footer summary{cursor:pointer;align-content:center}
+ .mobile-footer a{display:block;color:#073bbc}
+ body:has(#inicio) .footer-social{padding:6px 0;gap:4px}
+ body:has(#inicio) .site-footer>p{margin-top:12px}
+}
+@media(min-width:320px) and (max-width:700px){
+ #empresa-destacada.institutional-home .institutional-home-grid,#soluciones .solutions-grid,#vision .statement-journey .motion-story-grid.ecosystem-participants,#negocios.audiences .audience-grid--compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ #empresa-destacada .institutional-home-link{overflow-wrap:anywhere}
+}
+
+/* MOBILE-PERF-01: paint the critical mobile hero immediately, without
+   entry delays, filter/clip animation or large composited shadows.
+   Desktop choreography, final layout and all Prime 3D behavior remain intact. */
+@media(max-width:700px){
+ #inicio .motion-line__inner,#inicio .hero-lead,#inicio .hero-actions,
+ #inicio .prime-photo-surface,#inicio .prime-photo-image{
+  animation:none!important;transform:none!important;clip-path:none!important;
+  filter:none!important;opacity:1!important;will-change:auto
+ }
+ #inicio .prime-photo-surface{box-shadow:0 8px 20px rgba(14,25,47,.12)}
+}

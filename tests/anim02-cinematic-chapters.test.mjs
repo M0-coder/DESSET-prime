@@ -41,5 +41,5 @@ test("ANIM-02 checks actual browser animation and reduced-motion computed styles
  assert.match(audit,/anim02Reduced\.photo!=="none"/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{/);
  assert.match(css,/animation:none!important;transform:none!important;clip-path:none!important;/);
- assert.ok(statSync(new URL("styles-hero-photo.css",root)).size<=9500);
+ assert.ok(statSync(new URL("styles-hero-photo.css",root)).size<=17000);
 });

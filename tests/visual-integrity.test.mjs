@@ -65,3 +65,28 @@ test("Homepage-only neutral palette retains approved brand colors and scope",()=
  assert.match(heroCss,/#vision\.statement\[id="vision"\],#negocios\.audiences\{background:#fff\}/);
  assert.match(heroCss,/#inicio\.hero\[data-variant="v4"\]\{background:#f7f5ee/);
 });
+
+test("MOBILE-01 follows approved compact visual reference",()=>{
+ const mobile=heroCss.split("/* MOBILE-01:")[1];
+ assert.ok(mobile);
+ assert.match(mobile,/@media\(max-width:700px\)/);
+ assert.match(mobile,/@media\(min-width:320px\) and \(max-width:700px\)/);
+ assert.match(mobile,/#inicio \.prime-photo-surface\{grid-row:3;/);
+ assert.match(mobile,/#inicio \.hero-actions\{grid-row:4;/);
+ assert.match(mobile,/#inicio \.hero-cta\{min-height:48px;/);
+ assert.match(mobile,/#inicio \.v4-hero-rail\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+ assert.match(mobile,/#soluciones \.solutions-grid,#vision[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+ assert.match(html,/<nav class="mobile-footer" aria-label="Mapa del sitio móvil">/);
+ assert.equal((html.match(/class="mobile-corporate-icon"/g)||[]).length,2);
+});
+
+test("MOBILE-PERF-01 removes critical hero compositing only at phone widths",()=>{
+ const perf=heroCss.split("/* MOBILE-PERF-01:")[1];
+ assert.ok(perf);
+ assert.match(perf,/@media\(max-width:700px\)/);
+ assert.match(perf,/#inicio \.prime-photo-surface,#inicio \.prime-photo-image\{/);
+ assert.match(perf,/animation:none!important;transform:none!important;clip-path:none!important;/);
+ assert.match(perf,/filter:none!important;opacity:1!important;will-change:auto/);
+ assert.doesNotMatch(perf,/display:none|visibility:hidden|\.v6-|\.v5-city/);
+ assert.match(heroCss,/#inicio \.prime-photo-image\{animation:anim02-focus 2\.05s/);
+});
