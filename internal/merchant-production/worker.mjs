@@ -160,7 +160,7 @@ export async function handle(req,env,ctx,fetcher=fetch,now=Math.floor(Date.now()
  const {actor,csrf}=await authorize(req,env,ctx,fetcher,now);
  const runtime=await state(env);
  if(runtime.environment!=="staging"||runtime.intake_enabled!==0||runtime.notification_enabled!==0||runtime.activation_enabled!==0)throw fail(503,"STAGING_NOT_ISOLATED");
- if(url.pathname==="/admin/merchant"||url.pathname.startsWith("/admin/merchant/")||url.pathname.startsWith("/admin/assets/"))return adminMerchant(req,env,actor,csrf,url,ui);
+ if(url.pathname==="/admin/merchant"||url.pathname.startsWith("/admin/merchant/")||url.pathname.startsWith("/admin/assets/"))return await adminMerchant(req,env,actor,csrf,url,ui);
  if(req.method==="GET"&&(url.pathname==="/admin"||url.pathname==="/admin/api/requests")){const offset=Number(url.searchParams.get("offset")??0),rows=await list(env,offset);return url.pathname==="/admin"?panel(rows,offset,csrf):json({requests:rows});}
  if(req.method==="POST"&&url.pathname==="/admin/onboarding"){const b=await body(req,"application/x-www-form-urlencoded");if(!exact(b,["id","from","to","evidence","csrf"])||b.csrf!==csrf)throw fail(403,"CSRF");await advanceOnboarding(env,actor,{id:b.id,from:b.from,to:b.to,evidence:b.evidence});return new Response(null,{status:303,headers:{...sec,Location:"/admin"}});}
  if(req.method==="POST"&&url.pathname==="/admin/review"){const b=await body(req,"application/x-www-form-urlencoded");if(!exact(b,["id","decision","csrf"])||b.csrf!==csrf)throw fail(403,"CSRF");await review(env,actor,{id:b.id,decision:b.decision});return new Response(null,{status:303,headers:{...sec,Location:"/admin"}});}
