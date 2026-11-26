@@ -14,7 +14,7 @@ function fixture(t,seoPolicy='NOINDEX',src=dist){
  return {parent,outputDir,evidenceDir,report};
 }
 test('NOINDEX release shape preserves source and blocks crawling',t=>{
- const f=fixture(t);assert.equal(f.report.package_files,69);
+ const f=fixture(t);assert.equal(f.report.package_files,70);
  assert.equal(f.report.production_deployed,false);assert.equal(f.report.production_authorized,false);
  assert.match(readFileSync(join(f.outputDir,'index.html'),'utf8'),/name="robots" content="noindex,nofollow"/);
  assert.equal(readFileSync(join(f.outputDir,'robots.txt'),'utf8'),'User-agent: *\nDisallow: /\n');

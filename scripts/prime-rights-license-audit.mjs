@@ -8,7 +8,7 @@ import {createHash} from 'node:crypto';
 import {join,resolve,dirname,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {checkPrimeFonts} from './prime-font-licenses.mjs';
-import {reviewSelectedMedia,reviewPrimePageMedia} from './prime-manual-cutover-gate.mjs';
+import {reviewSelectedMedia,reviewPrimePageMedia,reviewTalentPhoto} from './prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const requireSafe=(okay,reason)=>{if(!okay)throw Error('NO-GO: '+reason)};
@@ -61,6 +61,10 @@ export function checkAssetRightsAndLicenses({
   requireSafe(!expected.has(a.path),'duplicated Prime page photograph');
   primePageByPath.set(a.path,a);expected.set(a.path,a.sha256);
  }
+ const talent=selected.talent_photo;
+ requireSafe(talent?.path==='assets/talento-cultura.webp'&&talent.claim==='third-party'&&talent.source_id==='4990531'&&talent.license==='Pexels License'&&talent.license_url==='https://www.pexels.com/license/'&&/^[a-f0-9]{64}$/.test(talent.sha256)&&Number.isSafeInteger(talent.bytes)&&talent.bytes>0&&talent.bytes<=230000&&['individual-source-pending','individual-source-verified'].includes(talent.verification)&&talent.release_authorized===false&&!expected.has(talent.path),'invalid talent media registry');
+ requireSafe(reviewTalentPhoto(selected).accepted,'talent photo lacks scoped rights review');
+ expected.set(talent.path,talent.sha256);
  const sources=source.files.filter(f=>isMedia(f.path));
  requireSafe(sources.length===expected.size,'unexpected original-media inventory');
  const verified=[],selectedVerified=[],primePageVerified=[];
@@ -77,6 +81,7 @@ export function checkAssetRightsAndLicenses({
    requireSafe(p.bytes===bytes.length&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid Prime page WebP '+entry.path);
    primePageVerified.push({...p});
   }
+  else if(entry.path===talent.path){requireSafe(bytes.length===talent.bytes&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid talent WebP');}
   else verified.push({path:entry.path,bytes:entry.bytes,sha256:entry.sha256,claim:'owner-declared'});
  }
  requireSafe(archived.length===2&&verified.length===12&&verified.every(x=>expected.has(x.path))&&selectedVerified.length===4&&primePageVerified.length===6,'incomplete ownership or selected media registry');
@@ -104,6 +109,7 @@ export function checkAssetRightsAndLicenses({
  return {schema:'desset-prime-rights-and-sbom-evidence-v1',outcome:'PASS',
   owner_declaration_status:'owner-declared',legal_title_independently_verified:false,
   assets_checked:verified.length,assets:verified,archived_media_checked:archived.length,archived_media:archived,
+  talent_media:{...talent,individual_source_verified:talent.verification==='individual-source-verified'},talent_media_review:reviewTalentPhoto(selected),
   prime_page_media_checked:primePageVerified.length,prime_page_media:primePageVerified,
   selected_media_checked:selectedVerified.length,selected_media:selectedVerified,individual_license_review_complete:selected.individual_license_review_complete===true&&selectedVerified.filter(a=>a.claim==='third-party').every(a=>a.verification==='individual-source-verified'),
   selected_media_review:reviewSelectedMedia(selected),selected_media_owner_attestation:selected.owner_attestation??null,

@@ -621,6 +621,12 @@ try{
    if(hierarchy.order!=="inicio|empresa-destacada|noticias-destacadas|soluciones|vision|talento-destacado|negocios"||!hierarchy.recent||hierarchy.columns!==(w<320?1:2)||hierarchy.headings.join("|")!=="Empresa|Inversores"||!hierarchy.fit||!hierarchy.investors)report.failures.push("VISUAL-HIERARCHY-01 "+label+": "+JSON.stringify(hierarchy));
    if(w===1440||w===390)await capture((root?"dist-":"source-")+"hierarchy-"+w+"px.png");
    report.tests.push({name:"VISUAL-HIERARCHY-01 "+label,hierarchy});
+   await js('document.querySelector("#talento-destacado").scrollIntoView({block:"center",behavior:"instant"})');
+   await until(async()=>await js('(()=>{const x=document.querySelector(".talent-photo img");return x?.complete&&x.naturalWidth===1200})()'),"Talent photograph loaded");
+   const talent=await js(`(()=>{const t=document.querySelector("#talento-destacado"),h=t.querySelector("h2").getBoundingClientRect(),i=t.querySelector("img"),f=i.getBoundingClientRect(),a=t.querySelector("a").getBoundingClientRect(),s=getComputedStyle(i);return {ratio:f.width/f.height,fit:s.objectFit,position:s.objectPosition,loaded:i.complete&&i.naturalWidth===1200,loading:i.loading,inside:f.left>=0&&f.right<=document.documentElement.clientWidth+2,desktop:f.left>=h.right-2,mobile:h.bottom<=f.top+2&&f.bottom<=a.top+2,tap:a.height,caption:t.querySelector("figcaption").textContent}})()`);
+   if(!talent.loaded||talent.loading!=="lazy"||!talent.inside||talent.fit!=="cover"||talent.tap<44||Math.abs(talent.ratio-(w<=700?1.6:4/3))>.04||(w<=700?!talent.mobile:!talent.desktop)||!talent.caption.includes("referencial"))report.failures.push("PHOTO-01 "+label+": "+JSON.stringify(talent));
+   if(w===1440||w===390)await capture((root?"dist-":"source-")+"talent-"+w+"px.png");
+   report.tests.push({name:"PHOTO-01 "+label,talent});
   }
   report.tests.push({name:"WEB-CLOSE-02 shared navigation "+label,state,disclosure});
  }

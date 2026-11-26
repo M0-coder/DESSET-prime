@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia} from '../scripts/prime-manual-cutover-gate.mjs';
+import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia,reviewTalentPhoto} from '../scripts/prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const target=JSON.parse(readFileSync(root+'/config/prime-release-target.json','utf8'));
 const sha='a'.repeat(40);
@@ -125,4 +125,12 @@ test("Independent source verification remains a distinct basis and owner declara
  for(const asset of m.assets.filter(a=>a.claim==='third-party'))asset.verification='individual-source-verified';
  assert.deepEqual(reviewSelectedMedia(m),{accepted:true,basis:'individual-source-verified',individual_license_review_complete:true,release_authorized:false});
  assert.equal(validateReleaseIntent({...valid,ref:'refs/heads/design/ecosystem-participants-01'}).result,'NO-GO');
+});
+
+test('PHOTO-01 accepts only scoped free-download attestation and does not certify independent rights',()=>{
+ const m=copyMedia();
+ assert.deepEqual(reviewTalentPhoto(m),{accepted:true,basis:'owner-attested-free-download',individual_source_verified:false,release_authorized:false});
+ for(const mutate of [x=>delete x.talent_photo.owner_attestation,x=>x.talent_photo.sha256='f'.repeat(64),x=>x.talent_photo.owner_attestation.exclusive_ownership_claim=true,x=>x.talent_photo.owner_attestation.individual_source_verification=true,x=>x.talent_photo.owner_attestation.scope='unlimited',x=>x.talent_photo.source_id='other',x=>x.talent_photo.release_authorized=true]){
+  const bad=copyMedia();mutate(bad);assert.equal(reviewTalentPhoto(bad).accepted,false);
+ }
 });

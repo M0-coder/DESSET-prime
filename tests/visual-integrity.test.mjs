@@ -81,7 +81,7 @@ test("MOBILE-01 follows approved compact visual reference",()=>{
 });
 
 test("MOBILE-PERF-01 removes critical hero compositing only at phone widths",()=>{
- const perf=heroCss.split("/* MOBILE-PERF-01:")[1];
+ const perf=heroCss.split("/* MOBILE-PERF-01:")[1]?.split("/* PHOTO-01:")[0];
  assert.ok(perf);
  assert.match(perf,/@media\(max-width:700px\)/);
  assert.match(perf,/#inicio \.prime-photo-surface,#inicio \.prime-photo-image\{/);
@@ -89,4 +89,11 @@ test("MOBILE-PERF-01 removes critical hero compositing only at phone widths",()=
  assert.match(perf,/filter:none!important;opacity:1!important;will-change:auto/);
  assert.doesNotMatch(perf,/display:none|visibility:hidden|\.v6-|\.v5-city/);
  assert.match(heroCss,/#inicio \.prime-photo-image\{animation:anim02-focus 2\.05s/);
+});
+
+test("PHOTO-01: talent photo is lazy and referential with mobile-first editorial crop",()=>{
+ assert.match(html,/<img src="\.\/assets\/talento-cultura\.webp" width="1200" height="1800" alt="[^"]+" loading="lazy" decoding="async" fetchpriority="low">/);
+ assert.match(html,/<figcaption>Imagen referencial de colaboración profesional\.<\/figcaption>/);
+ assert.match(heroCss,/\.talent-photo img\{[^}]*aspect-ratio:4\/3;object-fit:cover;object-position:50% 25%/);
+ assert.match(heroCss,/\.talent-photo img\{aspect-ratio:16\/10;border-radius:9px\}/);
 });

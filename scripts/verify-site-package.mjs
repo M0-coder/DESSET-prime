@@ -13,7 +13,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length===65,"unexpected file count");
+check(manifest.files.length===66,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -73,6 +73,7 @@ for(const name of ["commerce","courier","destination"]){
  const bytes=await readFile(resolve(dist,path));
  check(bytes.toString("ascii",0,4)==="glTF"&&bytes.readUInt32LE(4)===2,"invalid GLB "+name);
 }
+check(expected.has("assets/talento-cultura.webp")&&html.includes('src="./assets/talento-cultura.webp"'),"Talent photo missing");
 check(expected.has("assets/v6-three.bundle.js"),"Three.js bundle is missing");
 check(expected.has("styles-typography.css")&&html.includes('href="./styles-typography.css"'),"Locally hosted type system missing");
 check(expected.has("styles-audiences.css")&&[merchant,rider].every(p=>p.includes('href="./styles-audiences.css"'))&&!html.includes("styles-audiences.css")&&!company.includes("styles-audiences.css"),"Audience styles must remain isolated");
