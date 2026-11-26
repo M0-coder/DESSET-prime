@@ -1,3 +1,4 @@
+import {companyFiles,companyCss} from "./company-routes.mjs";
 import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 import {institutionalPages,assertInstitutionalNavigation} from "./institutional-navigation-contract.mjs";
 /** Static source and asset integrity scanner: deliberately not a full SAST/SCA tool. */
@@ -8,11 +9,11 @@ import {fileURLToPath} from "node:url";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const read=p=>readFileSync(resolve(root,p),"utf8");
 const html=read("index.html");
-const pageNames=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html","aplicaciones.html","aplicaciones-clientes.html","aplicaciones-comercios.html","aplicaciones-repartidores.html"];
+const pageNames=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html","aplicaciones.html","aplicaciones-clientes.html","aplicaciones-comercios.html","aplicaciones-repartidores.html",...companyFiles];
 const pages=pageNames.map(name=>[name,read(name)]);
 const headers=read("_headers");
 const js=["scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js"].map(read);
-const styles=["styles-typography.css","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-service-video.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","styles-onboarding.css","styles-applications.css"].map(read);
+const styles=["styles-typography.css","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-service-video.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","styles-onboarding.css","styles-applications.css",companyCss].map(read);
 const issues=[],warnings=[];
 const assert=(ok,label)=>{if(!ok)issues.push(label)};
 const localSet=new Set();
@@ -56,8 +57,8 @@ for(const [i,s] of js.entries()){
 }
 assert(styles.every(s=>!/@import\b|url\(\s*['"]?https?:/i.test(s)),"Remote CSS dependency");
 assert(!/\b(?:pages:\s*write|id-token:\s*write)\b/.test(read(".github/workflows/preview-checks.yml")),"CI write token permission");
-const budget={html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:14000,hero_css_bytes:17000,visual02_css_bytes:8200,audiences_css_bytes:8000,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,onboarding_css_bytes:4000,applications_css_bytes:5000,service_video_css_bytes:4500,service_desset_video_bytes:1200000,service_prime_video_bytes:1650000,service_desset_poster_bytes:20000,service_prime_poster_bytes:50000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000,merchant_hero_webp_bytes:210000};
-const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
+const budget={company_css_bytes:4500,html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:14000,hero_css_bytes:17000,visual02_css_bytes:8200,audiences_css_bytes:8000,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,onboarding_css_bytes:4000,applications_css_bytes:5000,service_video_css_bytes:4500,service_desset_video_bytes:1200000,service_prime_video_bytes:1650000,service_desset_poster_bytes:20000,service_prime_poster_bytes:50000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000,merchant_hero_webp_bytes:210000};
+const sizes={company_css_bytes:statSync(resolve(root,companyCss)).size,html_bytes:statSync(resolve(root,"index.html")).size,
  typography_css_bytes:statSync(resolve(root,"styles-typography.css")).size,
  v5_css_bytes:statSync(resolve(root,"styles-v5.css")).size,
  system_css_bytes:statSync(resolve(root,"styles-system.css")).size,

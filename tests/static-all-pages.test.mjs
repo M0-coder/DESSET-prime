@@ -1,3 +1,4 @@
+import {companyFiles,companyCss} from "../scripts/company-routes.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import {mkdtempSync,cpSync,readFileSync,writeFileSync,rmSync} from "node:fs";
@@ -6,16 +7,18 @@ import {join} from "node:path";
 import {fileURLToPath} from "node:url";
 import {spawnSync} from "node:child_process";
 const root=fileURLToPath(new URL("../",import.meta.url));
-const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html","aplicaciones.html","aplicaciones-clientes.html","aplicaciones-comercios.html","aplicaciones-repartidores.html"];
+const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html","aplicaciones.html","aplicaciones-clientes.html","aplicaciones-comercios.html","aplicaciones-repartidores.html",...companyFiles];
 test("Static gate scans every institutional page and rejects representative violations",()=>{
  const dir=mkdtempSync(join(tmpdir(),"desset-static-all-"));
  try{
- const names=[...pages,"_headers","styles.css","styles-typography.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-service-video.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","styles-onboarding.css","styles-applications.css","assets","fonts","scripts"," .github".trim()];
+ const names=[...pages,companyCss,"_headers","styles.css","styles-typography.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-service-video.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","styles-onboarding.css","styles-applications.css","assets","fonts","scripts"," .github".trim()];
  for(const name of names)cpSync(join(root,name),join(dir,name),{recursive:true});
  const run=()=>spawnSync(process.execPath,[join(dir,"scripts/static-gate.mjs")],{encoding:"utf8"});
  const ok=run();assert.equal(ok.status,0,ok.stderr);
  assert.deepEqual(JSON.parse(readFileSync(join(dir,"reports/quality/static.json"),"utf8")).pages_checked,pages);
  const cases=[
+ ["inversores.html",s=>s.replace("noindex,nofollow","index,follow"),"Missing noindex"],
+ ["principios.html",s=>s.replace("form-action 'none'","form-action *"),"Missing or weakened local CSP"],
  ["empresa.html",s=>s.replace('<script defer src="./scripts/app.js"></script>','<script defer src="./scripts/motion.js"></script>'),"Only approved local navigation script permitted"],
  ["comercios.html",s=>s.replace('href="./aplicaciones.html">Aplicaciones','href="./empresa.html">Aplicaciones'),"Header differs from canonical navigation"],
  ["contacto.html",s=>s.replace('<script defer src="./scripts/app.js"></script>',''),"Only approved local navigation script permitted"],

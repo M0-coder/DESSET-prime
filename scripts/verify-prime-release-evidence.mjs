@@ -1,3 +1,4 @@
+import {companyRoutes} from "./company-routes.mjs";
 import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 /** Offline independent verifier for the extracted, NOT-authorized Prime candidate. */
 import {readFileSync,readdirSync,lstatSync} from 'node:fs';
@@ -15,9 +16,9 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(/^[a-f0-9]{40}$/.test(expectedSha)&&info.origin_sha===expectedSha&&info.checkout_sha===expectedSha,'SHA mismatch');
  check(info.release_authorized===false&&info.release_decision==='NO-GO','not an offline-only candidate');
  check(info.noindex===true&&info.robots_disallow_all===true,'indexing policy changed');
- check(info.original_files===74&&info.staged_files===77,'package shape mismatch');
+ check(info.original_files===82&&info.staged_files===85,'package shape mismatch');
  check(info.repeated_packaging_identical===true&&info.independently_compiled_twice===false,'evidence claims changed');
- check(Array.isArray(info.files)&&info.files.length===77,'missing per-asset manifest');
+ check(Array.isArray(info.files)&&info.files.length===85,'missing per-asset manifest');
  check(sha(Buffer.from(JSON.stringify(info.files)))===info.artifacts_sha256,'manifest checksum mismatch');
  const expected=new Map(),actual=new Set();let total=0;
  for(const f of info.files){
@@ -66,6 +67,7 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(guide.includes('name="robots" content="noindex,nofollow"')&&guide.includes('rel="canonical" href="https://desset.lat/incorporacion-comercios"'),'Guide page canonical or noindex changed');
  for(const name of ["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){const p=readFileSync(join(publicDir,name+'.html'),'utf8');check(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Rider onboarding canonical or indexing gate: '+name);}
  const company=readFileSync(join(publicDir,'empresa.html'),'utf8');
+ for(const name of companyRoutes){const p=readFileSync(join(publicDir,name+'.html'),'utf8');check(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Company detail canonical or indexing gate: '+name);}
  check(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or noindex changed');
  for(const name of appPages){const p=readFileSync(join(publicDir,name+'.html'),'utf8');assertClosedAppPage(p,name);check(p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'App directory canonical missing: '+name);}
  const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');
