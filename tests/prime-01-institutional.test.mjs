@@ -28,7 +28,7 @@ for(const dir of ["","dist/"]){
  assert.ok(desset.includes('<a class="desset-service-cta" href="./aplicaciones.html" aria-label="Conocer más sobre las aplicaciones DESSET">Conocer más <svg'));
  assert.equal((home.match(/class="desset-service-cta"/g)||[]).length,1);
  assert.doesNotMatch(service,/desset-service-cta/);
- assert.match(read(dir+"styles-service-video.css"),/\.service-body a\{[^}]*min-height:48px[^}]*background:#fff;color:#073bbc/);
+ assert.match(read(dir+"styles-service-video.css"),/\.service-body a\{[^}]*min-height:56px[^}]*background:#fff;color:#073bbc/);
  assert.match(read(dir+"aplicaciones.html"),/class="apps-page"/);
  assert.match(read(dir+"styles-service-video.css"),/\.service-body a\{[^}]*position:absolute[^}]*bottom:/);
  assert.ok(html.includes('href="./styles-prime.css"'));

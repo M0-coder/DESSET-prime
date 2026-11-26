@@ -5,14 +5,12 @@
 #soluciones.solutions .solutions-grid .service::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.62),rgba(0,0,0,.14) 30%,transparent 48%,rgba(0,0,0,.12) 70%,rgba(0,0,0,.55));z-index:1;pointer-events:none}
 #soluciones.solutions .service .service-body{position:absolute;inset:0;z-index:2;display:block;height:auto;pointer-events:none}
 #soluciones.solutions .service .service-body h3{position:absolute;top:clamp(18px,3.3vw,48px);left:0;right:0;display:block;min-height:0;margin:0;text-align:center;color:#fff;font-family:var(--ds-type-body);font-size:clamp(30px,3.3vw,52px);font-weight:800;letter-spacing:-.045em;line-height:1;text-shadow:0 2px 16px #0004}
+#soluciones.solutions .solutions-grid .service--prime::after{background:linear-gradient(180deg,rgba(255,255,255,.93),rgba(255,255,255,.85) 27%,rgba(255,255,255,.12) 48%,transparent 58%,rgba(0,0,0,.55))}
+#soluciones.solutions .service--prime .service-body h3{color:#073bbc;text-shadow:0 1px 10px #ffffff80}
 #soluciones.solutions .service .service-body h3 span{display:block;color:inherit;font-size:.52em;letter-spacing:-.025em;line-height:1.1;margin-top:4px}
-#soluciones.solutions .service .service-body a{position:absolute;bottom:clamp(16px,2.7vw,38px);left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:12px;width:auto;min-width:185px;min-height:48px;margin:0;padding:12px 24px;border:1px solid #fff;border-radius:8px;background:#fff;color:#073bbc;font-size:14px;font-weight:700;white-space:nowrap;pointer-events:auto;text-decoration:none;overflow-wrap:normal}
+#soluciones.solutions .service .service-body a{position:absolute;bottom:clamp(16px,2.7vw,38px);left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:12px;width:65%;max-width:560px;min-width:0;min-height:56px;margin:0;padding:12px 24px;border:1px solid #fff;border-radius:8px;background:#fff;color:#073bbc;font-size:16px;font-weight:750;white-space:nowrap;pointer-events:auto;text-decoration:none;overflow-wrap:normal}
 #soluciones.solutions .service .service-body a:hover{background:#073bbc;color:#fff;border-color:#073bbc}
 #soluciones.solutions .service .service-body a:focus-visible{outline:3px solid #fff;outline-offset:4px}
 #soluciones.solutions .service .service-body a svg{width:16px;height:16px;flex:none}
-#soluciones .service-video-toggle{position:absolute;right:8px;bottom:8px;z-index:3;width:44px;height:44px;border:1px solid #ffffff99;border-radius:8px;background:#0009;color:#fff;display:grid;place-items:center;cursor:pointer}
-#soluciones .service-video-toggle[hidden]{display:none}
-#soluciones .service-video-toggle svg{width:19px;height:19px;pointer-events:none}
-#soluciones .service-video-toggle:focus-visible{outline:3px solid #fff;outline-offset:2px}
-@media(max-width:700px){#soluciones.solutions .solutions-grid{grid-template-columns:minmax(0,1fr);gap:12px}#soluciones.solutions .service .service-body h3{top:20px;font-size:clamp(28px,9vw,34px)}#soluciones.solutions .service .service-body a{bottom:16px;min-height:44px;min-width:158px;font-size:13px;padding:10px 18px}}
+@media(max-width:700px){#soluciones.solutions .solutions-grid{grid-template-columns:minmax(0,1fr);gap:12px}#soluciones.solutions .service .service-body h3{top:20px;font-size:clamp(28px,9vw,34px)}#soluciones.solutions .service .service-body a{bottom:16px;width:78%;min-height:48px;font-size:14px;padding:10px 12px}}
 @media(prefers-reduced-motion:reduce){#soluciones .service *{transition:none!important;animation:none!important}}
