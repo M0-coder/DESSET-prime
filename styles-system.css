@@ -219,7 +219,7 @@ h1,h2,h3,h4 {text-wrap:balance;}
  .main-nav .nav-submenu{position:static;grid-column:1/-1;min-width:0;max-width:none;box-shadow:none;margin:0 0 6px 12px;padding:0 8px}
  .main-nav .nav-submenu a{font-size:15px;padding:10px 8px}
 }
-@media(max-width:700px){.institutional-home-grid{grid-template-columns:minmax(0,1fr)}.institutional-home-link{padding:18px}}
+@media(max-width:700px){.institutional-home-grid{grid-template-columns:minmax(0,1fr)}.institutional-home-link{padding:18px}.institutional-home{content-visibility:auto;contain-intrinsic-size:auto 260px}#empresa-destacada{contain-intrinsic-size:auto 520px}}
 
 /* WEB-CLOSE-04: tablet navigation only; no scene or content layout changes. */
 @media(min-width:701px) and (max-width:960px){

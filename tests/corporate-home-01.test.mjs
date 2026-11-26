@@ -11,3 +11,4 @@ for(const dir of ["","dist/"])test("Corporate hierarchy, honest content, working
  assert.match(html,/name="robots" content="noindex,nofollow"/);assert.doesNotMatch(html,/<form\b|<input\b|<iframe\b/);
  assert.equal(read(dir+"scripts/app.js"),read("scripts/app.js"));
 });
+test("New editorial CSS remains isolated and bounded without changing the original styling or Lighthouse thresholds",()=>{const css=read("styles-system.css");const extra=css.split("/* CORPORATE-HOME-01:")[1].split("/* WEB-CLOSE-04:")[0];assert.ok(Buffer.byteLength(extra,"utf8")<4000);assert.match(extra,/content-visibility:auto/);assert.doesNotMatch(extra,/#inicio|\.v6-|\.v5-city|\.hero-cta|\.service--/);assert.ok(Buffer.byteLength(css,"utf8")<=14000);const lh=read("scripts/lighthouse-summary.mjs");assert.match(lh,/categories\.performance<85/);});
