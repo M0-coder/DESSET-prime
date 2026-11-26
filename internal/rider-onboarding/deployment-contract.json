@@ -1,0 +1,36 @@
+{
+  "status": "CANDIDATE_NOT_DEPLOYED",
+  "origin": "https://repartidores.desset.lat",
+  "binding": "RIDER_DB",
+  "documents": "RIDER_DOCUMENTS",
+  "defaults": {
+    "RIDER_INTAKE_ENABLED": "false",
+    "RIDER_ADMIN_POLICY_VERIFIED": "false",
+    "RIDER_TRAINING_ENABLED": "false",
+    "RIDER_TRAINING_POLICY_VERIFIED": "false",
+    "RIDER_REQUIREMENTS_VERIFIED": "false",
+    "RIDER_CONTRACT_POLICY_VERIFIED": "false",
+    "RIDER_APP_POLICY_VERIFIED": "false",
+    "RIDER_APP_INTEGRATION_ENABLED": "false",
+    "RIDER_ACTIVATION_ENABLED": "false",
+    "RIDER_OPERATIONS_VERIFIED": "false",
+    "RIDER_POLICY_VERIFIED": "false",
+    "TERRITORY_VERIFIED": "false"
+  },
+  "rpc": {
+    "entrypoint": "RiderIntegration",
+    "method": "getRiderStatus",
+    "schemaVersion": 1,
+    "caller": "trusted rider application backend only",
+    "cache": "none"
+  },
+  "institutionalRedirect": {
+    "enabled": false,
+    "source": [
+      "https://desset.lat/registro-repartidores.html",
+      "https://www.desset.lat/registro-repartidores.html"
+    ],
+    "target": "https://repartidores.desset.lat/registro-repartidores.html",
+    "status": 302
+  }
+}
