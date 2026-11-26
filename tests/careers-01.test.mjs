@@ -18,6 +18,11 @@ for(const dir of ["","dist/"]){
  assert.match(css,/\.careers-page \.ca-hero::after\{[^}]*linear-gradient\(90deg/);
  assert.match(css,/@media\(max-width:780px\)\{[^}]*align-items:flex-end/);
  assert.match(css,/linear-gradient\(0deg/);
+ assert.match(css,/font-family:var\(--ds-type-body\);font-size:clamp\(38px,4\.9vw,72px\);font-weight:900/);
+ assert.match(css,/max-width:13em;text-wrap:wrap/);
+ assert.match(css,/min-height:clamp\(380px,44\.65vw,640px\)/);
+ assert.match(css,/min-height:clamp\(435px,136vw,600px\)/);
+ assert.match(css,/max-width:9em;margin-bottom:\.65em/);
  assert.deepEqual([...html.matchAll(/<span>(Innovación con propósito|Excelencia en la ejecución|Responsabilidad compartida|Aprendizaje continuo)<\/span>/g)].map(m=>m[1]),["Innovación con propósito","Excelencia en la ejecución","Responsabilidad compartida","Aprendizaje continuo"]);
  assert.doesNotMatch(html.replace('<script defer src="./scripts/app.js"></script>',""),/<(?:form|input|script|iframe|textarea)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel/i);
  for(const page of ["index","empresa","comercios","repartidores","prime"]){
