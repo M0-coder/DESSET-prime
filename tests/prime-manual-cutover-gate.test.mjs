@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia,reviewTalentPhoto} from '../scripts/prime-manual-cutover-gate.mjs';
+import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia,reviewTalentPhoto,reviewMerchantHeroPhoto} from '../scripts/prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const target=JSON.parse(readFileSync(root+'/config/prime-release-target.json','utf8'));
 const sha='a'.repeat(40);
@@ -132,5 +132,13 @@ test('PHOTO-01 accepts only scoped free-download attestation and does not certif
  assert.deepEqual(reviewTalentPhoto(m),{accepted:true,basis:'owner-attested-free-download',individual_source_verified:false,release_authorized:false});
  for(const mutate of [x=>delete x.talent_photo.owner_attestation,x=>x.talent_photo.sha256='f'.repeat(64),x=>x.talent_photo.owner_attestation.exclusive_ownership_claim=true,x=>x.talent_photo.owner_attestation.individual_source_verification=true,x=>x.talent_photo.owner_attestation.scope='unlimited',x=>x.talent_photo.source_id='other',x=>x.talent_photo.release_authorized=true]){
   const bad=copyMedia();mutate(bad);assert.equal(reviewTalentPhoto(bad).accepted,false);
+ }
+});
+
+test('PHOTO-02 binds the selected photograph to the supplied source, not exclusive ownership or independent verification',()=>{
+ const m=copyMedia();
+ assert.deepEqual(reviewMerchantHeroPhoto(m),{accepted:true,basis:'owner-supplied-and-approved-preview',individual_source_verified:false,release_authorized:false});
+ for(const mutate of [x=>delete x.merchant_hero_photo.selection,x=>x.merchant_hero_photo.sha256='f'.repeat(64),x=>x.merchant_hero_photo.selection.exclusive_ownership_claim=true,x=>x.merchant_hero_photo.selection.individual_source_verification=true,x=>x.merchant_hero_photo.source_id='other',x=>x.merchant_hero_photo.release_authorized=true]){
+  const bad=copyMedia();mutate(bad);assert.equal(reviewMerchantHeroPhoto(bad).accepted,false);
  }
 });

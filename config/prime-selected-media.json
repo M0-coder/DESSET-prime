@@ -214,5 +214,39 @@
         "license_url": "https://www.pexels.com/license/"
       }
     }
+  },
+  "merchant_hero_photo": {
+    "path": "assets/comercios-hero-minimercado.webp",
+    "sha256": "e38fc8cef5a94d5113aea720b10847280ee50e1f71e2a6ed4b8f08422613306b",
+    "bytes": 183234,
+    "width": 1800,
+    "height": 1200,
+    "alt": "Fachada nocturna de un minimercado en blanco y negro.",
+    "claim": "third-party",
+    "author": "Tomás Asurmendi (attribution from supplied filename)",
+    "source": "https://www.pexels.com/photo/31487467/",
+    "source_id": "31487467",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/",
+    "verification": "source-identified-from-upload-filename",
+    "release_authorized": false,
+    "usage": "Illustrative storefront; no endorsement or affiliation implied.",
+    "selection": {
+      "status": "owner-supplied-and-approved-preview",
+      "scope": "PHOTO-02; illustrative website use of this specific photo only",
+      "date": "2026-11-26",
+      "source": "direct owner instruction in the project conversation",
+      "general_license_terms_reviewed_on": "2026-11-26",
+      "individual_source_verification": false,
+      "independent_legal_verification": false,
+      "exclusive_ownership_claim": false,
+      "asset": {
+        "path": "assets/comercios-hero-minimercado.webp",
+        "sha256": "e38fc8cef5a94d5113aea720b10847280ee50e1f71e2a6ed4b8f08422613306b",
+        "source_id": "31487467",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/"
+      }
+    }
   }
 }
