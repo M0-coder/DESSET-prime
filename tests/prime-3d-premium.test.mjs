@@ -27,9 +27,9 @@ test("PRIME-3D-03 preserves presentation controls, fallback and no false live tr
  assert.match(scene,/cancelAnimationFrame\(raf\)/);
  assert.match(scene,/document\.hidden\|\|!onscreen\|\|paused/);
  assert.match(scene,/dockBeacons\[i\]\.scale\.setScalar\(pulse\)/);
- assert.match(html,/CENTRO DE DISTRIBUCIÓN · SIMULACIÓN/);
- assert.match(html,/sin datos reales/);
- assert.match(html,/No corresponde a pedidos ni entregas activas/);
+ assert.match(read("prime.html"),/CENTRO DE DISTRIBUCIÓN · SIMULACIÓN/);
+ assert.match(read("prime.html"),/sin datos reales/);
+ assert.match(read("prime.html"),/No corresponde a pedidos ni entregas activas/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.doesNotMatch(scene,/fetch\s*\(|XMLHttpRequest|WebSocket|localStorage|sendBeacon/);
  assert.match(gpu,/PRIME-3D-03 real premium infrastructure and four conceptual dock beacons/);
@@ -56,8 +56,8 @@ test("PRIME-3D-04 truck geometry aligns to actual dock gate positions and moves 
  assert.match(gpu,/PRIME-3D-04 four independent dock tractors aligned to four gates and original fifth yard unit/);
  assert.match(gpu,/PRIME-3D-04 mobile fleet retains aligned truck gates/);
  for(const status of ["Puerta 01","Puerta 02","Puerta 03","Puerta 04"])
-  assert.match(html,new RegExp(status));
- assert.match(html,/Puerta 02<\/span><b>En carga/);
+  assert.match(read("prime.html"),new RegExp(status));
+ assert.match(read("prime.html"),/Puerta 02<\/span><b>En carga/);
  assert.match(scene,/Loading gate 02 is physically open/);
  assert.match(scene,/dockStatusLabels\[0\]\.textContent=arriving/);
  assert.match(scene,/dockStatusLabels\[2\]\.textContent=outbound/);

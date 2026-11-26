@@ -45,10 +45,9 @@ test("Prime has eight uniquely named sections and working in-page links",()=>{
 test("Removal preserves real visual service, mobile imagery, GPU scene, honest app status, and official channels",()=>{
   for(const required of [
     'class="hero-cta"','class="business-pitch"',
-    'class="v5-city-stage"','class="v6-three-mount"',
-    'class="v63-tour"','class="v6-pause"',
     'ecosistema-proveedores.webp','ecosistema-comercios.webp','ecosistema-consumidores.webp','ecosistema-operadores-logisticos.webp',
   ])assert.ok(html.includes(required),"Functional element removed: "+required);
+  for(const token of ['class="v5-city-stage"','class="v6-three-mount"','class="v63-tour"','class="v6-pause"']){assert.ok(!html.includes(token));assert.ok(read("prime.html").includes(token));}
   assert.equal((html.match(/data-channel-basis="owner-attested"/g)||[]).length,5);
   assert.match(cinematic,/activationObserver\.observe\(stage\)/);
   assert.doesNotMatch(cinematic,/data-v64-tour-launch/);
@@ -79,10 +78,10 @@ test("EDITORIAL-09 actually deletes the two marked desktop ornaments without hid
    "Do not retain or hide obsolete ornament CSS in "+sheet);
   assert.doesNotMatch(cssSource,/@keyframes (?:prime-bridge-draw|v45-declaration-in|v45-route-point)\b/);
  }
- assert.match(html,/<figure class="v5-city-stage" aria-label="Renderización gráfica conceptual de DESSET">/);
- assert.match(html,/class="v6-static-fallback"/);
- assert.match(html,/class="v6-three-mount"/);
- assert.match(html,/class="v63-tour"/);
+ assert.match(read("prime.html"),/<figure class="v5-city-stage" aria-label="Simulación logística conceptual de DESSET prime">/);
+ assert.match(read("prime.html"),/class="v6-static-fallback"/);
+ assert.match(read("prime.html"),/class="v6-three-mount"/);
+ assert.match(read("prime.html"),/class="v63-tour"/);
  assert.equal((html.match(/class="motion-story-unit motion-story-unit--/g)||[]).length,4);
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/);
  assert.doesNotMatch(css,/\.prime-photo-caption/);
@@ -96,6 +95,6 @@ test("CLEANUP-01 removes invisible hero ornaments physically, without touching v
  assert.doesNotMatch(read("styles-hero-photo.css"),/\.prime-photo-surface \.v4-shape/);
  assert.equal((html.match(/src="\.\/assets\/deliver-assets-mark\.png"/g)||[]).length,1);
  assert.match(html,/class="prime-photo-image"/);
- assert.match(html,/class="v6-three-mount"/);
- assert.match(html,/class="v63-tour"/);
+ assert.match(read("prime.html"),/class="v6-three-mount"/);
+ assert.match(read("prime.html"),/class="v63-tour"/);
 });

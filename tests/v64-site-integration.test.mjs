@@ -23,12 +23,12 @@ test("V6.4 packages the actual Prime website, not only an isolated GPU demo",()=
 });
 test("V6.4 viewport starts Three.js GLBs in the ecosystem; guided-tour control remains",()=>{
  assert.ok(!html.includes('data-v64-tour-launch'));
- assert.ok(html.includes('aria-label="Escena tridimensional conceptual de DESSET"'));
+ assert.ok(read("dist/prime.html").includes('aria-label="Simulación logística conceptual de DESSET prime"'));
  assert.ok(html.includes('id="ecosistema"'));
  assert.ok(html.includes('class="v4-flow motion-story statement-journey"'));
  assert.ok(html.indexOf('class="v4-flow motion-story statement-journey"')<html.indexOf('id="ecosistema"'));
- assert.ok(html.includes('class="v6-three-mount" aria-hidden="true"'));
- assert.ok(html.includes('class="v63-tour"'));
+ assert.ok(!html.includes('class="v6-three-mount" aria-hidden="true"'));assert.ok(read("dist/prime.html").includes('class="v6-three-mount" aria-hidden="true"'));
+ assert.ok(!html.includes('class="v63-tour"'));assert.ok(read("dist/prime.html").includes('class="v63-tour"'));
  assert.ok(loader.includes('activationObserver.observe(stage)'));
  assert.ok(loader.includes('rootMargin:"0px",threshold:0.12'));
  assert.ok(loader.includes('threeStart?.addEventListener("click",loadThree)'));

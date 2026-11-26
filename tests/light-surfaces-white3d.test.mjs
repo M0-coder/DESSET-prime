@@ -37,5 +37,5 @@ test("LIGHT-SURFACES-01 preserves WCAG AA contrast for editorial text and 3D but
  for(const [fg,bg] of [["#162943","#f4f8fe"],["#445a77","#f4f8fe"],["#1551d8","#ffffff"],["#162943","#ffffff"]])
   assert.ok(contrast(fg,bg)>=4.5,`${fg} on ${bg} contrast ${contrast(fg,bg).toFixed(2)}`);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
- assert.match(html,/class="v6-three-mount" aria-hidden="true"/);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v6-three-mount" aria-hidden="true"/);
 });

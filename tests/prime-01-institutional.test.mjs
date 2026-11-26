@@ -48,7 +48,8 @@ for(const dir of ["","dist/"]){
  assert.doesNotMatch(css,/\.prime-page (?:figcaption|\.pr-intro|\.pr-note)\{/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/form-action 'none'/);
- assert.doesNotMatch(html,/<(?:form|input|script|iframe)\b/i);
+ assert.doesNotMatch(html,/<(?:form|input|iframe)\b/i);
+ assert.deepEqual([...html.matchAll(/<script\b[^>]*src="([^"]+)"[^>]*>/g)].map(m=>m[1]),["./scripts/v5-cinematic.js"]);
  assert.ok(Buffer.byteLength(css,"utf8")<4500);
  assert.doesNotMatch(css,/@import\b|url\(\s*['"]?https?:/i);
  });

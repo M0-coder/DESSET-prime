@@ -71,7 +71,7 @@ const check=(name,pass,metadata={})=>{
 async function viewport(width,height,reduce=false){
  await send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:width<801});
  await send("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:reduce?"reduce":"no-preference"}]});
- await send("Page.navigate",{url:"http://127.0.0.1:4173/"});
+ await send("Page.navigate",{url:"http://127.0.0.1:4173/prime.html"});
  await waitUntil("page ready",async()=>evalJS("document.readyState==='complete'&&!!document.querySelector('.v5-city-stage')"));
 }
 try{

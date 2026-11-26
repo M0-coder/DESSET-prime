@@ -33,6 +33,7 @@ const server=createServer(async(req,res)=>{
   if(url.hostname!==host)return reject(400);
   rel=decodeURIComponent(url.pathname).replace(/^\/+/, "")||"index.html";
  }catch{return reject(400)}
+ if(/^assets\/roles-geometry-(?:v2|es|mobile-es)\.svg$/.test(rel))return reject(404);
  if(!permitted(rel)||rel.includes("..")||rel.includes("\\"))return reject(404);
  const abs=resolve(root,rel);
  if(!abs.startsWith(root+sep))return reject(404);

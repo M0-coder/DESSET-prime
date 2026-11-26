@@ -43,7 +43,7 @@ test("V4.3: hero CTA reaches the unique primary contact path and is accessible",
  assert.match(hero,/<a class="hero-cta" href="#contacto">Hablemos de tu negocio/);
  assert.doesNotMatch(hero,/hero-secondary|data-v64-tour-launch/);
  assert.equal((hero.match(/<a\b/g)||[]).length,1,"Only one primary hero CTA survives");
- assert.match(html,/class="v63-tour"/);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v63-tour"/);
  assert.match(html,/href="https:\/\/www\.instagram\.com\/deliver_assets\/" data-footer-channel="Instagram"/);
  assert.match(html,/data-footer-channel="Instagram" aria-label="Instagram"/);
  assert.match(css,/a:focus-visible,button:focus-visible/);

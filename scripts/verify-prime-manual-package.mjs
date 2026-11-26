@@ -14,12 +14,12 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(['INDEX','NOINDEX'].includes(seoPolicy)&&seoPolicy===m.seo_policy,'SEO policy differs');
  check(m.project==='desset-institucional'&&m.canonical==='https://desset.lat/','Wrong Pages destination');
  check(m.production_authorized===false&&m.production_deployed===false,'Report attempts to authorize production');
- check(m.original_files===67&&m.package_files===71&&Array.isArray(m.assets)&&m.assets.length===71,'Missing/extra source assets');
+ check(m.original_files===65&&m.package_files===69&&Array.isArray(m.assets)&&m.assets.length===69,'Missing/extra source assets');
  check(hash(Buffer.from(JSON.stringify(m.assets)))===m.assets_manifest_sha256,'Manifest SHA changed');
  const want=new Map(),seen=new Set();
  for(const a of m.assets){
   check(typeof a.path==='string'&&(/^[a-z0-9_.\/-]+$/.test(a.path)||a.path==='THIRD-PARTY-NOTICES.txt'||/^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(a.path))&&!a.path.startsWith('/')&&
-    !a.path.split('/').some(s=>!s||s==='.'||s==='..')&&!want.has(a.path),'Unsafe or repeated path');
+    !a.path.split('/').some(s=>!s||s==='.'||s==='..')&&!want.has(a.path)&&!/^assets\/roles-geometry-/.test(a.path),'Unsafe, retired or repeated path');
   check(Number.isSafeInteger(a.bytes)&&a.bytes>0&&/^[a-f0-9]{64}$/.test(a.sha256),'Invalid expected file hash');
   want.set(a.path,a);
  }
@@ -31,7 +31,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
    else {check(stat.isFile()&&!seen.has(rel),'Not a regular file: '+rel);seen.add(rel);}
   }
  }
- scan(publicDir);check(seen.size===71,'Unexpected file count');
+ scan(publicDir);check(seen.size===69,'Unexpected file count');
  for(const path of seen)check(want.has(path),'Unexpected file: '+path);
  for(const [path,spec] of want){
   check(seen.has(path),'Missing file: '+path);

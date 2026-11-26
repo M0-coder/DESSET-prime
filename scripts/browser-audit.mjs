@@ -183,17 +183,12 @@ async function viewport(width,height,reduce=false,entry=URL){
    businessCTA:style("#negocios .business-pitch-cta").backgroundColor,
    statementAccent:style("#vision h2 span").color,
    stageSummaryArrow:style("#ecosistema .v4-architecture-details summary span").color,
-   threeTourButton:style("#ecosistema .v63-tour").backgroundColor,
-   threePauseButton:style("#ecosistema .v6-pause").backgroundColor,
-   stageFrame:style("#ecosistema .v5-city-stage").backgroundColor,
-   stageToolbar:style("#ecosistema .v6-three-toolbar").backgroundColor,
    ecosystemBoard:style("#ecosistema .ecosystem-board").backgroundColor,
    statementBackground:style("#vision").backgroundColor,
    footerBackground:style(".site-footer").backgroundColor,
    navContactBackground:style(".main-nav .nav-contact").backgroundColor,
    primeHeadingColor:style("#desset-prime-heading").color,
    primeSubtitleColor:style("#ecosistema .prime-3d-heading p").color,
-   primeKickerColor:style("#ecosistema .prime-3d-heading p strong").color,
    brandNameInk:style(".site-header .brand-name").color,
    footerBrandInk:style(".footer-brand").color,
    footerCopyInk:style(".site-footer>p").color,
@@ -221,13 +216,10 @@ async function viewport(width,height,reduce=false,entry=URL){
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
    !exactBlue||palette.businessCTA!==brandBlue||
-   palette.statementAccent!==brandBlue||palette.stageSummaryArrow!==expectedOriginal||
-   palette.threeTourButton!==pureWhite||palette.threePauseButton!==pureWhite||
-   palette.stageFrame!==paleBlue||palette.stageToolbar!==paleBlue||
+   palette.statementAccent!==brandBlue||palette.stageSummaryArrow!==brandBlue||
    palette.ecosystemBoard!==pureWhite||palette.statementBackground!==paleBlue||
    palette.footerBackground!=="rgb(241, 245, 250)"||palette.navContactBackground!==pureWhite||
    palette.primeHeadingColor!=="rgb(21, 81, 216)"||palette.primeSubtitleColor!=="rgb(17, 17, 17)"||
-   palette.primeKickerColor!=="rgb(17, 17, 17)"||
    palette.institutionalInk!=="#000000"||
    palette.stageInk!=="#111111"||palette.stageDesignInk!=="#111111"||palette.stageInheritedColor!=="rgb(17, 17, 17)"||
    palette.heroHeadingColor!=="rgb(0, 0, 0)"||
@@ -313,7 +305,7 @@ try{
     !heroPhoto.logo?.endsWith("deliver-assets-mark.png")||heroPhoto.oldText||heroPhoto.ratio<1.2||heroPhoto.ratio>2)
     report.failures.push("HERO-PHOTO-01 exact local render, original logo, conceptual disclosure failed: "+JSON.stringify(heroPhoto));
  report.tests.push({name:"HERO-PHOTO-01 exact local render, original logo, conceptual disclosure",heroPhoto});
- const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",board:".ecosystem-board",stage:".v5-city-stage",pitch:".business-pitch"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
+ const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",board:".ecosystem-board",pitch:".business-pitch"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
  const decorDots=roundedUI.titles.filter(t=>t.endsWith("."));
  if(decorDots.length||Object.entries(roundedUI.radii).some(([,v])=>v<10))
    report.failures.push("V6.6 unexpected heading periods or missing rounded corners: "+JSON.stringify({decorDots,radii:roundedUI.radii}));
@@ -362,17 +354,9 @@ try{
  await sleep(2050);
  await capture("desktop-final.png");
  
-  const v5Cover=await js('(()=>({mode:document.documentElement.dataset.v5Mode,overlayAbsent:!document.querySelector(".v5-hero-refraction"),stage:!!document.querySelector(".v5-city-stage"),staticText:document.querySelector(".v6-static-fallback")?.textContent.includes("CENTRO"),noPoster:!document.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),contactLight:!!document.querySelector(".v5-contact-light")}))()');
-  if(v5Cover.mode!=="ready"||!v5Cover.overlayAbsent||!v5Cover.stage||!v5Cover.staticText||!v5Cover.noPoster||v5Cover.contactLight)report.failures.push("V5 image-free 3D section incomplete: "+JSON.stringify(v5Cover));
-  report.tests.push({name:"V5 image-free accessible WebGL fallback",v5Cover});
- await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
- await sleep(580);
-  const v5Stage=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),w=e.querySelector(".v5-stage-world").getBoundingClientRect(),t=e.querySelector(".v6-static-fallback");return {visible:e.classList.contains("v5-visible"),fallback:!!t,sourceImage:!!e.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),fallbackText:t?.textContent.includes("CENTRO"),worldWidth:w.width,worldHeight:w.height,obsoleteOverlay:!!e.querySelector(".v5-route-overlay"),left:r.left,right:r.right,viewport:document.documentElement.clientWidth,sceneDescription:e.getAttribute("aria-label"),noCaption:!e.querySelector("figcaption,.v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge")}})()');
-  if(!v5Stage.visible||!v5Stage.fallback||v5Stage.sourceImage||!v5Stage.fallbackText||v5Stage.worldWidth<300||v5Stage.worldHeight<200||v5Stage.obsoleteOverlay||v5Stage.left< -2||v5Stage.right>v5Stage.viewport+2||!v5Stage.sceneDescription?.includes("conceptual")||!v5Stage.noCaption||!v5Stage.noBridge)report.failures.push("V5 image-free desktop stage failed: "+JSON.stringify(v5Stage));
-  report.tests.push({name:"V5 accessible image-free desktop stage",v5Stage});
- await capture("desktop-v5-scene-motion.png");
- await sleep(1750);
- await capture("desktop-v5-scene-final.png");
+  const v5Cover=await js('(()=>({mode:document.documentElement.dataset.v5Mode,overlayAbsent:!document.querySelector(".v5-hero-refraction"),stage:!!document.querySelector(".v5-city-stage,.v6-three-mount"),diagram:!!document.querySelector(".roles-diagram-responsive"),link:!!document.querySelector("a[href=\\\"./prime.html#modelo\\\"]"),noPoster:!document.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),contactLight:!!document.querySelector(".v5-contact-light")}))()');
+  if(v5Cover.mode!=="ready"||!v5Cover.overlayAbsent||v5Cover.stage||v5Cover.diagram||!v5Cover.link||!v5Cover.noPoster||v5Cover.contactLight)report.failures.push("Home must not mount logistics WebGL or old diagram: "+JSON.stringify(v5Cover));
+  report.tests.push({name:"Home is free of logistics 3D and obsolete diagram",v5Cover});
    // Capture full page after activation without any poster image.
    await capture("desktop-full.png",true);
  await js('document.querySelector(".motion-story").scrollIntoView({block:"center",behavior:"instant"})');
@@ -455,8 +439,8 @@ try{
    if(fallback.navDisplay!=="flex"||fallback.menuDisplay!=="none"||fallback.headerHeight<70||Math.abs(fallback.headerHeight-fallback.headerHeightAfter)>1||fallback.links.length<4||fallback.links.some(l=>l.height<42))
      report.failures.push("V6.8 no-JS mobile navigation failed: "+JSON.stringify(fallback));
    report.tests.push({name:"V6.8 resilient mobile navigation without JavaScript "+w,fallback});
-   const radius=await js('(()=>({stage:parseFloat(getComputedStyle(document.querySelector(".v5-city-stage")).borderTopLeftRadius),pitch:parseFloat(getComputedStyle(document.querySelector(".business-pitch")).borderTopLeftRadius),screen:document.documentElement.clientWidth}))()');
-   if(radius.stage<15||radius.pitch<17)report.failures.push("V6.6 mobile curves missing: "+JSON.stringify(radius));
+   const radius=await js('(()=>({board:parseFloat(getComputedStyle(document.querySelector(".ecosystem-board")).borderTopLeftRadius),pitch:parseFloat(getComputedStyle(document.querySelector(".business-pitch")).borderTopLeftRadius),screen:document.documentElement.clientWidth}))()');
+   if(radius.board<15||radius.pitch<17)report.failures.push("V6.6 mobile curves missing: "+JSON.stringify(radius));
    report.tests.push({name:"V6.6 mobile curved surfaces "+w,radius});
   }
   if(w===390){
@@ -501,26 +485,16 @@ try{
    if(!detailOpen.open||!detailOpen.visible||detailOpen.roles!==4)report.failures.push("Technical roles accordion failed: "+JSON.stringify(detailOpen));
    await js('document.querySelector(".v4-architecture-details").scrollIntoView({block:"start",behavior:"instant"})');
    await sleep(100);
-   const mobileDiagram=await js('(()=>{const im=document.querySelector(".v4-architecture-details picture img"),source=document.querySelector(".v4-architecture-details picture source"),r=im.getBoundingClientRect();return {src:im.currentSrc,naturalWidth:im.naturalWidth,naturalHeight:im.naturalHeight,renderWidth:r.width,renderHeight:r.height,source:source?.getAttribute("srcset")}})()');
-   // Chromium may report SVG naturalWidth after responsive-density scaling.
-   // The actual selected source, decoded aspect ratio and rendered CSS size
-   // establish readability more reliably than fixed natural pixel dimensions.
-   const aspect=mobileDiagram.naturalWidth/Math.max(1,mobileDiagram.naturalHeight);
-   if(!mobileDiagram.src.endsWith("roles-geometry-mobile-es.svg")||mobileDiagram.renderWidth<220||mobileDiagram.renderHeight<220||Math.abs(aspect-360/392)>.035)
-    report.failures.push("V6.8 mobile diagram must use legible art-directed SVG: "+JSON.stringify(mobileDiagram));
-   report.tests.push({name:"V6.8 art-directed legible mobile SVG diagram",mobileDiagram});
+   const mobileDiagram=await js('(()=>{const d=document.querySelector(".v4-architecture-inner"),r=d.getBoundingClientRect();return {image:!!d.querySelector("picture,img,svg"),background:getComputedStyle(d).backgroundColor,width:r.width,viewport:document.documentElement.clientWidth,inside:r.left>=-2&&r.right<=document.documentElement.clientWidth+2}})()');
+   if(mobileDiagram.image||mobileDiagram.background!=="rgb(255, 255, 255)"||mobileDiagram.width<220||!mobileDiagram.inside)report.failures.push("Neutral mobile role panel failed: "+JSON.stringify(mobileDiagram));
+   report.tests.push({name:"Mobile role panel uses neutral background and no diagram",mobileDiagram});
    await capture("mobile-architecture-expanded.png");
    report.tests.push({name:"mobile technical detail expandable",detailOpen});
    await js('document.querySelector(".v4-architecture-details summary").click()');
    const detailsClosed=await js('document.querySelector(".v4-architecture-details").open === false');
    if(!detailsClosed)report.failures.push("Technical details remained expanded after mobile accordion test");
    report.tests.push({name:"Mobile technical accordion restored closed after testing",detailsClosed});
-   await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
-   await sleep(350);
-    const v5Mobile=await js('(()=>{const e=document.querySelector(".v5-city-stage"),r=e.getBoundingClientRect(),w=e.querySelector(".v5-stage-world").getBoundingClientRect(),v=document.documentElement.clientWidth,t=e.querySelector(".v6-static-fallback");return {visible:e.classList.contains("v5-visible"),left:r.left,right:r.right,viewport:v,overflow:document.documentElement.scrollWidth>v+2,sceneDescription:e.getAttribute("aria-label"),noCaption:!e.querySelector("figcaption,.v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge"),fallbackText:t?.textContent.includes("CENTRO"),noImage:!e.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan"),ratio:+(w.height/w.width).toFixed(2)}})()');
-    if(!v5Mobile.visible||v5Mobile.left< -2||v5Mobile.right>v5Mobile.viewport+2||v5Mobile.overflow||!v5Mobile.fallbackText||!v5Mobile.noImage||v5Mobile.ratio<1.4||!v5Mobile.sceneDescription?.includes("conceptual")||!v5Mobile.noCaption||!v5Mobile.noBridge)report.failures.push("V5 mobile 390 image-free fallback failed: "+JSON.stringify(v5Mobile));
-    report.tests.push({name:"V5 mobile 390 image-free stage",v5Mobile});
-   await capture("mobile-v5-scene.png");
+   if(await js('!!document.querySelector(".v5-city-stage,.v6-three-mount")'))report.failures.push("390px home unexpectedly mounts 3D");
    // Capture full page after activation without any poster image.
    const wholePageClosed=await js('(()=>({technical:document.querySelector(".v4-architecture-details").open,obsoleteServices:!!document.querySelector(".future-services")}))()');
    if(wholePageClosed.technical||wholePageClosed.obsoleteServices)report.failures.push("390px full-page screenshot would misrepresent default closed state: "+JSON.stringify(wholePageClosed));
@@ -533,12 +507,7 @@ try{
    await sleep(3200);
    await capture("mobile-320-final.png");
    
-   await js('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
-   await sleep(250);
-    const v5Narrow=await js('(()=>{const e=document.querySelector(".v5-city-stage"),t=e.querySelector(".v6-static-fallback"),b=e.getBoundingClientRect(),v=document.documentElement.clientWidth,w=e.querySelector(".v5-stage-world").getBoundingClientRect();return {inside:b.left>=-2&&b.right<=v+2,ratio:+(w.height/w.width).toFixed(2),fallback:!!t&&t.textContent.includes("MUELLES"),noImage:!e.querySelector(".v5-responsive-art,.v5-stage-render,.v5-stage-scan")}})()');
-    if(!v5Narrow.inside||v5Narrow.ratio<1.4||!v5Narrow.fallback||!v5Narrow.noImage)report.failures.push("V5 mobile 320 text fallback failed: "+JSON.stringify(v5Narrow));
-    report.tests.push({name:"V5 mobile 320 image-free fallback",v5Narrow});
-   await capture("mobile-320-v5-scene.png");
+   if(await js('!!document.querySelector(".v5-city-stage,.v6-three-mount")'))report.failures.push("320px home unexpectedly mounts 3D");
    // Capture full page after activation without any poster image.
    const narrowPageClosed=await js('(()=>({technical:document.querySelector(".v4-architecture-details").open,obsoleteServices:!!document.querySelector(".future-services")}))()');
    if(narrowPageClosed.technical||narrowPageClosed.obsoleteServices)report.failures.push("320px full-page screenshot would misrepresent default closed state: "+JSON.stringify(narrowPageClosed));
@@ -566,9 +535,7 @@ try{
   report.failures.push("ANIM-02 reduced-motion accessibility contract failed: "+JSON.stringify(anim02Reduced));
  report.tests.push({name:"ANIM-02 reduced motion leaves approved image and copy static",anim02Reduced});
 
-  const v5Reduced=await js('(()=>{const e=document.querySelector(".v5-city-stage"),t=e.querySelector(".v6-static-fallback");return {mode:document.documentElement.dataset.v5Mode,light:document.querySelector(".v5-contact-light")?"present":"none",textVisible:!!t&&getComputedStyle(t).visibility!=="hidden",noImage:!e.querySelector("img,picture,.v5-responsive-art,.v5-stage-render,.v5-stage-scan"),gpuHidden:getComputedStyle(e.querySelector(".v6-three-mount")).display==="none",sceneDescription:e.getAttribute("aria-label"),noCaption:!document.querySelector(".v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge")}})()');
-  if(v5Reduced.mode!=="reduced"||v5Reduced.light!=="none"||!v5Reduced.textVisible||!v5Reduced.noImage||!v5Reduced.gpuHidden||!v5Reduced.sceneDescription?.includes("conceptual")||!v5Reduced.noCaption||!v5Reduced.noBridge)report.failures.push("V5 reduced-motion semantic text fallback failed: "+JSON.stringify(v5Reduced));
-  report.tests.push({name:"V5 image-free reduced-motion fallback",v5Reduced});
+  if(await js('!!document.querySelector(".v5-city-stage,.v6-three-mount")'))report.failures.push("Reduced-motion home unexpectedly mounts 3D");
  await capture("mobile-reduced-motion.png");
  report.tests.push({name:"reduced motion",animation:reduced.animation});
 
@@ -704,6 +671,7 @@ try{
  for(const root of ["","dist/"]){
   for(const [w,h] of [[1440,900],[768,900],[390,844],[320,700]]){
    await call("Emulation.setDeviceMetricsOverride",{width:w,height:h,deviceScaleFactor:1,mobile:w<=800});
+   await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:"no-preference"}]});
    await call("Page.navigate",{url:pathToFileURL(resolve(root+"prime.html")).href});
    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.prime-page')"),"prime page render");
    await js('document.fonts.ready');
@@ -717,9 +685,27 @@ try{
    await js('window.scrollTo({top:0,behavior:"instant"})');
    const brand=await js('(()=>{const a=document.querySelector(".site-header .prime-header-brand"),n=a?.querySelector(".brand-name"),p=n?.querySelector(".pr-wordmark");if(!a||!n||!p)return null;const x=getComputedStyle(n),y=getComputedStyle(p),r=a.getBoundingClientRect(),home=document.querySelector(".site-header > a:last-child").getBoundingClientRect();return {label:n.textContent,icon:!!a.querySelector("img,svg"),blue:x.color,primeBlue:y.color,bold:x.fontWeight,light:y.fontWeight,style:y.fontStyle,sameSize:x.fontSize===y.fontSize,fit:r.width>0&&r.left>=0&&r.right<=home.left+2}})()');
    if(!brand||brand.label!=="DESSET Prime"||brand.icon||brand.blue!=="rgb(7, 59, 188)"||brand.primeBlue!==brand.blue||brand.bold!=="800"||brand.light!=="500"||brand.style!=="normal"||!brand.sameSize||!brand.fit)report.failures.push("PRIME brand "+root+w+": "+JSON.stringify(brand));
-   const prime=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,lead:document.querySelector(".pr-hero .pr-lead").textContent,headingCount:document.querySelectorAll("h1").length,headingFit:[...document.querySelectorAll("#prime-title span")].every(e=>e.clientWidth>0&&e.scrollWidth<=e.clientWidth+2&&getComputedStyle(e).display==="block"),sections:[...document.querySelectorAll("main section")].length,cards:document.querySelectorAll(".pr-card").length,steps:document.querySelectorAll(".pr-steps li").length,width:v,scroll:document.documentElement.scrollWidth,background:getComputedStyle(document.querySelector(".pr-hero")).backgroundColor,visionBackground:getComputedStyle(document.querySelector(".pr-vision")).backgroundColor,forms:document.querySelectorAll("form,input,iframe").length,links:document.querySelectorAll("#canales-oficiales a").length,cta:document.querySelector(".pr-button").getAttribute("href"),images:[...document.querySelectorAll("main img")].every(e=>e.complete&&e.naturalWidth>0),visible:[...document.querySelectorAll("main h1,main h2,main h3,main p,main li")].every(e=>e.clientWidth>0&&e.scrollWidth<=e.clientWidth+2)}})()`);
+   const prime=await js(`(()=>{const v=document.documentElement.clientWidth;return {title:document.querySelector("h1").textContent,lead:document.querySelector(".pr-hero .pr-lead").textContent,headingCount:document.querySelectorAll("h1").length,headingFit:[...document.querySelectorAll("#prime-title span")].every(e=>e.clientWidth>0&&e.scrollWidth<=e.clientWidth+2&&getComputedStyle(e).display==="block"),sections:[...document.querySelectorAll("main section")].length,cards:document.querySelectorAll(".pr-card").length,steps:document.querySelectorAll(".pr-steps li").length,width:v,scroll:document.documentElement.scrollWidth,background:getComputedStyle(document.querySelector(".pr-hero")).backgroundColor,visionBackground:getComputedStyle(document.querySelector(".pr-vision")).backgroundColor,forms:document.querySelectorAll("form,input,iframe").length,links:document.querySelectorAll("#canales-oficiales a").length,cta:document.querySelector(".pr-button").getAttribute("href"),images:[...document.querySelectorAll("main img")].every(e=>e.complete&&e.naturalWidth>0),visible:[...document.querySelectorAll("main h1,main h2,main h3,main p,main li")].filter(e=>!e.closest(".v5-city-stage")).every(e=>e.clientWidth>0&&e.scrollWidth<=e.clientWidth+2)}})()`);
    if(prime.title!=="DEL ORIGEN AL DESTINO MÁS ALLÁ DE LAS DISTANCIAS"||prime.lead!=="Creemos que la distancia no debe ser una barrera para el comercio, las empresas ni las personas. Nuestro propósito es conectar cada origen con su destino, independientemente de lo lejos que esté."||prime.headingCount!==1||!prime.headingFit||prime.sections!==5||prime.cards!==4||prime.steps!==4||prime.scroll>prime.width+2||prime.background!=="rgb(0, 0, 0)"||prime.visionBackground!=="rgb(0, 0, 0)"||prime.forms||prime.links!==5||prime.cta!=="#modelo"||!prime.images||!prime.visible)report.failures.push("PRIME-01 "+root+w+": "+JSON.stringify(prime));
    await capture((root?"dist-":"source-")+"prime-"+w+"px.png",true);
+   await js('document.querySelector("#modelo .v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+   await sleep(580);
+   const v5Stage=await js('(()=>{const measureFallback=()=>{const e=document.querySelector("#modelo .v5-city-stage"),t=e?.querySelector(".v6-static-fallback"),world=e?.querySelector(".v5-stage-world");if(!t||!world)return {readable:false,missing:true};const b=world.getBoundingClientRect(),cs=getComputedStyle(t),lines=[...t.querySelectorAll("span,strong,p")].map(n=>{const range=document.createRange();range.selectNodeContents(n);const rects=[...range.getClientRects()].filter(r=>r.width>0&&r.height>0);return {className:n.className,text:n.textContent,rects:rects.map(r=>({left:r.left-b.left,right:r.right-b.left,top:r.top-b.top,bottom:r.bottom-b.top})),inside:rects.length>0&&rects.every(r=>r.left>=b.left-2&&r.right<=b.right+2&&r.top>=b.top-2&&r.bottom<=b.bottom+2)}});return {state:e.dataset.v6State||"initial",visibility:cs.visibility,opacity:Number(cs.opacity),display:cs.display,readable:cs.visibility==="visible"&&cs.display!=="none"&&Number(cs.opacity)>.99&&lines.length===3&&lines.every(n=>n.inside),lines}};const e=document.querySelector("#modelo .v5-city-stage"),t=e?.querySelector(".v6-static-fallback"),r=e?.getBoundingClientRect(),world=e?.querySelector(".v5-stage-world")?.getBoundingClientRect(),v=document.documentElement.clientWidth;return {count:document.querySelectorAll(".v5-city-stage").length,visible:e?.classList.contains("v5-visible"),fallback:!!t,fallbackMeasurement:measureFallback(),active:e?.dataset.v6State==="active",sourceImage:!!e?.querySelector("img,picture,.v5-responsive-art,.v5-stage-render,.v5-stage-scan"),fallbackText:t?.textContent.includes("CENTRO")&&t?.textContent.includes("simulaciones"),worldWidth:world?.width,worldHeight:world?.height,ratio:world?.height/world?.width,left:r?.left,right:r?.right,viewport:v,sceneDescription:e?.getAttribute("aria-label"),noCaption:!e?.querySelector("figcaption,.v5-stage-caption"),noBridge:!document.querySelector(".motion-story-bridge"),radius:parseFloat(getComputedStyle(e).borderTopLeftRadius),stageFrame:getComputedStyle(e).backgroundColor,stageToolbar:getComputedStyle(e.querySelector(".v6-three-toolbar")).backgroundColor,threeTourButton:getComputedStyle(e.querySelector(".v63-tour")).backgroundColor,threePauseButton:getComputedStyle(e.querySelector(".v6-pause")).backgroundColor,afterSteps:!!document.querySelector("#modelo .pr-steps + .pr-logistics-stage")}})()');
+   if(v5Stage.count!==1||!v5Stage.visible||!v5Stage.fallback||(!v5Stage.active&&!v5Stage.fallbackMeasurement.readable)||v5Stage.sourceImage||!v5Stage.fallbackText||v5Stage.worldWidth<200||v5Stage.worldHeight<200||v5Stage.left< -2||v5Stage.right>v5Stage.viewport+2||!v5Stage.sceneDescription?.includes("conceptual")||!v5Stage.noCaption||!v5Stage.noBridge||!v5Stage.afterSteps||v5Stage.radius<15||(w<=390&&v5Stage.ratio<1.4)||v5Stage.stageFrame!=="rgb(244, 248, 254)"||v5Stage.stageToolbar!=="rgb(244, 248, 254)"||v5Stage.threeTourButton!=="rgb(255, 255, 255)"||v5Stage.threePauseButton!=="rgb(255, 255, 255)")report.failures.push("Prime relocated scene "+root+w+": "+JSON.stringify(v5Stage));
+   report.tests.push({name:"V5 accessible image-free desktop stage / Prime responsive "+root+w,v5Stage});
+   await capture((root?"dist-":"source-")+"prime-3d-"+w+"px.png");
+   {
+    await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:"reduce"}]});
+    await call("Page.navigate",{url:pathToFileURL(resolve(root+"prime.html")).href});
+    await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.prime-page')"),"reduced Prime render");
+    await js('document.fonts.ready');
+    const v5Reduced=await js('(()=>{const measureFallback=()=>{const e=document.querySelector("#modelo .v5-city-stage"),t=e?.querySelector(".v6-static-fallback"),world=e?.querySelector(".v5-stage-world");if(!t||!world)return {readable:false,missing:true};const b=world.getBoundingClientRect(),cs=getComputedStyle(t),lines=[...t.querySelectorAll("span,strong,p")].map(n=>{const range=document.createRange();range.selectNodeContents(n);const rects=[...range.getClientRects()].filter(r=>r.width>0&&r.height>0);return {className:n.className,text:n.textContent,rects:rects.map(r=>({left:r.left-b.left,right:r.right-b.left,top:r.top-b.top,bottom:r.bottom-b.top})),inside:rects.length>0&&rects.every(r=>r.left>=b.left-2&&r.right<=b.right+2&&r.top>=b.top-2&&r.bottom<=b.bottom+2)}});return {state:e.dataset.v6State||"initial",visibility:cs.visibility,opacity:Number(cs.opacity),display:cs.display,readable:cs.visibility==="visible"&&cs.display!=="none"&&Number(cs.opacity)>.99&&lines.length===3&&lines.every(n=>n.inside),lines}};const e=document.querySelector("#modelo .v5-city-stage"),t=e?.querySelector(".v6-static-fallback");return {mode:document.documentElement.dataset.v5Mode,textVisible:!!t&&getComputedStyle(t).visibility!=="hidden",fallbackMeasurement:measureFallback(),noImage:!e?.querySelector("img,picture"),gpuHidden:getComputedStyle(e.querySelector(".v6-three-mount")).display==="none",sceneDescription:e?.getAttribute("aria-label"),noBundle:![...document.scripts].some(s=>s.src.includes("v6-three.bundle"))}})()');
+    if(v5Reduced.mode!=="reduced"||!v5Reduced.textVisible||!v5Reduced.fallbackMeasurement.readable||!v5Reduced.noImage||!v5Reduced.gpuHidden||!v5Reduced.sceneDescription?.includes("conceptual")||!v5Reduced.noBundle)report.failures.push("Prime reduced-motion fallback "+root+w+": "+JSON.stringify(v5Reduced));
+    report.tests.push({name:"V5 image-free reduced-motion fallback / Prime "+root+w,v5Reduced});
+    await js('document.querySelector("#modelo .v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+    await capture((root?"dist-":"source-")+"prime-3d-reduced-"+w+"px.png");
+    await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:"no-preference"}]});
+   }
    report.tests.push({name:"Prime page "+root+w,prime});
   }
  }

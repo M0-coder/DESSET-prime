@@ -32,12 +32,18 @@ export function checkAssetRightsAndLicenses({
  requireSafe(register.excluded_generated_asset==='assets/v6-three.bundle.js'&&
    !register.assets.some(a=>a.path===register.excluded_generated_asset),
    'Three.js bundle is mixed proprietary/third-party code, not a solely owned visual asset');
- const expected=new Map();
+ const expected=new Map(),declared=new Set(),retired=new Set(["assets/roles-geometry-es.svg","assets/roles-geometry-mobile-es.svg"]),archived=[];
  requireSafe(Array.isArray(register.assets)&&register.assets.length===14,'original media count changed');
  for(const a of register.assets){
   requireSafe(isMedia(a.path)&&/^[a-f0-9]{64}$/.test(a.sha256)&&a.claim==='owner-declared'&&
-    !expected.has(a.path),'invalid or duplicated declared media');
-  expected.set(a.path,a.sha256);
+    !declared.has(a.path),'invalid or duplicated declared media');
+  declared.add(a.path);
+  if(retired.has(a.path)){
+   const historical=readFileSync(join(root,a.path));
+   requireSafe(hash(historical)===a.sha256,'modified historical media: '+a.path);
+   requireSafe(!source.files.some(f=>f.path===a.path),'retired diagram in release: '+a.path);
+   archived.push({path:a.path,sha256:a.sha256,scope:'source-only'});
+  }else expected.set(a.path,a.sha256);
  }
  const selected=JSON.parse(readFileSync(join(root,'config/prime-selected-media.json'),'utf8'));
  requireSafe(selected.schema==='desset-prime-selected-media-v1'&&selected.release_authorized===false&&Array.isArray(selected.assets)&&selected.assets.length===4,'invalid selected media inventory');
@@ -73,7 +79,7 @@ export function checkAssetRightsAndLicenses({
   }
   else verified.push({path:entry.path,bytes:entry.bytes,sha256:entry.sha256,claim:'owner-declared'});
  }
- requireSafe(verified.length===14&&verified.every(x=>expected.has(x.path))&&selectedVerified.length===4&&primePageVerified.length===6,'incomplete ownership or selected media registry');
+ requireSafe(archived.length===2&&verified.length===12&&verified.every(x=>expected.has(x.path))&&selectedVerified.length===4&&primePageVerified.length===6,'incomplete ownership or selected media registry');
  // SPDX/license metadata is derived from the reproducible npm lock, not from the owner assertion.
  requireSafe(lock.lockfileVersion===3&&pkg.dependencies?.three==='0.187.0'&&
    pkg.devDependencies?.esbuild==='0.28.2','unreviewed package versions');
@@ -97,7 +103,7 @@ export function checkAssetRightsAndLicenses({
    'third-party Three.js bundle missing from website');
  return {schema:'desset-prime-rights-and-sbom-evidence-v1',outcome:'PASS',
   owner_declaration_status:'owner-declared',legal_title_independently_verified:false,
-  assets_checked:verified.length,assets:verified,
+  assets_checked:verified.length,assets:verified,archived_media_checked:archived.length,archived_media:archived,
   prime_page_media_checked:primePageVerified.length,prime_page_media:primePageVerified,
   selected_media_checked:selectedVerified.length,selected_media:selectedVerified,individual_license_review_complete:selected.individual_license_review_complete===true&&selectedVerified.filter(a=>a.claim==='third-party').every(a=>a.verification==='individual-source-verified'),
   selected_media_review:reviewSelectedMedia(selected),selected_media_owner_attestation:selected.owner_attestation??null,

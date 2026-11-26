@@ -11,7 +11,7 @@ import {fileURLToPath} from "node:url";
 const root=resolve(fileURLToPath(new URL("../",import.meta.url)));
 const target=resolve(root,"dist");
 const assets=await readdir(resolve(root,"assets"));
-const allowStatic=assets.filter(name=>name!=="roles-geometry-v2.svg"&&/^[a-z0-9-]+\.(?:png|svg|webp)$/.test(name))
+const allowStatic=assets.filter(name=>!/^roles-geometry-(?:v2|es|mobile-es)\.svg$/.test(name)&&/^[a-z0-9-]+\.(?:png|svg|webp)$/.test(name))
  .map(name=>"assets/"+name);
 const compiled=["assets/v6-three.bundle.js",
  "assets/v62-commerce.glb","assets/v62-courier.glb","assets/v62-destination.glb"];
@@ -26,21 +26,22 @@ const original=await readFile(resolve(root,"index.html"),"utf8");
 const loader=await readFile(resolve(root,"scripts/v5-cinematic.js"),"utf8");
 const vision=original.split('<section class="statement" id="vision"')[1]?.split("</section>")[0]||"";
 const scene=original.split('<section class="ecosystem" id="ecosistema"')[1]?.split("</section>")[0]||"";
+const primeScene=await readFile(resolve(root,"prime.html"),"utf8");
 if(!vision.includes('class="v4-flow motion-story statement-journey"')||
  (vision.match(/class="motion-story-unit motion-story-unit--/g)||[]).length!==4||
- scene.includes("motion-story-unit")||!scene.includes('class="v6-three-mount"'))
+ scene.includes("motion-story-unit")||scene.includes('class="v6-three-mount"')||!primeScene.includes('class="v6-three-mount"'))
  throw Error("PRIME-LAYOUT-01: missing four approved participants in statement or scene contains duplicate cards.");
 
-if(!original.includes('id="ecosistema"')||!original.includes('aria-label="Escena tridimensional conceptual de DESSET"')||
- !original.includes('class="v6-three-mount"')||
- !original.includes('class="v63-tour"')||
+if(!original.includes('id="ecosistema"')||original.includes('class="v6-three-mount"')||original.includes("roles-geometry-")||
+ !primeScene.includes('class="v6-three-mount"')||
+ !primeScene.includes('class="v63-tour"')||
  !original.includes('name="robots" content="noindex,nofollow"'))
  throw Error("Missing integrated Three.js site, guided tour, or noindex gate.");
 if(!loader.includes('activationObserver.observe(stage)')||
  !loader.includes('threeStart?.addEventListener("click",loadThree)')||
  !loader.includes('./assets/v6-three.bundle.js'))
  throw Error("Viewport-activated 3D scene is not connected to bundled WebGL or manual fallback.");
-if(files.length!==67)throw Error("Too many release files for DESSET Prime: "+files.length);
+if(files.length!==65)throw Error("Too many release files for DESSET Prime: "+files.length);
 for(const path of files){
  if(path.split("/").includes("..") || !(path==="assets/v6-three.bundle.js" || /^(?:(?:index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios|registro-repartidores|incorporacion-repartidores|capacitacion-repartidores|aplicaciones|aplicaciones-clientes|aplicaciones-comercios|aplicaciones-repartidores)\.html|styles(?:-v5|-system|-hero-photo|-visual02|-typography|-audiences|-prime|-contact|-trust|-news|-careers|-onboarding|-applications)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb)|fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2|fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt)$/.test(path)))
    throw Error("Unexpected package path: "+path);

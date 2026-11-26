@@ -24,10 +24,11 @@ test("Only the hero CTA receives the owner-approved institutional blue override"
 test("VISUAL-02 preserves the approved stylesheet except the explicitly authorized neutral and brand-blue edits",()=>{
  const hierarchy=css.indexOf("\n/* VISUAL-HIERARCHY-01:");assert.ok(hierarchy>0&&hierarchy<cut);const revised=css.slice(0,hierarchy);
  assert.equal(revised.split("--v02-deep:#000000;").length,2,"Exactly one authorized black editorial token");
- assert.equal(revised.split("#ecosistema .ecosystem-board{background:#142239;").length,2,"Exactly one preserved visual component color");
+ assert.equal(revised.split("#ecosistema .ecosystem-board{background:#fff;").length,2,"Exactly one authorized neutral role panel");
  assert.equal(revised.split("--v02-blue:#073bbc;").length,2,"Exactly one authorized institutional blue token");
  assert.equal(revised.split(".service--main{border:1px solid #073bbc;").length,2,"Exactly one authorized blue service border");
- const original=revised.replace("--v02-blue:#073bbc;","--v02-blue:#1551d8;").replace(".service--main{border:1px solid #073bbc;",".service--main{border:1px solid #1755d4;").replace("--v02-deep:#000000;","--v02-deep:#142239;").replace("#ecosistema .ecosystem-board{background:#142239;","#ecosistema .ecosystem-board{background:var(--v02-deep);");
+ const restored=revised.replace("#ecosistema .ecosystem-board{background:#fff;border:1px solid #d5dae2;box-shadow:none}\n#ecosistema .v4-architecture-inner{background:#fff}\n#ecosistema summary,#ecosistema summary .disclosure-indicator{color:#073bbc}","#ecosistema .ecosystem-board{background:#142239;border:1px solid #304158;box-shadow:0 23px 60px rgba(18,32,50,.18)}\n#ecosistema .v5-city-stage{border:1px solid rgba(230,236,247,.18);box-shadow:0 14px 32px rgba(0,0,0,.16)}").replace("#ecosistema .ecosystem-board{box-shadow:none}","#ecosistema .ecosystem-board{box-shadow:0 14px 34px rgba(18,32,50,.15)}");
+ const original=restored.replace("--v02-blue:#073bbc;","--v02-blue:#1551d8;").replace(".service--main{border:1px solid #073bbc;",".service--main{border:1px solid #1755d4;").replace("--v02-deep:#000000;","--v02-deep:#142239;").replace("#ecosistema .ecosystem-board{background:#142239;","#ecosistema .ecosystem-board{background:var(--v02-deep);");
  const sha=createHash("sha1").update("blob "+Buffer.byteLength(original)+"\0").update(original).digest("hex");
  assert.equal(sha,"58bc1934ced19bd632b2291531c8a505cce365f9", "Previously approved stylesheet modified unexpectedly");
  for(const [path,pattern] of [
@@ -42,8 +43,8 @@ test("VISUAL-02 preserves the approved stylesheet except the explicitly authoriz
 test("The blue CTA retains WCAG AA contrast and 3D markup remains unchanged",()=>{
  assert.ok(contrast("#FFFFFF",blue)>=4.5,"White text must remain legible on institutional blue");
  assert.equal(oldGold,"#FFC62F");
- assert.match(html,/class="v6-three-mount"/);
- assert.match(html,/class="v63-tour"/);
+ assert.match(read("prime.html"),/class="v6-three-mount"/);
+ assert.match(read("prime.html"),/class="v63-tour"/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });
 test("Browser QA enforces gold on other elements, blue in hero, and reproducible dist",()=>{

@@ -28,8 +28,8 @@ test("Hero source and signed package preload only matching mobile/desktop LCP ar
 test("No photo bytes, fonts, WebGL or typography were replaced to obtain the performance result",()=>{
  assert.match(source,/fonts\/inter-latin-variable\.woff2/);
  assert.match(source,/fonts\/plus-jakarta-sans-latin-variable\.woff2/);
- assert.match(source,/class="v6-three-mount" aria-hidden="true"/);
- assert.match(source,/class="v63-tour"/);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v6-three-mount" aria-hidden="true"/);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v63-tour"/);
  const manifest=JSON.parse(readFileSync(new URL("../dist/site-manifest.json",import.meta.url),"utf8"));
  for(const name of ["desset-hero-entrega-mobile.webp","desset-hero-entrega-dos-espejos.webp"]){
   const mediaFile=manifest.files.find(f=>f.path==="assets/"+name);

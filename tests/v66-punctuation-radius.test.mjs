@@ -16,11 +16,11 @@ test("V6.6 all presentation headings and standalone labels omit terminal ornamen
  for(const heading of headings)
   assert.ok(!/[.]$/.test(heading.text),"Ornamental full stop remains in "+heading.tag+": "+heading.text);
  assert.match(html,/aria-label="Participantes del modelo de servicios DESSET"/);
- assert.match(html,/aria-label="Escena tridimensional conceptual de DESSET"/);
+ assert.match(read("prime.html"),/aria-label="Simulación logística conceptual de DESSET prime"/);
  assert.doesNotMatch(html,/id="ecosystem-title"/);
  assert.doesNotMatch(html,/>COMERCIO · TECNOLOGÍA · LOGÍSTICA<\/p>/);
  assert.match(html,/id="hero-title"/);
- assert.match(html,/CENTRO · FLOTA · MUELLES/);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/CENTRO · FLOTA · MUELLES/);
  for(const action of ["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"])
   assert.ok(html.includes("<h3>"+action+"</h3>"),"Missing clean action "+action);
  assert.doesNotMatch(html,/<h3>[^<]+<span>\.<\/span><\/h3>/);
@@ -62,8 +62,8 @@ test("V6.6 change is limited to presentation: no commerce launch or public publi
  assert.equal((html.match(/<section\b/g)||[]).length,8);
  assert.doesNotMatch(html,/data-v64-tour-launch/);
  assert.match(html,/id="ecosistema" aria-label/);
- assert.match(html,/class="v63-tour"/);
- assert.match(html,/class="v6-three-mount" aria-hidden="true"/);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v63-tour"/);
+ assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v6-three-mount" aria-hidden="true"/);
  assert.match(html,/href="#contacto"/);
  assert.doesNotMatch(html,/<form\b|<iframe\b/i);
  assert.equal((html.match(/data-channel-review="owner-attested" data-channel-basis="owner-attested"/g)||[]).length,5);

@@ -14,7 +14,7 @@ test("V4: portada comercial editorial con mensaje legible, CTA reales y sin oper
  assert.doesNotMatch(head,/v4-hero-declaration|COMERCIO · TECNOLOGÍA · LOGÍSTICA/);
  assert.match(head,/href="#contacto"/);
  assert.doesNotMatch(head,/href="#ecosistema"/);
- assert.match(html,/id="ecosistema" aria-label="Escena tridimensional conceptual de DESSET"/);
+ assert.match(html,/id="ecosistema" aria-label="Funciones del ecosistema DESSET"/);
  assert.match(head,/v4-motion-canvas/);
  assert.doesNotMatch(head,/roles-geometry-v2\.svg|system-illustration|Cuatro funciones conectadas/);
  assert.doesNotMatch(head,/Huacho|clientes activos|seguimiento en tiempo real|descarga la app|operación en vivo/i);
@@ -35,7 +35,7 @@ test("V4: la secuencia cotidiana es visible y el diagrama técnico no domina la 
  assert.match(html,/v4-flow-board/);
  for(const label of ["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"])assert.ok(html.includes("<h3>"+label+"</h3>"));
  assert.match(html,/<details class="v4-architecture-details">/);
- assert.equal((html.match(/roles-geometry-es\.svg/g)||[]).length,1);
+ assert.doesNotMatch(html,/roles-geometry-(?:mobile-)?es\.svg/);
  assert.match(app,/event\.key==="Escape"/);
 });
 test("CSP desde headers reales y prototipo sin indexación",()=>{

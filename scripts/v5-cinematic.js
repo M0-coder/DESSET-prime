@@ -9,7 +9,7 @@
   const media=window.matchMedia?.("(prefers-reduced-motion: reduce)");
   const reduced=media?.matches===true;
 
-  if(!stage || !contact){
+  if(!stage && !contact){
     root.dataset.v5Mode="unavailable";
     return;
   }
@@ -27,10 +27,11 @@
     }
   },{threshold:0.12,rootMargin:"0px 0px 6% 0px"});
 
-  observer.observe(stage);
-  observer.observe(contact);
+  if(stage)observer.observe(stage);
+  if(contact)observer.observe(contact);
   root.classList.add("v5-motion-ready");
   root.dataset.v5Mode="ready";
+  if(!stage)return;
 
   // Automatically load the actual 3D scene shortly before entering the viewport.
   const threeStart=stage.querySelector(".v6-enable-webgl");

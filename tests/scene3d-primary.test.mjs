@@ -18,14 +18,14 @@ test("SCENE3D-01 automatic scene uses viewport intersection, not page-start down
  assert.match(loader,/script\.onerror=/);
 });
 test("SCENE3D-01 hides redundant controls and retains functional route/pause/fallback",()=>{
- assert.doesNotMatch(html,/data-v6-camera=/);
- assert.doesNotMatch(html,/class="v6-poster"/);
- assert.match(html,/class="v63-tour" type="button"/);
- assert.match(html,/class="v6-pause" type="button"/);
+ assert.doesNotMatch(read("prime.html"),/data-v6-camera=/);
+ assert.doesNotMatch(read("prime.html"),/class="v6-poster"/);
+ assert.match(read("prime.html"),/class="v63-tour" type="button"/);
+ assert.match(read("prime.html"),/class="v6-pause" type="button"/);
  assert.doesNotMatch(css,/\.v6-three-controls \[data-v6-camera/);
  assert.match(css,/\.v5-city-stage\[data-v6-autostart="enabled"\] \.v6-enable-webgl/);
- assert.match(html,/class="v6-static-fallback"/);
- assert.match(html,/aria-label="Renderización gráfica conceptual de DESSET"/);
+ assert.match(read("prime.html"),/class="v6-static-fallback"/);
+ assert.match(read("prime.html"),/aria-label="Simulación logística conceptual de DESSET prime"/);
  assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
  assert.doesNotMatch(html,/v5-stage-caption|motion-story-bridge/);
  assert.match(gpu,/Desktop loads WebGL without a user click/);

@@ -36,7 +36,9 @@ async function check(){
  record("CSP blocks external scripts, objects, frames",["default-src 'self'","script-src 'self'","object-src 'none'","frame-ancestors 'none'"].every(x=>headers.get("content-security-policy")?.includes(x)));
  record("Browser security headers",headers.get("x-content-type-options")==="nosniff"&&headers.get("referrer-policy")==="no-referrer");
  record("No cache for CI-only preview",headers.get("cache-control")==="no-store");
- record("HTML noindex and accessible image-free 3D fallback",html.includes('name="robots" content="noindex,nofollow"')&&html.includes('class="v6-static-fallback"')&&!html.includes("v5-cinematic-"));
+ const prime=await fetch(host+"/prime.html",{signal:AbortSignal.timeout(5000)});
+ const primeHtml=await prime.text();
+ record("HTML noindex and accessible image-free 3D fallback exclusively in Prime",html.includes('name="robots" content="noindex,nofollow"')&&prime.status===200&&prime.headers.get("x-robots-tag")==="noindex, nofollow"&&primeHtml.includes('name="robots" content="noindex,nofollow"')&&primeHtml.includes('class="v6-static-fallback"')&&primeHtml.includes('class="v6-three-mount"')&&!html.includes('class="v6-static-fallback"')&&!html.includes('class="v6-three-mount"')&&![html,primeHtml].some(x=>x.includes("v5-cinematic-")));
  const company=await fetch(host+"/empresa.html",{signal:AbortSignal.timeout(5000)});
  const companyHtml=await company.text();
  record("Company page is served with noindex and CSP",company.status===200&&company.headers.get("content-type")?.startsWith("text/html")&&company.headers.get("x-robots-tag")==="noindex, nofollow"&&companyHtml.includes('<h1>Empresa</h1>')&&companyHtml.includes('name="robots" content="noindex,nofollow"'));
@@ -53,7 +55,7 @@ async function check(){
  const mainBytes=currentCss?Buffer.from(await currentCss.arrayBuffer()):Buffer.alloc(0);
  const cssBlob=createHash("sha1").update("blob "+mainBytes.length+"\0").update(mainBytes).digest("hex");
  record("CSS served with correct MIME and exact versioned main stylesheet bytes",css.status===200&&css.headers.get("content-type")?.startsWith("text/css")&&currentCss?.status===200&&currentCss.headers.get("content-type")?.startsWith("text/css")&&cssBlob===cssRef?.[2]);
- const blocked=["/.git/config","/.github/workflows/preview-checks.yml","/scripts/local-preview.mjs","/docs/V5.3-RELEASE-GATE.md","/%2e%2e/%2e%2e/secret.env","/package.json"];
+ const blocked=["/assets/roles-geometry-es.svg","/assets/roles-geometry-mobile-es.svg","/assets/roles-geometry-v2.svg","/.git/config","/.github/workflows/preview-checks.yml","/scripts/local-preview.mjs","/docs/V5.3-RELEASE-GATE.md","/%2e%2e/%2e%2e/secret.env","/package.json"];
  for(const path of blocked){
   const resp=await fetch(host+path,{signal:AbortSignal.timeout(5000)});
   record("Forbidden route "+path,resp.status===404);

@@ -47,8 +47,8 @@ test("INK-REMOVAL-01: actual source colors were replaced, never masked by extra 
  assert.match(diagram,/<rect x="18" y="221"[^>]+fill="#1551D8"/);
  assert.match(diagram,/<text x="267" y="96" fill="#1551D8">COMERCIOS<\/text>/);
  assert.match(diagram,/<text x="267" y="297" fill="#1551D8">CONTROL<\/text>/);
- assert.match(read("index.html"),/<h2 id="desset-prime-heading">DESSET PRIME<\/h2>/);
- assert.match(read("index.html"),/FROM HUB TO DOOR/);
+ assert.match(read("index.html"),/<h2 id="desset-prime-heading">DESSET prime<\/h2>/);
+ assert.match(read("prime.html"),/Cada movimiento cuenta/);
 });
 test("INK-REMOVAL-01: the revised mobile SVG is registered with its exact asset SHA256",()=>{
  const register=JSON.parse(read("config/prime-original-assets.json"));
@@ -75,7 +75,7 @@ test("INK-REMOVAL-02: institutional sections use black without recoloring visual
   assert.match(trust,/\.tr-hero\{background:#000000;color:#fff/);
   assert.match(careers,/\.ca-closing\{background:#000000;color:#fff/);
   assert.match(editorial,/--v02-deep:#000000/);
-  assert.match(editorial,/#ecosistema \.ecosystem-board\{background:#142239;border:1px solid #304158;box-shadow:0 23px 60px rgba\(18,32,50,\.18\)/);
+  assert.match(editorial,/#ecosistema \.ecosystem-board\{background:#fff;border:1px solid #d5dae2;box-shadow:none/);
   assert.match(read(prefix+"styles-typography.css"),/#ecosistema \.ecosystem-board\{background:#fff/);
   assert.match(prime,/\.pr-vision-art img\{background:#203b5a\}/);
   assert.match(prime,/color:#073bbc/);

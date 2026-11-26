@@ -55,7 +55,7 @@ test("visual narrative uses original geometry grammar but makes no operational c
  assert.match(html,/class="closing-title"/);
  assert.equal((html.match(/class="closing-line/g)||[]).length,2);
  assert.match(html,/src="\.\/scripts\/motion\.js"/);
- assert.equal((html.match(/roles-geometry-es.svg/g)||[]).length,1);
+ assert.doesNotMatch(html,/roles-geometry-(?:mobile-)?es\.svg/);
   assert.equal((html.match(/src="\.\/assets\/deliver-assets-mark\.png"/g)||[]).length,1);
 });
 test("motion is finite, reduced-accessible and never depends on external services",()=>{
