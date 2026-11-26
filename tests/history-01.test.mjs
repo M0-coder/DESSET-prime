@@ -4,7 +4,7 @@ import {readFileSync} from "node:fs";
 const read=p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 for(const dir of ["","dist/"]){
  test("HISTORY-01 verified digital milestones and no invented corporate founding "+(dir||"source"),()=>{
- const html=read(dir+"empresa.html"),history=html.match(/<section id="historia"[\s\S]*?<\/section>/)?.[0];
+ const html=read(dir+"historia.html"),history=html.match(/<section id="historia"[\s\S]*?<\/section>/)?.[0];
  assert.ok(history);
  assert.match(history,/<h3 class="history-year">2026<\/h3>/);
  assert.deepEqual([...history.matchAll(/<h4>([^<]+)<\/h4>/g)].map(m=>m[1]),["Identidad institucional","DESSET prime","Infraestructura corporativa"]);

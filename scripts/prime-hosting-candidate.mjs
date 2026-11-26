@@ -1,3 +1,4 @@
+import {companyRoutes,companyFiles,companyCss} from "./company-routes.mjs";
 import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 /**
  * Prime-only hosting integration: OFFLINE LOCAL REHEARSAL. Not a deployment tool.
@@ -20,7 +21,7 @@ const EXTRAS=Object.freeze({
  'sitemap.xml':'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>\n',
  '404.html':'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DESSET — Página no encontrada</title></head><body><main><h1>Página no encontrada</h1><p>La dirección solicitada no existe.</p><a href="/">Volver al inicio</a></main></body></html>\n'
 });
-const REQUIRED=['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','registro-comercios.html','incorporacion-comercios.html','registro-repartidores.html','incorporacion-repartidores.html','capacitacion-repartidores.html','aplicaciones.html','aplicaciones-clientes.html','aplicaciones-comercios.html','aplicaciones-repartidores.html','styles-onboarding.css','styles-applications.css','_headers','scripts/service-state.js','assets/deliver-assets-mark.png','assets/talento-cultura.webp','assets/talento-equipo.webp','assets/servicio-desset.mp4','assets/servicio-prime.mp4','assets/servicio-desset-poster.webp','assets/servicio-prime-poster.webp','styles-service-video.css','assets/repartidores-hero-original.jpg','assets/comercios-hero-minimercado.webp','assets/scene-choose.webp','assets/scene-prepare.webp','assets/scene-move.webp','assets/ecosistema-proveedores.webp','assets/ecosistema-comercios.webp','assets/ecosistema-consumidores.webp','assets/ecosistema-operadores-logisticos.webp','assets/v62-commerce.glb','assets/v62-courier.glb','assets/v62-destination.glb',
+const REQUIRED=['index.html','empresa.html',...companyFiles,companyCss,'comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','registro-comercios.html','incorporacion-comercios.html','registro-repartidores.html','incorporacion-repartidores.html','capacitacion-repartidores.html','aplicaciones.html','aplicaciones-clientes.html','aplicaciones-comercios.html','aplicaciones-repartidores.html','styles-onboarding.css','styles-applications.css','_headers','scripts/service-state.js','assets/deliver-assets-mark.png','assets/talento-cultura.webp','assets/talento-equipo.webp','assets/servicio-desset.mp4','assets/servicio-prime.mp4','assets/servicio-desset-poster.webp','assets/servicio-prime-poster.webp','styles-service-video.css','assets/repartidores-hero-original.jpg','assets/comercios-hero-minimercado.webp','assets/scene-choose.webp','assets/scene-prepare.webp','assets/scene-move.webp','assets/ecosistema-proveedores.webp','assets/ecosistema-comercios.webp','assets/ecosistema-consumidores.webp','assets/ecosistema-operadores-logisticos.webp','assets/v62-commerce.glb','assets/v62-courier.glb','assets/v62-destination.glb',
  'styles-typography.css','styles-audiences.css','styles-prime.css','styles-contact.css','styles-trust.css','styles-news.css','styles-careers.css','fonts/inter-latin-variable.woff2','fonts/plus-jakarta-sans-latin-variable.woff2',
  'fonts/LICENSE-Inter-OFL.txt','fonts/LICENSE-Plus-Jakarta-Sans-OFL.txt'];
 
@@ -31,7 +32,7 @@ function verifyManifest(dist){
  const dstat=lstatSync(dist);assert(dstat.isDirectory()&&!dstat.isSymbolicLink(),'dist must be a normal directory');
  const raw=readFileSync(join(dist,'site-manifest.json'));const m=JSON.parse(raw.toString('utf8'));
  assert(m.schema==='desset-prime-static-web-package-v1'&&m.entrypoint==='index.html'&&m.domain==='none'&&m.noindex===true,'source package must remain Prime noindex');
- assert(Array.isArray(m.files)&&m.files.length===74,'unexpected Prime asset count');
+ assert(Array.isArray(m.files)&&m.files.length===82,'unexpected Prime asset count');
  const paths=new Set();let size=0;
  for(const f of m.files){
   assert(safeName(f.path)&&!paths.has(f.path),'unsafe or duplicate asset: '+f.path);
@@ -59,6 +60,7 @@ function verifyManifest(dist){
  assert(actual.length===m.files.length+1&&actual.includes('site-manifest.json')&&actual.every(p=>p==='site-manifest.json'||paths.has(p)),'unlisted file(s) in source dist');
  const html=readFileSync(join(dist,'index.html'),'utf8');
  const company=readFileSync(join(dist,'empresa.html'),'utf8');
+ for(const name of companyRoutes){const p=readFileSync(join(dist,name+'.html'),'utf8');assert(p.includes('name="robots" content="noindex,nofollow"')&&!p.includes('rel="canonical"'),'Company detail source indexing changed: '+name);}
  const merchant=readFileSync(join(dist,'comercios.html'),'utf8');
  assert(merchant.includes('<meta name="robots" content="noindex,nofollow">')&&!merchant.includes('rel="canonical"'),'Merchant page source indexing changed');
  const rider=readFileSync(join(dist,'repartidores.html'),'utf8');
@@ -115,7 +117,7 @@ export function preparePrimeHosting({dist,sourceSha,mode}){
    mkdirSync(dirname(dst),{recursive:true});copyFileSync(src,dst,constants.COPYFILE_EXCL);
    let bytes=readFileSync(dst);
    assert(bytes.length===item.bytes&&sha256(bytes)===item.sha256,'copy content changed during transfer: '+item.path);
-   if(['index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','registro-comercios.html','incorporacion-comercios.html','registro-repartidores.html','incorporacion-repartidores.html','capacitacion-repartidores.html','aplicaciones.html','aplicaciones-clientes.html','aplicaciones-comercios.html','aplicaciones-repartidores.html'].includes(item.path)){
+   if([...companyFiles,'index.html','empresa.html','comercios.html','repartidores.html','prime.html','contacto.html','confianza.html','noticias.html','talento.html','en.html','registro-comercios.html','incorporacion-comercios.html','registro-repartidores.html','incorporacion-repartidores.html','capacitacion-repartidores.html','aplicaciones.html','aplicaciones-clientes.html','aplicaciones-comercios.html','aplicaciones-repartidores.html'].includes(item.path)){
     const upgraded=Buffer.from(stageHtml(bytes.toString('utf8'),item.path==='index.html'?BASE_ORIGIN:BASE_ORIGIN+item.path.replace(/\.html$/,'')));
     writeFileSync(dst,upgraded);bytes=upgraded;
    }
@@ -163,6 +165,7 @@ export function preparePrimeHosting({dist,sourceSha,mode}){
   assert(stagedGuide.includes('name="robots" content="noindex,nofollow"')&&stagedGuide.includes('rel="canonical" href="https://desset.lat/incorporacion-comercios"'),'Guide page canonical or indexing gate');
   for(const name of ["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){const p=readFileSync(join(publicDir,name+'.html'),'utf8');assert(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Rider onboarding canonical or indexing gate: '+name);}
   const stagedCompany=readFileSync(join(publicDir,'empresa.html'),'utf8');
+ for(const name of companyRoutes){const p=readFileSync(join(publicDir,name+'.html'),'utf8');assert(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Company detail canonical or indexing gate: '+name);}
   assert(stagedCompany.includes('name="robots" content="noindex,nofollow"')&&stagedCompany.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or indexing gate');
  for(const name of appPages){const p=readFileSync(join(publicDir,name+'.html'),'utf8');assertClosedAppPage(p,name);assert(p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'App directory canonical missing: '+name);}
   const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');

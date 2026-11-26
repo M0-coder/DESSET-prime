@@ -1,9 +1,10 @@
+import {companyFiles} from "../scripts/company-routes.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import {createHash} from "node:crypto";
 const root=new URL("../",import.meta.url),read=p=>readFileSync(new URL(p,root),"utf8");
-const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html","aplicaciones.html","aplicaciones-clientes.html","aplicaciones-comercios.html","aplicaciones-repartidores.html"];
+const pages=["index.html","empresa.html","comercios.html","repartidores.html","prime.html","contacto.html","confianza.html","noticias.html","talento.html","en.html","registro-comercios.html","incorporacion-comercios.html","registro-repartidores.html","incorporacion-repartidores.html","capacitacion-repartidores.html","aplicaciones.html","aplicaciones-clientes.html","aplicaciones-comercios.html","aplicaciones-repartidores.html",...companyFiles];
 const approved=new Map(JSON.parse(read("config/prime-social-owner-attestation.json")).exact_channels.map(c=>[c.url,c.platform]));
 for(const dir of ["","dist/"]){
  test("Corporate links resolve in "+(dir||"source"),()=>{
@@ -13,7 +14,7 @@ for(const dir of ["","dist/"]){
    for(const m of doc.matchAll(/<a\b[^>]*href="([^"]+)"/g)){
     const href=m[1];
     if(href.startsWith("https://")){assert.ok(approved.has(href));continue}
-    const match=href.match(/^(?:\.\/(index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios|registro-repartidores|incorporacion-repartidores|capacitacion-repartidores|aplicaciones|aplicaciones-clientes|aplicaciones-comercios|aplicaciones-repartidores)\.html)?(?:#([a-z0-9-]+))?$/);
+    const match=href.match(/^(?:\.\/(index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios|registro-repartidores|incorporacion-repartidores|capacitacion-repartidores|aplicaciones|aplicaciones-clientes|aplicaciones-comercios|aplicaciones-repartidores|mensaje-direccion|perfil-corporativo|mision-vision-valores|principios|gobierno-corporativo|historia|inversores)\.html)?(?:#([a-z0-9-]+))?$/);
     assert.ok(match,"Unapproved route "+href);
     const target=docs[match[1]?match[1]+".html":name];
     assert.ok(target);
@@ -35,7 +36,7 @@ for(const dir of ["","dist/"]){
   assert.match(company,/Este sitio no procesa pedidos ni pagos\./);
   assert.match(company,/<h1>Empresa<\/h1>/);
   assert.doesNotMatch(company.replace('<script defer src="./scripts/app.js"></script>',""),/<form\b|<script\b|<iframe\b/i);
-  assert.equal((company.match(/<section id="/g)||[]).length,9);
+  assert.equal((company.match(/<section id="/g)||[]).length,7);for(const p of companyFiles)assert.ok(company.includes('href="./'+p+'"'),"Directory route missing: "+p);
   assert.match(docs["index.html"],/href="\.\/empresa\.html">Empresa<\/a>/);
   const css=Buffer.from(read(dir+"styles.css"));
   const rev=createHash("sha1").update("blob "+css.length+"\0").update(css).digest("hex");

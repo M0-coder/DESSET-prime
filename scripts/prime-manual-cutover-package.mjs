@@ -1,3 +1,4 @@
+import {companyRoutes} from "./company-routes.mjs";
 import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 /**
  * Generate a RELEASE-SHAPED static folder from the native DESSET Prime artifact.
@@ -65,7 +66,7 @@ export function preparePrimeCutoverPackage({dist,sourceSha,seoPolicy,outputDir,e
      if(st.isDirectory())scan(full,rel);else{assert(st.isFile(),'Not a regular file in package');paths.push(rel);}
    }
   }scan(output);
-  assert(paths.length===78&&paths.every(x=>expected.has(x)),'Unexpected candidate inventory');
+  assert(paths.length===86&&paths.every(x=>expected.has(x)),'Unexpected candidate inventory');
   for(const path of requiredSpecial)assert(paths.includes(path),'Missing required static host policy '+path);
   const modifiable=new Set(['index.html','_headers','robots.txt','sitemap.xml','THIRD-PARTY-NOTICES.txt']);
   const inventory=paths.sort().map(path=>{
@@ -96,6 +97,7 @@ export function preparePrimeCutoverPackage({dist,sourceSha,seoPolicy,outputDir,e
   assert(guide.includes('name="robots" content="noindex,nofollow"')&&guide.includes('rel="canonical" href="https://desset.lat/incorporacion-comercios"'),'Guide page must remain noindex');
   for(const name of ["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){const p=readFileSync(join(output,name+'.html'),'utf8');assert(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Rider onboarding canonical or indexing gate: '+name);}
   const company=readFileSync(join(output,'empresa.html'),'utf8');
+ for(const name of companyRoutes){const p=readFileSync(join(output,name+'.html'),'utf8');assert(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Company detail canonical or indexing gate: '+name);}
   assert(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page must remain noindex independently of homepage policy');
  for(const name of appPages){const p=readFileSync(join(output,name+'.html'),'utf8');assertClosedAppPage(p,name);assert(p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'App directory canonical missing: '+name);}
   const outHtml=readFileSync(htmlPath,'utf8');

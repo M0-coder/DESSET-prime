@@ -1,3 +1,4 @@
+import {companyFiles,companyCss} from "./company-routes.mjs";
 import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 /** Verify the packaged DESSET Prime website, not only source files.
  * Strict offline integrity and negative-control checks before any preview.
@@ -13,7 +14,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length===74,"unexpected file count");
+check(manifest.files.length===82,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -50,6 +51,8 @@ check(expected.has("incorporacion-comercios.html")&&guide.includes('name="robots
 for(const name of ["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){const path=name+".html",p=await readFile(resolve(dist,path),"utf8");check(expected.has(path)&&p.includes('name="robots" content="noindex,nofollow"')&&p.includes('href="./styles-onboarding.css"')&&p.includes("form-action 'none'"),"Rider onboarding missing or unsafe: "+name);}
 const merchant=await readFile(resolve(dist,"comercios.html"),"utf8");
 check(expected.has("comercios.html")&&merchant.includes('name="robots" content="noindex,nofollow"'),"Merchant page absent or indexing changed");
+for(const p of companyFiles){const doc=await readFile(resolve(dist,p),"utf8");check(expected.has(p)&&doc.includes('name="robots" content="noindex,nofollow"')&&doc.includes('href="./'+companyCss+'"')&&!doc.includes('rel="canonical"'),"Company detail missing or source policy changed: "+p);}
+check(expected.has(companyCss)&&company.includes('href="./'+companyCss+'"')&&!html.includes(companyCss),"Company CSS missing or not isolated");
 check(expected.has("empresa.html")&&company.includes('name="robots" content="noindex,nofollow"'),"Company page absent or indexing changed");
 const mainCss=await readFile(resolve(dist,"styles.css"));
 const cssRevision=createHash("sha1").update("blob "+mainCss.length+"\0").update(mainCss).digest("hex");

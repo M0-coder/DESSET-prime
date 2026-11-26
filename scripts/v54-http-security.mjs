@@ -1,3 +1,4 @@
+import {companyFiles} from "./company-routes.mjs";
 /** V5.4: loopback-only HTTP and preview security regression audit.
  * CI evidence, not a penetration test or live-site verification. */
 import {spawn} from "node:child_process";
@@ -39,6 +40,7 @@ async function check(){
  const prime=await fetch(host+"/prime.html",{signal:AbortSignal.timeout(5000)});
  const primeHtml=await prime.text();
  record("HTML noindex and accessible image-free 3D fallback exclusively in Prime",html.includes('name="robots" content="noindex,nofollow"')&&prime.status===200&&prime.headers.get("x-robots-tag")==="noindex, nofollow"&&primeHtml.includes('name="robots" content="noindex,nofollow"')&&primeHtml.includes('class="v6-static-fallback"')&&primeHtml.includes('class="v6-three-mount"')&&!html.includes('class="v6-static-fallback"')&&!html.includes('class="v6-three-mount"')&&![html,primeHtml].some(x=>x.includes("v5-cinematic-")));
+ for(const path of companyFiles){const res=await fetch(host+"/"+path,{signal:AbortSignal.timeout(5000)});const doc=await res.text();record("Company detail HTTP policy "+path,res.status===200&&res.headers.get("content-type")?.startsWith("text/html")&&res.headers.get("x-robots-tag")==="noindex, nofollow"&&doc.includes('name="robots" content="noindex,nofollow"')&&doc.includes("form-action 'none'"));}
  const company=await fetch(host+"/empresa.html",{signal:AbortSignal.timeout(5000)});
  const companyHtml=await company.text();
  record("Company page is served with noindex and CSP",company.status===200&&company.headers.get("content-type")?.startsWith("text/html")&&company.headers.get("x-robots-tag")==="noindex, nofollow"&&companyHtml.includes('<h1>Empresa</h1>')&&companyHtml.includes('name="robots" content="noindex,nofollow"'));

@@ -1,0 +1,35 @@
+/* COMPANY-02: scoped corporate directory and detail pages. */
+.company-hub,.company-detail{background:#fff;padding:0;color:#000}
+.company-hub .co-intro,.company-detail .co-intro{max-width:none;border:0;background:#000;color:#fff;padding:clamp(38px,6vw,88px) max(var(--edge,24px),calc((100% - 1120px)/2));}
+.company-hub .co-crumb,.company-detail .co-crumb{font-size:14px;line-height:1.5;margin:0 0 24px;color:#e0e0e0}
+.company-hub .co-crumb a,.company-detail .co-crumb a{color:inherit;text-decoration:underline;text-underline-offset:4px}
+.company-hub h1,.company-detail h1{font-size:clamp(38px,6vw,86px);line-height:1.02;letter-spacing:-.045em;margin:0 0 18px;font-weight:800;overflow-wrap:break-word}
+.company-hub .co-intro p:last-child,.company-detail .co-intro p:last-child{max-width:54ch;margin-bottom:0}
+.company-hub .co-directory,.company-detail .co-body{max-width:1120px;margin:auto;padding:clamp(30px,5vw,72px) var(--edge,24px)}
+.company-hub .co-directory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(18px,3vw,36px)}
+.company-hub .co-card{max-width:none;border:0;padding:0;min-width:0;scroll-margin-top:120px}
+.company-hub .co-card a{display:block;color:#000;text-decoration:none;min-height:48px;border-bottom:1px solid #d8dce2;padding-bottom:12px}
+.company-hub .co-card a:hover .co-card-title{color:#073bbc}
+.company-hub .co-art{height:clamp(128px,18vw,206px);display:flex;align-items:center;justify-content:center;background:#f4f8fe;overflow:hidden;position:relative;color:#073bbc}
+.company-hub .co-art img{width:100%;height:100%;object-fit:cover;display:block}
+.company-hub .co-editorial{background:#000;color:#fff;justify-content:flex-start;padding:clamp(18px,3vw,36px);font-size:clamp(20px,3vw,38px);font-weight:800;line-height:1.12;letter-spacing:-.04em}
+.company-hub .co-governance{background:#073bbc}
+.company-hub .co-year{font-size:clamp(56px,9vw,100px);justify-content:center}
+.company-hub .co-card-title{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:clamp(20px,2.3vw,28px);line-height:1.2;font-weight:800;margin:14px 0 8px}
+.company-hub .co-arrow{font-size:24px;color:#073bbc;flex-shrink:0}
+.company-hub .co-card p{font-size:15px;color:#414141;line-height:1.5;margin:0 0 4px}
+.company-hub .co-card .co-sublinks{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:10px}
+.company-hub .co-sublinks a{font-size:14px;display:inline-flex;align-items:center;min-height:44px;padding:0;color:#073bbc}
+.company-hub .co-card:last-child{grid-column:1/-1}
+.company-hub .co-notice{max-width:1120px;margin:0 auto;padding:0 var(--edge,24px) 40px;color:#414141}
+.company-hub .co-sublinks a,.company-detail .co-body h3{scroll-margin-top:120px}
+.company-detail .co-body section{max-width:78ch;padding:28px 0;border-bottom:1px solid #d8dce2;scroll-margin-top:120px}
+.company-detail .co-body section:first-child{padding-top:0}
+.company-detail .co-body{min-height:360px}
+.company-detail .co-body #mensaje-direccion h2{max-width:25ch;color:#073bbc}
+.company-detail .co-body h2{font-size:clamp(26px,3vw,38px);letter-spacing:-.03em;line-height:1.2;margin:0 0 18px}
+.company-detail .co-body h3{font-size:clamp(20px,2vw,27px);line-height:1.3}
+.company-detail .co-back{display:inline-flex;align-items:center;min-height:44px;color:#073bbc;font-weight:700;margin-top:28px}
+.company-hub a:focus-visible,.company-detail a:focus-visible{outline:3px solid #073bbc;outline-offset:4px}
+.company-hub .co-intro a:focus-visible,.company-detail .co-intro a:focus-visible{outline-color:#fff}
+@media(max-width:700px){.company-hub .co-directory{grid-template-columns:1fr;gap:24px}.company-hub .co-art{height:clamp(140px,45vw,210px)}.company-hub .co-card:last-child{grid-column:auto}.company-hub .co-intro,.company-detail .co-intro{padding:32px var(--edge,24px) 42px}.company-detail .co-body section{padding:24px 0}}
