@@ -12,7 +12,7 @@ const pageNames=["index.html","empresa.html","comercios.html","repartidores.html
 const pages=pageNames.map(name=>[name,read(name)]);
 const headers=read("_headers");
 const js=["scripts/app.js","scripts/motion.js","scripts/v5-cinematic.js","scripts/service-state.js"].map(read);
-const styles=["styles-typography.css","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","styles-onboarding.css","styles-applications.css"].map(read);
+const styles=["styles-typography.css","styles.css","styles-v5.css","styles-system.css","styles-hero-photo.css","styles-visual02.css","styles-service-video.css","styles-audiences.css","styles-prime.css","styles-contact.css","styles-trust.css","styles-news.css","styles-careers.css","styles-onboarding.css","styles-applications.css"].map(read);
 const issues=[],warnings=[];
 const assert=(ok,label)=>{if(!ok)issues.push(label)};
 const localSet=new Set();
@@ -20,8 +20,8 @@ const mainCss=readFileSync(resolve(root,"styles.css"));
 const cssRevision=createHash("sha1").update("blob "+mainCss.length+"\0").update(mainCss).digest("hex");
 for(const [page,doc] of pages){
  assert(doc.includes('href="./styles.css?v='+cssRevision+'"'),page+": Main stylesheet cache revision does not match source bytes");
- for(const tag of doc.match(/<(?:script|link|img|source)\b[^>]*>/gi)||[]){
-  const attrs=[...tag.matchAll(/\b(?:src|href|srcset)="([^"]+)"/g)].map(m=>m[1]);
+ for(const tag of doc.match(/<(?:script|link|img|source|video)\b[^>]*>/gi)||[]){
+  const attrs=[...tag.matchAll(/\b(?:src|href|srcset|poster|data-src)="([^"]+)"/g)].map(m=>m[1]);
   for(const val of attrs){
    if(!val.startsWith("./")){issues.push(page+": Nonlocal DOM resource "+val);continue}
    const raw=val.slice(2);
@@ -38,7 +38,9 @@ for(const [page,doc] of pages){
  const csp=doc.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/i)?.[1]||"";
  for(const directive of ["default-src 'self'","script-src 'self'","object-src 'none'","base-uri 'none'","form-action 'none'"])
   assert(csp.split(";").map(x=>x.trim()).includes(directive),page+": Missing or weakened local CSP directive "+directive);
- assert(!/<(?:form|iframe|video)\b/i.test(doc),page+": Unauthorized form/iframe/video");
+ assert(!/<(?:form|iframe)\b/i.test(doc),page+": Unauthorized form/iframe");
+ const videoTags=[...doc.matchAll(/<video\b[^>]*>/gi)].map(m=>m[0]);
+ if(page==="index.html"){const section=doc.match(/<section class="solutions" id="soluciones"[\s\S]*?<\/section>/)?.[0]||"";assert(videoTags.length===2&&["desset","prime"].every(n=>videoTags.some(tag=>section.includes(tag)&&tag.includes('data-src="./assets/servicio-'+n+'.mp4"')&&tag.includes('poster="./assets/servicio-'+n+'-poster.webp"')&&tag.includes('muted loop playsinline preload="none"')&&!/\s(?:src|autoplay)\b/i.test(tag))),"VIDEO-01: only the two approved deferred local videos");}else assert(videoTags.length===0,page+": Unauthorized video");
  assert(!/(?:\s)on[a-z]+\s*=/i.test(doc),page+": Inline event attribute detected");
  if(["registro-comercios.html","registro-repartidores.html"].includes(page))for(const field of doc.matchAll(/<(?:input|select|textarea|button)\b[^>]*>/gi))assert(/\bdisabled\b/.test(field[0]),page+": Enabled data entry in inactive preview");
  if(appPages.includes(page.replace(/\.html$/,""))){try{assertClosedAppPage(doc,page.replace(/\.html$/,""));}catch(e){issues.push(page+": "+e.message);}}else if(page==="prime.html"){const scripts=[...doc.matchAll(/<script\b[^>]*src="([^"]+)"[^>]*>/gi)].map(m=>m[1]);assert(scripts.length===1&&scripts[0]==="./scripts/v5-cinematic.js",page+": Unexpected Prime script");}else if(page!=="index.html"&&!institutionalPages.includes(page.replace(/\.html$/,"")))assert(!/<script\b/i.test(doc),page+": Unexpected script on institutional page");
@@ -54,7 +56,7 @@ for(const [i,s] of js.entries()){
 }
 assert(styles.every(s=>!/@import\b|url\(\s*['"]?https?:/i.test(s)),"Remote CSS dependency");
 assert(!/\b(?:pages:\s*write|id-token:\s*write)\b/.test(read(".github/workflows/preview-checks.yml")),"CI write token permission");
-const budget={html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:14000,hero_css_bytes:17000,visual02_css_bytes:8200,audiences_css_bytes:8000,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,onboarding_css_bytes:4000,applications_css_bytes:5000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000,merchant_hero_webp_bytes:210000};
+const budget={html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:14000,hero_css_bytes:17000,visual02_css_bytes:8200,audiences_css_bytes:8000,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,onboarding_css_bytes:4000,applications_css_bytes:5000,service_video_css_bytes:4500,service_desset_video_bytes:1200000,service_prime_video_bytes:1650000,service_desset_poster_bytes:20000,service_prime_poster_bytes:50000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000,merchant_hero_webp_bytes:210000};
 const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
  typography_css_bytes:statSync(resolve(root,"styles-typography.css")).size,
  v5_css_bytes:statSync(resolve(root,"styles-v5.css")).size,
@@ -69,6 +71,11 @@ const sizes={html_bytes:statSync(resolve(root,"index.html")).size,
  careers_css_bytes:statSync(resolve(root,"styles-careers.css")).size,
  applications_css_bytes:statSync(resolve(root,"styles-applications.css")).size,
  onboarding_css_bytes:statSync(resolve(root,"styles-onboarding.css")).size,
+ service_video_css_bytes:statSync(resolve(root,"styles-service-video.css")).size,
+ service_desset_video_bytes:statSync(resolve(root,"assets/servicio-desset.mp4")).size,
+ service_prime_video_bytes:statSync(resolve(root,"assets/servicio-prime.mp4")).size,
+ service_desset_poster_bytes:statSync(resolve(root,"assets/servicio-desset-poster.webp")).size,
+ service_prime_poster_bytes:statSync(resolve(root,"assets/servicio-prime-poster.webp")).size,
  hero_webp_bytes:statSync(resolve(root,"assets/desset-hero-entrega-dos-espejos.webp")).size,
  merchant_hero_webp_bytes:statSync(resolve(root,"assets/comercios-hero-minimercado.webp")).size,
  mobile_hero_webp_bytes:statSync(resolve(root,"assets/desset-hero-entrega-mobile.webp")).size};

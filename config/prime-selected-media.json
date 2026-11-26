@@ -309,5 +309,42 @@
         "sha256": "6a8a00bb029a440050ea93497efc61ff52687c9c1d4a895e1c46204e47018ebe"
       }
     }
+  },
+  "service_videos": {
+    "scope": "VIDEO-01; approved owner-supplied visual preview only",
+    "source": "conversation-upload",
+    "verification": "license-provenance-pending",
+    "release_authorized": false,
+    "independent_legal_verification": false,
+    "assets": [
+      {
+        "path": "assets/servicio-desset.mp4",
+        "sha256": "592dd2d37d778a57d784195bd866d168243e973f3890064aab11c73e63d68bbc",
+        "bytes": 1175493,
+        "kind": "video",
+        "source_filename": "Fccyaq.mp4"
+      },
+      {
+        "path": "assets/servicio-prime.mp4",
+        "sha256": "dcca0f7554c7e3267e141d8f4bdb19acde67f8628932b374ccad0962c19c2081",
+        "bytes": 1620138,
+        "kind": "video",
+        "source_filename": "23232-333604632.mp4"
+      },
+      {
+        "path": "assets/servicio-desset-poster.webp",
+        "sha256": "c59181261f58aa6337eb1139e1e814222d1fc6657759795db7fc2a0b788d6733",
+        "bytes": 10072,
+        "kind": "poster",
+        "derived_from": "assets/servicio-desset.mp4"
+      },
+      {
+        "path": "assets/servicio-prime-poster.webp",
+        "sha256": "ce1ed66071c700d3a921df00e668571403e6300c33192d7bff426d355c430a3c",
+        "bytes": 41806,
+        "kind": "poster",
+        "derived_from": "assets/servicio-prime.mp4"
+      }
+    ]
   }
 }

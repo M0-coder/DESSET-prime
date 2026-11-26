@@ -13,12 +13,13 @@ const host="127.0.0.1";
 const port=4173;
 const mime={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",
  ".js":"text/javascript; charset=utf-8",".svg":"image/svg+xml",
- ".png":"image/png",".webp":"image/webp",".woff2":"font/woff2",".txt":"text/plain; charset=utf-8",".glb":"model/gltf-binary"};
-const permitted=rel=>rel==="index.html"||rel==="empresa.html"||rel==="comercios.html"||rel==="repartidores.html"||rel==="prime.html"||rel==="contacto.html"||rel==="confianza.html"||rel==="noticias.html"||rel==="talento.html"||rel==="en.html"||rel==="registro-comercios.html"||rel==="incorporacion-comercios.html"||rel==="registro-repartidores.html"||rel==="incorporacion-repartidores.html"||rel==="capacitacion-repartidores.html"||rel==="aplicaciones.html"||rel==="aplicaciones-clientes.html"||rel==="aplicaciones-comercios.html"||rel==="aplicaciones-repartidores.html"||rel==="styles-applications.css"||rel==="styles-onboarding.css"||rel==="styles.css"||rel==="styles-v5.css"||rel==="styles-system.css"||rel==="styles-hero-photo.css"||rel==="styles-visual02.css"||rel==="styles-typography.css"||rel==="styles-audiences.css"||rel==="styles-prime.css"||rel==="styles-contact.css"||rel==="styles-trust.css"||rel==="styles-news.css"||rel==="styles-careers.css"
+ ".png":"image/png",".webp":"image/webp",".mp4":"video/mp4",".woff2":"font/woff2",".txt":"text/plain; charset=utf-8",".glb":"model/gltf-binary"};
+const permitted=rel=>rel==="index.html"||rel==="empresa.html"||rel==="comercios.html"||rel==="repartidores.html"||rel==="prime.html"||rel==="contacto.html"||rel==="confianza.html"||rel==="noticias.html"||rel==="talento.html"||rel==="en.html"||rel==="registro-comercios.html"||rel==="incorporacion-comercios.html"||rel==="registro-repartidores.html"||rel==="incorporacion-repartidores.html"||rel==="capacitacion-repartidores.html"||rel==="aplicaciones.html"||rel==="aplicaciones-clientes.html"||rel==="aplicaciones-comercios.html"||rel==="aplicaciones-repartidores.html"||rel==="styles-applications.css"||rel==="styles-onboarding.css"||rel==="styles.css"||rel==="styles-v5.css"||rel==="styles-system.css"||rel==="styles-hero-photo.css"||rel==="styles-visual02.css"||rel==="styles-service-video.css"||rel==="styles-typography.css"||rel==="styles-audiences.css"||rel==="styles-prime.css"||rel==="styles-contact.css"||rel==="styles-trust.css"||rel==="styles-news.css"||rel==="styles-careers.css"
  || /^fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2$/.test(rel)
  || /^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(rel)
  || /^scripts\/(?:app|motion|v5-cinematic|service-state)\.js$/.test(rel)
  || /^assets\/[a-z0-9-]+\.(?:png|svg|webp)$/.test(rel)
+ || /^assets\/servicio-(?:desset|prime)\.mp4$/.test(rel)
  || rel==="assets/v6-three.bundle.js"
  || /^assets\/v62-(?:commerce|courier|destination)\.glb$/.test(rel);
 const server=createServer(async(req,res)=>{
@@ -41,7 +42,8 @@ const server=createServer(async(req,res)=>{
   const info=await stat(abs);
   if(!info.isFile())return reject(404);
   const ext="."+rel.split(".").at(-1);
-  res.writeHead(200,{...headers,"Content-Type":mime[ext]||"application/octet-stream",
+  if(ext===".mp4"&&req.headers.range){const match=/^bytes=(\d+)-(\d*)$/.exec(req.headers.range);const start=match?Number(match[1]):-1,end=match&&match[2]?Math.min(Number(match[2]),info.size-1):info.size-1;if(!match||!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<0||start>end||start>=info.size){res.writeHead(416,{...headers,"Content-Range":"bytes */"+info.size});return res.end();}res.writeHead(206,{...headers,"Content-Type":"video/mp4","Accept-Ranges":"bytes","Content-Range":`bytes ${start}-${end}/${info.size}`,"Content-Length":end-start+1});if(req.method==="HEAD")return res.end();return createReadStream(abs,{start,end}).on("error",()=>res.destroy()).pipe(res);}
+  res.writeHead(200,{...headers,"Content-Type":mime[ext]||"application/octet-stream",...(ext===".mp4"?{"Accept-Ranges":"bytes"}:{}),
    "Content-Length":info.size});
   if(req.method==="HEAD")return res.end();
   createReadStream(abs).on("error",()=>res.destroy()).pipe(res);

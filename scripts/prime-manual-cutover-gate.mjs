@@ -133,6 +133,7 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    if(!talentReview.accepted)throw Error('PHOTO-01: scoped photographic rights review required before production');
    const homeTalentReview=reviewHomeTalentPhoto(media);
    if(!homeTalentReview.accepted)throw Error('PHOTO-05: scoped homepage photograph review required before production');
+   if(media.service_videos?.verification!=="source-page-and-license-reviewed")throw Error("VIDEO-01: source and usage rights must be verified before production");
    const riderReview=reviewRiderHeroPhoto(media);
    if(!riderReview.accepted)throw Error('PHOTO-06: scoped rider portrait usage review required before production');
    const merchantReview=reviewMerchantHeroPhoto(media);

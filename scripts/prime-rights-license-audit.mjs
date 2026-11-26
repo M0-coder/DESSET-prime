@@ -12,7 +12,7 @@ import {reviewSelectedMedia,reviewPrimePageMedia,reviewTalentPhoto,reviewMerchan
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const requireSafe=(okay,reason)=>{if(!okay)throw Error('NO-GO: '+reason)};
-const isMedia=p=>p==='assets/repartidores-hero-original.jpg'||/^assets\/[a-z0-9-]+\.(?:png|webp|svg|glb)$/.test(p);
+const isMedia=p=>/^assets\/servicio-(?:desset|prime)\.mp4$/.test(p)||p==='assets/repartidores-hero-original.jpg'||/^assets\/[a-z0-9-]+\.(?:png|webp|svg|glb)$/.test(p);
 export function checkAssetRightsAndLicenses({
   dist,register=JSON.parse(readFileSync(join(root,'config/prime-original-assets.json'),'utf8')),
   lock=JSON.parse(readFileSync(join(root,'package-lock.json'),'utf8')),
@@ -74,6 +74,11 @@ export function checkAssetRightsAndLicenses({
  const rider=selected.rider_hero_photo;
  requireSafe(reviewRiderHeroPhoto(selected).accepted&&!expected.has(rider.path),'invalid rider hero registry');
  expected.set(rider.path,rider.sha256);
+ const service=selected.service_videos;
+ requireSafe(service?.scope==="VIDEO-01; approved owner-supplied visual preview only"&&service.source==="conversation-upload"&&service.release_authorized===false&&service.independent_legal_verification===false&&Array.isArray(service.assets)&&service.assets.length===4,"invalid service video registry");
+ const serviceByPath=new Map();
+ for(const x of service.assets){requireSafe(["assets/servicio-desset.mp4","assets/servicio-prime.mp4","assets/servicio-desset-poster.webp","assets/servicio-prime-poster.webp"].includes(x.path)&&!expected.has(x.path)&&/^[a-f0-9]{64}$/.test(x.sha256)&&Number.isSafeInteger(x.bytes)&&x.bytes>0,"invalid service media");expected.set(x.path,x.sha256);serviceByPath.set(x.path,x);}
+
  const sources=source.files.filter(f=>isMedia(f.path));
  requireSafe(sources.length===expected.size,'unexpected original-media inventory');
  const verified=[],selectedVerified=[],primePageVerified=[];
@@ -93,6 +98,7 @@ export function checkAssetRightsAndLicenses({
   else if(entry.path===talent.path){requireSafe(bytes.length===talent.bytes&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid talent WebP');}
   else if(entry.path===homeTalent.path){requireSafe(bytes.length===homeTalent.bytes&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid home talent WebP');}
   else if(entry.path===merchant.path){requireSafe(bytes.length===merchant.bytes&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid merchant hero WebP');}
+  else if(serviceByPath.has(entry.path)){const v=serviceByPath.get(entry.path);requireSafe(bytes.length===v.bytes&&(v.kind==="video"?bytes.toString("ascii",4,8)==="ftyp":v.kind==="poster"&&bytes.toString("ascii",0,4)==="RIFF"&&bytes.toString("ascii",8,12)==="WEBP"),"invalid service media "+entry.path);}
   else if(entry.path===rider.path){requireSafe(bytes.length===rider.bytes&&bytes[0]===255&&bytes[1]===216&&bytes[bytes.length-2]===255&&bytes[bytes.length-1]===217,'invalid rider hero JPEG');}
   else verified.push({path:entry.path,bytes:entry.bytes,sha256:entry.sha256,claim:'owner-declared'});
  }
@@ -122,6 +128,7 @@ export function checkAssetRightsAndLicenses({
   owner_declaration_status:'owner-declared',legal_title_independently_verified:false,
   assets_checked:verified.length,assets:verified,archived_media_checked:archived.length,archived_media:archived,
   merchant_hero_media:{...merchant,individual_source_verified:merchant.verification==='individual-source-verified'},merchant_hero_media_review:reviewMerchantHeroPhoto(selected),
+  service_video_media:{...service,publication_blocked:true},
   rider_hero_media:{...rider,individual_source_verified:false},rider_hero_media_review:reviewRiderHeroPhoto(selected),
    home_talent_media:{...homeTalent,individual_source_verified:false},home_talent_media_review:reviewHomeTalentPhoto(selected),
   talent_media:{...talent,individual_source_verified:talent.verification==='individual-source-verified'},talent_media_review:reviewTalentPhoto(selected),

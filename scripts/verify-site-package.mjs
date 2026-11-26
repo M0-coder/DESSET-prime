@@ -13,7 +13,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length===69,"unexpected file count");
+check(manifest.files.length===74,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -77,6 +77,8 @@ check(expected.has("assets/repartidores-hero-original.jpg")&&rider.includes('src
 check(expected.has("assets/comercios-hero-minimercado.webp"),"Merchant hero photo missing");
 check(expected.has("assets/talento-cultura.webp")&&careers.includes('src="./assets/talento-cultura.webp"'),"Careers hero photo missing");
 check(expected.has("assets/talento-equipo.webp")&&html.includes('src="./assets/talento-equipo.webp"')&&!html.includes('src="./assets/talento-cultura.webp"'),"Homepage talent photo missing or incorrect");
+for(const path of ["assets/servicio-desset.mp4","assets/servicio-prime.mp4","assets/servicio-desset-poster.webp","assets/servicio-prime-poster.webp"])check(expected.has(path)&&html.includes("./"+path),"Missing approved service media "+path);
+check(expected.has("styles-service-video.css")&&html.includes('href="./styles-service-video.css"'),"Service video stylesheet missing");
 check(expected.has("assets/v6-three.bundle.js"),"Three.js bundle is missing");
 check(expected.has("styles-typography.css")&&html.includes('href="./styles-typography.css"'),"Locally hosted type system missing");
 check(expected.has("styles-audiences.css")&&[merchant,rider].every(p=>p.includes('href="./styles-audiences.css"'))&&!html.includes("styles-audiences.css")&&!company.includes("styles-audiences.css"),"Audience styles must remain isolated");

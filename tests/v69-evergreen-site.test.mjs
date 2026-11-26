@@ -14,8 +14,7 @@ test("V6.9 describes services as a lasting institutional identity, not as a star
  assert.match(html,/<p class="hero-lead">DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla\.<\/p>/);
  assert.doesNotMatch(html,/UN ECOSISTEMA, TRES PILARES/);
  assert.match(html,/class="business-pitch"/);
- for(const phrase of ["Comercio y delivery","Logística integral","Paquetería, transporte y distribución de mercancías",
- "PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"])
+ for(const phrase of ["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"])
   assert.ok(html.includes(phrase),"Missing institutional service facet "+phrase);
  assert.doesNotMatch(html,/Proyecto en desarrollo|En construcción|En desarrollo: una plataforma|Horizonte futuro|antes del lanzamiento|validar necesidades con comercios|estamos construyendo un sistema/i);
  assert.equal((html.match(/<section\b/g)||[]).length,7);

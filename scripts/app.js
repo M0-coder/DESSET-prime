@@ -36,3 +36,23 @@ if(typeof window!=="undefined"&&typeof document.getElementById==="function"){
  const selectNewsCategory=()=>{const id=window.location.hash.slice(1);if(categories.includes(id)){const input=document.getElementById(id);if(input?.type==="radio"&&input.name==="categoria")input.checked=true;}else if(id==="recursos-de-marca"){const item=document.getElementById(id);if(item?.tagName==="DETAILS")item.open=true;}};
  selectNewsCategory();window.addEventListener("hashchange",selectNewsCategory);
 }
+
+// VIDEO-01: load only while visible; muted local video, reduced-motion and pause control.
+if(typeof window!=="undefined"&&typeof document.querySelectorAll==="function"){
+ const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)");
+ const videos=[...document.querySelectorAll("#soluciones .service-video")];
+ for(const video of videos){
+  const button=video.closest(".service").querySelector(".service-video-toggle");
+  const name=video.closest(".service").querySelector("h3").textContent.trim();
+  let visible=false,manualPause=false,manualPlay=false;
+  const update=()=>{const playing=!video.paused&&!video.ended;button.setAttribute("aria-label",(playing?"Pausar":"Reproducir")+" video de "+name);button.querySelector("path").setAttribute("d",playing?"M9 5v14m6-14v14":"M8 5l12 7-12 7z");};
+  const play=()=>{if(!video.getAttribute("src"))video.src=video.dataset.src;video.muted=true;video.play()?.catch(()=>update());};
+  const sync=()=>{if(!visible||document.hidden||manualPause||(reduced?.matches&&!manualPlay))video.pause();else play();update();};
+  button.hidden=false;update();
+  button.addEventListener("click",()=>{if(video.paused){manualPause=false;manualPlay=true;visible=true;play();}else{manualPause=true;manualPlay=false;video.pause();}update();});
+  video.addEventListener("play",update);video.addEventListener("pause",update);
+  document.addEventListener("visibilitychange",sync);
+  reduced?.addEventListener?.("change",()=>{manualPlay=false;sync();});
+  if(typeof window.IntersectionObserver==="function")new window.IntersectionObserver(entries=>{visible=entries[0].isIntersecting;sync();},{threshold:.15}).observe(video);
+ }
+}
