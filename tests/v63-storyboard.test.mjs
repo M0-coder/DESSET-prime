@@ -57,10 +57,10 @@ test("V6.3 users control storyboard without tracking, CDNs or background timers"
  assert.match(app,/storyProgress\.value=step\.progress/);
  assert.match(app,/cancelTour\("complete"\)/);
  assert.match(app,/tourActive:storyActive/);
- assert.match(html,/class="v63-tour" type="button" aria-pressed="false"/);
+ assert.match(read("prime.html"),/class="v63-tour" type="button" aria-pressed="false"/);
  assert.match(app,/courier:\{pos:/);
- assert.match(html,/class="v63-story" role="status" aria-live="polite"/);
- assert.match(html,/class="v63-story-progress" max="100" value="0"/);
+ assert.match(read("prime.html"),/class="v63-story" role="status" aria-live="polite"/);
+ assert.match(read("prime.html"),/class="v63-story-progress" max="100" value="0"/);
  assert.match(css,/\.v63-story\[hidden\]\{display:none!important;\}/);
  assert.match(ci,/node scripts\/v6-gpu-browser-audit\.mjs/);
  assert.match(ci,/permissions:\s*\n\s*contents:\s*read/);

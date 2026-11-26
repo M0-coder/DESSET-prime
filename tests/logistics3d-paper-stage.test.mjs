@@ -35,5 +35,5 @@ test("LOGISTICS-PAPER-01: refresh scene bundle without changing release or servi
  assert.doesNotMatch(launcher,/\bfetch\s*\(/);
  const html=read("index.html");
  assert.match(html,/name="robots" content="noindex,nofollow"/);
- assert.match(html,/No corresponde a pedidos ni entregas activas/);
+ assert.match(read("prime.html"),/No corresponde a pedidos ni entregas activas/);
 });

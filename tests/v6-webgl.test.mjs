@@ -38,12 +38,12 @@ test("V6 remains self-hosted, reproducibly pinned and within byte budgets",()=>{
  assert.match(workflow,/npm run build:3d/);
 });
 test("V6 has real input controls, opt-in mobile loading and permanent poster fallback",()=>{
- assert.match(html,/class="v6-three-mount" aria-hidden="true"/);
- assert.match(html,/class="v6-three-controls" role="group"/);
- assert.doesNotMatch(html,/data-v6-camera=/);
- assert.match(html,/class="v6-enable-webgl" type="button" hidden/);
- assert.match(html,/class="v6-pause"/);
- assert.doesNotMatch(html,/class="v6-poster"/);
+ assert.match(read("prime.html"),/class="v6-three-mount" aria-hidden="true"/);
+ assert.match(read("prime.html"),/class="v6-three-controls" role="group"/);
+ assert.doesNotMatch(read("prime.html"),/data-v6-camera=/);
+ assert.match(read("prime.html"),/class="v6-enable-webgl" type="button" hidden/);
+ assert.match(read("prime.html"),/class="v6-pause"/);
+ assert.doesNotMatch(read("prime.html"),/class="v6-poster"/);
  assert.match(loader,/document\.createElement\("script"\)/);
  assert.match(loader,/\.\/assets\/v6-three\.bundle\.js/);
  assert.match(loader,/threeStart\?\.addEventListener\("click",loadThree\)/);

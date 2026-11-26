@@ -33,11 +33,11 @@ test("LOGISTICS-3D-02: visual fallback matches original 3D architecture and pres
  assert.match(loader,/sign\(parent,"DESSET Prime",0,2\.72,1\.91,3\.00,\.29/);
 });
 test("LOGISTICS-3D-02: floating dashboard is simulation-only and invisible without verified GPU",()=>{
- assert.match(html,/class="logistics-hud" aria-hidden="true"/);
- assert.match(html,/NOTIFICACIÓN SIMULADA/);
- assert.match(html,/CENTRO DE DISTRIBUCIÓN · SIMULACIÓN/);
- assert.match(html,/sin datos reales/);
- assert.match(html,/No corresponde a pedidos ni entregas activas/);
+ assert.match(read("prime.html"),/class="logistics-hud" aria-hidden="true"/);
+ assert.match(read("prime.html"),/NOTIFICACIÓN SIMULADA/);
+ assert.match(read("prime.html"),/CENTRO DE DISTRIBUCIÓN · SIMULACIÓN/);
+ assert.match(read("prime.html"),/sin datos reales/);
+ assert.match(read("prime.html"),/No corresponde a pedidos ni entregas activas/);
  assert.match(css,/\.logistics-hud\{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;visibility:hidden/);
  assert.match(css,/data-v6-state="active"\] \.logistics-hud\{opacity:1;visibility:visible/);
  assert.match(css,/data-v6-paused="true"\] \.logistics-hud__card/);

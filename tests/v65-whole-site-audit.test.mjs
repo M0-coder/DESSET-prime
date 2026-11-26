@@ -9,7 +9,7 @@ const engine=read("scripts/v6-three.src.mjs");
 const glb=read("scripts/v62-glb-loader.src.mjs");
 const gpu=read("scripts/v6-gpu-browser-audit.mjs");
 test("V6.5 page opens with original high-quality WebP on all devices",()=>{
- assert.match(html,/class="v6-static-fallback"/);
+ assert.match(read("prime.html"),/class="v6-static-fallback"/);
  assert.doesNotMatch(html,/v5-cinematic-mobile\.webp/);
  assert.doesNotMatch(html,/class="v5-stage-render"/);
  assert.match(html,/class="v65-load-status" role="status" aria-live="polite"/);
