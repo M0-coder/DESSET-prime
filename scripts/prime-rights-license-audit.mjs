@@ -8,7 +8,7 @@ import {createHash} from 'node:crypto';
 import {join,resolve,dirname,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {checkPrimeFonts} from './prime-font-licenses.mjs';
-import {reviewSelectedMedia,reviewPrimePageMedia,reviewTalentPhoto,reviewMerchantHeroPhoto} from './prime-manual-cutover-gate.mjs';
+import {reviewSelectedMedia,reviewPrimePageMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto} from './prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const requireSafe=(okay,reason)=>{if(!okay)throw Error('NO-GO: '+reason)};
@@ -65,6 +65,9 @@ export function checkAssetRightsAndLicenses({
  requireSafe(talent?.path==='assets/talento-cultura.webp'&&talent.claim==='third-party'&&talent.source_id==='4990531'&&talent.license==='Pexels License'&&talent.license_url==='https://www.pexels.com/license/'&&/^[a-f0-9]{64}$/.test(talent.sha256)&&Number.isSafeInteger(talent.bytes)&&talent.bytes>0&&talent.bytes<=230000&&['individual-source-pending','individual-source-verified'].includes(talent.verification)&&talent.release_authorized===false&&!expected.has(talent.path),'invalid talent media registry');
  requireSafe(reviewTalentPhoto(selected).accepted,'talent photo lacks scoped rights review');
  expected.set(talent.path,talent.sha256);
+ const homeTalent=selected.home_talent_photo;
+ requireSafe(reviewHomeTalentPhoto(selected).accepted&&!expected.has(homeTalent.path),'invalid home talent photo registry');
+ expected.set(homeTalent.path,homeTalent.sha256);
  const merchant=selected.merchant_hero_photo;
  requireSafe(reviewMerchantHeroPhoto(selected).accepted&&!expected.has(merchant.path),'invalid merchant hero photo registry');
  expected.set(merchant.path,merchant.sha256);
@@ -85,6 +88,7 @@ export function checkAssetRightsAndLicenses({
    primePageVerified.push({...p});
   }
   else if(entry.path===talent.path){requireSafe(bytes.length===talent.bytes&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid talent WebP');}
+  else if(entry.path===homeTalent.path){requireSafe(bytes.length===homeTalent.bytes&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid home talent WebP');}
   else if(entry.path===merchant.path){requireSafe(bytes.length===merchant.bytes&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid merchant hero WebP');}
   else verified.push({path:entry.path,bytes:entry.bytes,sha256:entry.sha256,claim:'owner-declared'});
  }
@@ -114,6 +118,7 @@ export function checkAssetRightsAndLicenses({
   owner_declaration_status:'owner-declared',legal_title_independently_verified:false,
   assets_checked:verified.length,assets:verified,archived_media_checked:archived.length,archived_media:archived,
   merchant_hero_media:{...merchant,individual_source_verified:merchant.verification==='individual-source-verified'},merchant_hero_media_review:reviewMerchantHeroPhoto(selected),
+  home_talent_media:{...homeTalent,individual_source_verified:false},home_talent_media_review:reviewHomeTalentPhoto(selected),
   talent_media:{...talent,individual_source_verified:talent.verification==='individual-source-verified'},talent_media_review:reviewTalentPhoto(selected),
   prime_page_media_checked:primePageVerified.length,prime_page_media:primePageVerified,
   selected_media_checked:selectedVerified.length,selected_media:selectedVerified,individual_license_review_complete:selected.individual_license_review_complete===true&&selectedVerified.filter(a=>a.claim==='third-party').every(a=>a.verification==='individual-source-verified'),

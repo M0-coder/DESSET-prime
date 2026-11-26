@@ -191,6 +191,5 @@ body:has(#inicio){--ds-60-surface:#fff}
 /* PHOTO-01: editorial talent section, only on home. */
 #talento-destacado .institutional-home-inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:center;gap:clamp(16px,4vw,44px)}
 .talent-photo{margin:0;min-width:0}
-.talent-photo img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 25%;border-radius:12px}
-.talent-photo figcaption{font-size:11px;color:#686868;margin-top:7px}
+.talent-photo img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 50%;border-radius:12px}
 @media(max-width:700px){#talento-destacado .institutional-home-inner{grid-template-columns:1fr;gap:10px}.talent-copy{display:contents}.talent-copy h2{grid-row:1;margin:0}.talent-copy p{display:none}.talent-photo{grid-row:2}.talent-photo img{aspect-ratio:16/10;border-radius:9px}.talent-copy .institutional-home-more{grid-row:3;margin:0}}

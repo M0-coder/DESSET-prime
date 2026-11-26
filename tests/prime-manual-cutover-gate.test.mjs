@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia,reviewTalentPhoto,reviewMerchantHeroPhoto} from '../scripts/prime-manual-cutover-gate.mjs';
+import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto} from '../scripts/prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const target=JSON.parse(readFileSync(root+'/config/prime-release-target.json','utf8'));
 const sha='a'.repeat(40);
@@ -141,4 +141,9 @@ test('PHOTO-02 binds the selected photograph to the supplied source, not exclusi
  for(const mutate of [x=>delete x.merchant_hero_photo.selection,x=>x.merchant_hero_photo.sha256='f'.repeat(64),x=>x.merchant_hero_photo.selection.exclusive_ownership_claim=true,x=>x.merchant_hero_photo.selection.individual_source_verification=true,x=>x.merchant_hero_photo.source_id='other',x=>x.merchant_hero_photo.release_authorized=true]){
   const bad=copyMedia();mutate(bad);assert.equal(reviewMerchantHeroPhoto(bad).accepted,false);
  }
+});
+
+test('PHOTO-05 homepage photo review is scoped and fail-closed',()=>{
+ const fresh=copyMedia();assert.equal(reviewHomeTalentPhoto(fresh).accepted,true);assert.equal(reviewHomeTalentPhoto(fresh).release_authorized,false);
+ for(const mutate of [x=>delete x.home_talent_photo.selection,x=>x.home_talent_photo.sha256='f'.repeat(64),x=>x.home_talent_photo.selection.exclusive_ownership_claim=true,x=>x.home_talent_photo.selection.remote_original_binary_comparison=true,x=>x.home_talent_photo.source_id='other',x=>x.home_talent_photo.release_authorized=true]){const bad=copyMedia();mutate(bad);assert.equal(reviewHomeTalentPhoto(bad).accepted,false);}
 });
