@@ -21,16 +21,16 @@ for(const dir of ["","dist/"]){
  assert.equal(primeFooter,canonicalFooter.replace('href="#soluciones"','href="./index.html#soluciones"').replace('href="./prime.html"','href="./prime.html" aria-current="page"'),"Prime footer must preserve the canonical site map");
 
  assert.ok(service);
- assert.ok(service.includes('<a class="prime-service-cta" href="./prime.html" aria-label="Más información sobre DESSET prime">Más información</a>'));
+ assert.ok(service.includes('<a class="prime-service-cta" href="./prime.html" aria-label="Conocer más sobre DESSET prime">Conocer más <svg'));
  assert.equal((home.match(/class="prime-service-cta"/g)||[]).length,1);
  const desset=home.match(/<article class="service service--main">([\s\S]*?)<\/article>/)?.[1]||"";
  assert.doesNotMatch(desset,/prime-service-cta/);
- assert.ok(desset.includes('<a class="desset-service-cta" href="./aplicaciones.html" aria-label="Más información sobre las aplicaciones DESSET">Más información</a>'));
+ assert.ok(desset.includes('<a class="desset-service-cta" href="./aplicaciones.html" aria-label="Conocer más sobre las aplicaciones DESSET">Conocer más <svg'));
  assert.equal((home.match(/class="desset-service-cta"/g)||[]).length,1);
  assert.doesNotMatch(service,/desset-service-cta/);
- assert.match(read(dir+"styles-system.css"),/#soluciones \.service--main \.desset-service-cta\{[^}]*min-height:48px[^}]*background:#fff;color:#073bbc/);
+ assert.match(read(dir+"styles-service-video.css"),/\.service-body a\{[^}]*min-height:48px[^}]*background:#fff;color:#073bbc/);
  assert.match(read(dir+"aplicaciones.html"),/class="apps-page"/);
- assert.match(read(dir+"styles.css"),/#soluciones \.service--prime \.prime-service-cta\{[^}]*min-height:48px/);
+ assert.match(read(dir+"styles-service-video.css"),/\.service-body a\{[^}]*position:absolute[^}]*bottom:/);
  assert.ok(html.includes('href="./styles-prime.css"'));
  assert.ok(html.includes("<h1 id=\"prime-title\"><span>DEL ORIGEN AL DESTINO</span> <span>MÁS ALLÁ DE LAS DISTANCIAS</span></h1><p class=\"pr-lead\">Creemos que la distancia no debe ser una barrera para el comercio, las empresas ni las personas. Nuestro propósito es conectar cada origen con su destino, independientemente de lo lejos que esté.</p>"));
  assert.equal((html.match(/<h1\b/g)||[]).length,1);

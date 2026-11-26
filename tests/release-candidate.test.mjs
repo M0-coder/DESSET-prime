@@ -27,15 +27,15 @@ test("Two independent visible service brands without implied availability",()=>{
  assert.ok(services);
  assert.doesNotMatch(services,/<h2\b|solutions-title/);
  assert.match(html,/<section class="solutions" id="soluciones" aria-label="Servicios y aplicaciones DESSET">/);
- assert.match(css,/#soluciones \.service \.service-body h3\{[^}]*align-items:center;justify-content:center;text-align:center/);
- assert.match(css,/#soluciones \.service--prime h3 span\{display:block/);
+ const videoCss=readFileSync(new URL("styles-service-video.css",root),"utf8");assert.match(videoCss,/\.service-body h3\{[^}]*text-align:center;color:#fff/);
+ assert.match(videoCss,/\.service-body h3 span\{display:block/);
  const cards=[...services.matchAll(/<article class="service service--(main|prime)">([\s\S]*?)<\/article>/g)];
  assert.deepEqual(cards.map(c=>c[1]),["main","prime"]);
- assert.match(cards[0][2],/<h3>DESSET<\/h3>[\s\S]*?<strong>Comercio y delivery<\/strong>/);
- assert.match(cards[1][2],/<h3>DESSET <span>prime<\/span><\/h3>[\s\S]*?<strong>Logística integral<\/strong>/);
+ assert.match(cards[0][2],/<h3>DESSET<\/h3>[\s\S]*?href="\.\/aplicaciones\.html"/);
+ assert.match(cards[1][2],/<h3>DESSET <span>prime<\/span><\/h3>[\s\S]*?href="\.\/prime\.html"/);assert.doesNotMatch(services,/<(?:strong|p|figcaption)\b/);
  assert.doesNotMatch(services,/<details|service-arrow|future-services|Área complementaria|acceso público disponible|operación comercial activa/i);
- assert.match(css,/#soluciones \.solutions-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
- assert.match(css,/@media\(max-width:700px\)\{\s*#soluciones \.solutions-grid\{grid-template-columns:minmax\(0,1fr\)/);
+ assert.match(videoCss,/#soluciones\.solutions \.solutions-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+ assert.match(videoCss,/@media\(max-width:700px\)\{#soluciones\.solutions \.solutions-grid\{grid-template-columns:minmax\(0,1fr\)/);
 });
 
 test("V4.3: hero CTA reaches the unique primary contact path and is accessible",()=>{

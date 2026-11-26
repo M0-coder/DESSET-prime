@@ -16,7 +16,8 @@ test("Prime 3D has no hidden static WebP/SVG illustration or permanently hidden 
  assert.match(read("prime.html"),/class="v6-pause" type="button"/);
  assert.doesNotMatch(html,/v5-cinematic-(?:desktop|mobile)\.webp|v5-logistics-(?:scene|mobile)\.svg/);
  assert.doesNotMatch(read("prime.html"),/v5-responsive-art|v5-stage-render|v5-stage-scan|data-v6-camera|v6-poster/);
- assert.doesNotMatch(html,/<video\b|<canvas\b|<iframe\b|<form\b/i);
+ assert.doesNotMatch(html,/<canvas\b|<iframe\b|<form\b/i);
+ const services=html.match(/<section class="solutions"[^>]*>[\s\S]*?<\/section>/)[0];assert.equal((html.match(/<video\b/g)||[]).length,2);assert.equal((services.match(/<video\b/g)||[]).length,2);assert.doesNotMatch(services,/<video[^>]*\sautoplay\b/);
  assert.ok(statSync(new URL("index.html",root)).size<35000);
  assert.ok(statSync(new URL("styles-v5.css",root)).size<16000);
 });

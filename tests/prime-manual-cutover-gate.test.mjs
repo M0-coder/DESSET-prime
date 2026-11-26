@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto,reviewRiderHeroPhoto} from '../scripts/prime-manual-cutover-gate.mjs';
+import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto,reviewRiderHeroPhoto,reviewServiceVideos} from '../scripts/prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const target=JSON.parse(readFileSync(root+'/config/prime-release-target.json','utf8'));
 const sha='a'.repeat(40);
@@ -149,3 +149,8 @@ test('PHOTO-05 homepage photo review is scoped and fail-closed',()=>{
 });
 
 test('PHOTO-06 scoped original rider image only; no independent title or release claim',()=>{const x=copyMedia();assert.equal(reviewRiderHeroPhoto(x).accepted,true);assert.equal(reviewRiderHeroPhoto(x).release_authorized,false);for(const mutate of [m=>delete m.rider_hero_photo.selection,m=>m.rider_hero_photo.sha256='0'.repeat(64),m=>m.rider_hero_photo.selection.exclusive_ownership_claim=true,m=>m.rider_hero_photo.release_authorized=true]){const bad=copyMedia();mutate(bad);assert.equal(reviewRiderHeroPhoto(bad).accepted,false);}});
+
+test('VIDEO-01 owner declaration binds only four exact assets and never authorizes release',()=>{
+ const m=copyMedia();assert.deepEqual(reviewServiceVideos(m),{accepted:true,basis:'owner-attested-free-use',individual_source_verified:false,release_authorized:false});
+ for(const mutate of [x=>delete x.service_videos.owner_attestation,x=>x.service_videos.assets.pop(),x=>x.service_videos.assets[0].sha256='0'.repeat(64),x=>x.service_videos.owner_attestation.assets[1]=x.service_videos.owner_attestation.assets[0],x=>x.service_videos.owner_attestation.scope='unlimited',x=>x.service_videos.owner_attestation.individual_source_verification=true,x=>x.service_videos.owner_attestation.exclusive_ownership_claim=true,x=>x.service_videos.release_authorized=true]){const bad=copyMedia();mutate(bad);assert.equal(reviewServiceVideos(bad).accepted,false);}
+});

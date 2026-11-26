@@ -143,20 +143,11 @@ async function viewport(width,height,reduce=false,entry=URL){
     photoRatio:photo.width/photo.height,fit:getComputedStyle(image).objectFit,
     titleFont:parseFloat(getComputedStyle(h).fontSize),copyFont:parseFloat(getComputedStyle(p).fontSize)};
   })};
- const servicesGrid=document.querySelector("#soluciones .solutions-grid");
- const servicesBounds=servicesGrid.getBoundingClientRect();
- const servicesSheet=document.querySelector('link[href^="./styles.css?v="]');
- const servicesLayout={sheetLoaded:!!servicesSheet?.sheet,revision:servicesSheet?.getAttribute("href"),surface:getComputedStyle(servicesGrid.closest("section")).backgroundColor,gap:parseFloat(getComputedStyle(servicesGrid).gap),columns:getComputedStyle(servicesGrid).gridTemplateColumns.trim().split(/\\s+/).length,
-  headingAbsent:!document.querySelector("#soluciones > h2"),label:document.querySelector("#soluciones").getAttribute("aria-label"),
-  cards:[...servicesGrid.querySelectorAll("article.service")].map(c=>{
-   const r=c.getBoundingClientRect(),h=c.querySelector("h3"),p=c.querySelector("p"),s=c.querySelector("strong");
-   const style=getComputedStyle(c),brandRect=h.getBoundingClientRect(),textRect=s.getBoundingClientRect(),last=p.getBoundingClientRect(),prime=h.querySelector("span"),a=c.querySelector(".prime-service-cta,.desset-service-cta"),ar=a?.getBoundingClientRect();
-   return {brand:h.textContent.trim(),service:s.textContent.trim(),copy:p.textContent.trim(),background:style.backgroundColor,borderWidth:style.borderTopWidth,borderColor:style.borderTopColor,radius:parseFloat(style.borderTopLeftRadius),shadow:style.boxShadow,primeColor:prime?getComputedStyle(prime).color:null,divider:getComputedStyle(s).borderTopWidth,descriptionColor:getComputedStyle(p).color,alignedCopy:getComputedStyle(s).textAlign==="left"&&getComputedStyle(p).textAlign==="left",bottomSpace:r.bottom-(ar?.bottom??last.bottom),cta:a?{href:a.getAttribute("href"),label:a.textContent.trim(),accessible:a.getAttribute("aria-label"),height:ar.height,fullWidth:Math.abs(ar.width-p.clientWidth)<=2,inside:ar.left>=r.left&&ar.right<=r.right&&ar.bottom<=r.bottom,fit:a.scrollWidth<=a.clientWidth+2,background:getComputedStyle(a).backgroundColor,color:getComputedStyle(a).color,gap:ar.top-last.bottom}:null,brandBottom:brandRect.bottom-r.top,dividerOffset:textRect.top-r.top,centered:getComputedStyle(h).textAlign==="center"&&getComputedStyle(h).alignItems==="center"&&getComputedStyle(h).justifyContent==="center",brandHeight:h.getBoundingClientRect().height,primeStack:!h.querySelector("span")||getComputedStyle(h.querySelector("span")).display==="block",
-    visible:r.height>100&&getComputedStyle(c).visibility!=="hidden",
-    inside:r.left>=servicesBounds.left-2&&r.right<=servicesBounds.right+2,
-    fits:[h,p,s].every(e=>e.scrollWidth<=e.clientWidth+2),height:r.height,
-    copyFont:parseFloat(getComputedStyle(p).fontSize)};
-  })};
+ const servicesGrid=document.querySelector("#soluciones .solutions-grid"),servicesBounds=servicesGrid.getBoundingClientRect(),servicesSheet=document.querySelector('link[href^="./styles.css?v="]');
+ const servicesLayout={sheetLoaded:!!servicesSheet?.sheet,revision:servicesSheet?.getAttribute("href"),surface:getComputedStyle(servicesGrid.closest("section")).backgroundColor,gap:parseFloat(getComputedStyle(servicesGrid).gap),columns:getComputedStyle(servicesGrid).gridTemplateColumns.trim().split(/\\s+/).length,headingAbsent:!document.querySelector("#soluciones > h2"),label:document.querySelector("#soluciones").getAttribute("aria-label"),cards:[...servicesGrid.querySelectorAll("article.service")].map(c=>{
+  const r=c.getBoundingClientRect(),h=c.querySelector("h3"),hr=h.getBoundingClientRect(),a=c.querySelector(".prime-service-cta,.desset-service-cta"),ar=a.getBoundingClientRect(),v=c.querySelector("video"),vr=v.getBoundingClientRect(),button=c.querySelector("button"),cs=getComputedStyle(c);
+  return {brand:h.textContent.trim(),source:v.dataset.src,poster:v.getAttribute("poster"),muted:v.muted,loop:v.loop,inline:v.playsInline,ratio:r.width/r.height,full:Math.abs(vr.width-r.width)<2&&Math.abs(vr.height-r.height)<2,fit:getComputedStyle(v).objectFit,overlay:getComputedStyle(c,"::after").backgroundImage,titleColor:getComputedStyle(h).color,primeColor:h.querySelector("span")?getComputedStyle(h.querySelector("span")).color:null,primeStack:!h.querySelector("span")||getComputedStyle(h.querySelector("span")).display==="block",titleTop:hr.top-r.top,titleBottom:hr.bottom-r.top,ctaTop:ar.top-r.top,ctaBottom:r.bottom-ar.bottom,centered:Math.abs((hr.left+hr.right-r.left-r.right)/2)<2&&Math.abs((ar.left+ar.right-r.left-r.right)/2)<2,inside:ar.left>=r.left&&ar.right<=r.right&&ar.bottom<=r.bottom&&r.left>=servicesBounds.left-2&&r.right<=servicesBounds.right+2,extra:!!c.querySelector("strong,p,figcaption"),radius:parseFloat(cs.borderTopLeftRadius),cta:{href:a.getAttribute("href"),label:a.textContent.trim(),height:ar.height,background:getComputedStyle(a).backgroundColor,color:getComputedStyle(a).color},pause:!!button?.getAttribute("aria-label"),height:r.height};
+ })};
  const partnersGrid=document.querySelector("#negocios .audience-grid--compact");
  const partnersBounds=partnersGrid.getBoundingClientRect();
  const close=document.querySelector("#contacto"),heading=close.querySelector("h2"),lines=[...heading.querySelectorAll(".closing-line")],headingStyle=getComputedStyle(heading);
@@ -227,7 +218,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    palette.statementAccent!==brandBlue||palette.statementBackground!==pureWhite||
    palette.homeHeader!==pureWhite||palette.homeRecent!==pureWhite||palette.homeCorporate!=="rgb(245, 245, 245)"||palette.homeCorporateCard!==pureWhite||palette.homeNews!==pureWhite||palette.homeTalent!=="rgb(245, 245, 245)"||palette.homeHero!=="rgb(247, 245, 238)"||
    palette.footerBackground!=="rgb(245, 245, 245)"||palette.navContactBackground!==pureWhite||
-   palette.primeHeadingColor!==brandBlue||palette.primeSubtitleColor!==brandBlue||
+   palette.primeHeadingColor!==pureWhite||palette.primeSubtitleColor!==pureWhite||
    palette.institutionalInk!=="#000000"||
    palette.stageInk!=="#111111"||palette.stageDesignInk!=="#111111"||palette.stageInheritedColor!=="rgb(17, 17, 17)"||
    palette.heroHeadingColor!=="rgb(0, 0, 0)"||
@@ -261,15 +252,8 @@ async function viewport(width,height,reduce=false,entry=URL){
   participants.cards.some((c,i)=>c.title!==expectedParticipantTitles[i]||c.src!==expectedParticipantFiles[i]||!c.alt||c.lazy!=="lazy"||!c.inside||!c.fits||Math.abs(c.photoRatio-1.5)>.03||c.fit!=="cover"||c.titleFont<(width<=700?13:17)||c.copyFont<14))
   fails.push("ECOSYSTEM-PARTICIPANTS-01 responsive layout, card order or text clipping: "+JSON.stringify(participants));
   const services=diag.servicesLayout;
-  if(!services.sheetLoaded||!services.revision?.startsWith("./styles.css?v=")||services.surface!=="rgb(245, 245, 245)"||services.gap!==(width<=700?10:16)||!services.headingAbsent||services.label!=="Servicios y aplicaciones DESSET"||services.columns!==(width<320?1:2)||services.cards.length!==2||
-   services.cards.map(c=>c.brand).join("|")!=="DESSET|DESSET prime"||
-   services.cards.map(c=>c.service).join("|")!=="Comercio y delivery|Logística integral"||
-   services.cards.some(c=>!c.visible||!c.inside||!c.fits||!c.centered||!c.primeStack||c.brandHeight<(width<=700?64:100)||c.copyFont<(width<=700?14:15)||c.copy.length<30)||
-   services.cards.some(c=>c.borderWidth!=="1px"||c.radius!==12||c.shadow!=="none"||c.divider!=="1px"||!c.alignedCopy||c.bottomSpace>70+(c.cta?0:62)||c.height>350)||
-   !services.cards[0].cta||services.cards[0].cta.href!=="./aplicaciones.html"||services.cards[0].cta.label!=="Más información"||services.cards[0].cta.accessible!=="Más información sobre las aplicaciones DESSET"||services.cards[0].cta.height<48||!services.cards[0].cta.fullWidth||!services.cards[0].cta.inside||!services.cards[0].cta.fit||services.cards[0].cta.background!==pureWhite||services.cards[0].cta.color!==brandBlue||services.cards[0].cta.gap<10||!services.cards[1].cta||services.cards[1].cta.href!=="./prime.html"||services.cards[1].cta.label!=="Más información"||services.cards[1].cta.accessible!=="Más información sobre DESSET prime"||services.cards[1].cta.height<48||!services.cards[1].cta.fullWidth||!services.cards[1].cta.inside||!services.cards[1].cta.fit||services.cards[1].cta.background!==brandBlue||services.cards[1].cta.color!==pureWhite||services.cards[1].cta.gap<10||
-   services.cards[0].background!=="rgb(7, 59, 188)"||services.cards[0].borderColor!=="rgb(7, 59, 188)"||services.cards[0].descriptionColor!=="rgb(255, 255, 255)"||
-   services.cards[1].background!=="rgb(255, 255, 255)"||services.cards[1].borderColor!=="rgb(216, 220, 226)"||services.cards[1].primeColor!=="rgb(7, 59, 188)"||services.cards[1].descriptionColor!=="rgb(65, 65, 65)"||
-   Math.abs(services.cards[0].height-services.cards[1].height)>2||Math.abs(services.cards[0].dividerOffset-services.cards[1].dividerOffset)>2)
+  if(!services.sheetLoaded||!services.headingAbsent||services.label!=="Servicios y aplicaciones DESSET"||services.columns!==(width<=700?1:2)||services.cards.length!==2||services.cards.map(c=>c.brand).join("|")!=="DESSET|DESSET prime"||
+   services.cards.some((c,i)=>c.source!==("./assets/servicio-"+(i?"prime":"desset")+".mp4")||c.poster!==("./assets/servicio-"+(i?"prime":"desset")+"-poster.webp")||!c.muted||!c.loop||!c.inline||!c.full||c.fit!=="cover"||!c.overlay.includes("linear-gradient")||c.titleColor!==pureWhite||(i===1&&c.primeColor!==pureWhite)||!c.primeStack||!c.centered||!c.inside||c.extra||!c.pause||c.radius!==12||Math.abs(c.ratio-16/9)>.04||c.titleTop<=0||c.ctaBottom<=0||c.titleBottom>=c.ctaTop||c.cta.label!=="Conocer más"||c.cta.height<(width<=700?44:48)||c.cta.background!==pureWhite||c.cta.color!==brandBlue||c.cta.href!==(i?"./prime.html":"./aplicaciones.html")))
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
   if(diag.decorativeArrowCount!==0)fails.push("Decorative arrows remain in interactive controls");
  if((width>700&&diag.footerLayout.columns!==2)||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==14||diag.footerLayout.links.map(x=>x.href).join("|")!=="./empresa.html#quienes-somos|./empresa.html#mision-vision|./empresa.html#valores|#soluciones|./prime.html|./aplicaciones.html|./comercios.html|./repartidores.html|./contacto.html|./confianza.html|./noticias.html|./talento.html|./en.html|./empresa.html#informacion-corporativa"||(width>700&&diag.footerLayout.links.some(x=>!x.inside||x.height<24))||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
@@ -328,14 +312,14 @@ try{
  if(!designSystem.cssLoaded||
     designSystem.body!=="rgb(247, 245, 238)"||
     designSystem.contact!=="rgba(0, 0, 0, 0)"||
-    designSystem.feature!=="rgb(7, 59, 188)"||
+    designSystem.feature!=="rgb(35, 35, 35)"||
     designSystem.brand!=="rgb(255, 255, 255)"||
     JSON.stringify(designSystem.steps)!==JSON.stringify(expectedSteps))
    report.failures.push("V6.7 computed 60-30-10 palette or four-participant narrative mismatch: "+JSON.stringify(designSystem));
  report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
  const visual02=await js('(()=>{const q=s=>document.querySelector(s);const cs=s=>getComputedStyle(q(s));return {cssLoaded:[...document.styleSheets].some(x=>x.href?.endsWith("/styles-visual02.css")),heroPhoto:q("#inicio .prime-photo-image")?.getAttribute("src"),heroLogo:q(".site-header .brand-mark")?.getAttribute("src"),heroCTA:q("#inicio .hero-cta")?.getAttribute("href"),businessShadow:cs("#negocios .business-pitch").boxShadow,serviceTop:cs("#soluciones .service--main").borderTopWidth,trustBg:cs("#vision").backgroundColor,mobileSafe:document.documentElement.scrollWidth<=document.documentElement.clientWidth+2}})()');
  if(!visual02.cssLoaded||!visual02.heroPhoto?.endsWith("desset-hero-entrega-dos-espejos.webp")||!visual02.heroLogo?.endsWith("deliver-assets-mark.png")||visual02.heroCTA!=="#contacto"||
-   visual02.serviceTop!=="1px"||visual02.trustBg!=="rgb(255, 255, 255)"||!visual02.mobileSafe)
+   visual02.serviceTop!=="0px"||visual02.trustBg!=="rgb(255, 255, 255)"||!visual02.mobileSafe)
   report.failures.push("VISUAL-02 institutional editorial consistency regression: "+JSON.stringify(visual02));
  report.tests.push({name:"VISUAL-02 corporate style, approved hero and responsive safety",visual02});
 
