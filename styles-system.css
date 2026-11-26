@@ -235,3 +235,8 @@ h1,h2,h3,h4 {text-wrap:balance;}
  .js-enabled .site-header .main-nav a{min-height:50px;padding:12px 5px;font-size:17px}
  .js-enabled .site-header .main-nav .nav-contact{padding:12px 15px;margin-top:8px}
 }
+
+/* DESSET application directory entry: inverse of the Prime card CTA. */
+#soluciones .service--main .desset-service-cta{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;padding:12px 16px;margin-top:12px;border:1px solid #fff;border-radius:10px;background:#fff;color:#073bbc;font-size:14px;line-height:1.4;font-weight:750;text-align:center;text-decoration:none}
+#soluciones .service--main .desset-service-cta:hover{background:#e2ebff;color:#073bbc;border-color:#e2ebff}
+#soluciones .service--main .desset-service-cta:focus-visible{outline:3px solid #fff;outline-offset:4px}
