@@ -253,7 +253,7 @@ async function viewport(width,height,reduce=false,entry=URL){
   fails.push("ECOSYSTEM-PARTICIPANTS-01 responsive layout, card order or text clipping: "+JSON.stringify(participants));
   const services=diag.servicesLayout;
   if(!services.sheetLoaded||!services.headingAbsent||services.label!=="Servicios y aplicaciones DESSET"||services.columns!==(width<=700?1:2)||services.cards.length!==2||services.cards.map(c=>c.brand).join("|")!=="DESSET|DESSET prime"||
-   services.cards.some((c,i)=>c.source!==("./assets/servicio-"+(i?"prime":"desset")+".mp4")||c.poster!==("./assets/servicio-"+(i?"prime":"desset")+"-poster.webp")||!c.muted||c.loop||!c.inline||!c.full||c.fit!=="cover"||!c.overlay.includes("linear-gradient")||c.titleColor!==(i?brandBlue:pureWhite)||(i===1&&c.primeColor!==brandBlue)||!c.primeStack||!c.centered||!c.inside||c.extra||c.pause||c.radius!==12||Math.abs(c.ratio-16/9)>.04||c.titleTop<=0||c.ctaBottom<=0||c.titleBottom>=c.ctaTop||c.cta.label!=="Conocer más"||c.cta.height<(width<=700?48:56)||Math.abs(c.cta.widthRatio-(width<=700?.78:Math.min(.65,560/(c.height*16/9))))>.025||c.cta.background!==pureWhite||c.cta.color!==brandBlue||c.cta.href!==(i?"./prime.html":"./aplicaciones.html")))
+   services.cards.some((c,i)=>c.source!==("./assets/servicio-"+(i?"prime":"desset")+".mp4")||c.poster!==("./assets/servicio-"+(i?"prime":"desset")+"-poster.webp")||!c.muted||!c.loop||!c.inline||!c.full||c.fit!=="cover"||!c.overlay.includes("linear-gradient")||c.titleColor!==(i?brandBlue:pureWhite)||(i===1&&c.primeColor!==brandBlue)||!c.primeStack||!c.centered||!c.inside||c.extra||c.pause||c.radius!==12||Math.abs(c.ratio-16/9)>.04||c.titleTop<=0||c.ctaBottom<=0||c.titleBottom>=c.ctaTop||c.cta.label!=="Conocer más"||c.cta.height<(width<=700?48:56)||Math.abs(c.cta.widthRatio-(width<=700?.78:Math.min(.65,560/(c.height*16/9))))>.025||c.cta.background!==pureWhite||c.cta.color!==brandBlue||c.cta.href!==(i?"./prime.html":"./aplicaciones.html")))
     fails.push("Two visible responsive service brands: "+JSON.stringify(services));
   if(diag.decorativeArrowCount!==0)fails.push("Decorative arrows remain in interactive controls");
  if((width>700&&diag.footerLayout.columns!==2)||diag.footerLayout.groups.join("|")!=="Empresa|Servicios|Ecosistema|Información institucional"||diag.footerLayout.links.length!==14||diag.footerLayout.links.map(x=>x.href).join("|")!=="./empresa.html#quienes-somos|./empresa.html#mision-vision|./empresa.html#valores|#soluciones|./prime.html|./aplicaciones.html|./comercios.html|./repartidores.html|./contacto.html|./confianza.html|./noticias.html|./talento.html|./en.html|./empresa.html#informacion-corporativa"||(width>700&&diag.footerLayout.links.some(x=>!x.inside||x.height<24))||diag.footerLayout.social.length!==5||diag.footerLayout.social.some(x=>x.width<44||x.height<44)||diag.footerLayout.center!=="center"||diag.footerLayout.copyright!=="© 2026 DESSET. Todos los derechos reservados.")fails.push("Corporate footer layout: "+JSON.stringify(diag.footerLayout));
@@ -503,6 +503,15 @@ try{
    await capture("services-"+w+"px.png");
   }
  }
+ // Exercise both real video decoders and verify playback crosses the native loop boundary.
+ await viewport(1440,900,false);
+ await js('document.querySelector("#soluciones").scrollIntoView({block:"center",behavior:"instant"})');
+ await until(async()=>await js('[...document.querySelectorAll("#soluciones video")].every(v=>v.loop&&!v.paused&&Number.isFinite(v.duration)&&v.duration>1&&v.currentTime>0)'),"both service videos playing");
+ await js('[...document.querySelectorAll("#soluciones video")].forEach(v=>v.currentTime=v.duration-.35)');
+ await sleep(1300);
+ const loopEvidence=await js('[...document.querySelectorAll("#soluciones video")].map(v=>({loop:v.loop,paused:v.paused,ended:v.ended,time:v.currentTime,duration:v.duration}))');
+ if(loopEvidence.length!==2||loopEvidence.some(v=>!v.loop||v.paused||v.ended||v.time>=v.duration-.35))report.failures.push("VIDEO-03 actual loop boundary failed: "+JSON.stringify(loopEvidence));
+ report.tests.push({name:"VIDEO-03 both videos cross native loop boundary",loopEvidence});
  const reduced=await viewport(390,844,true);
  const mobilePhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");return {src:x?.currentSrc,width:x?.naturalWidth,height:x?.naturalHeight,loaded:!!x?.complete}})()');
  if(!mobilePhoto.loaded||!mobilePhoto.src?.includes("desset-hero-entrega-mobile.webp")||mobilePhoto.width!==960)
