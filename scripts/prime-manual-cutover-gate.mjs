@@ -94,6 +94,7 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    const mediaReview=reviewSelectedMedia(media);
    if(!mediaReview.accepted)throw Error('Selected photographs require a valid scoped review before production');
    if(!reviewPrimePageMedia(media))throw Error('Prime page photographs require a valid individual inventory before production');
+   if(media.talent_photo?.path!=='assets/talento-cultura.webp'||media.talent_photo.verification!=='individual-source-verified')throw Error('PHOTO-01: individual Pexels source review required before production');
    const e=process.env;
    const out=validateReleaseIntent({repository:e.GITHUB_REPOSITORY,ref:e.GITHUB_REF,event:e.GITHUB_EVENT_NAME,
      expectedSha:e.RELEASE_SHA,checkoutSha:e.GITHUB_SHA,previousId:e.PREVIOUS_DEPLOYMENT_ID,

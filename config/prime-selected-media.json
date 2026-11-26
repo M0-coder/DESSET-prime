@@ -179,5 +179,22 @@
       "verification": "individual-source-verified",
       "verification_note": "Source page and license reviewed 2026-11-25; no independent binary comparison to remote original."
     }
-  ]
+  ],
+  "talent_photo": {
+    "path": "assets/talento-cultura.webp",
+    "sha256": "7f6c27b84b918769e6539796775a303a5df21a1839266964fdc291fa18dbab54",
+    "bytes": 228726,
+    "width": 1200,
+    "height": 1800,
+    "alt": "Tres personas colaboran en una mesa de trabajo con ordenadores y documentos.",
+    "claim": "third-party",
+    "author": "Antoni Shkraba (filename attribution; individual source pending)",
+    "source": "https://www.pexels.com/photo/4990531/",
+    "source_id": "4990531",
+    "license": "Pexels License",
+    "license_url": "https://www.pexels.com/license/",
+    "verification": "individual-source-pending",
+    "release_authorized": false,
+    "usage": "Illustrative collaboration; not actual DESSET employees."
+  }
 }
