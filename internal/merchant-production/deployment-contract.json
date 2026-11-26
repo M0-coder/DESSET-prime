@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "policy": "NO DEPLOY. Inventory and closed initial configuration; operator must resolve IDs, secrets and policy verification before provisioning.",
+  "environments": {
+    "staging": {
+      "worker": "desset-merchant-staging",
+      "origin": "https://desset-merchant-staging.morimil-pabfelon.workers.dev",
+      "database": "desset-merchant-staging",
+      "documents": "desset-merchant-documents-staging",
+      "publicIntake": false,
+      "cron": []
+    },
+    "production": {
+      "worker": "desset-merchant-production",
+      "origin": "https://comercios.desset.lat",
+      "database": "desset-merchant-production",
+      "documents": "desset-merchant-documents-production",
+      "publicIntake": false,
+      "workersDev": false,
+      "previews": false,
+      "accessPaths": [
+        "/admin",
+        "/admin/*"
+      ],
+      "cronAfterAuthorizedDeployment": [
+        "*/5 * * * *"
+      ],
+      "appEntrypoint": "MerchantIntegration",
+      "institutionalRedirect": {
+        "ref": "desset_merchant_registration",
+        "description": "DESSET commercial registration — authorized launch only",
+        "enabled": false,
+        "expression": "(http.host in {\"desset.lat\" \"www.desset.lat\"} and http.request.method in {\"GET\" \"HEAD\"} and http.request.uri.path in {\"/registro-comercios.html\" \"/registro-comercios\"})",
+        "action": "redirect",
+        "action_parameters": {
+          "from_value": {
+            "target_url": {
+              "value": "https://comercios.desset.lat/registro-comercios.html"
+            },
+            "status_code": 302,
+            "preserve_query_string": false
+          }
+        }
+      },
+      "privacyUrl": "https://comercios.desset.lat/privacidad-comercios.html"
+    }
+  },
+  "initialFlags": {
+    "INTAKE_ENABLED": "false",
+    "NOTIFICATIONS_ENABLED": "false",
+    "ACTIVATION_ENABLED": "false",
+    "APP_INTEGRATION_ENABLED": "false",
+    "ADMIN_POLICY_VERIFIED": "false",
+    "PRODUCTION_POLICY_VERIFIED": "false",
+    "PRIVACY_POLICY_VERIFIED": "false",
+    "TERRITORY_VERIFIED": "false",
+    "COMMERCIAL_POLICY_VERIFIED": "false"
+  },
+  "bindings": [
+    "DB",
+    "DOCUMENTS",
+    "INTAKE_LIMIT",
+    "EMAIL"
+  ],
+  "environmentSpecific": [
+    "ENVIRONMENT",
+    "SERVICE_ORIGIN",
+    "DOCUMENTS_ENVIRONMENT",
+    "ACCESS_ISSUER",
+    "ACCESS_AUD",
+    "ADMIN_SUBJECTS",
+    "ADMIN_EMAIL",
+    "TURNSTILE_HOST",
+    "TURNSTILE_SITE_KEY",
+    "TURNSTILE_SECRET",
+    "PRIVACY_VERSION",
+    "PRIVACY_URL",
+    "NOTIFY_FROM",
+    "NOTIFY_TO",
+    "LAUNCH_AUTHORIZATION_REF",
+    "ACTIVATION_AUTHORIZATION_REF",
+    "PRIVACY_NOTICE",
+    "PRIVACY_NOTICE_SHA256"
+  ],
+  "noAutomaticDeployment": true
+}

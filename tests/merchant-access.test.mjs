@@ -1,0 +1,143 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {DatabaseSync} from "node:sqlite";
+import {readFileSync} from "node:fs";
+import worker,{handle,STAGING_ORIGIN} from "../internal/merchant-production/worker.mjs";
+import {loadMerchantUI,buildMerchantWorker} from "../internal/merchant-production/build-worker.mjs";
+const ui=loadMerchantUI();
+const now=1800000000, id="00000000-0000-4000-8000-000000000077";
+const email="reviewer@example.invalid",sub="synthetic-reviewer",aud="a".repeat(64),issuer="https://test.cloudflareaccess.com";
+const cfg={ENVIRONMENT:"staging",SERVICE_ORIGIN:STAGING_ORIGIN,ADMIN_POLICY_VERIFIED:"true",ACCESS_ISSUER:issuer,ACCESS_AUD:aud,ADMIN_SUBJECTS:sub,ADMIN_EMAIL:email};
+const payload={iss:issuer,aud:[aud],exp:now+300,iat:now-30,sub,email,type:"app"};
+const pair=await crypto.subtle.generateKey({name:"RSASSA-PKCS1-v1_5",modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:"SHA-256"},true,["sign","verify"]);
+const jwk=await crypto.subtle.exportKey("jwk",pair.publicKey);jwk.kid="test";
+const b64=v=>Buffer.from(JSON.stringify(v)).toString("base64url");
+async function sign(p=payload,h={alg:"RS256",kid:"test"}){const a=b64(h)+"."+b64(p);return a+"."+Buffer.from(await crypto.subtle.sign("RSASSA-PKCS1-v1_5",pair.privateKey,new TextEncoder().encode(a))).toString("base64url");}
+const token=await sign();
+const fetcher=async url=>{assert.equal(url,issuer+"/cdn-cgi/access/certs");return Response.json({keys:[jwk]});};
+const context={access:{aud,getIdentity:async()=>({email})}};
+const request=(path="/admin",opts={})=>new Request((opts.origin??STAGING_ORIGIN)+path,{method:opts.method??"GET",headers:{...(opts.token===null?{}:{"Cf-Access-Jwt-Assertion":opts.token??token}),...opts.headers},body:opts.body});
+const invoke=(req,env=cfg,ctx=context,f=fetcher)=>handle(req,env,ctx,f,now,ui);
+function fixture(t){
+ const db=new DatabaseSync(":memory:");t.after(()=>db.close());db.exec("PRAGMA foreign_keys=ON;");db.exec(readFileSync(new URL("../internal/merchant-production/schema.sql",import.meta.url),"utf8"));db.exec(readFileSync(new URL("../internal/merchant-production/migrations/0002-merchant-integration.sql",import.meta.url),"utf8"));db.exec(readFileSync(new URL("../internal/merchant-production/migrations/0003-merchant-drafts.sql",import.meta.url),"utf8"));db.exec(readFileSync(new URL("../internal/merchant-production/migrations/0004-merchant-operations.sql",import.meta.url),"utf8"));
+ db.prepare("INSERT INTO merchant_requests(id,request_key,payload_hash,identity_hash,business_name,category,department,province,district,address,contact_name,phone,email,observations,privacy_version,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").run(id,"synthetic-key","hash","identity","Synthetic <shop>","grocery","Lima","Huaura","Huacho","Synthetic address","Synthetic contact","+51900000000","synthetic@example.invalid","<script>bad</script>","TEST-v1",now);
+ let reads=0;
+ const DB={prepare(sql){reads++;const stmt=db.prepare(sql);const wrap=args=>({first:async()=>stmt.get(...args)??null,all:async()=>({results:stmt.all(...args)}),run:async()=>({meta:{changes:stmt.run(...args).changes}})});return {...wrap([]),bind:(...args)=>wrap(args)};}};
+ return {db,env:{...cfg,DB},reads:()=>reads};
+}
+test("valid signed JWT alone cannot reach data without native Access context",async t=>{
+ const f=fixture(t);
+ for(const ctx of [null,{}, {access:{aud:"b".repeat(64),getIdentity:async()=>({email})}}, {access:{aud}}]){
+  const r=await invoke(request(),f.env,ctx);assert.equal(r.status,403);
+ }
+ assert.equal(f.reads(),0);
+});
+test("missing, malformed, expired, wrong audience/issuer/subject and service token denied before DB",async t=>{
+ const f=fixture(t);
+ const candidates=[null,"not.a.jwt",await sign({...payload,exp:now-1}),await sign({...payload,aud:["b".repeat(64)]}),await sign({...payload,iss:"https://other.cloudflareaccess.com"}),await sign({...payload,sub:"other"}),await sign({...payload,type:"service"}),await sign({...payload,exp:now+1800}),await sign({...payload,iat:now+60}),await sign(payload,{alg:"none",kid:"test"}),await sign({...payload,email:123})];
+ for(const candidate of candidates)assert.equal((await invoke(request("/admin",{token:candidate}),f.env)).status,403);
+ assert.equal(f.reads(),0);
+});
+test("key fetch failure, duplicate signing keys and identity mismatch fail closed",async t=>{
+ const f=fixture(t);
+ for(const x of [async()=>{throw Error("offline")},async()=>Response.json({keys:[jwk,jwk]}),async()=>Response.json({keys:[]})])assert.equal((await invoke(request(),f.env,context,x)).status,403);
+ for(const ctx of [{access:{aud,getIdentity:async()=>({email:"other@example.invalid"})}},{access:{aud,getIdentity:async()=>null}},{access:{aud,getIdentity:async()=>{throw Error("identity offline")}}}])assert.equal((await invoke(request(),f.env,ctx)).status,403);
+ assert.equal((await invoke(request(),{...f.env,ADMIN_EMAIL:"other@example.invalid"})).status,403);
+ assert.equal(f.reads(),0);
+});
+test("only exact staging hostname and environment accepted; alternative URLs and forged headers cannot bypass",async t=>{
+ const f=fixture(t);
+ for(const origin of ["https://other.example.invalid","https://preview-desset-merchant-staging.morimil-pabfelon.workers.dev","https://desset.lat","http://desset-merchant-staging.morimil-pabfelon.workers.dev"])assert.equal((await invoke(request("/admin",{origin}),f.env)).status,403);
+ assert.equal((await invoke(request(),{...f.env,ENVIRONMENT:"production"})).status,403);
+ assert.equal((await invoke(request("/admin",{token:null,headers:{"Cf-Access-Authenticated-User-Email":email,"X-Role":"merchant-reviewer","X-Forwarded-Host":new URL(STAGING_ORIGIN).host}}),f.env,null)).status,403);
+ assert.equal(f.reads(),0);
+});
+test("public intake and scheduled notifications remain hard-disabled even with enabled bindings",async t=>{
+ const f=fixture(t);f.db.exec("UPDATE merchant_runtime SET privacy_version='TEST-v1',intake_enabled=1,notification_enabled=1");
+ const env={...f.env,INTAKE_ENABLED:"true",NOTIFICATIONS_ENABLED:"true"};
+ for(const method of ["GET","POST","PUT","DELETE"])assert.equal((await invoke(request("/api/intake",{method,headers:{Origin:STAGING_ORIGIN}}),env)).status,503);
+ assert.equal(typeof worker.scheduled,"function");let scheduled;worker.scheduled({},env,{waitUntil(p){scheduled=p;}});assert.deepEqual(await scheduled,{processed:0});assert.equal(f.reads(),0);
+ assert.equal((await invoke(request(),env)).status,503);
+ assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_requests").get().n,1);
+});
+test("private panel and JSON require authorized identity; escaping and no-store",async t=>{
+ const f=fixture(t);
+ const page=await invoke(request(),f.env);assert.equal(page.status,200);assert.equal(page.headers.get("Cache-Control"),"no-store");
+ const html=await page.text();assert.match(html,/&lt;script&gt;bad&lt;\/script&gt;/);assert.doesNotMatch(html,/<script>/);assert.match(html,/name="csrf" value="[a-f0-9]{64}"/);
+ const api=await invoke(request("/admin/api/requests"),f.env);assert.equal(api.status,200);assert.equal((await api.json()).requests[0].id,id);
+ assert.equal((await invoke(request("/admin?offset=-1"),f.env)).status,400);
+ for(const path of ["/","/admin%2fapi%2frequests","/internal/merchant-production/schema.sql","/admin/unknown"])assert.equal((await invoke(request(path),f.env)).status,404);
+});
+test("review CSRF, origin, token binding, identity and terminal audit",async t=>{
+ const f=fixture(t);
+ const html=await (await invoke(request(),f.env)).text(),csrf=html.match(/name="csrf" value="([a-f0-9]{64})"/)[1];
+ const review=(data,headers={},jwt=token)=>request("/admin/review",{method:"POST",token:jwt,headers:{Origin:STAGING_ORIGIN,"Content-Type":"application/x-www-form-urlencoded",...headers},body:new URLSearchParams(data)});
+ const data={id,decision:"APPROVED",csrf};
+ assert.equal((await invoke(review({...data,csrf:"wrong"}),f.env)).status,403);
+ assert.equal((await invoke(review(data,{Origin:"https://other.invalid"}),f.env)).status,403);
+ assert.equal((await invoke(review(data,{"Sec-Fetch-Site":"cross-site"}),f.env)).status,403);
+ assert.equal((await invoke(review({...data,actor:"forged"}),f.env)).status,403);
+ assert.equal((await invoke(review(data,{},await sign({...payload,iat:now-20})),f.env)).status,403);
+ assert.equal(f.db.prepare("SELECT status FROM merchant_requests WHERE id=?").get(id).status,"PENDING");
+ assert.equal((await invoke(review(data),f.env)).status,303);
+ assert.equal((await invoke(review({...data,decision:"REJECTED"}),f.env)).status,409);
+ assert.deepEqual({...f.db.prepare("SELECT actor_id,decision FROM merchant_review_events WHERE request_id=?").get(id)},{actor_id:sub,decision:"APPROVED"});
+});
+test("wrong D1 environment and disabled policy cannot read request data",async t=>{
+ const f=fixture(t);assert.equal((await invoke(request(),{...f.env,ADMIN_POLICY_VERIFIED:"false"})).status,503);assert.equal(f.reads(),0);
+ f.db.exec("UPDATE merchant_runtime SET environment='production'");assert.equal((await invoke(request(),f.env)).status,503);assert.equal(f.reads(),1);
+});
+
+test("Packaged Worker builds offline with pinned approved assets",async()=>{
+ const a=await buildMerchantWorker(),b=await buildMerchantWorker();
+ assert.equal(a,b);assert.ok(a.length>100000);assert.ok(!a.includes("node:fs"));assert.ok(!a.includes("node:sqlite"));
+});
+test("Private Worker form -> D1 draft -> edit -> receipt; public remains hard closed",async t=>{
+ const f=fixture(t);
+ const page=await invoke(request("/admin/merchant"),f.env);assert.equal(page.status,200);
+ assert.match(page.headers.get("content-security-policy"),/script-src 'self'/);
+ const html=await page.text(),csrf=html.match(/name="csrf" value="([a-f0-9]{64})"/)[1];
+ assert.match(html,/action="\/admin\/merchant\/confirm"/);
+ assert.match(html,/src="\/admin\/assets\/merchant-territory.js"/);
+ assert.equal((await invoke(request("/admin/assets/merchant-territory.js"),f.env)).status,200);
+ assert.equal((await invoke(request("/admin/assets/merchant-territory.js",{token:null}),f.env)).status,403);
+ const post=(path,body)=>invoke(request("/admin/merchant/"+path,{method:"POST",headers:{Origin:STAGING_ORIGIN,"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(body)}),f.env);
+ const input={business_name:"Synthetic Worker form",category:"restaurant",department:"Junín",province:"Chanchamayo",district:"Sangani",address:"Synthetic address 99",contact_name:"Synthetic contact",phone:"+51900000000",email:"worker@example.invalid",email_confirm:"WORKER@example.invalid",postal_code:"12345",interest_level:"evaluating",contact_pronunciation:"Synthetic name",observations:"Synthetic note",consent:"yes",csrf};
+ assert.equal((await post("confirm",{...input,csrf:"wrong"})).status,403);
+ assert.equal((await post("confirm",{...input,email:"real@example.com",email_confirm:"real@example.com"})).status,400);
+ const preview=await post("confirm",input);assert.equal(preview.status,200);const key=(await preview.text()).match(/name="draft" value="([a-f0-9]{64})"/)[1];
+ assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_requests").get().n,1);
+ assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_drafts").get().n,1);
+ const edit=await post("edit",{draft:key,csrf});assert.equal(edit.status,200);assert.match(await edit.text(),/Synthetic Worker form/);
+ assert.equal((await post("submit",{draft:key,csrf})).status,400);
+ const again=await post("confirm",input),newKey=(await again.text()).match(/name="draft" value="([a-f0-9]{64})"/)[1];
+ const receipt=await post("submit",{draft:newKey,csrf});assert.equal(receipt.status,201);assert.match(await receipt.text(),/Solicitud de ensayo recibida/);
+ const saved=f.db.prepare("SELECT id,ubigeo,postal_code,interest_level,contact_pronunciation FROM merchant_requests WHERE business_name='Synthetic Worker form'").get();
+ assert.equal(saved.ubigeo,"120307");assert.equal(saved.postal_code,"12345");assert.equal(saved.interest_level,"evaluating");assert.equal(saved.contact_pronunciation,"Synthetic name");
+ const draftRow=f.db.prepare("SELECT payload_json,receipt_id FROM merchant_drafts").get();assert.equal(draftRow.payload_json,null);assert.equal(draftRow.receipt_id,saved.id);
+ assert.equal((await post("submit",{draft:newKey,csrf})).status,200);
+ assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_requests").get().n,2);
+ assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_notification_outbox WHERE request_id=?").get(saved.id).n,1);
+ assert.equal((await invoke(request("/api/intake",{method:"POST",headers:{Origin:STAGING_ORIGIN}}),f.env)).status,503);
+});
+
+test("Protected operations: search, notification reconciliation and deactivation never activate staging",async t=>{
+ const f=fixture(t);
+ f.db.prepare("UPDATE merchant_requests SET status='APPROVED',reviewed_by='synthetic',reviewed_at=1 WHERE id=?").run(id);
+ for(const stage of ["DOCUMENTATION_VERIFIED","CONTRACT_VERIFIED","CONFIGURATION_VERIFIED","READY_FOR_ACTIVATION"])f.db.prepare("UPDATE merchant_onboarding SET stage=?,actor_id='synthetic',evidence_ref='SYNTHETIC-TEST',updated_at=2 WHERE request_id=?").run(stage,id);
+ f.db.prepare("UPDATE merchant_notification_outbox SET status='NEEDS_REVIEW',attempts=2 WHERE request_id=?").run(id);
+ const page=await invoke(request("/admin?status=APPROVED&id="+id),f.env);assert.equal(page.status,200);const html=await page.text(),csrf=html.match(/name="csrf" value="([a-f0-9]{64})"/)[1];
+ const post=(path,body)=>invoke(request(path,{method:"POST",headers:{Origin:STAGING_ORIGIN,"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(body)}),f.env);
+ const n={id,decision:"CONFIRMED_NOT_SENT",evidence:"SYNTHETIC-UNSENT",providerMessageId:"",csrf};
+ assert.equal((await post("/admin/notification",{...n,csrf:"wrong"})).status,403);assert.equal((await post("/admin/notification",n)).status,303);
+ assert.equal(f.db.prepare("SELECT status FROM merchant_notification_outbox WHERE request_id=?").get(id).status,"PENDING");
+ assert.equal((await post("/admin/notification",n)).status,409);
+ const a={id,from:"READY",to:"ACTIVE",version:"0",reason:"SYNTHETIC-TEST",csrf};
+ assert.equal((await post("/admin/account",a)).status,503);
+ assert.equal((await post("/admin/account",{...a,to:"DEACTIVATED"})).status,303);
+ assert.equal((await post("/admin/account",{...a,to:"DEACTIVATED"})).status,409);
+ const history=await invoke(request("/admin/api/history?id="+id),f.env),h=await history.json();assert.equal(h.account.length,2);assert.equal(h.account[1].to_status,"DEACTIVATED");assert.equal(h.notifications.length,1);
+ assert.equal((await invoke(request("/admin/api/history?id="+id,{token:null}),f.env)).status,403);
+ assert.equal((await invoke(request("/admin/api/requests?status=REJECTED"),f.env)).status,200);
+ assert.equal((await (await invoke(request("/admin/api/requests?status=REJECTED"),f.env)).json()).requests.length,0);
+});

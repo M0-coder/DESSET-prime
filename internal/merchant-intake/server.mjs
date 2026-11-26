@@ -3,21 +3,22 @@ import {createServer} from "node:http";
 import {randomBytes,createHash,scrypt,timingSafeEqual} from "node:crypto";
 import {promisify} from "node:util";
 import {openMerchantIntake} from "./intake.mjs";
+import {createRegistration,registrationAsset,privateStyle,privateAdminStyle,territoryScript} from "./registration.mjs";
 const derive=promisify(scrypt);
 const digest=v=>createHash("sha256").update(v).digest("hex");
 const token=()=>randomBytes(32).toString("hex");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fail=(status,code)=>Object.assign(Error(code),{status,code});
-const headers={"Cache-Control":"no-store","Content-Security-Policy":"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'","X-Content-Type-Options":"nosniff","Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"};
+const headers={"Cache-Control":"no-store","Content-Security-Policy":"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'","X-Content-Type-Options":"nosniff","Referrer-Policy":"same-origin","X-Robots-Tag":"noindex, nofollow"};
 const send=(res,status,body,type="application/json; charset=utf-8",extra={})=>{res.writeHead(status,{...headers,"Content-Type":type,...extra});res.end(type.startsWith("application/json")?JSON.stringify(body):body);};
-const page=(res,body,status=200)=>send(res,status,'<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>DESSET | Incorporación interna de ensayo</title><main><h1>DESSET — Ensayo privado</h1>'+body+'</main></html>',"text/html; charset=utf-8");
+const page=(res,body,status=200)=>send(res,status,'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>DESSET | Incorporación interna de ensayo</title><link rel="stylesheet" href="/styles-typography.css"><link rel="stylesheet" href="/merchant-registration.css"></head><body class="merchant-admin"><main><div class="admin-brand"><img src="/assets/deliver-assets-mark.png" alt="" width="46" height="35">DESSET</div><h1>DESSET — Ensayo privado</h1>'+body+'</main></body></html>',"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"});
 async function readBody(req,kind){
  if((req.headers["content-type"]??"").split(";")[0].trim()!==kind)throw fail(415,"CONTENT_TYPE");
  let bytes=0,parts=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>8192)throw fail(413,"BODY_LIMIT");parts.push(chunk);}
  try{const raw=Buffer.concat(parts).toString("utf8");if(kind==="application/json"){const v=JSON.parse(raw);if(!v||typeof v!=="object"||Array.isArray(v))throw Error();return v;}const params=new URLSearchParams(raw);if(new Set(params.keys()).size!==[...params.keys()].length)throw Error();return Object.fromEntries(params);}catch{throw fail(400,"INVALID_BODY");}
 }
 const exact=(obj,keys)=>Object.keys(obj).every(k=>keys.includes(k));
-const businessErrors={INTAKE_DISABLED:503,PRIVACY_REQUIRED:400,INVALID_REQUEST_KEY:400,INVALID_FIELDS:400,INVALID_FIELD:400,INVALID_CONTACT_OR_CATEGORY:400,IDEMPOTENCY_CONFLICT:409,DUPLICATE_BUSINESS:409,NOT_PENDING:409,INVALID_DECISION:400,INVALID_OFFSET:400};
+const businessErrors={INTAKE_DISABLED:503,PRIVACY_REQUIRED:400,INVALID_REQUEST_KEY:400,INVALID_FIELDS:400,INVALID_FIELD:400,INVALID_CONTACT_OR_CATEGORY:400,INVALID_POSTAL_CODE:400,INVALID_INTEREST_LEVEL:400,IDEMPOTENCY_CONFLICT:409,DUPLICATE_BUSINESS:409,NOT_PENDING:409,INVALID_DECISION:400,INVALID_OFFSET:400};
 export async function makeReviewerCredential(password){
  if(typeof password!=="string"||password.length<16||password.length>256)throw Error("INVALID_TEST_PASSWORD");
  const salt=randomBytes(32);return {salt:salt.toString("hex"),hash:(await derive(password,salt,64)).toString("hex")};
@@ -25,6 +26,7 @@ export async function makeReviewerCredential(password){
 export async function startSyntheticIntake({databasePath,credential,syntheticEnabled=false,privacyVersion="TEST-v1",sessionMs=900000,port=0}={}){
  if(!databasePath||typeof databasePath!=="string"||!credential||!/^[a-f0-9]{64}$/.test(credential.salt)||!/^[a-f0-9]{128}$/.test(credential.hash)||!/^TEST-[A-Za-z0-9-]+$/.test(privacyVersion)||!Number.isSafeInteger(sessionMs)||sessionMs<1||sessionMs>3600000)throw Error("INVALID_TEST_CONFIGURATION");
  const store=openMerchantIntake(databasePath,{enabled:syntheticEnabled===true,privacyVersion});
+ const registration=createRegistration({store,enabled:syntheticEnabled===true,privacyVersion});
  const actor=Object.freeze({id:"synthetic-owner",role:"merchant-reviewer"}),sessions=new Map(),limits=new Map();
  let origin;
  const rate=(bucket,max,interval)=>{const at=Date.now();let v=limits.get(bucket);if(!v||v.until<=at)v={count:0,until:at+interval};v.count++;limits.set(bucket,v);if(v.count>max)throw fail(429,"RATE_LIMIT");};
@@ -33,7 +35,7 @@ export async function startSyntheticIntake({databasePath,credential,syntheticEna
  function csrf(s,value){if(typeof value!=="string"||value!==s.csrf)throw fail(403,"CSRF");}
  function panel(res,s,offset){
   const rows=store.list(actor,offset);
-  const details=rows.map(r=>'<article><h2>'+esc(r.business_name)+'</h2><p>Referencia: '+esc(r.id)+' | Estado: '+esc(r.status)+'</p><p>'+esc(r.category)+' — '+esc(r.department)+' / '+esc(r.province)+' / '+esc(r.district)+' — '+esc(r.address)+'</p><p>'+esc(r.contact_name)+' | '+esc(r.phone)+' | '+esc(r.email)+'</p><p>'+esc(r.observations)+'</p><p>Notificación: '+esc(store.notificationState(actor,r.id)?.status)+' | Intentos: '+esc(store.notificationState(actor,r.id)?.attempts)+'</p><ul>'+store.history(actor,r.id).map(h=>'<li>'+esc(h.decision)+' · '+esc(h.actor_id)+' · '+esc(h.created_at)+'</li>').join('')+'</ul>'+(r.status==="PENDING"?'<form method="post" action="/admin/review"><input type="hidden" name="csrf" value="'+s.csrf+'"><input type="hidden" name="id" value="'+esc(r.id)+'"><button name="decision" value="APPROVED">Aprobar solicitud</button> <button name="decision" value="REJECTED">Rechazar solicitud</button></form>':'')+'</article>').join('');
+  const details=rows.map(r=>'<article><h2>'+esc(r.business_name)+'</h2><p>Referencia: '+esc(r.id)+' | Estado: '+esc(r.status)+'</p><p>'+esc(r.category)+' — '+esc(r.department)+' / '+esc(r.province)+' / '+esc(r.district)+' — '+esc(r.address)+'</p><p>'+esc(r.contact_name)+' | '+esc(r.phone)+' | '+esc(r.email)+'</p><p>'+esc(r.observations)+'</p><p>CP: '+esc(r.postal_code)+' | Interés: '+esc(r.interest_level)+' | Pronunciación: '+esc(r.contact_pronunciation)+'</p><p>Notificación: '+esc(store.notificationState(actor,r.id)?.status)+' | Intentos: '+esc(store.notificationState(actor,r.id)?.attempts)+'</p><ul>'+store.history(actor,r.id).map(h=>'<li>'+esc(h.decision)+' · '+esc(h.actor_id)+' · '+esc(h.created_at)+'</li>').join('')+'</ul>'+(r.status==="PENDING"?'<form method="post" action="/admin/review"><input type="hidden" name="csrf" value="'+s.csrf+'"><input type="hidden" name="id" value="'+esc(r.id)+'"><button name="decision" value="APPROVED">Aprobar solicitud</button> <button name="decision" value="REJECTED">Rechazar solicitud</button></form>':'')+'</article>').join('');
   page(res,'<p>Solo datos sintéticos. Aprobar no activa comercios.</p><form method="post" action="/logout"><input type="hidden" name="csrf" value="'+s.csrf+'"><button>Cerrar sesión</button></form>'+details+(offset?'<a href="/admin?offset='+Math.max(0,offset-100)+'">Anterior</a> ':'')+(rows.length===100?'<a href="/admin?offset='+(offset+100)+'">Siguiente</a>':''));
  }
  const server=createServer(async(req,res)=>{
@@ -42,6 +44,11 @@ export async function startSyntheticIntake({databasePath,credential,syntheticEna
    const url=new URL(req.url,origin),path=url.pathname;
    if(url.origin!==origin)throw fail(403,"HOST");
    if(req.method==="POST"&&req.headers.origin!==origin)throw fail(403,"ORIGIN");
+   if(req.method==="GET"&&path==="/registro-comercios.html"){const r=registration.get();return send(res,r.status,r.html,"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src "+(syntheticEnabled===true?"'self'":"'none'")+"; form-action "+(syntheticEnabled===true?"'self'":"'none'")+"; frame-ancestors 'none'; base-uri 'none'"});}
+   if(req.method==="GET"&&path==="/merchant-territory.js"&&syntheticEnabled===true)return send(res,200,territoryScript,"text/javascript; charset=utf-8");
+   if(req.method==="GET"&&path==="/merchant-registration.css")return send(res,200,privateStyle+privateAdminStyle,"text/css; charset=utf-8");
+   if(req.method==="GET"){const asset=registrationAsset(path);if(asset)return send(res,200,asset.body,asset.type);}
+   if(req.method==="POST"&&["/merchant/confirm","/merchant/edit","/merchant/submit"].includes(path)){if(syntheticEnabled!==true)throw fail(503,"INTAKE_DISABLED");rate("registration",60,60000);const b=await readBody(req,"application/x-www-form-urlencoded");const r=registration.post(path,b);return send(res,r.status,r.html,"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"});}
    if(req.method==="GET"&&path==="/login")return page(res,'<form method="post" action="/login"><label>Contraseña de ensayo <input type="password" name="password" required maxlength="256" autocomplete="current-password"></label><button>Ingresar</button></form>');
    if(req.method==="POST"&&path==="/login"){
     rate("login",8,60000);
@@ -76,5 +83,5 @@ export async function startSyntheticIntake({databasePath,credential,syntheticEna
  });
  server.requestTimeout=10000;server.headersTimeout=5000;server.maxHeadersCount=40;server.maxConnections=32;
  try{await new Promise((resolve,reject)=>{server.once("error",reject);server.listen(port,"127.0.0.1",resolve);});origin="http://127.0.0.1:"+server.address().port;}catch(e){store.close();throw e;}
- return {origin,close:async()=>{await new Promise((resolve,reject)=>{server.close(e=>e?reject(e):resolve());server.closeAllConnections();});sessions.clear();store.close();}};
+ return {origin,close:async()=>{await new Promise((resolve,reject)=>{server.close(e=>e?reject(e):resolve());server.closeAllConnections();});sessions.clear();registration.close();store.close();}};
 }
