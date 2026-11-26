@@ -17,10 +17,11 @@ for(const dir of ["","dist/"]){
   for(const m of doc.matchAll(/<(?:input|textarea|button|select)\b[^>]*>/g))assert.match(m[0],/\bdisabled\b/);
  }
  const reg=read(dir+pages[0]+".html");
- assert.equal((reg.match(/<fieldset disabled/g)||[]).length,2);
- assert.match(reg,/no se envía ni almacena información/);
+ assert.doesNotMatch(reg,/<(?:fieldset|input|select|textarea|button)\b/i);
+ assert.match(reg,/no recoge, envía ni almacena información/);
+ assert.match(reg,/no constituye una solicitud, aceptación ni garantía/);
  assert.doesNotMatch(reg,/\btype="file"|id="(?:dni|cuenta-bancaria|licencia|foto)"/);
- for(const v of ["Bicicleta","Motocicleta","Automóvil"])assert.ok(reg.includes("<option>"+v+"</option>"));
+ for(const v of ["Bicicleta","motocicleta","automóvil"])assert.ok(reg.includes(v));
  });
  test("Rider guide and training explicitly distinguish approval from activation "+(dir||"source"),()=>{
  const guide=read(dir+pages[1]+".html"),training=read(dir+pages[2]+".html");
