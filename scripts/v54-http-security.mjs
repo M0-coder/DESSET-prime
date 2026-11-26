@@ -36,7 +36,9 @@ async function check(){
  record("CSP blocks external scripts, objects, frames",["default-src 'self'","script-src 'self'","object-src 'none'","frame-ancestors 'none'"].every(x=>headers.get("content-security-policy")?.includes(x)));
  record("Browser security headers",headers.get("x-content-type-options")==="nosniff"&&headers.get("referrer-policy")==="no-referrer");
  record("No cache for CI-only preview",headers.get("cache-control")==="no-store");
- record("HTML noindex and accessible image-free 3D fallback",html.includes('name="robots" content="noindex,nofollow"')&&html.includes('class="v6-static-fallback"')&&!html.includes("v5-cinematic-"));
+ const prime=await fetch(host+"/prime.html",{signal:AbortSignal.timeout(5000)});
+ const primeHtml=await prime.text();
+ record("HTML noindex and accessible image-free 3D fallback exclusively in Prime",html.includes('name="robots" content="noindex,nofollow"')&&prime.status===200&&prime.headers.get("x-robots-tag")==="noindex, nofollow"&&primeHtml.includes('name="robots" content="noindex,nofollow"')&&primeHtml.includes('class="v6-static-fallback"')&&primeHtml.includes('class="v6-three-mount"')&&!html.includes('class="v6-static-fallback"')&&!html.includes('class="v6-three-mount"')&&![html,primeHtml].some(x=>x.includes("v5-cinematic-")));
  const company=await fetch(host+"/empresa.html",{signal:AbortSignal.timeout(5000)});
  const companyHtml=await company.text();
  record("Company page is served with noindex and CSP",company.status===200&&company.headers.get("content-type")?.startsWith("text/html")&&company.headers.get("x-robots-tag")==="noindex, nofollow"&&companyHtml.includes('<h1>Empresa</h1>')&&companyHtml.includes('name="robots" content="noindex,nofollow"'));
