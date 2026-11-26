@@ -18,8 +18,9 @@
 /* Keep the opt-in 3D intact; frame the existing concept art as a professional
    exhibit instead of creating a second visual language or adding new buildings. */
 #ecosistema.ecosystem{background:#eef0ef}
-#ecosistema .ecosystem-board{background:#142239;border:1px solid #304158;box-shadow:0 23px 60px rgba(18,32,50,.18)}
-#ecosistema .v5-city-stage{border:1px solid rgba(230,236,247,.18);box-shadow:0 14px 32px rgba(0,0,0,.16)}
+#ecosistema .ecosystem-board{background:#fff;border:1px solid #d5dae2;box-shadow:none}
+#ecosistema .v4-architecture-inner{background:#fff}
+#ecosistema summary,#ecosistema summary .disclosure-indicator{color:#073bbc}
 #vision .motion-story-grid{border-color:rgba(255,255,255,.25)}
 #vision .motion-story-unit{border-color:rgba(255,255,255,.25)}
 #vision .motion-story-art img{filter:drop-shadow(0 12px 18px rgba(0,0,0,.2))}
@@ -38,7 +39,7 @@
 @media(max-width:860px){
 
 
- #ecosistema .ecosystem-board{box-shadow:0 14px 34px rgba(18,32,50,.15)}
+ #ecosistema .ecosystem-board{box-shadow:none}
  #negocios .business-pitch{box-shadow:0 15px 32px rgba(20,34,57,.17)}
 }
 @media(max-width:700px){

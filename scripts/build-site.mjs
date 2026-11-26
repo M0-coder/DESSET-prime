@@ -26,14 +26,15 @@ const original=await readFile(resolve(root,"index.html"),"utf8");
 const loader=await readFile(resolve(root,"scripts/v5-cinematic.js"),"utf8");
 const vision=original.split('<section class="statement" id="vision"')[1]?.split("</section>")[0]||"";
 const scene=original.split('<section class="ecosystem" id="ecosistema"')[1]?.split("</section>")[0]||"";
+const primeScene=await readFile(resolve(root,"prime.html"),"utf8");
 if(!vision.includes('class="v4-flow motion-story statement-journey"')||
  (vision.match(/class="motion-story-unit motion-story-unit--/g)||[]).length!==4||
- scene.includes("motion-story-unit")||!scene.includes('class="v6-three-mount"'))
+ scene.includes("motion-story-unit")||scene.includes('class="v6-three-mount"')||!primeScene.includes('class="v6-three-mount"'))
  throw Error("PRIME-LAYOUT-01: missing four approved participants in statement or scene contains duplicate cards.");
 
-if(!original.includes('id="ecosistema"')||!original.includes('aria-label="Escena tridimensional conceptual de DESSET"')||
- !original.includes('class="v6-three-mount"')||
- !original.includes('class="v63-tour"')||
+if(!original.includes('id="ecosistema"')||original.includes('class="v6-three-mount"')||original.includes("roles-geometry-")||
+ !primeScene.includes('class="v6-three-mount"')||
+ !primeScene.includes('class="v63-tour"')||
  !original.includes('name="robots" content="noindex,nofollow"'))
  throw Error("Missing integrated Three.js site, guided tour, or noindex gate.");
 if(!loader.includes('activationObserver.observe(stage)')||
