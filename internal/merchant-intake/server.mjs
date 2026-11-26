@@ -3,6 +3,7 @@ import {createServer} from "node:http";
 import {randomBytes,createHash,scrypt,timingSafeEqual} from "node:crypto";
 import {promisify} from "node:util";
 import {openMerchantIntake} from "./intake.mjs";
+import {createRegistration,registrationAsset,privateStyle} from "./registration.mjs";
 const derive=promisify(scrypt);
 const digest=v=>createHash("sha256").update(v).digest("hex");
 const token=()=>randomBytes(32).toString("hex");
@@ -25,6 +26,7 @@ export async function makeReviewerCredential(password){
 export async function startSyntheticIntake({databasePath,credential,syntheticEnabled=false,privacyVersion="TEST-v1",sessionMs=900000,port=0}={}){
  if(!databasePath||typeof databasePath!=="string"||!credential||!/^[a-f0-9]{64}$/.test(credential.salt)||!/^[a-f0-9]{128}$/.test(credential.hash)||!/^TEST-[A-Za-z0-9-]+$/.test(privacyVersion)||!Number.isSafeInteger(sessionMs)||sessionMs<1||sessionMs>3600000)throw Error("INVALID_TEST_CONFIGURATION");
  const store=openMerchantIntake(databasePath,{enabled:syntheticEnabled===true,privacyVersion});
+ const registration=createRegistration({store,enabled:syntheticEnabled===true,privacyVersion});
  const actor=Object.freeze({id:"synthetic-owner",role:"merchant-reviewer"}),sessions=new Map(),limits=new Map();
  let origin;
  const rate=(bucket,max,interval)=>{const at=Date.now();let v=limits.get(bucket);if(!v||v.until<=at)v={count:0,until:at+interval};v.count++;limits.set(bucket,v);if(v.count>max)throw fail(429,"RATE_LIMIT");};
@@ -42,6 +44,10 @@ export async function startSyntheticIntake({databasePath,credential,syntheticEna
    const url=new URL(req.url,origin),path=url.pathname;
    if(url.origin!==origin)throw fail(403,"HOST");
    if(req.method==="POST"&&req.headers.origin!==origin)throw fail(403,"ORIGIN");
+   if(req.method==="GET"&&path==="/registro-comercios.html"){const r=registration.get();return send(res,r.status,r.html,"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; form-action "+(syntheticEnabled===true?"'self'":"'none'")+"; frame-ancestors 'none'; base-uri 'none'"});}
+   if(req.method==="GET"&&path==="/merchant-registration.css")return send(res,200,privateStyle,"text/css; charset=utf-8");
+   if(req.method==="GET"){const asset=registrationAsset(path);if(asset)return send(res,200,asset.body,asset.type);}
+   if(req.method==="POST"&&["/merchant/confirm","/merchant/edit","/merchant/submit"].includes(path)){if(syntheticEnabled!==true)throw fail(503,"INTAKE_DISABLED");rate("registration",60,60000);const b=await readBody(req,"application/x-www-form-urlencoded");const r=registration.post(path,b);return send(res,r.status,r.html,"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"});}
    if(req.method==="GET"&&path==="/login")return page(res,'<form method="post" action="/login"><label>Contraseña de ensayo <input type="password" name="password" required maxlength="256" autocomplete="current-password"></label><button>Ingresar</button></form>');
    if(req.method==="POST"&&path==="/login"){
     rate("login",8,60000);
@@ -76,5 +82,5 @@ export async function startSyntheticIntake({databasePath,credential,syntheticEna
  });
  server.requestTimeout=10000;server.headersTimeout=5000;server.maxHeadersCount=40;server.maxConnections=32;
  try{await new Promise((resolve,reject)=>{server.once("error",reject);server.listen(port,"127.0.0.1",resolve);});origin="http://127.0.0.1:"+server.address().port;}catch(e){store.close();throw e;}
- return {origin,close:async()=>{await new Promise((resolve,reject)=>{server.close(e=>e?reject(e):resolve());server.closeAllConnections();});sessions.clear();store.close();}};
+ return {origin,close:async()=>{await new Promise((resolve,reject)=>{server.close(e=>e?reject(e):resolve());server.closeAllConnections();});sessions.clear();registration.close();store.close();}};
 }

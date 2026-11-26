@@ -4,7 +4,7 @@ import {readFileSync} from "node:fs";
 import {DatabaseSync} from "node:sqlite";
 const fields=["business_name","category","department","province","district","address","contact_name","phone","email"];
 const allowedCategories=new Set(["restaurant","grocery","bakery","specialty","pharmacy","other"]);
-function clean(input){
+export function validateMerchantInput(input){
  if(!input||typeof input!=="object"||Object.keys(input).some(k=>!fields.includes(k)&&k!=="observations"))throw Error("INVALID_FIELDS");
  const data={};
  for(const key of fields){
@@ -32,7 +32,7 @@ export function openMerchantIntake(path,policy={enabled:false,privacyVersion:nul
    if(policy.enabled!==true||!policy.privacyVersion)throw Error("INTAKE_DISABLED");
    if(consent!==true||privacyVersion!==policy.privacyVersion)throw Error("PRIVACY_REQUIRED");
    if(typeof requestKey!=="string"||! /^[A-Za-z0-9_-]{16,100}$/.test(requestKey))throw Error("INVALID_REQUEST_KEY");
-   const d=clean(input),hash=createHash("sha256").update(JSON.stringify([d,privacyVersion])).digest("hex");
+   const d=validateMerchantInput(input),hash=createHash("sha256").update(JSON.stringify([d,privacyVersion])).digest("hex");
    return tx(()=>{
     const old=db.prepare("SELECT id,payload_hash FROM merchant_requests WHERE request_key=?").get(requestKey);
     if(old){if(old.payload_hash!==hash)throw Error("IDEMPOTENCY_CONFLICT");return {id:old.id,replayed:true};}
