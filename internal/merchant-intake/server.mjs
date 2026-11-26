@@ -3,7 +3,7 @@ import {createServer} from "node:http";
 import {randomBytes,createHash,scrypt,timingSafeEqual} from "node:crypto";
 import {promisify} from "node:util";
 import {openMerchantIntake} from "./intake.mjs";
-import {createRegistration,registrationAsset,privateStyle,privateAdminStyle} from "./registration.mjs";
+import {createRegistration,registrationAsset,privateStyle,privateAdminStyle,territoryScript} from "./registration.mjs";
 const derive=promisify(scrypt);
 const digest=v=>createHash("sha256").update(v).digest("hex");
 const token=()=>randomBytes(32).toString("hex");
@@ -44,10 +44,11 @@ export async function startSyntheticIntake({databasePath,credential,syntheticEna
    const url=new URL(req.url,origin),path=url.pathname;
    if(url.origin!==origin)throw fail(403,"HOST");
    if(req.method==="POST"&&req.headers.origin!==origin)throw fail(403,"ORIGIN");
-   if(req.method==="GET"&&path==="/registro-comercios.html"){const r=registration.get();return send(res,r.status,r.html,"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; form-action "+(syntheticEnabled===true?"'self'":"'none'")+"; frame-ancestors 'none'; base-uri 'none'"});}
+   if(req.method==="GET"&&path==="/registro-comercios.html"){const r=registration.get();return send(res,r.status,r.html,"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src "+(syntheticEnabled===true?"'self'":"'none'")+"; form-action "+(syntheticEnabled===true?"'self'":"'none'")+"; frame-ancestors 'none'; base-uri 'none'"});}
+   if(req.method==="GET"&&path==="/merchant-territory.js"&&syntheticEnabled===true)return send(res,200,territoryScript,"text/javascript; charset=utf-8");
    if(req.method==="GET"&&path==="/merchant-registration.css")return send(res,200,privateStyle+privateAdminStyle,"text/css; charset=utf-8");
    if(req.method==="GET"){const asset=registrationAsset(path);if(asset)return send(res,200,asset.body,asset.type);}
-   if(req.method==="POST"&&["/merchant/confirm","/merchant/edit","/merchant/submit"].includes(path)){if(syntheticEnabled!==true)throw fail(503,"INTAKE_DISABLED");rate("registration",60,60000);const b=await readBody(req,"application/x-www-form-urlencoded");const r=registration.post(path,b);return send(res,r.status,r.html,"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"});}
+   if(req.method==="POST"&&["/merchant/confirm","/merchant/edit","/merchant/submit"].includes(path)){if(syntheticEnabled!==true)throw fail(503,"INTAKE_DISABLED");rate("registration",60,60000);const b=await readBody(req,"application/x-www-form-urlencoded");const r=registration.post(path,b);return send(res,r.status,r.html,"text/html; charset=utf-8",{"Content-Security-Policy":"default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"});}
    if(req.method==="GET"&&path==="/login")return page(res,'<form method="post" action="/login"><label>Contraseña de ensayo <input type="password" name="password" required maxlength="256" autocomplete="current-password"></label><button>Ingresar</button></form>');
    if(req.method==="POST"&&path==="/login"){
     rate("login",8,60000);

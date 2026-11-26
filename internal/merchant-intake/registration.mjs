@@ -2,6 +2,9 @@
 import {readFileSync} from "node:fs";
 import {randomBytes} from "node:crypto";
 import {validateMerchantInput,interestLevels} from "./intake.mjs";
+import {resolveTerritory} from "../merchant-common/territory.mjs";
+import {locationControl,shortInterestLabels,territoryScript} from "../merchant-common/location-ui.mjs";
+export {territoryScript};
 const root=new URL("../../",import.meta.url);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const categories={restaurant:"Restaurantes y gastronomía",grocery:"Supermercados y bodegas",bakery:"Panaderías y pastelerías",specialty:"Tiendas especializadas",pharmacy:"Farmacias",other:"Otros comercios"};
@@ -40,18 +43,17 @@ function field([key,id,label],data){
  const value=esc(data[key]),optional=key==="contact_pronunciation",attrs=' id="'+id+'" name="'+key+'"'+(optional?"":" required");
  let control;
  if(key==="category")control='<select'+attrs+'><option value="">Selecciona una opción</option>'+Object.entries(categories).map(([v,l])=>'<option value="'+v+'"'+(data[key]===v?" selected":"")+'>'+esc(l)+'</option>').join("")+'</select>';
- else if(key==="interest_level")control='<select'+attrs+'><option value="">Selecciona una opción</option>'+interestLevels.map(v=>'<option value="'+v+'"'+(data[key]===v?" selected":"")+'>'+esc(interestLabels[v])+'</option>').join("")+'</select>';
+ else if(key==="interest_level")control='<select'+attrs+'><option value="">Selecciona una opción</option>'+interestLevels.map(v=>'<option value="'+v+'"'+(data[key]===v?" selected":"")+'>'+esc(shortInterestLabels[v])+'</option>').join("")+'</select>';
  else if(key==="postal_code")control='<input'+attrs+' type="text" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" value="'+value+'">';
  else if(["department","province","district"].includes(key)){
-  const item={department:"Lima",province:"Huaura",district:"Huacho"}[key];
-  control='<select'+attrs+'><option value="">Selecciona una opción</option><option'+(data[key]===item?" selected":"")+'>'+item+'</option></select>';
+  control=locationControl(key,attrs,data);
  }else control='<input'+attrs+' type="'+(key==="phone"?"tel":key.startsWith("email")?"email":"text")+'" maxlength="200" value="'+value+'"'+(key==="phone"?' pattern="\\+51[0-9]{9}"':"")+'>';
  return '<div class="ob-field"><label for="'+id+'">'+label+(optional?"":" *")+'</label>'+control+'</div>';
 }
-const errors={INVALID_FIELD:"Revisa los campos obligatorios y sus longitudes.",INVALID_FIELDS:"Revisa la información solicitada.",INVALID_CONTACT_OR_CATEGORY:"Comprueba el correo, teléfono y categoría.",EMAIL_MISMATCH:"Los correos electrónicos no coinciden.",PRIVACY_REQUIRED:"Confirma el aviso de privacidad de ensayo.",SYNTHETIC_ONLY:"Solo se admiten los datos sintéticos indicados.",INVALID_POSTAL_CODE:"Introduce un código postal peruano de cinco dígitos.",INVALID_INTEREST_LEVEL:"Selecciona tu estado de interés.",INVALID_LOCATION:"La ubicación debe pertenecer a la zona ilustrativa del ensayo.",DRAFT_EXPIRED:"La confirmación ha caducado. Inicia una nueva solicitud de ensayo.",DUPLICATE_BUSINESS:"Ya existe una solicitud de ensayo para este comercio.",IDEMPOTENCY_CONFLICT:"La referencia ya se usó con información diferente."};
+const errors={INVALID_FIELD:"Revisa los campos obligatorios y sus longitudes.",INVALID_FIELDS:"Revisa la información solicitada.",INVALID_CONTACT_OR_CATEGORY:"Comprueba el correo, teléfono y categoría.",EMAIL_MISMATCH:"Los correos electrónicos no coinciden.",PRIVACY_REQUIRED:"Confirma el aviso de privacidad de ensayo.",SYNTHETIC_ONLY:"Solo se admiten los datos sintéticos indicados.",INVALID_POSTAL_CODE:"Introduce un código postal peruano de cinco dígitos.",INVALID_INTEREST_LEVEL:"Selecciona tu estado de interés.",INVALID_LOCATION:"Selecciona un departamento, provincia y distrito compatibles.",DRAFT_EXPIRED:"La confirmación ha caducado. Inicia una nueva solicitud de ensayo.",DUPLICATE_BUSINESS:"Ya existe una solicitud de ensayo para este comercio.",IDEMPOTENCY_CONFLICT:"La referencia ya se usó con información diferente."};
 function error(code){return code?'<p class="ob-error" role="alert">'+esc(errors[code]??"No se pudo completar la operación de ensayo.")+'</p>':"";}
 function form(data={},code=""){
- return stage(1,error(code)+'<form method="post" action="/merchant/confirm"><fieldset class="ob-fields"><legend>Información del comercio</legend>'+fields.slice(0,7).map(f=>field(f,data)).join("")+'<p class="ob-small">Ubicaciones ilustrativas; no constituyen cobertura confirmada.</p></fieldset><fieldset class="ob-fields"><legend>Información del responsable</legend>'+fields.slice(7).map(f=>field(f,data)).join("")+'<div class="ob-field"><label for="observaciones">Observaciones (opcional)</label><textarea id="observaciones" name="observations" maxlength="1000" rows="3">'+esc(data.observations)+'</textarea></div><label class="ob-consent"><input type="checkbox" name="consent" value="yes" required> He leído el aviso de ensayo y usaré exclusivamente datos sintéticos.</label></fieldset><button class="ob-submit" type="submit">Continuar a confirmación</button></form>');
+ return stage(1,error(code)+'<form method="post" action="/merchant/confirm"><fieldset class="ob-fields"><legend>Información del comercio</legend>'+fields.slice(0,7).map(f=>field(f,data)).join("")+'<p class="ob-small">Catálogo territorial de ensayo; la ubicación no constituye cobertura confirmada.</p></fieldset><fieldset class="ob-fields"><legend>Información del responsable</legend>'+fields.slice(7).map(f=>field(f,data)).join("")+'<div class="ob-field"><label for="observaciones">Observaciones (opcional)</label><textarea id="observaciones" name="observations" maxlength="1000" rows="3">'+esc(data.observations)+'</textarea></div><label class="ob-consent"><input type="checkbox" name="consent" value="yes" required> He leído el aviso de ensayo y usaré exclusivamente datos sintéticos.</label></fieldset><button class="ob-submit" type="submit">Continuar a confirmación</button></form><script src="/merchant-territory.js" defer></script>');
 }
 function confirmation(data,token,code=""){
  const summary=fields.filter(f=>f[0]!=="email_confirm").map(([k,,label])=>"<dt>"+esc(label)+"</dt><dd>"+esc(k==="category"?categories[data[k]]:k==="interest_level"?interestLabels[data[k]]:data[k])+"</dd>").join("")+(data.observations?"<dt>Observaciones</dt><dd>"+esc(data.observations)+"</dd>":"");
@@ -69,7 +71,8 @@ export function validateRegistrationForm(body){
  const raw=Object.fromEntries(keys.filter(k=>k!=="email_confirm"&&body[k]!==undefined).map(k=>[k,body[k]]));
  if(body.observations!==undefined)raw.observations=body.observations;
  const d=validateMerchantInput(raw);
- if(d.department!=="Lima"||d.province!=="Huaura"||d.district!=="Huacho")fail("INVALID_LOCATION");
+ const location=resolveTerritory(d.department,d.province,d.district);
+ d.department=location.department;d.province=location.province;d.district=location.district;
  if(!d.business_name.startsWith("Synthetic ")||!d.email.endsWith(".invalid")||d.phone!=="+51900000000")fail("SYNTHETIC_ONLY");
  return d;
 }

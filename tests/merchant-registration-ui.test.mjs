@@ -34,7 +34,8 @@ test("Private form reuses exact public assets, confirms, edits, submits and repl
  assert.equal(r.headers.get("referrer-policy"),"same-origin");
  const html=await r.text();assert.match(html,/<h1>Registra tu comercio\.<\/h1>/);
  assert.match(html,/name="email_confirm" required/);assert.match(html,/name="postal_code" required/);assert.match(html,/name="interest_level" required/);assert.match(html,/name="contact_pronunciation"/);assert.match(html,/action="\/merchant\/confirm"/);
- assert.doesNotMatch(html,/<fieldset disabled|<script\b/);
+ assert.doesNotMatch(html,/<fieldset disabled/);assert.deepEqual([...html.matchAll(/<script\b[^>]*>/g)].map(m=>m[0]),['<script src="/merchant-territory.js" defer>']);assert.match(r.headers.get("content-security-policy"),/script-src 'self'/);
+ const js=await f.get("/merchant-territory.js");assert.equal(js.status,200);assert.match(await js.text(),/addEventListener/);assert.match(html,/data-code="120307"/);assert.match(html,/data-code="160405"/);
  for(const path of ["styles.css","styles-system.css","styles-typography.css","styles-onboarding.css","assets/deliver-assets-mark.png","fonts/inter-latin-variable.woff2","fonts/plus-jakarta-sans-latin-variable.woff2"]){
   const a=await f.get("/"+path);assert.equal(a.status,200);assert.deepEqual(Buffer.from(await a.arrayBuffer()),read(path));
  }
@@ -66,6 +67,8 @@ test("Private form reuses exact public assets, confirms, edits, submits and repl
 });
 test("Validation does not persist the confirmation email and draft expires before writing",()=>{
  const data=validateRegistrationForm(input);assert.equal(data.email,"test@example.invalid");assert.equal(data.postal_code,"15136");assert.equal(data.interest_level,"evaluating");assert.equal(data.email_confirm,undefined);assert.equal(data.consent,undefined);
+ assert.equal(validateRegistrationForm({...input,department:"Junín",province:"Chanchamayo",district:"Sangani"}).district,"Sangani");
+ assert.throws(()=>validateRegistrationForm({...input,department:"Lima",province:"Chanchamayo",district:"Sangani"}),/INVALID_LOCATION/);
  let time=0,writes=0;
  const flow=createRegistration({store:{submit(){writes++;throw Error("unexpected write");}},enabled:true,privacyVersion:"TEST-v1",clock:()=>time});
  const d=draft(flow.post("/merchant/confirm",input).html);time=900001;
