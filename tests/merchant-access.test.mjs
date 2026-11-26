@@ -19,7 +19,7 @@ const context={access:{aud,getIdentity:async()=>({email})}};
 const request=(path="/admin",opts={})=>new Request((opts.origin??STAGING_ORIGIN)+path,{method:opts.method??"GET",headers:{...(opts.token===null?{}:{"Cf-Access-Jwt-Assertion":opts.token??token}),...opts.headers},body:opts.body});
 const invoke=(req,env=cfg,ctx=context,f=fetcher)=>handle(req,env,ctx,f,now,ui);
 function fixture(t){
- const db=new DatabaseSync(":memory:");t.after(()=>db.close());db.exec("PRAGMA foreign_keys=ON;");db.exec(readFileSync(new URL("../internal/merchant-production/schema.sql",import.meta.url),"utf8"));db.exec(readFileSync(new URL("../internal/merchant-production/migrations/0002-merchant-integration.sql",import.meta.url),"utf8"));db.exec(readFileSync(new URL("../internal/merchant-production/migrations/0003-merchant-drafts.sql",import.meta.url),"utf8"));
+ const db=new DatabaseSync(":memory:");t.after(()=>db.close());db.exec("PRAGMA foreign_keys=ON;");db.exec(readFileSync(new URL("../internal/merchant-production/schema.sql",import.meta.url),"utf8"));db.exec(readFileSync(new URL("../internal/merchant-production/migrations/0002-merchant-integration.sql",import.meta.url),"utf8"));db.exec(readFileSync(new URL("../internal/merchant-production/migrations/0003-merchant-drafts.sql",import.meta.url),"utf8"));db.exec(readFileSync(new URL("../internal/merchant-production/migrations/0004-merchant-operations.sql",import.meta.url),"utf8"));
  db.prepare("INSERT INTO merchant_requests(id,request_key,payload_hash,identity_hash,business_name,category,department,province,district,address,contact_name,phone,email,observations,privacy_version,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").run(id,"synthetic-key","hash","identity","Synthetic <shop>","grocery","Lima","Huaura","Huacho","Synthetic address","Synthetic contact","+51900000000","synthetic@example.invalid","<script>bad</script>","TEST-v1",now);
  let reads=0;
  const DB={prepare(sql){reads++;const stmt=db.prepare(sql);const wrap=args=>({first:async()=>stmt.get(...args)??null,all:async()=>({results:stmt.all(...args)}),run:async()=>({meta:{changes:stmt.run(...args).changes}})});return {...wrap([]),bind:(...args)=>wrap(args)};}};
@@ -119,4 +119,25 @@ test("Private Worker form -> D1 draft -> edit -> receipt; public remains hard cl
  assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_requests").get().n,2);
  assert.equal(f.db.prepare("SELECT count(*) n FROM merchant_notification_outbox WHERE request_id=?").get(saved.id).n,1);
  assert.equal((await invoke(request("/api/intake",{method:"POST",headers:{Origin:STAGING_ORIGIN}}),f.env)).status,503);
+});
+
+test("Protected operations: search, notification reconciliation and deactivation never activate staging",async t=>{
+ const f=fixture(t);
+ f.db.prepare("UPDATE merchant_requests SET status='APPROVED',reviewed_by='synthetic',reviewed_at=1 WHERE id=?").run(id);
+ for(const stage of ["DOCUMENTATION_VERIFIED","CONTRACT_VERIFIED","CONFIGURATION_VERIFIED","READY_FOR_ACTIVATION"])f.db.prepare("UPDATE merchant_onboarding SET stage=?,actor_id='synthetic',evidence_ref='SYNTHETIC-TEST',updated_at=2 WHERE request_id=?").run(stage,id);
+ f.db.prepare("UPDATE merchant_notification_outbox SET status='NEEDS_REVIEW',attempts=2 WHERE request_id=?").run(id);
+ const page=await invoke(request("/admin?status=APPROVED&id="+id),f.env);assert.equal(page.status,200);const html=await page.text(),csrf=html.match(/name="csrf" value="([a-f0-9]{64})"/)[1];
+ const post=(path,body)=>invoke(request(path,{method:"POST",headers:{Origin:STAGING_ORIGIN,"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(body)}),f.env);
+ const n={id,decision:"CONFIRMED_NOT_SENT",evidence:"SYNTHETIC-UNSENT",providerMessageId:"",csrf};
+ assert.equal((await post("/admin/notification",{...n,csrf:"wrong"})).status,403);assert.equal((await post("/admin/notification",n)).status,303);
+ assert.equal(f.db.prepare("SELECT status FROM merchant_notification_outbox WHERE request_id=?").get(id).status,"PENDING");
+ assert.equal((await post("/admin/notification",n)).status,409);
+ const a={id,from:"READY",to:"ACTIVE",version:"0",reason:"SYNTHETIC-TEST",csrf};
+ assert.equal((await post("/admin/account",a)).status,503);
+ assert.equal((await post("/admin/account",{...a,to:"DEACTIVATED"})).status,303);
+ assert.equal((await post("/admin/account",{...a,to:"DEACTIVATED"})).status,409);
+ const history=await invoke(request("/admin/api/history?id="+id),f.env),h=await history.json();assert.equal(h.account.length,2);assert.equal(h.account[1].to_status,"DEACTIVATED");assert.equal(h.notifications.length,1);
+ assert.equal((await invoke(request("/admin/api/history?id="+id,{token:null}),f.env)).status,403);
+ assert.equal((await invoke(request("/admin/api/requests?status=REJECTED"),f.env)).status,200);
+ assert.equal((await (await invoke(request("/admin/api/requests?status=REJECTED"),f.env)).json()).requests.length,0);
 });
