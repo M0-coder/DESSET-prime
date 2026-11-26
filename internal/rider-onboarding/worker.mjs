@@ -2,6 +2,7 @@
 import {RIDER_ORIGIN,fields,riderGate,createDraft,editDraft,submitDraft,newSession,csrfToken} from "./intake.mjs";
 import {locationControl,territoryScript} from "../merchant-common/location-ui.mjs";
 import {riderAdmin} from "./admin.mjs";
+import {trainingRoute} from "./training-route.mjs";
 const headers={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow","Content-Security-Policy":"default-src 'none'; script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com; style-src 'self'; font-src 'self'; img-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fail=(status,publicCode)=>Object.assign(Error(publicCode),{status,publicCode});
@@ -26,6 +27,7 @@ export async function handleRider(req,env,ui=null,fetcher=fetch,ctx=null){
  try{const url=new URL(req.url);if(url.origin!==RIDER_ORIGIN||env.SERVICE_ORIGIN!==RIDER_ORIGIN)throw fail(403,"HOST");
  if(req.method==="POST"&&(req.headers.get("Origin")!==url.origin||req.headers.get("Sec-Fetch-Site")==="cross-site"))throw fail(403,"ORIGIN");
  if(url.pathname==="/admin"||url.pathname.startsWith("/admin/"))return await riderAdmin(req,env,ctx,fetcher,headers,body);
+ if(url.pathname==="/capacitacion"||url.pathname.startsWith("/capacitacion/"))return await trainingRoute(req,env,headers,body);
  await riderGate(env);
  if(!env.TURNSTILE_SECRET||!/^[A-Za-z0-9_-]{10,100}$/.test(env.TURNSTILE_SITE_KEY??"")||!env.RIDER_LIMIT)throw fail(503,"UNAVAILABLE");
  if(req.method==="GET"&&url.pathname.startsWith("/assets/")){const path=url.pathname.slice(8).split("?")[0];if(path==="territory.js")return new Response(territoryScript,{headers:{...headers,"Content-Type":"text/javascript; charset=utf-8"}});if(path==="rider-form.css")return new Response(".onboarding-page .ob-submit:not(:disabled){cursor:pointer;background:#073BBC;color:#fff}",{headers:{...headers,"Content-Type":"text/css; charset=utf-8"}});const a=ui?.assets?.[path];if(!a||!Object.hasOwn(ui.assets,path))throw fail(404,"NOT_FOUND");return new Response(Uint8Array.from(atob(a.base64),c=>c.charCodeAt(0)),{headers:{...headers,"Content-Type":a.type}});}
