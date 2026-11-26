@@ -150,7 +150,7 @@ async function viewport(width,height,reduce=false,entry=URL){
   headingAbsent:!document.querySelector("#soluciones > h2"),label:document.querySelector("#soluciones").getAttribute("aria-label"),
   cards:[...servicesGrid.querySelectorAll("article.service")].map(c=>{
    const r=c.getBoundingClientRect(),h=c.querySelector("h3"),p=c.querySelector("p"),s=c.querySelector("strong");
-   const style=getComputedStyle(c),brandRect=h.getBoundingClientRect(),textRect=s.getBoundingClientRect(),last=p.getBoundingClientRect(),prime=h.querySelector("span"),a=c.querySelector(".prime-service-cta"),ar=a?.getBoundingClientRect();
+   const style=getComputedStyle(c),brandRect=h.getBoundingClientRect(),textRect=s.getBoundingClientRect(),last=p.getBoundingClientRect(),prime=h.querySelector("span"),a=c.querySelector(".prime-service-cta,.desset-service-cta"),ar=a?.getBoundingClientRect();
    return {brand:h.textContent.trim(),service:s.textContent.trim(),copy:p.textContent.trim(),background:style.backgroundColor,borderWidth:style.borderTopWidth,borderColor:style.borderTopColor,radius:parseFloat(style.borderTopLeftRadius),shadow:style.boxShadow,primeColor:prime?getComputedStyle(prime).color:null,divider:getComputedStyle(s).borderTopWidth,descriptionColor:getComputedStyle(p).color,alignedCopy:getComputedStyle(s).textAlign==="left"&&getComputedStyle(p).textAlign==="left",bottomSpace:r.bottom-(ar?.bottom??last.bottom),cta:a?{href:a.getAttribute("href"),label:a.textContent.trim(),accessible:a.getAttribute("aria-label"),height:ar.height,fullWidth:Math.abs(ar.width-p.clientWidth)<=2,inside:ar.left>=r.left&&ar.right<=r.right&&ar.bottom<=r.bottom,fit:a.scrollWidth<=a.clientWidth+2,background:getComputedStyle(a).backgroundColor,color:getComputedStyle(a).color,gap:ar.top-last.bottom}:null,brandBottom:brandRect.bottom-r.top,dividerOffset:textRect.top-r.top,centered:getComputedStyle(h).textAlign==="center"&&getComputedStyle(h).alignItems==="center"&&getComputedStyle(h).justifyContent==="center",brandHeight:h.getBoundingClientRect().height,primeStack:!h.querySelector("span")||getComputedStyle(h.querySelector("span")).display==="block",
     visible:r.height>100&&getComputedStyle(c).visibility!=="hidden",
     inside:r.left>=servicesBounds.left-2&&r.right<=servicesBounds.right+2,
@@ -255,7 +255,7 @@ async function viewport(width,height,reduce=false,entry=URL){
    services.cards.map(c=>c.service).join("|")!=="Comercio y delivery|Logística integral"||
    services.cards.some(c=>!c.visible||!c.inside||!c.fits||!c.centered||!c.primeStack||c.brandHeight<100||c.copyFont<15||c.copy.length<30)||
    services.cards.some(c=>c.borderWidth!=="1px"||c.radius!==12||c.shadow!=="none"||c.divider!=="1px"||!c.alignedCopy||c.bottomSpace>70+(c.cta?0:62)||c.height>350)||
-   services.cards[0].cta!==null||!services.cards[1].cta||services.cards[1].cta.href!=="./prime.html"||services.cards[1].cta.label!=="Más información"||services.cards[1].cta.accessible!=="Más información sobre DESSET prime"||services.cards[1].cta.height<48||!services.cards[1].cta.fullWidth||!services.cards[1].cta.inside||!services.cards[1].cta.fit||services.cards[1].cta.background!==brandBlue||services.cards[1].cta.color!==pureWhite||services.cards[1].cta.gap<10||
+   !services.cards[0].cta||services.cards[0].cta.href!=="./aplicaciones.html"||services.cards[0].cta.label!=="Más información"||services.cards[0].cta.accessible!=="Más información sobre las aplicaciones DESSET"||services.cards[0].cta.height<48||!services.cards[0].cta.fullWidth||!services.cards[0].cta.inside||!services.cards[0].cta.fit||services.cards[0].cta.background!==pureWhite||services.cards[0].cta.color!==brandBlue||services.cards[0].cta.gap<10||!services.cards[1].cta||services.cards[1].cta.href!=="./prime.html"||services.cards[1].cta.label!=="Más información"||services.cards[1].cta.accessible!=="Más información sobre DESSET prime"||services.cards[1].cta.height<48||!services.cards[1].cta.fullWidth||!services.cards[1].cta.inside||!services.cards[1].cta.fit||services.cards[1].cta.background!==brandBlue||services.cards[1].cta.color!==pureWhite||services.cards[1].cta.gap<10||
    services.cards[0].background!=="rgb(7, 59, 188)"||services.cards[0].borderColor!=="rgb(7, 59, 188)"||services.cards[0].descriptionColor!=="rgb(255, 255, 255)"||
    services.cards[1].background!=="rgb(255, 255, 255)"||services.cards[1].borderColor!=="rgb(216, 220, 226)"||services.cards[1].primeColor!=="rgb(7, 59, 188)"||services.cards[1].descriptionColor!=="rgb(65, 65, 65)"||
    Math.abs(services.cards[0].height-services.cards[1].height)>2||Math.abs(services.cards[0].dividerOffset-services.cards[1].dividerOffset)>2)
@@ -690,6 +690,14 @@ try{
    }
    report.tests.push({name:"Prime page "+root+w,prime});
   }
+ }
+ // DESSET-NAV: follow the new home CTA in source and package.
+ for(const root of ["","dist/"]){
+  await call("Page.navigate",{url:pathToFileURL(resolve(root+"index.html")).href});
+  await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.desset-service-cta')"),"DESSET applications entry");
+  await js("document.querySelector('.desset-service-cta').click()");
+  await until(async()=>await js("document.readyState==='complete' && location.pathname.endsWith('/aplicaciones.html') && !!document.querySelector('.apps-page')"),"DESSET applications destination");
+  report.tests.push({name:"DESSET applications navigation "+root,pass:true});
  }
  // PRIME-NAV-01: exercise both public entry points in the exact source and package.
  for(const root of ["","dist/"]){
