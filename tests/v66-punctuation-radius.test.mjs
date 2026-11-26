@@ -16,7 +16,7 @@ test("V6.6 all presentation headings and standalone labels omit terminal ornamen
  for(const heading of headings)
   assert.ok(!/[.]$/.test(heading.text),"Ornamental full stop remains in "+heading.tag+": "+heading.text);
  assert.match(html,/aria-label="Participantes del modelo de servicios DESSET"/);
- assert.match(html,/aria-label="Escena tridimensional conceptual de DESSET"/);
+ assert.match(read("prime.html"),/aria-label="Simulación logística conceptual de DESSET prime"/);
  assert.doesNotMatch(html,/id="ecosystem-title"/);
  assert.doesNotMatch(html,/>COMERCIO · TECNOLOGÍA · LOGÍSTICA<\/p>/);
  assert.match(html,/id="hero-title"/);

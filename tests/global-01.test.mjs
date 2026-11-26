@@ -2,7 +2,7 @@ import test from "node:test";import assert from "node:assert/strict";import {rea
 const read=p=>readFileSync(new URL("../"+p,import.meta.url));
 const reviewed={
  "empresa.html":"71a8ba2852b84cf8409f9e4b916bd656da4f7218",
- "prime.html":"ccad9d7e9eb102bdeacb92493d725b45eab0d55b",
+ "prime.html":"00b573383d17be091badcdd05074ae4990908adb",
  "contacto.html":"a60fcbfac1412a9813c3dcea1dd45db2a4fc9b51",
  "confianza.html":"390cb4277bc255ed48eb901a536449eeef63e812",
  "noticias.html":"8abcb3ac7bc72f89ca06a565d1d199d903021a53",

@@ -18,7 +18,8 @@ test("V6.8 diagrams are Spanish in both pixels and accessibility descriptions",(
  }
  assert.doesNotMatch(diagram,/\bCUSTOMER\b|\bBUSINESS\b|\bRIDER\b/i);
  assert.match(diagram,/<desc id="d">Los clientes solicitan, los comercios preparan, los repartidores entregan y el control supervisa/);
- assert.match(html,/Diagrama conceptual de cuatro funciones: clientes eligen, comercios preparan, reparto entrega y control supervisa/);
+ assert.doesNotMatch(html,/Diagrama conceptual de cuatro funciones/);
+ for(const role of ["Para personas","Para comercios","Para repartidores","Para la operación"])assert.ok(html.includes(role));
  assert.doesNotMatch(html,/<source media="\(max-width:700px\)" srcset="\.\/assets\/roles-geometry-mobile-es\.svg"/);
  assert.match(mobileDiagram,/viewBox="0 0 360 392"/);
  for(const label of ["CLIENTES","COMERCIOS","REPARTO","CONTROL","ELEGIR","PREPARAR","ENTREGAR","SUPERVISAR"])

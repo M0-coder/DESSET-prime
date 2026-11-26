@@ -12,7 +12,7 @@ test("V6.5 page opens with original high-quality WebP on all devices",()=>{
  assert.match(read("prime.html"),/class="v6-static-fallback"/);
  assert.doesNotMatch(html,/v5-cinematic-mobile\.webp/);
  assert.doesNotMatch(html,/class="v5-stage-render"/);
- assert.match(html,/class="v65-load-status" role="status" aria-live="polite"/);
+ assert.match(read("prime.html"),/class="v65-load-status" role="status" aria-live="polite"/);
  assert.match(css,/\[data-v6-state="preparing"\] \.v6-three-mount/);
  assert.match(css,/\[data-v6-state="active"\] \.v6-three-mount/);
  assert.match(entry,/if\(threeStart\)threeStart.hidden=false/);

@@ -21,10 +21,12 @@ test("institutional statement retains business direction without fictitious oper
 test("truthful service and conceptual 3D disclosures remain without redundant three-pillar trust panels",()=>{
  const flow=html.match(/<section class="ecosystem"[\s\S]*?<\/section>/)?.[0]||"";
  const statement=html.match(/<section class="statement"[\s\S]*?<\/section>/)?.[0]||"";
- assert.ok(flow.length>1500&&statement.length>1000,"3D scene and participant statement must remain");
- assert.match(flow,/class="v6-three-mount"/);
- assert.match(flow,/aria-label="Renderización gráfica conceptual de DESSET"/);
- assert.match(flow,/class="v6-static-fallback"/);
+ const prime=readFileSync(new URL("../prime.html",import.meta.url),"utf8");
+ assert.ok(flow.length>500&&statement.length>1000&&prime.includes('id="modelo"'),"Home participant statement and Prime model must remain");
+ assert.doesNotMatch(flow,/v6-three-mount|v6-static-fallback/);
+ assert.match(prime,/class="v6-three-mount"/);
+ assert.match(prime,/aria-label="Simulación logística conceptual de DESSET prime"/);
+ assert.match(prime,/class="v6-static-fallback"/);
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/i);
  assert.match(html,/aria-label="Escena conceptual:/);
  assert.doesNotMatch(flow,/v5-stage-caption|motion-story-bridge/);
