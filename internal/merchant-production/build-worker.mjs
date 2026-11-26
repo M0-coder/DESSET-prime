@@ -8,7 +8,7 @@ export function loadMerchantUI(){
 }
 export async function buildMerchantWorker(){
  const ui=loadMerchantUI();
- const result=await build({stdin:{contents:'import {handle,scheduledNotifications} from "./internal/merchant-production/worker.mjs"; const ui='+JSON.stringify(ui)+'; export default {fetch(req,env,ctx){return handle(req,env,ctx,fetch,Math.floor(Date.now()/1000),ui)},scheduled(controller,env,ctx){ctx.waitUntil(scheduledNotifications(env))}};',resolveDir:fileURLToPath(root),sourcefile:"merchant-entry.mjs",loader:"js"},bundle:true,format:"esm",platform:"browser",target:"es2022",write:false,minify:true,logLevel:"silent"});
+ const result=await build({stdin:{contents:'import {WorkerEntrypoint} from "cloudflare:workers"; import {handle,scheduledNotifications} from "./internal/merchant-production/worker.mjs"; import {merchantAccountSnapshot} from "./internal/merchant-production/evidence.mjs"; export class MerchantIntegration extends WorkerEntrypoint { async getMerchantStatus(id){ if(this.env.APP_INTEGRATION_ENABLED!=="true") throw Error("INTEGRATION_DISABLED"); return merchantAccountSnapshot(this.env,id); } } const ui='+JSON.stringify(ui)+'; export default {fetch(req,env,ctx){return handle(req,env,ctx,fetch,Math.floor(Date.now()/1000),ui)},scheduled(controller,env,ctx){ctx.waitUntil(scheduledNotifications(env))}};',resolveDir:fileURLToPath(root),sourcefile:"merchant-entry.mjs",loader:"js"},bundle:true,format:"esm",platform:"browser",external:["cloudflare:workers"],target:"es2022",write:false,minify:true,logLevel:"silent"});
  if(result.outputFiles.length!==1)throw Error("Unexpected Worker output");
  return result.outputFiles[0].text;
 }
