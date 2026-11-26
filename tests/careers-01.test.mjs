@@ -10,6 +10,14 @@ for(const dir of ["","dist/"]){
  assert.match(html,/no se anuncian vacantes\./);
  assert.match(html,/no se reciben candidaturas\./);
  assert.match(html,/<h1>El futuro lo construyen las personas\.<\/h1>/);
+ const hero=html.match(/<section class="ca-hero">[\s\S]*?<\/section>/)[0];
+ assert.match(hero,/<img class="ca-hero-photo" src="\.\/assets\/talento-cultura\.webp" width="1200" height="1800" alt="Fotografía referencial de colaboración profesional\." decoding="async" fetchpriority="high">/);
+ assert.match(hero,/Una cultura basada en la responsabilidad, el aprendizaje y la capacidad de transformar ideas en soluciones reales\./);
+ assert.doesNotMatch(hero,/ca-kicker|<figcaption|<a\b|<button\b|<figure/);
+ assert.match(css,/\.ca-hero-photo\{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%/);
+ assert.match(css,/\.careers-page \.ca-hero::after\{[^}]*linear-gradient\(90deg/);
+ assert.match(css,/@media\(max-width:780px\)\{[^}]*align-items:flex-end/);
+ assert.match(css,/linear-gradient\(0deg/);
  assert.deepEqual([...html.matchAll(/<span>(Innovación con propósito|Excelencia en la ejecución|Responsabilidad compartida|Aprendizaje continuo)<\/span>/g)].map(m=>m[1]),["Innovación con propósito","Excelencia en la ejecución","Responsabilidad compartida","Aprendizaje continuo"]);
  assert.doesNotMatch(html.replace('<script defer src="./scripts/app.js"></script>',""),/<(?:form|input|script|iframe|textarea)\b|mailto:|tel:|https?:\/\/|footer-social|data-footer-channel/i);
  for(const page of ["index","empresa","comercios","repartidores","prime"]){
