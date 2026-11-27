@@ -45,3 +45,50 @@
 /* APP-IDENTITY-01: approved DESSET consumer app icon; corporate mark unchanged. */
 .apps-page .apps-icon-desset{width:clamp(88px,9vw,112px);height:auto;aspect-ratio:1;background:#fff;border:1px solid #ddd;border-radius:20%;overflow:hidden}
 .apps-page .apps-icon-desset img{display:block;width:100%;height:100%;object-fit:contain}
+
+/* APP-CONSUMER-02 — consumer product landing, scoped to this route only. */
+.consumer-page{--consumer-edge:clamp(20px,5vw,76px);--consumer-line:#e0e0e0;--consumer-red:#B42419}
+.apps-page.consumer-page .consumer-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(24px,5vw,78px);align-items:center;padding:clamp(36px,6vw,92px) var(--consumer-edge);background:#fff;min-height:clamp(460px,44vw,660px)}
+.consumer-page .consumer-hero-copy{max-width:680px;min-width:0}
+.apps-page.consumer-page .consumer-hero .apps-icon-desset{width:clamp(116px,13vw,180px);height:auto;margin-bottom:20px}
+.apps-page.consumer-page .consumer-hero h1{font-size:clamp(26px,3vw,42px);margin:0 0 12px;letter-spacing:-.035em}
+.consumer-page .consumer-hero h2{font:800 clamp(40px,5.4vw,80px)/1.04 var(--ds-type-display);letter-spacing:-.055em;margin:0 0 20px;overflow-wrap:normal}
+.consumer-page .consumer-hero-copy>p{font-size:clamp(16px,1.5vw,20px);max-width:42ch}
+.consumer-page .consumer-hero-copy .consumer-note{font-size:13px;color:#555}
+.apps-page.consumer-page a.consumer-cta{background:#000;color:#fff;padding:15px 24px;border-radius:8px;text-decoration:none;text-align:center;min-height:48px;line-height:1.4;font-weight:700;max-width:100%}
+.consumer-page .consumer-hero-media{position:relative;min-width:0;aspect-ratio:5/4;background:#f5f5f5;overflow:hidden;border-radius:16px}
+.consumer-page .consumer-hero-media img{display:block;width:100%;height:100%;object-fit:cover;object-position:54% center}
+.consumer-page .consumer-hero-media span{position:absolute;bottom:12px;left:12px;background:#fff;color:#333;padding:8px 12px;border-radius:4px;font-size:12px}
+.consumer-page .consumer-nav{display:flex;gap:clamp(12px,3vw,36px);flex-wrap:wrap;justify-content:center;padding:8px var(--consumer-edge);border-block:1px solid var(--consumer-line);background:#fff}
+.consumer-page .consumer-nav a{color:#171717;text-decoration:none;font-size:14px;padding:4px 8px}
+.consumer-page .consumer-section{max-width:1440px;margin-inline:auto;padding:clamp(44px,6vw,90px) var(--consumer-edge);scroll-margin-top:100px}
+.consumer-page .consumer-heading{max-width:760px;margin-bottom:clamp(24px,3vw,44px)}
+.consumer-page .consumer-heading h2,.consumer-page .consumer-close h2{font:800 clamp(30px,4vw,54px)/1.12 var(--ds-type-display);letter-spacing:-.04em;margin:0 0 14px}
+.consumer-page .consumer-heading p{color:#555;margin:0;max-width:70ch}
+.consumer-page .consumer-categories,.consumer-page .consumer-benefit-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.consumer-page .consumer-category{min-width:0;border:1px solid var(--consumer-line);border-radius:12px;padding:clamp(16px,2.2vw,28px);background:#fafafa}
+.consumer-page .consumer-category svg{color:var(--consumer-red);margin-bottom:16px}
+.consumer-page .consumer-section h3{font:750 clamp(18px,1.8vw,24px)/1.25 var(--ds-type-display);margin:0 0 10px;letter-spacing:-.025em}
+.consumer-page .consumer-section article p,.consumer-page .consumer-steps p{margin:0;color:#555}
+.consumer-page .consumer-benefits{background:#f5f5f5;max-width:none}
+.consumer-page .consumer-benefit-grid article{border-top:3px solid var(--consumer-red);padding-top:22px;min-width:0}
+.consumer-page .consumer-steps,.consumer-page .consumer-commercial-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.consumer-page .consumer-steps{padding:0;margin:0;list-style:none}
+.consumer-page .consumer-steps li{min-width:0;border:1px solid var(--consumer-line);border-radius:12px;padding:clamp(18px,3vw,34px)}
+.consumer-page .consumer-steps li span{display:block;color:var(--consumer-red);font-size:36px;font-weight:800;margin-bottom:24px}
+.consumer-page .consumer-access{max-width:none;background:#f5f5f5}
+.consumer-page .consumer-access-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(20px,5vw,68px);align-items:start}
+.consumer-page .consumer-access-info{min-width:0}
+.consumer-page .consumer-access-info .apps-country{margin-bottom:12px}
+.consumer-page .consumer-access-info .apps-country p{width:100%;margin:0}
+.consumer-page .consumer-access .apps-card{background:#fff}
+.consumer-page .consumer-commercial-grid article{border-top:1px solid #aaa;padding-top:20px;min-width:0}
+.consumer-page .consumer-faq details{border-top:1px solid var(--consumer-line);padding:0}
+.consumer-page .consumer-faq details:last-child{border-bottom:1px solid var(--consumer-line)}
+.consumer-page .consumer-faq summary{padding:18px 0;min-height:48px;cursor:pointer;font-weight:700;line-height:1.5}
+.consumer-page .consumer-faq details p{margin:0 0 18px;color:#555;max-width:72ch}
+.consumer-page .consumer-close{display:flex;align-items:center;justify-content:space-between;gap:24px;max-width:none;background:#f5f5f5}
+.consumer-page .consumer-close p{margin:0}
+@media(max-width:960px){.consumer-page .consumer-categories,.consumer-page .consumer-benefit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.apps-page.consumer-page .consumer-hero{min-height:0}}
+@media(max-width:700px){.apps-page.consumer-page .consumer-hero,.consumer-page .consumer-access-grid,.consumer-page .consumer-steps,.consumer-page .consumer-commercial-grid{grid-template-columns:1fr}.consumer-page .consumer-hero-media{aspect-ratio:16/10}.consumer-page .consumer-nav{justify-content:flex-start}.consumer-page .consumer-close{align-items:flex-start;flex-direction:column}.consumer-page .consumer-hero h2{font-size:clamp(36px,9vw,55px)}}
+@media(max-width:380px){.consumer-page .consumer-categories,.consumer-page .consumer-benefit-grid{grid-template-columns:1fr}}
