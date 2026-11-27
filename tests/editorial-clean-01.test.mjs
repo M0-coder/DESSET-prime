@@ -4,7 +4,7 @@ import {readFileSync} from "node:fs";
 import {createHash} from "node:crypto";
 const read=p=>readFileSync(new URL("../"+p,import.meta.url));
 const approved={
-  "aplicaciones-clientes.html": "9bc2d4b4634fcdc5cd7de21580f53631052d9b03",
+  "aplicaciones-clientes.html": "4efd8948cc5ad1e775fd50c35863a86cea63c914",
   "aplicaciones-comercios.html": "ea71ad8fd7f36a41bc9e87129a01d2e21fe22bdd",
   "aplicaciones-repartidores.html": "c6899ff1771948abb63e14a768c61b8e87cc7918",
   "aplicaciones.html": "06081d086a83af13b59e9ff6dd3d39e6d5bbc4a8",
