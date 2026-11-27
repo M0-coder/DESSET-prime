@@ -69,7 +69,7 @@
 .audience-page--comercios .ap-step{position:relative;display:grid;justify-items:center;text-align:center;align-content:start;gap:10px;padding:0}
 .audience-page--comercios .ap-step svg{box-sizing:content-box;background:#eef3ff;border-radius:50%;padding:18px}
 .audience-page--comercios .ap-step h3{font-size:clamp(18px,2vw,26px);margin:0;overflow-wrap:anywhere}
-.audience-page--comercios .ap-step:not(:last-child)::after{content:"";position:absolute;width:20px;height:1px;top:38px;right:-18px;background:#a3aab5}
+.audience-page--comercios .ap-step:not(:last-child)::after{content:"";position:absolute;width:12px;height:1px;top:38px;right:0;background:#a3aab5}
 .audience-page--comercios .mc-flow-note{margin:24px auto 0;text-align:center}
 .audience-page--comercios .mc-terms{margin:0 0 20px;border-top:1px solid #d8dce2}
 .audience-page--comercios .mc-terms>div{display:flex;justify-content:space-between;gap:12px;padding:18px 0;border-bottom:1px solid #d8dce2;flex-wrap:wrap}
