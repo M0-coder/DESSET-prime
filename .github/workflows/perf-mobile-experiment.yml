@@ -27,11 +27,29 @@ jobs:
           npm run build:site
           npm run verify:site
           node scripts/static-gate.mjs
+      - name: Install and record FFmpeg tools for isolated laboratory
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/perf-mobile
+          {
+            if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+              sudo apt-get update
+              sudo apt-get install --yes --no-install-recommends ffmpeg
+            fi
+            ffmpeg -version
+            ffprobe -version
+            ffmpeg -hide_banner -encoders
+            dpkg-query -W ffmpeg
+          } 2>&1 | tee reports/perf-mobile/ffmpeg-setup.log
       - name: Paired laboratory measurement, no publishable candidate
         env:
           npm_config_ignore_scripts: 'true'
           EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
-        run: python3 scripts/perf-mobile-lab.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/perf-mobile-lab.py 2>&1 | tee reports/perf-mobile/experiment.log
       - name: Verify restored baseline package and clean tracked files
         if: always()
         run: |
