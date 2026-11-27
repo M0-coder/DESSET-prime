@@ -86,6 +86,9 @@ export function checkAssetRightsAndLicenses({
  const editorial=selected.editorial_home_hero;
  requireSafe(reviewEditorialHomeHero(selected).accepted,"invalid home editorial media registry");
  for(const x of editorial.assets){requireSafe(!expected.has(x.path),"duplicate editorial asset");expected.set(x.path,x.sha256);serviceByPath.set(x.path,x);}
+ const appIcon=selected.consumer_app_icon;
+ requireSafe(appIcon?.path==='assets/desset-app-icon.svg'&&appIcon.sha256==='85416a7648aa4e772d987febb8cbf832b0d3539feec6555e7b110277e5d65727'&&appIcon.bytes===22423&&appIcon.claim==='owner-approved-design'&&appIcon.source==='conversation-upload'&&appIcon.font_license==='SIL Open Font License 1.1'&&appIcon.font_source==='https://github.com/oliverlalan/Doto'&&appIcon.independent_legal_verification===false&&appIcon.release_authorized===false&&!expected.has(appIcon.path),'invalid approved consumer app icon registry');
+ expected.set(appIcon.path,appIcon.sha256);
  const sources=source.files.filter(f=>isMedia(f.path));
  requireSafe(sources.length===expected.size,'unexpected original-media inventory');
  const verified=[],selectedVerified=[],primePageVerified=[];
@@ -107,6 +110,7 @@ export function checkAssetRightsAndLicenses({
   else if(entry.path===merchant.path){requireSafe(bytes.length===merchant.bytes&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP','invalid merchant hero WebP');}
   else if(serviceByPath.has(entry.path)){const v=serviceByPath.get(entry.path);requireSafe(bytes.length===v.bytes&&(v.kind==="video"?bytes.toString("ascii",4,8)==="ftyp":v.kind==="poster"&&bytes.toString("ascii",0,4)==="RIFF"&&bytes.toString("ascii",8,12)==="WEBP"),"invalid service media "+entry.path);}
   else if(entry.path===rider.path){requireSafe(bytes.length===rider.bytes&&bytes[0]===255&&bytes[1]===216&&bytes[bytes.length-2]===255&&bytes[bytes.length-1]===217,'invalid rider hero JPEG');}
+  else if(entry.path===appIcon.path){requireSafe(bytes.length===appIcon.bytes,'invalid consumer app icon length');}
   else verified.push({path:entry.path,bytes:entry.bytes,sha256:entry.sha256,claim:'owner-declared'});
  }
  requireSafe(archived.length===2&&verified.length===12&&verified.every(x=>expected.has(x.path))&&selectedVerified.length===4&&primePageVerified.length===6,'incomplete ownership or selected media registry');
@@ -133,6 +137,7 @@ export function checkAssetRightsAndLicenses({
    'third-party Three.js bundle missing from website');
  return {schema:'desset-prime-rights-and-sbom-evidence-v1',outcome:'PASS',
   owner_declaration_status:'owner-declared',legal_title_independently_verified:false,
+  consumer_app_icon:{...appIcon},
   assets_checked:verified.length,assets:verified,archived_media_checked:archived.length,archived_media:archived,
   merchant_hero_media:{...merchant,individual_source_verified:merchant.verification==='individual-source-verified'},merchant_hero_media_review:reviewMerchantHeroPhoto(selected),
   editorial_home_hero:{...editorial,individual_source_verified:false},editorial_home_hero_review:reviewEditorialHomeHero(selected),

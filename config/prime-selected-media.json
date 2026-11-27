@@ -449,5 +449,17 @@
         "duration_seconds": 2.2
       }
     ]
+  },
+  "consumer_app_icon": {
+    "path": "assets/desset-app-icon.svg",
+    "sha256": "85416a7648aa4e772d987febb8cbf832b0d3539feec6555e7b110277e5d65727",
+    "bytes": 22423,
+    "claim": "owner-approved-design",
+    "source": "conversation-upload",
+    "design": "Doto 700 / ROND 35; D personalizada",
+    "font_license": "SIL Open Font License 1.1",
+    "font_source": "https://github.com/oliverlalan/Doto",
+    "independent_legal_verification": false,
+    "release_authorized": false
   }
 }
