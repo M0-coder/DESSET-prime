@@ -7,9 +7,9 @@ const app=readFileSync(new URL("../scripts/app.js",import.meta.url),"utf8");
 const head=html.split('<section id="inicio" class="hero hero--motion"')[1]?.split('<section class="statement"')[0]||"";
 test("V4: portada comercial editorial con mensaje legible, CTA reales y sin operaciones fingidas",()=>{
  assert.ok(head.length>1500);
- assert.match(head,/class="motion-line v4-headline-a"><span class="motion-line__inner">AUMENTA EL VALOR<\/span>/);
- assert.match(head,/class="motion-line v4-headline-b"><span class="motion-line__inner">A TU TIEMPO<\/span>/);
- for(const keyword of ["COMERCIO","LOGÍSTICA","CONEXIÓN","DISTRIBUCIÓN","A TU TIEMPO"])assert.match(head,new RegExp(keyword));
+ assert.match(head,/class="motion-line v4-headline-a"><span class="motion-line__inner">TU TIEMPO<\/span>/);
+ assert.match(head,/class="motion-line v4-headline-b"><span class="motion-line__inner">VALE MÁS<\/span>/);
+ for(const keyword of ["COMERCIO","LOGÍSTICA","CONEXIÓN","DISTRIBUCIÓN","VALE MÁS"])assert.match(head,new RegExp(keyword));
  assert.match(head,/Conectamos personas, negocios y mercados/i);
  assert.doesNotMatch(head,/v4-hero-declaration|COMERCIO · TECNOLOGÍA · LOGÍSTICA/);
  assert.match(head,/href="\.\/mision-vision-valores\.html#proposito"/);
