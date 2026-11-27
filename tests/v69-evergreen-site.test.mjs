@@ -17,7 +17,7 @@ test("V6.9 describes services as a lasting institutional identity, not as a star
  for(const phrase of ["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"])
   assert.ok(html.includes(phrase),"Missing institutional service facet "+phrase);
  assert.doesNotMatch(html,/Proyecto en desarrollo|En construcción|En desarrollo: una plataforma|Horizonte futuro|antes del lanzamiento|validar necesidades con comercios|estamos construyendo un sistema/i);
- assert.equal((html.match(/<section\b/g)||[]).length,7);
+ assert.equal((html.match(/<section\b/g)||[]).length,6);
  assert.match(html,/href="#soluciones">Servicios/);
  assert.match(html,/href="#ecosistema">Cómo funciona/);
  assert.match(html,/href="\.\/contacto\.html">Canales DESSET/);

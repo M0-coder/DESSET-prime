@@ -59,7 +59,7 @@ test("V6.6 rounded design uses disciplined radius scale, not global clipping",()
 });
 
 test("V6.6 change is limited to presentation: no commerce launch or public publishing",()=>{
- assert.equal((html.match(/<section\b/g)||[]).length,7);
+ assert.equal((html.match(/<section\b/g)||[]).length,6);
  assert.doesNotMatch(html,/data-v64-tour-launch/);
  assert.match(html,/class="service-body" id="ecosistema"/);assert.doesNotMatch(html,/<section class="ecosystem"/);
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v63-tour"/);

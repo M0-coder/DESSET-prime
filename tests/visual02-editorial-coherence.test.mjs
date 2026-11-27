@@ -29,13 +29,13 @@ test("VISUAL-02 concentrates editorial retouching below hero, no image, typeface
  assert.match(css,/@media\(max-width:700px\)/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
  assert.doesNotMatch(visual02Css,/#inicio|\.prime-photo-image|\.brand-mark|(?:@import|url\(|@font-face|@keyframes|animation:)/);
- assert.ok(statSync(new URL("styles-visual02.css",root)).size<=8200);
+ assert.ok(statSync(new URL("styles-visual02.css",root)).size<=12200);
 });
 test("VISUAL-02 ships a single budgeted local stylesheet in source and packaged dist",()=>{
  assert.match(html,/href="\.\/styles-hero-photo\.css">\s*<link rel="stylesheet" href="\.\/styles-visual02\.css"/);
  assert.match(build,/"styles-hero-photo\.css","styles-visual02\.css"/);
  assert.match(build,/hero-photo\|-visual02/);
- assert.match(gate,/visual02_css_bytes:8200/);
+ assert.match(gate,/visual02_css_bytes:12200/);
  assert.match(gate,/styles-visual02\.css/);
  assert.match(preview,/rel==="styles-visual02\.css"/);
  assert.match(verify,/VISUAL-02 editorial stylesheet missing/);

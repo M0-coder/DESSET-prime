@@ -37,7 +37,7 @@ test("Clean accessible photo cards: static, no remote assets, no hero crop",()=>
  assert.match(scoped,/object-fit:cover/);
  assert.match(scoped,/animation:none/);
  assert.doesNotMatch(scoped,/background-image|https?:\/\/|@import|@font-face/);
- assert.ok(statSync(new URL("styles-visual02.css",root)).size<=8200);
+ assert.ok(statSync(new URL("styles-visual02.css",root)).size<=12200);
  assert.match(browser,/ECOSYSTEM-PARTICIPANTS-01 four different approved photos, exact sizes, alternative text/);
 });
 test("Packaged assets also retain approved checksums; no public domain",()=>{

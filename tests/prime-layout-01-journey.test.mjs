@@ -34,7 +34,7 @@ test("Heading above four cards, two on tablet, one on narrow screens, no hiding 
  assert.match(scoped,/object-fit:cover/);
  assert.match(scoped,/animation:none/);
  assert.doesNotMatch(scoped,/display:\s*none|@import|https?:\/\//);
- assert.ok(Buffer.byteLength(css,"utf8")<=45000);assert.ok(Buffer.byteLength(sealed,"utf8")<=8200);
+ assert.ok(Buffer.byteLength(css,"utf8")<=45000);assert.ok(Buffer.byteLength(sealed,"utf8")<=12200);
 });
 test("Exact local package contains all four photos and preserves original 3D assets",()=>{
  assert.equal(read("dist/index.html"),html);

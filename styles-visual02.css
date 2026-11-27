@@ -145,3 +145,68 @@
 
 /* PRIME-COLOR-03 — owner-approved institutional blue on the hero CTA only. */
 #inicio .hero-cta,#inicio .hero-cta:hover{background:#073BBC;color:#FFFFFF;box-shadow:0 4px 0 rgba(7,59,188,.25)}
+
+/* CORPORATE-FOOTER-02 — owner-approved three-card summary and dark footer.
+   Homepage only. Keep other pages, approved media and service sections unchanged. */
+body.desset-home-cinematic #empresa-destacada.corporate-summary{
+ background:#f4f8fe;color:#000;padding:clamp(28px,4vw,56px) var(--edge);
+ border:0;content-visibility:visible;contain-intrinsic-size:none;
+}
+#empresa-destacada.corporate-summary .institutional-home-inner{max-width:1400px;margin-inline:auto}
+#empresa-destacada.corporate-summary h2{font-size:clamp(26px,3.4vw,44px);font-weight:800;line-height:1.15;letter-spacing:-.025em;margin:0 0 24px}
+body.desset-home-cinematic #empresa-destacada.corporate-summary .institutional-home-grid{
+ grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,1.7vw,24px);align-items:stretch
+}
+body.desset-home-cinematic #empresa-destacada.corporate-summary .institutional-home-link{
+ display:flex;flex-direction:column;align-items:flex-start;min-width:0;
+ padding:clamp(16px,2vw,26px);background:#fff;border:1px solid #d8dce2;border-radius:8px;box-shadow:none;
+}
+#empresa-destacada.corporate-summary .institutional-home-link:hover{border-color:#073bbc}
+#empresa-destacada.corporate-summary .institutional-home-link h3{font-size:clamp(18px,1.8vw,25px);font-weight:750;line-height:1.2;margin:0 0 8px}
+#empresa-destacada.corporate-summary .institutional-home-link p{display:block;color:#414141;font-size:14px;line-height:1.5;margin:0 0 6px}
+#empresa-destacada.corporate-summary .institutional-home-more{
+ display:inline-flex;gap:5px;align-items:center;min-height:44px;margin-top:auto;
+ color:#073bbc;font-size:14px;font-weight:700;text-decoration:none;
+}
+#empresa-destacada.corporate-summary .institutional-home-more:hover{text-decoration:underline}
+body:has(#inicio) .site-footer.home-footer-dark{
+ display:grid;grid-template-columns:minmax(140px,1.35fr) minmax(0,4fr);
+ align-items:start;gap:24px 32px;background:#0a0a0a;color:#fff;border:0;
+ padding:clamp(28px,4vw,56px) max(var(--edge),calc((100% - 1400px)/2)) 24px;
+}
+body:has(#inicio) .home-footer-dark .footer-brand{
+ color:#fff;font-family:var(--ds-type-display);font-size:clamp(25px,3vw,36px);
+ font-weight:800;letter-spacing:-.035em;margin:0;line-height:1.15;justify-self:start;
+}
+body:has(#inicio) .home-footer-dark .corporate-footer{
+ grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;padding:0;
+}
+.home-footer-dark .corporate-footer strong{color:#fff;font-weight:700;margin-bottom:8px}
+.home-footer-dark .corporate-footer a,.home-footer-dark .mobile-footer a{
+ color:#c7c7c7;line-height:1.5;text-decoration:none;
+}
+.home-footer-dark .corporate-footer a:hover,.home-footer-dark .mobile-footer a:hover{
+ color:#fff;text-decoration:underline;
+}
+/* Preserve the original social strip: centered icons, colors, spacing,
+   borders and hover remain in the existing styles. Restore its light canvas
+   locally because the surrounding footer is now black. */
+body:has(#inicio) .home-footer-dark .footer-social{
+ grid-column:1/-1;background:#f5f5f5;
+}
+/* Keep the existing copyright typography, text color and margins.
+   A local light background preserves the original contrast. */
+body:has(#inicio) .site-footer.home-footer-dark>p{
+ grid-column:1/-1;background:#f5f5f5;
+}
+.home-footer-dark a:not(.footer-social a):focus-visible,.home-footer-dark summary:focus-visible{outline:3px solid #ffc62f;outline-offset:3px}
+@media(max-width:960px){
+ body:has(#inicio) .site-footer.home-footer-dark{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:700px){
+ body.desset-home-cinematic #empresa-destacada.corporate-summary .institutional-home-grid{grid-template-columns:minmax(0,1fr);gap:12px}
+ body.desset-home-cinematic #empresa-destacada.corporate-summary{padding-block:28px}
+ #empresa-destacada.corporate-summary h2{font-size:26px;margin-bottom:16px}
+ body:has(#inicio) .site-footer.home-footer-dark{gap:16px;padding-block:28px 20px}
+ body:has(#inicio) .home-footer-dark .mobile-footer{border-top:1px solid #444;gap:8px 16px}
+}

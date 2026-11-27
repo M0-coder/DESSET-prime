@@ -77,7 +77,8 @@ test("MOBILE-01 follows approved compact visual reference",()=>{
  assert.match(mobile,/#inicio \.v4-hero-rail\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
  assert.match(mobile,/#soluciones \.solutions-grid,#vision[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.match(html,/<nav class="mobile-footer" aria-label="Mapa del sitio móvil">/);
- assert.equal((html.match(/class="mobile-corporate-icon"/g)||[]).length,2);
+ assert.equal((html.match(/class="mobile-corporate-icon"/g)||[]).length,0);
+ assert.match(readFileSync(new URL("../styles-visual02.css",import.meta.url),"utf8"),/@media\(max-width:700px\)\{\s*body\.desset-home-cinematic #empresa-destacada\.corporate-summary \.institutional-home-grid\{grid-template-columns:minmax\(0,1fr\)/);
 });
 
 test("MOBILE-PERF-01 removes critical hero compositing only at phone widths",()=>{
