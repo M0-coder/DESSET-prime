@@ -40,7 +40,7 @@ if(typeof window!=="undefined"&&typeof document.getElementById==="function"){
 // VIDEO-03: continuous decorative loops while visible; no added visual controls.
 if(typeof window!=="undefined"&&typeof document.querySelectorAll==="function"){
  const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)");
- for(const video of document.querySelectorAll("#soluciones .service-video")){
+ for(const video of document.querySelectorAll("#soluciones .service-video, .apps-hero--video .apps-hero-video")){
   let visible=false;
   const sync=()=>{
    if(!visible||document.hidden||reduced?.matches){video.pause();return;}

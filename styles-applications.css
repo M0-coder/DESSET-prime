@@ -30,3 +30,12 @@
 .apps-page .apps-states dd{margin:0;color:#555}
 .apps-page :focus-visible{outline:3px solid #073bbc;outline-offset:3px}
 @media(max-width:700px){.apps-page .apps-grid{grid-template-columns:1fr}.apps-page .apps-states{grid-template-columns:1fr;gap:6px}.apps-page .apps-states dd{margin-bottom:8px}}
+
+/* APP-HERO-VIDEO-01: only the main applications directory; role pages unchanged. */
+.apps-page .apps-hero--video{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;min-height:clamp(350px,31vw,540px);background:#000;color:#fff;padding-block:clamp(36px,6vw,84px)}
+.apps-page .apps-hero--video .apps-hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;pointer-events:none;z-index:-2}
+.apps-page .apps-hero--video::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;background:linear-gradient(90deg,rgba(0,0,0,.76) 0%,rgba(0,0,0,.56) 34%,rgba(0,0,0,.12) 66%,transparent 100%)}
+.apps-page .apps-hero--video .apps-hero-copy{position:relative;width:100%;min-width:0;max-width:100%;padding:0}
+.apps-page .apps-hero--video h1,.apps-page .apps-hero--video p{color:#fff;max-width:100%}
+.apps-page .apps-hero--video p{margin-bottom:0;max-width:40ch}
+@media(max-width:780px){.apps-page .apps-hero--video{min-height:clamp(435px,120vw,600px);align-items:flex-end;padding-bottom:clamp(42px,12vw,72px)}.apps-page .apps-hero--video::after{background:linear-gradient(0deg,rgba(0,0,0,.92),rgba(0,0,0,.65) 34%,rgba(0,0,0,.15) 65%,transparent 90%)}.apps-page .apps-hero--video h1{font-size:clamp(30px,9vw,44px)}}
