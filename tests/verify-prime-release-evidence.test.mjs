@@ -15,9 +15,13 @@ function fixture(t){
  prepareReleaseEvidence({dist:join(root,'dist'),sourceSha:SHA,gitSha:SHA,previousDeploymentId:target.recovery_deployment_id,target,artifactDir:publicDir,evidenceDir});
  return {publicDir,evidencePath:join(evidenceDir,'prime-release-evidence.json')};
 }
-test('independent verifier checks all 46 original/rehearsal resource hashes',t=>{
+test('independent verifier checks all 86 release resource hashes',t=>{
  const f=fixture(t),r=verifyPrimeReleaseEvidence({...f,expectedSha:SHA});
  assert.equal(r.result,'PASS');assert.equal(r.files,86);assert.equal(r.release_authorized,false);
+});
+test('rejects tampered application hero video bytes',t=>{
+ const f=fixture(t);writeFileSync(join(f.publicDir,'assets/aplicaciones-hero.mp4'),'corrupt');
+ assert.throws(()=>verifyPrimeReleaseEvidence({...f,expectedSha:SHA}),/NO-GO/);
 });
 test('rejects tampered publication bytes',t=>{
  const f=fixture(t);writeFileSync(join(f.publicDir,'assets/scene-move.webp'),'corrupt');

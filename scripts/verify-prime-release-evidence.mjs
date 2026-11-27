@@ -18,7 +18,7 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(info.noindex===true&&info.robots_disallow_all===true,'indexing policy changed');
  check(info.original_files===83&&info.staged_files===86,'package shape mismatch');
  check(info.repeated_packaging_identical===true&&info.independently_compiled_twice===false,'evidence claims changed');
- check(Array.isArray(info.files)&&info.files.length===85,'missing per-asset manifest');
+ check(Array.isArray(info.files)&&info.files.length===86,'missing per-asset manifest');
  check(sha(Buffer.from(JSON.stringify(info.files)))===info.artifacts_sha256,'manifest checksum mismatch');
  const expected=new Map(),actual=new Set();let total=0;
  for(const f of info.files){
@@ -70,6 +70,7 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  for(const name of companyRoutes){const p=readFileSync(join(publicDir,name+'.html'),'utf8');check(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Company detail canonical or indexing gate: '+name);}
  check(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or noindex changed');
  for(const name of appPages){const p=readFileSync(join(publicDir,name+'.html'),'utf8');assertClosedAppPage(p,name);check(p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'App directory canonical missing: '+name);}
+ check(expected.has('assets/aplicaciones-hero.mp4'),'Applications hero video missing from release evidence');
  const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');
  const site=readFileSync(join(publicDir,'sitemap.xml'),'utf8');
  check(html.includes('name="robots" content="noindex,nofollow"')&&robots==='User-agent: *\nDisallow: /\n','dangerous indexing state');
