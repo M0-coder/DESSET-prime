@@ -10,7 +10,7 @@ test("V4: portada comercial editorial con mensaje legible, CTA reales y sin oper
  assert.match(head,/class="motion-line v4-headline-a"><span class="motion-line__inner">TU TIEMPO<\/span>/);
  assert.match(head,/class="motion-line v4-headline-b"><span class="motion-line__inner">VALE MÁS<\/span>/);
  for(const keyword of ["COMERCIO","LOGÍSTICA","CONEXIÓN","DISTRIBUCIÓN","VALE MÁS"])assert.match(head,new RegExp(keyword));
- assert.match(head,/Conectamos personas, negocios y mercados/i);
+ assert.doesNotMatch(head,/Conectamos personas, negocios y mercados/i);
  assert.doesNotMatch(head,/v4-hero-declaration|COMERCIO · TECNOLOGÍA · LOGÍSTICA/);
  assert.match(head,/href="\.\/mision-vision-valores\.html#proposito"/);
  assert.doesNotMatch(head,/href="#ecosistema"/);

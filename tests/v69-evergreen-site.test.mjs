@@ -11,7 +11,7 @@ const css=read("styles-system.css");
 const pack=read("scripts/build-site.mjs");
 const preview=read("scripts/local-preview.mjs");
 test("V6.9 describes services as a lasting institutional identity, not as a startup pitch",()=>{
- assert.match(html,/<p class="hero-lead">Conectamos personas, negocios y mercados\.<\/p>/);
+ assert.doesNotMatch(html,/<p class="hero-lead">/);
  assert.doesNotMatch(html,/UN ECOSISTEMA, TRES PILARES/);
  assert.match(html,/class="business-pitch"/);
  for(const phrase of ["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"])
