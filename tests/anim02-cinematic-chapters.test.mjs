@@ -36,7 +36,7 @@ test("ANIM-02 chapters use progressive one-time observers without timers or auto
 });
 test("ANIM-02 checks actual browser animation and reduced-motion computed styles",()=>{
  assert.match(audit,/ANIM-02 real photographic opening, official mark, editorial chronology/);
- assert.match(audit,/anim02\.photo!=="anim02-frame"/);
+ assert.match(audit,/anim02\.photo!=="none"/);
  assert.match(audit,/ANIM-02 reduced motion leaves approved image and copy static/);
  assert.match(audit,/anim02Reduced\.photo!=="none"/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{/);

@@ -20,3 +20,6 @@
 #inicio .desset-editorial-stage :focus-visible{outline:3px solid #fff;outline-offset:4px}
 @media(max-width:700px){#inicio .v4-hero-composition.desset-editorial-stage{aspect-ratio:4/5;min-height:410px;align-items:flex-end;padding:24px 22px 76px}#inicio .desset-editorial-stage::after{background:linear-gradient(0deg,rgba(0,0,0,.94),rgba(0,0,0,.71) 36%,rgba(0,0,0,.10) 85%)}#inicio.hero[data-variant="v4"] .desset-editorial-stage .motion-headline{font-size:clamp(30px,7.4vw,48px);margin-bottom:15px}#inicio .desset-editorial-stage .hero-lead{font-size:16px}#inicio .desset-editorial-stage .desset-editorial-media img,#inicio .desset-editorial-stage .desset-editorial-media video{object-position:58% center}#inicio .desset-editorial-toggle{right:16px;bottom:16px}}
 @media(prefers-reduced-motion:reduce){#inicio .desset-editorial-media video{display:none}}
+
+#inicio.hero[data-variant="v4"] .desset-editorial-stage .hero-cta,#inicio.hero[data-variant="v4"] .desset-editorial-stage .hero-cta:hover{background:#fff;color:#000;box-shadow:none;border-radius:6px}
+#inicio.hero[data-variant="v4"] .desset-editorial-stage .desset-editorial-media{border-radius:0;background:#101010}

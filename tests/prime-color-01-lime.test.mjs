@@ -51,7 +51,7 @@ test("The blue CTA retains WCAG AA contrast and 3D markup remains unchanged",()=
 test("Browser QA enforces gold on other elements, blue in hero, and reproducible dist",()=>{
  for(const key of ["heroCTA","businessCTA","statementAccent","railDisplay","titleInk","threeTourButton","rootYellow","stageYellow","stageDesignGold","stageVisualGold"])
   assert.ok(audit.includes(key),"Missing computed-color measurement "+key);
- assert.match(audit,/PRIME-COLOR-03: hero CTA must use institutional blue with white text/);
+ assert.match(audit,/HERO-EDITORIAL-01: hero CTA must use opaque white with black text/);
  assert.equal(read("dist/styles-visual02.css"),css,"Dist must match the source exactly");
  const manifest=JSON.parse(read("dist/site-manifest.json"));
  assert.equal(manifest.noindex,true);assert.equal(manifest.domain,"none");
@@ -64,7 +64,7 @@ test("Browser QA waits for the final opaque CTA instead of accepting a transient
  const sample=audit.indexOf("const palette={");
  assert.ok(settle>0&&sample>settle,"Color must settle BEFORE browser palette sampling");
  assert.match(audit,/return !match\|\|Number\(match\[1\]\)>=0\.9999/);
- assert.match(audit,/Number\(blueChannels\[1\]\)>=\.9999/);
- assert.doesNotMatch(audit,/Number\(blueChannels\[1\]\)>=\.99&&/,"Do not weaken final alpha threshold");
- assert.match(audit,/PRIME-COLOR-03: hero CTA must use institutional blue with white text/);
+ assert.match(audit,/Number\(whiteChannels\[1\]\)>=\.9999/);
+ assert.doesNotMatch(audit,/Number\(whiteChannels\[1\]\)>=\.99&&/,"Do not weaken final alpha threshold");
+ assert.match(audit,/HERO-EDITORIAL-01: hero CTA must use opaque white with black text/);
 });

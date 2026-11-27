@@ -99,7 +99,7 @@ async function viewport(width,height,reduce=false,entry=URL){
   return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.left < -2 || (s.display!=='none'&&s.visibility!=='hidden'&&r.right>viewport+2&&r.width>0);
  }).slice(0,12).map(el=>({tag:el.tagName,className:typeof el.className==='string'?el.className.slice(0,70):'',right:Math.round(el.getBoundingClientRect().right),left:Math.round(el.getBoundingClientRect().left)}));
  const composition=document.querySelector("#inicio .v4-hero-composition").getBoundingClientRect();
- const type=(viewport<=700?document.querySelector("#inicio .v4-hero-composition"):document.querySelector("#inicio .v4-hero-type")).getBoundingClientRect();
+ const type=document.querySelector("#inicio .v4-hero-type").getBoundingClientRect();
  const photo=document.querySelector("#inicio .prime-photo-surface").getBoundingClientRect();
  const heroFit={
   compositionLeft:Math.round(composition.left),
@@ -161,7 +161,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  const footerLayout={columns:getComputedStyle(footerNav).gridTemplateColumns.trim().split(/\\s+/).length,links:[...footerNav.querySelectorAll("a")].map(e=>({href:e.getAttribute("href"),inside:e.getBoundingClientRect().left>=0&&e.getBoundingClientRect().right<=viewport+2,height:e.getBoundingClientRect().height})),groups:[...footerNav.querySelectorAll("strong")].map(e=>e.textContent),social:[...document.querySelectorAll(".footer-social a")].map(e=>({label:e.getAttribute("aria-label"),height:e.getBoundingClientRect().height,width:e.getBoundingClientRect().width})),center:getComputedStyle(document.querySelector(".footer-social")).justifyContent,copyright:document.querySelector(".site-footer>p").textContent};
  const mobileFooter=document.querySelector(".mobile-footer"),mobileGroups=[...mobileFooter.querySelectorAll("details")];
  const mobileFooterLayout={visible:getComputedStyle(mobileFooter).display!=="none",groups:mobileGroups.map(d=>{const summary=d.querySelector("summary"),height=summary.getBoundingClientRect().height;d.open=true;const links=[...d.querySelectorAll("a")].map(a=>({href:a.getAttribute("href"),height:a.getBoundingClientRect().height}));d.open=false;return {name:summary.textContent,height,links}})};
- const mobileGeometry={criticalPaint:[...document.querySelectorAll("#inicio .motion-line__inner,#inicio .hero-lead,#inicio .hero-actions,#inicio .prime-photo-surface,#inicio .prime-photo-image")].map(e=>{const s=getComputedStyle(e);return {animation:s.animationName,opacity:s.opacity,filter:s.filter,transform:s.transform,clip:s.clipPath}}),photoBeforeCTA:photo.bottom<=document.querySelector("#inicio .hero-cta").getBoundingClientRect().top+2,header:document.querySelector(".site-header").getBoundingClientRect().height,heroCTA:document.querySelector("#inicio .hero-cta").getBoundingClientRect().height,heroCTAWidth:document.querySelector("#inicio .hero-cta").getBoundingClientRect().width,heroColumn:Math.round(type.width),photoRatio:photo.width/photo.height,corporateColumns:getComputedStyle(document.querySelector("#empresa-destacada .institutional-home-grid")).gridTemplateColumns.trim().split(/\\s+/).length};
+ const mobileGeometry={criticalPaint:[...document.querySelectorAll("#inicio .motion-line__inner,#inicio .hero-lead,#inicio .hero-actions,#inicio .prime-photo-surface,#inicio .prime-photo-image")].map(e=>{const s=getComputedStyle(e);return {animation:s.animationName,opacity:s.opacity,filter:s.filter,transform:s.transform,clip:s.clipPath}}),photoFull:Math.abs(photo.width-composition.width)<2&&Math.abs(photo.height-composition.height)<2,ctaInside:(()=>{const a=document.querySelector("#inicio .hero-cta").getBoundingClientRect();return a.left>=type.left-2&&a.right<=type.right+2&&a.top>=composition.top&&a.bottom<=composition.bottom})(),header:document.querySelector(".site-header").getBoundingClientRect().height,heroCTA:document.querySelector("#inicio .hero-cta").getBoundingClientRect().height,heroCTAWidth:document.querySelector("#inicio .hero-cta").getBoundingClientRect().width,heroColumn:Math.round(type.width),photoRatio:photo.width/photo.height,corporateColumns:getComputedStyle(document.querySelector("#empresa-destacada .institutional-home-grid")).gridTemplateColumns.trim().split(/\\s+/).length};
  const typeSizes={
   heroLead:parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize),
   serviceTitle:parseFloat(getComputedStyle(document.querySelector(".solutions .service--main h3")).fontSize),
@@ -210,24 +210,24 @@ async function viewport(width,height,reduce=false,entry=URL){
   const palette=diag.palette;
   // The final computed color is checked only after the background settles.
   // Never accept a semi-transparent or differently colored CTA as a PASS.
-  const blueChannels=palette.heroCTA.match(/^rgba?\(7,\s*59,\s*188(?:,\s*([\d.]+))?\)$/);
-  const exactBlue=!!blueChannels&&(blueChannels[1]===undefined||
-   (Number(blueChannels[1])>=.9999&&Number(blueChannels[1])<=1));
+  const whiteChannels=palette.heroCTA.match(/^rgba?\(255,\s*255,\s*255(?:,\s*([\d.]+))?\)$/);
+  const exactWhite=!!whiteChannels&&(whiteChannels[1]===undefined||
+   (Number(whiteChannels[1])>=.9999&&Number(whiteChannels[1])<=1));
   if(palette.rootYellow!=="#FFC62F"||palette.stageYellow!=="#FFC62F"||
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
-   !exactBlue||palette.businessCTA!==brandBlue||
+   !exactWhite||palette.businessCTA!==brandBlue||
    palette.statementAccent!==brandBlue||palette.statementBackground!==pureWhite||
-   palette.homeHeader!==pureWhite||palette.homeRecent!==pureWhite||palette.homeCorporate!=="rgb(245, 245, 245)"||palette.homeCorporateCard!==pureWhite||palette.homeNews!==pureWhite||palette.homeTalent!=="rgb(245, 245, 245)"||palette.homeHero!=="rgb(247, 245, 238)"||
+   palette.homeHeader!==pureWhite||palette.homeRecent!==pureWhite||palette.homeCorporate!=="rgb(245, 245, 245)"||palette.homeCorporateCard!==pureWhite||palette.homeNews!==pureWhite||palette.homeTalent!=="rgb(245, 245, 245)"||palette.homeHero!==pureWhite||
    palette.footerBackground!=="rgb(245, 245, 245)"||palette.navContactBackground!==pureWhite||
    palette.primeHeadingColor!==brandBlue||palette.primeSubtitleColor!==brandBlue||
    palette.institutionalInk!=="#000000"||
    palette.stageInk!=="#111111"||palette.stageDesignInk!=="#111111"||palette.stageInheritedColor!=="rgb(17, 17, 17)"||
-   palette.heroHeadingColor!=="rgb(0, 0, 0)"||
-   palette.heroCtaInk!==pureWhite||
-   palette.heroPhotoFallbackBg!==paleBlue||
+   palette.heroHeadingColor!==pureWhite||
+   palette.heroCtaInk!=="rgb(0, 0, 0)"||
+   palette.heroPhotoFallbackBg!=="rgb(16, 16, 16)"||
    palette.brandNameInk!=="rgb(0, 0, 0)"||
    palette.footerBrandInk!==brandBlue||palette.footerCopyInk!=="rgb(86, 86, 86)")
-   fails.push("PRIME-COLOR-03: hero CTA must use institutional blue with white text; brand yellow preserved, home surfaces neutral and 3D controls white: "+JSON.stringify(palette));
+   fails.push("HERO-EDITORIAL-01: hero CTA must use opaque white with black text; brand yellow preserved, home surfaces neutral and 3D controls white: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.heroFit.typeLeft<diag.heroFit.compositionLeft-2 ||
     diag.heroFit.rows.length!==2 ||
@@ -273,7 +273,7 @@ async function viewport(width,height,reduce=false,entry=URL){
     fails.push("Partner cards responsive parity: "+JSON.stringify(partners));
   if(width<=700){
    const g=diag.mobileGeometry;
-   if(g.criticalPaint.length!==6||g.criticalPaint.some(s=>s.animation!=="none"||s.opacity!=="1"||s.filter!=="none"||s.transform!=="none"||s.clip!=="none")||!g.photoBeforeCTA||Math.abs(g.header-64)>1||g.heroCTA<48||Math.abs(g.heroCTAWidth-g.heroColumn)>2||Math.abs(g.photoRatio-1.6)>.04||g.corporateColumns!==(width<320?1:2))fails.push("MOBILE-01 compact geometry: "+JSON.stringify(g));
+   if(g.criticalPaint.length!==6||g.criticalPaint.some(s=>s.animation!=="none"||s.opacity!=="1"||s.filter!=="none"||s.transform!=="none"||s.clip!=="none")||!g.photoFull||!g.ctaInside||Math.abs(g.header-64)>1||g.heroCTA<48||g.heroCTAWidth>g.heroColumn+2||g.corporateColumns!==(width<320?1:2))fails.push("MOBILE-01 compact geometry: "+JSON.stringify(g));
    if(!diag.menuLabel?.startsWith("Menú"))fails.push("Mobile menu accessible name must include visible Menú label: "+diag.menuLabel);
   if(diag.typeSizes.heroLead<14||diag.typeSizes.serviceTitle<23||diag.typeSizes.storyTitle<13)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }
@@ -297,14 +297,22 @@ try{
  const heroQuality=await js(`(()=>({headline:document.querySelector("#hero-title")?.textContent?.replace(/\\s+/g," ").trim(),art:!!document.querySelector(".v4-motion-canvas"),oldDiagram:!!document.querySelector("#inicio .system-illustration"),brand:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),flow:!!document.querySelector("#ecosistema .prime-service-cta"),unapprovedAutoPublish:!!document.querySelector("[data-deploy]")}))()`);
  if(!heroQuality.headline?.includes("AUMENTA EL VALOR")||!heroQuality.headline?.includes("A TU TIEMPO")||!heroQuality.art||heroQuality.oldDiagram||!heroQuality.flow||!heroQuality.brand?.includes("deliver-assets-mark.png")||heroQuality.unapprovedAutoPublish) report.failures.push("V4 visual contract failed: "+JSON.stringify(heroQuality));
  report.tests.push({name:"V4 motion/design contract",heroQuality});
- const heroPhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");const f=document.querySelector("#inicio .prime-photo-surface");return {loaded:!!x?.complete&&x.naturalWidth===1671&&x.naturalHeight===941,src:x?.getAttribute("src"),logo:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),oldText:document.querySelector("#inicio")?.textContent?.includes("IDEAS EN ACCIÓN"),ratio:f?.getBoundingClientRect().width/f?.getBoundingClientRect().height}})()');
- if(!heroPhoto.loaded||!heroPhoto.src?.endsWith("desset-hero-entrega-dos-espejos.webp")||
-    !heroPhoto.logo?.endsWith("deliver-assets-mark.png")||heroPhoto.oldText||heroPhoto.ratio<1.2||heroPhoto.ratio>2)
+ const heroPhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");const f=document.querySelector("#inicio .prime-photo-surface");return {loaded:!!x?.complete&&x.naturalWidth===1920&&x.naturalHeight===960,src:x?.getAttribute("src"),logo:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),oldText:document.querySelector("#inicio")?.textContent?.includes("IDEAS EN ACCIÓN"),ratio:f?.getBoundingClientRect().width/f?.getBoundingClientRect().height}})()');
+ if(!heroPhoto.loaded||!heroPhoto.src?.endsWith("desset-hero-editorial-poster.webp")||
+    !heroPhoto.logo?.endsWith("deliver-assets-mark.png")||heroPhoto.oldText||Math.abs(heroPhoto.ratio-2)>.04)
     report.failures.push("HERO-PHOTO-01 exact local render, original logo, conceptual disclosure failed: "+JSON.stringify(heroPhoto));
  report.tests.push({name:"HERO-PHOTO-01 exact local render, original logo, conceptual disclosure",heroPhoto});
+ await until(async()=>await js('(()=>{const v=document.querySelector("#desset-editorial-video");return v.readyState>=2&&v.videoWidth===1920&&v.videoHeight===960&&v.loop&&v.muted&&!v.paused&&v.currentTime>0})()'),"editorial hero video playing");
+ const heroPlayback=await js('(()=>{const v=document.querySelector("#desset-editorial-video"),b=document.querySelector(".desset-editorial-toggle"),t=document.querySelector(".desset-editorial-stage"),r=t.getBoundingClientRect(),p=v.getBoundingClientRect();return {source:v.dataset.src,ready:v.dataset.ready,loop:v.loop,muted:v.muted,inline:v.playsInline,controls:v.controls,buttonVisible:!b.hidden,buttonLabel:b.getAttribute("aria-label"),fit:getComputedStyle(v).objectFit,full:Math.abs(r.width-p.width)<2&&Math.abs(r.height-p.height)<2}})()');
+ if(heroPlayback.source!=="./assets/desset-hero-editorial.mp4"||heroPlayback.ready!=="true"||!heroPlayback.loop||!heroPlayback.muted||!heroPlayback.inline||heroPlayback.controls||!heroPlayback.buttonVisible||heroPlayback.buttonLabel!=="Pausar animación"||heroPlayback.fit!=="cover"||!heroPlayback.full)report.failures.push("HERO-EDITORIAL-01 playback/geometry "+JSON.stringify(heroPlayback));
+ await js('document.querySelector(".desset-editorial-toggle").click()');
+ await until(async()=>await js('document.querySelector("#desset-editorial-video").paused && document.querySelector(".desset-editorial-toggle").getAttribute("aria-label")==="Reproducir animación"'),"editorial pause");
+ await js('document.querySelector(".desset-editorial-toggle").click()');
+ await until(async()=>await js('!document.querySelector("#desset-editorial-video").paused'),"editorial resume");
+ report.tests.push({name:"HERO-EDITORIAL-01 real video and manual pause/resume",heroPlayback});
  const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",pitch:".business-pitch"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
  const decorDots=roundedUI.titles.filter(t=>t.endsWith("."));
- if(decorDots.length||Object.entries(roundedUI.radii).some(([,v])=>v<10))
+ if(decorDots.length||Object.entries(roundedUI.radii).some(([key,v])=>key==="hero"?v!==0:key==="cta"?v!==6:v<10))
    report.failures.push("V6.6 unexpected heading periods or missing rounded corners: "+JSON.stringify({decorDots,radii:roundedUI.radii}));
  report.tests.push({name:"V6.6 editorial punctuation and computed corner radii",roundedUI});
 
@@ -319,7 +327,7 @@ try{
    report.failures.push("V6.7 computed 60-30-10 palette or four-participant narrative mismatch: "+JSON.stringify(designSystem));
  report.tests.push({name:"V6.7 palette 60-30-10 and editorial journey computed in browser",designSystem});
  const visual02=await js('(()=>{const q=s=>document.querySelector(s);const cs=s=>getComputedStyle(q(s));return {cssLoaded:[...document.styleSheets].some(x=>x.href?.endsWith("/styles-visual02.css")),heroPhoto:q("#inicio .prime-photo-image")?.getAttribute("src"),heroLogo:q(".site-header .brand-mark")?.getAttribute("src"),heroCTA:q("#inicio .hero-cta")?.getAttribute("href"),businessShadow:cs("#negocios .business-pitch").boxShadow,serviceTop:cs("#soluciones .service--main").borderTopWidth,trustBg:cs("#vision").backgroundColor,mobileSafe:document.documentElement.scrollWidth<=document.documentElement.clientWidth+2}})()');
- if(!visual02.cssLoaded||!visual02.heroPhoto?.endsWith("desset-hero-entrega-dos-espejos.webp")||!visual02.heroLogo?.endsWith("deliver-assets-mark.png")||visual02.heroCTA!=="#contacto"||
+ if(!visual02.cssLoaded||!visual02.heroPhoto?.endsWith("desset-hero-editorial-poster.webp")||!visual02.heroLogo?.endsWith("deliver-assets-mark.png")||visual02.heroCTA!=="./mision-vision-valores.html#proposito"||
    visual02.serviceTop!=="0px"||visual02.trustBg!=="rgb(255, 255, 255)"||!visual02.mobileSafe)
   report.failures.push("VISUAL-02 institutional editorial consistency regression: "+JSON.stringify(visual02));
  report.tests.push({name:"VISUAL-02 corporate style, approved hero and responsive safety",visual02});
@@ -336,8 +344,8 @@ try{
   report.failures.push("ANIM-01 obsolete ornament or arcade overlay detected: "+JSON.stringify(anim01));
  report.tests.push({name:"ANIM-01 no scanner, glint, cursor-game lens or bouncing hero",anim01});
  const anim02=await js('(()=>({photo:getComputedStyle(document.querySelector("#inicio .prime-photo-surface")).animationName,focus:getComputedStyle(document.querySelector("#inicio .prime-photo-image")).animationName,title:getComputedStyle(document.querySelector("#inicio .v4-headline-a .motion-line__inner")).animationName,cta:getComputedStyle(document.querySelector("#inicio .hero-actions")).animationName,chapters:document.documentElement.dataset.anim02,approvedSrc:document.querySelector("#inicio .prime-photo-image")?.getAttribute("src"),logo:document.querySelector(".brand-mark")?.getAttribute("src")}))()');
- if(anim02.photo!=="anim02-frame"||anim02.focus!=="anim02-focus"||anim02.title!=="anim02-type"||anim02.cta!=="anim02-enter"||anim02.chapters!=="cinematic-chapters"||
-   !anim02.approvedSrc?.endsWith("desset-hero-entrega-dos-espejos.webp")||!anim02.logo?.endsWith("deliver-assets-mark.png"))
+ if(anim02.photo!=="none"||anim02.focus!=="none"||anim02.title!=="none"||anim02.cta!=="none"||anim02.chapters!=="cinematic-chapters"||
+   !anim02.approvedSrc?.endsWith("desset-hero-editorial-poster.webp")||!anim02.logo?.endsWith("deliver-assets-mark.png"))
   report.failures.push("ANIM-02 original DESSET hero/finite cinematography contract failed: "+JSON.stringify(anim02));
  report.tests.push({name:"ANIM-02 real photographic opening, official mark, editorial chronology",anim02});
 
@@ -401,7 +409,7 @@ try{
  report.tests.push({name:"Commercial pitch CTA",pitch});
  await capture("desktop-business-pitch.png");
  const rc=await js('(()=>{const h=document.querySelector(".hero-cta");const services=document.querySelector("#soluciones .solutions-grid");const prim=document.querySelector(".footer-social a[data-footer-channel=Instagram]");const count=[...document.querySelectorAll("h1")].length;return {primaryHref:h.getAttribute("href"),obsoleteServices:!!document.querySelector(".future-services"),serviceCards:services.querySelectorAll(".service").length,contactHref:prim.getAttribute("href"),contactText:prim.getAttribute("aria-label"),contactTarget:prim.getAttribute("target"),oldContact:!!document.querySelector(".contact-bottom,.contact-primary,.social-links--official"),headingCount:count,removedResponsibility:!document.querySelector(".responsibility")}})()');
- if(rc.primaryHref!=="#contacto"||rc.obsoleteServices||rc.serviceCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||rc.oldContact||rc.contactText!=="Instagram"||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
+ if(rc.primaryHref!=="./mision-vision-valores.html#proposito"||rc.obsoleteServices||rc.serviceCards!==2||!rc.contactHref.startsWith("https://www.instagram.com/")||rc.contactTarget!=="_blank"||rc.oldContact||rc.contactText!=="Instagram"||rc.headingCount!==1||!rc.removedResponsibility)report.failures.push("RC funnel and honesty contract failed: "+JSON.stringify(rc));
  report.tests.push({name:"V4.3 commercial focus & primary contact",rc});
  const socials=await js('(()=>{const nav=document.querySelector(".footer-social");const links=[...nav?.querySelectorAll("a")||[]];return {count:links.length,navLabel:nav?.getAttribute("aria-label"),oldBlock:!!document.querySelector(".contact-bottom,.contact-primary,.social-links--official,.social-links--secondary"),links:links.map(a=>({name:a.getAttribute("aria-label"),href:a.href,owner:a.dataset.channelBasis,review:a.dataset.channelReview,height:Math.round(a.getBoundingClientRect().height),background:getComputedStyle(a).backgroundColor,border:getComputedStyle(a).borderTopColor})),width:Math.round(nav?.getBoundingClientRect().width||0)}})()');
  if(socials.count!==5||socials.navLabel!=="Redes sociales oficiales en el pie de página"||socials.oldBlock||
@@ -515,16 +523,18 @@ try{
  report.tests.push({name:"VIDEO-03 both videos cross native loop boundary",loopEvidence});
  const reduced=await viewport(390,844,true);
  const mobilePhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");return {src:x?.currentSrc,width:x?.naturalWidth,height:x?.naturalHeight,loaded:!!x?.complete}})()');
- if(!mobilePhoto.loaded||!mobilePhoto.src?.includes("desset-hero-entrega-mobile.webp")||mobilePhoto.width!==960)
+ if(!mobilePhoto.loaded||!mobilePhoto.src?.includes("desset-hero-editorial-poster.webp")||mobilePhoto.width!==1920||mobilePhoto.height!==960)
   report.failures.push("HERO-PHOTO-01 mobile responsive photo not selected: "+JSON.stringify(mobilePhoto));
- report.tests.push({name:"HERO-PHOTO-01 60KB mobile WebP actually loaded",mobilePhoto});
+ report.tests.push({name:"HERO-EDITORIAL-01 panoramic poster loaded with reduced motion",mobilePhoto});
+ const reducedHero=await js('(()=>{const v=document.querySelector("#desset-editorial-video"),b=document.querySelector(".desset-editorial-toggle");return v.paused&&!v.getAttribute("src")&&getComputedStyle(v).display==="none"&&b.hidden})()');
+ if(!reducedHero)report.failures.push("HERO-EDITORIAL-01 reduced-motion fallback must not load or play video");
  const reducedMode=await js("document.documentElement.dataset.motionSystem");
  if(reducedMode!=="reduced")report.failures.push("Motion fallback failed for reduced preference: "+String(reducedMode));
  const reducedAnimations=await js('(()=>({headline:document.querySelector(".motion-headline").textContent.trim(),cta:document.querySelector(".hero-cta").getAttribute("href"),closing:document.querySelector("#contact-title").textContent.trim(),noDecor:!document.querySelector("#inicio .v4-shape, #inicio .v4-canvas-stamp, #inicio .v5-hero-refraction, #inicio .motion-brand-thread")}))()');
- if(!reducedAnimations.noDecor||!reducedAnimations.headline.includes("AUMENTA EL VALOR")||reducedAnimations.cta!=="#contacto"||!reducedAnimations.closing.includes("CONEXIONES"))report.failures.push("V4.5 reduced motion/essential information failed: "+JSON.stringify(reducedAnimations));
+ if(!reducedAnimations.noDecor||!reducedAnimations.headline.includes("AUMENTA EL VALOR")||reducedAnimations.cta!=="./mision-vision-valores.html#proposito"||!reducedAnimations.closing.includes("CONEXIONES"))report.failures.push("V4.5 reduced motion/essential information failed: "+JSON.stringify(reducedAnimations));
  report.tests.push({name:"V4.5 full-fidelity reduced motion fallback",reducedAnimations});
  const anim02Reduced=await js('(()=>({photo:getComputedStyle(document.querySelector("#inicio .prime-photo-surface")).animationName,focus:getComputedStyle(document.querySelector("#inicio .prime-photo-image")).animationName,title:getComputedStyle(document.querySelector("#inicio .v4-headline-a .motion-line__inner")).animationName,cta:document.querySelector("#inicio .hero-cta")?.getAttribute("href"),captionAbsent:!document.querySelector("#inicio .prime-photo-caption")}))()');
- if(anim02Reduced.photo!=="none"||anim02Reduced.focus!=="none"||anim02Reduced.title!=="none"||anim02Reduced.cta!=="#contacto"||!anim02Reduced.captionAbsent)
+ if(anim02Reduced.photo!=="none"||anim02Reduced.focus!=="none"||anim02Reduced.title!=="none"||anim02Reduced.cta!=="./mision-vision-valores.html#proposito"||!anim02Reduced.captionAbsent)
   report.failures.push("ANIM-02 reduced-motion accessibility contract failed: "+JSON.stringify(anim02Reduced));
  report.tests.push({name:"ANIM-02 reduced motion leaves approved image and copy static",anim02Reduced});
 
