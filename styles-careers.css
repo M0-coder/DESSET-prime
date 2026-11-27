@@ -19,3 +19,40 @@
 .ca-footer{background:#f1f5fa;border-top:1px solid #d8dce2;padding:24px var(--edge,24px)}
 .ca-footer a{color:#073bbc;font-size:24px;font-weight:650;text-decoration:none}
 .ca-footer p{font-size:12px;color:#565656;margin:12px 0 0}
+
+/* CAREERS-02: preoperative corporate careers structure; hero rules unchanged. */
+.careers-page .ca-block{padding-block:clamp(32px,5vw,64px)}
+.careers-page .ca-block h2{font-size:clamp(27px,3.3vw,44px);letter-spacing:-.025em}
+.careers-page .ca-business,.careers-page .ca-areas,.careers-page .ca-values{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.careers-page .ca-business article{background:#f4f8fe;border-radius:12px;padding:24px;min-width:0}
+.careers-page .ca-business h3{color:#073bbc;margin:0 0 8px}
+.careers-page .ca-block h3{font-size:clamp(18px,2vw,24px);line-height:1.25;overflow-wrap:anywhere}
+.careers-page .ca-business p,.careers-page .ca-values p,.careers-page .ca-areas p{margin:0}
+.careers-page .ca-values{border:0;margin:0}
+.careers-page .ca-values li{border:0;align-items:flex-start;padding:20px 0;min-width:0}
+.careers-page .ca-values li div{min-width:0}
+.careers-page .ca-values li span{display:block;margin-bottom:8px;overflow-wrap:anywhere}
+.careers-page .ca-values p{font-weight:400}
+.careers-page .ca-areas{list-style:none;padding:0;margin:24px 0 0}
+.careers-page .ca-areas li{border:1px solid #d8dce2;border-radius:12px;padding:clamp(16px,3vw,28px);min-width:0}
+.careers-page .ca-areas svg,.careers-page .ca-opportunities svg{width:36px;height:36px;color:#073bbc;margin-bottom:12px}
+.careers-page .ca-areas h3{margin:0 0 10px}
+.careers-page .ca-principles,.careers-page .ca-selection{list-style:none;padding:0;margin:0 0 20px;counter-reset:ca-step;border-top:1px solid #d8dce2}
+.careers-page .ca-principles li,.careers-page .ca-selection li{counter-increment:ca-step;position:relative;min-height:64px;border-bottom:1px solid #d8dce2;padding:20px 12px 20px 64px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
+.careers-page .ca-principles li::before,.careers-page .ca-selection li::before{content:counter(ca-step,decimal-leading-zero);position:absolute;left:0;top:16px;width:36px;height:36px;display:grid;place-items:center;color:#073bbc;font-weight:800}
+.careers-page .ca-selection li::before{background:#eef3ff;border-radius:50%}
+.careers-page .ca-opportunities{text-align:center;border:1px solid #d8dce2;border-radius:16px;padding:clamp(20px,5vw,48px)}
+.careers-page .ca-opportunities h3{margin:0 0 16px}
+.careers-page .ca-opportunities p{margin:0 auto 12px}
+.careers-page .ca-opportunities p:last-child{margin-bottom:0}
+.careers-page .ca-faq details{border-bottom:1px solid #d8dce2;padding:12px 0}
+.careers-page .ca-faq summary{min-height:48px;padding:12px 0;cursor:pointer;font-weight:700;line-height:1.5}
+.careers-page .ca-faq details p{margin:4px 0 12px}
+.careers-page .ca-faq summary:focus-visible{outline:3px solid #073bbc;outline-offset:3px}
+.careers-page .ca-closing .ca-inner{text-align:center}
+.careers-page .ca-closing p{margin:0 auto 24px}
+.careers-page .ca-button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;max-width:100%;width:380px;padding:12px 24px;border-radius:10px;background:#073bbc;color:#fff;text-decoration:none;font-weight:750;line-height:1.5}
+.careers-page .ca-button:hover{background:#1248b1}
+.careers-page .ca-button:focus-visible{outline:3px solid #fff;outline-offset:4px}
+@media(max-width:540px){.careers-page .ca-areas,.careers-page .ca-values{grid-template-columns:1fr}.careers-page .ca-business article{padding:16px}.careers-page .ca-business h3{font-size:18px}.careers-page .ca-business{gap:10px}}
+@media(max-width:360px){.careers-page .ca-business{grid-template-columns:1fr}}
