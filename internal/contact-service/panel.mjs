@@ -4,7 +4,8 @@ const labels={alianzas:"Alianzas",inversion:"Inversionistas",marketing:"Marketin
 const states={RECEIVED:"Recibida",IN_REVIEW:"En revisión",CLOSED:"Cerrada"};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const validId=id=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(id);
-const headers={"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Robots-Tag":"noindex, nofollow","Referrer-Policy":"no-referrer","Content-Security-Policy":"default-src 'none'; style-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"};
+const headers={"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Robots-Tag":"noindex, nofollow",// Keep same-origin form POST Origin intact; never send a referrer cross-origin.
+ "Referrer-Policy":"same-origin","Content-Security-Policy":"default-src 'none'; style-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"};
 const page=(body,status=200)=>new Response('<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>DESSET — Administración de contacto</title><link rel="stylesheet" href="/panel/style.css"></head><body><header><strong>DESSET</strong><span>Administración institucional</span></header><main><p class="notice">ENTORNO SINTÉTICO · Sin datos reales</p>'+body+'</main></body></html>',{status,headers});
 const error=s=>page("<h1>Acceso o solicitud no disponible</h1>",s);
 async function body(req){

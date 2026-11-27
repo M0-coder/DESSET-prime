@@ -92,7 +92,9 @@ try{
    assert.ok(await js("document.body.innerText.includes("+JSON.stringify(email)+") && document.documentElement.scrollWidth<=document.documentElement.clientWidth+2"));
    if(category==="marketing")await screenshot("panel-"+width);
    await js("document.querySelector('form button').click()");
-   await until(async()=>await js("document.readyState==='complete' && document.querySelector('form button')?.textContent==='Cerrar consulta'"),"review");
+   await until(async()=>{const last=fixture.transitions.at(-1);if(last&&last.status!==303)return true;return await js("document.readyState==='complete' && document.querySelector('form button')?.textContent==='Cerrar consulta'");},"review");
+   assert.equal(fixture.transitions.at(-1)?.status,303,"review response "+JSON.stringify(fixture.transitions.at(-1)));
+   assert.equal(await js("document.querySelector('form button')?.textContent"),"Cerrar consulta");
    await js("document.querySelector('form button').click()");
    await until(async()=>await js("document.readyState==='complete' && document.body.innerText.includes('Consulta cerrada.')"),"close");
    const row=fixture.db.prepare("SELECT state,version FROM contact_requests WHERE id=?").get(id);
@@ -111,7 +113,9 @@ try{
  assert.equal(fixture.purge(),36);assert.equal(fixture.db.prepare("SELECT count(*) n FROM contact_events").get().n,0);
  fixture.disable();assert.equal((await fetch(fixture.origin+"/panel")).status,503);
  await writeFile(join(output,"checks.json"),JSON.stringify({checks,negativeControls:["unauthenticated","department","synthetic-only","challenge","expiry","disabled"],rowsAfterPurge:0,eventsAfterPurge:0},null,2));
+ assert.equal(fixture.transitions.length,72);assert.ok(fixture.transitions.every(t=>t.status===303&&t.origin==="same-origin"&&t.authorized));
  console.log("CONTACT-READY-04 PASS: "+checks.length+" full browser circuits, 72 audit transitions, purge and negative controls");
+}catch(e){if(fixture){await writeFile(join(output,"transition-diagnostics.json"),JSON.stringify(fixture.transitions,null,2));console.error("Synthetic transition diagnostics",JSON.stringify(fixture.transitions));}throw e;
 }finally{
  child.kill();await new Promise(r=>{if(child.exitCode!==null)r();else child.once("exit",r)});
  try{await rm(profile,{recursive:true,force:true,maxRetries:12,retryDelay:250});}finally{if(fixture)await fixture.close();}

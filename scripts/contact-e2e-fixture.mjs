@@ -24,7 +24,7 @@ export async function startFixture(){
  const db=new DatabaseSync(":memory:");db.exec(read("internal/contact-service/schema.sql").toString());
  const admin=randomBytes(32).toString("hex"),restricted=randomBytes(32).toString("hex"),csrf=randomBytes(32).toString("hex");
  let at=1700000000000,enabled=true,allowChallenge=true;
- let attempts=0;
+ let attempts=0;const transitions=[];
  const options={db,mode:"synthetic-local",enabled:true,rateLimit:async()=>++attempts<=100,verifyChallenge:async(token,c)=>allowChallenge&&token==="synthetic-test"&&c.hostname==="contact-preview.invalid"&&c.action==="contact_intake",authorizeAdmin:async req=>{const t=req.headers.get("X-Fixture-Admin");if(t===admin)return {id:"synthetic-admin-all",categories:[...categories],csrf};if(t===restricted)return {id:"synthetic-admin-restricted",categories:["marketing"],csrf};return null;},now:()=>at};
  const api=makeContactHandler(options),panel=makePanel(options,read("internal/contact-service/panel.css").toString());
  let origin;
@@ -44,10 +44,12 @@ export async function startFixture(){
    let buf=Buffer.alloc(0);
    if(req.method==="POST"){for await(const chunk of req){if(buf.length+chunk.length>12000)return await send(new Response("Too large",{status:413}));buf=Buffer.concat([buf,chunk]);}}
    const request=new Request(ORIGIN+url.pathname+url.search,{method:req.method,headers:h,...(req.method==="POST"?{body:buf}:{})});
-   return await send(await (url.pathname==="/api/contact"?api(request):panel(request)));
+   const response=await (url.pathname==="/api/contact"?api(request):panel(request));
+   if(url.pathname==="/panel/transition")transitions.push({status:response.status,origin:req.headers.origin===origin?"same-origin":req.headers.origin==="null"?"null":req.headers.origin?"other":"missing",fetchSite:req.headers["sec-fetch-site"]==="same-origin"?"same-origin":"other",authorized:h.get("X-Fixture-Admin")===admin||h.get("X-Fixture-Admin")===restricted});
+   return await send(response);
   }catch{return await send(new Response("Unavailable",{status:503}));}
  });
  await new Promise((ok,no)=>{server.once("error",no);server.listen(0,"127.0.0.1",ok);});
  origin="http://127.0.0.1:"+server.address().port;
- return {origin,admin,restricted,db,disable:()=>{enabled=false;},challenge:v=>{allowChallenge=v;},purge:()=>{at+=7*86400000;return purgeSynthetic(db,at);},close:async()=>{await new Promise(ok=>{server.close(ok);server.closeAllConnections();});db.close();}};
+ return {origin,admin,restricted,db,transitions,disable:()=>{enabled=false;},challenge:v=>{allowChallenge=v;},purge:()=>{at+=7*86400000;return purgeSynthetic(db,at);},close:async()=>{await new Promise(ok=>{server.close(ok);server.closeAllConnections();});db.close();}};
 }
