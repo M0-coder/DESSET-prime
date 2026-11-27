@@ -11,7 +11,7 @@ const allowed=new Set(origins);
 const headersRequired=['content-security-policy','x-content-type-options'];
 export async function verifyLive({publicDir,reportPath,request=fetch,attempts=5,delay=3000,log=console.log}){
  const m=JSON.parse(readFileSync(reportPath,'utf8'));
- if(m.schema!=='desset-prime-manual-release-package-v1'||m.seo_policy!=='NOINDEX'||m.production_authorized!==false||m.production_deployed!==false||m.package_files!==91||m.assets?.length!==91||m.assets.some(a=>/^assets\/roles-geometry-/.test(a.path))||hash(Buffer.from(JSON.stringify(m.assets)))!==m.assets_manifest_sha256)throw Error('NO-GO: unverified package manifest');
+ if(m.schema!=='desset-prime-manual-release-package-v1'||m.seo_policy!=='NOINDEX'||m.production_authorized!==false||m.production_deployed!==false||m.package_files!==92||m.assets?.length!==92||m.assets.some(a=>/^assets\/roles-geometry-/.test(a.path))||hash(Buffer.from(JSON.stringify(m.assets)))!==m.assets_manifest_sha256)throw Error('NO-GO: unverified package manifest');
  const paths=new Set();
  for(const a of m.assets){
   if(typeof a.path!=='string'||a.path.startsWith('/')||a.path.split('/').some(p=>!p||p==='.'||p==='..')||!(/^[a-z0-9_.\/-]+$/.test(a.path)||a.path==='THIRD-PARTY-NOTICES.txt'||/^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(a.path))||paths.has(a.path))throw Error('NO-GO: invalid or duplicate asset');
