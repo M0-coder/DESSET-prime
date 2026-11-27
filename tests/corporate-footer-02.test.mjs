@@ -30,7 +30,7 @@ test('homepage labels do not weaken the canonical internal navigation checks', a
   const company=read('empresa.html');
   assert.doesNotThrow(()=>assertInstitutionalNavigation(html,company,'empresa'));
   assert.throws(()=>assertInstitutionalNavigation(html,company.replace('<strong>Ecosistema</strong>','<strong>Unexpected</strong>'),'empresa'),/Footer differs/);
-  assert.throws(()=>assertInstitutionalNavigation(html,company.replace('href="./prime.html">DESSET prime','href="./contacto.html">DESSET prime'),'empresa'),/Footer differs/);
+  assert.throws(()=>assertInstitutionalNavigation(html,company.replace('<nav class="corporate-footer"'+company.split('<nav class="corporate-footer"')[1],('<nav class="corporate-footer"'+company.split('<nav class="corporate-footer"')[1]).replace('href="./prime.html">DESSET prime','href="./contacto.html">DESSET prime')),'empresa'),/Footer differs/);
 });
 test('social strip preserves its existing icon appearance and layout rules',()=>{
   const scoped=css.split('/* CORPORATE-FOOTER-02')[1];
