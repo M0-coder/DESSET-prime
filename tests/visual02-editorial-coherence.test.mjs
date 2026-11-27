@@ -11,7 +11,7 @@ assert.ok(css.includes("/* VISUAL-03:"),"Must retain isolated VISUAL-03 marker")
 test("VISUAL-02 leaves the approved photographic hero and real official identity untouched",()=>{
  assert.match(html,/desset-hero-editorial-poster\.webp/);
  assert.match(html,/data-src="\.\/assets\/desset-hero-editorial\.mp4"/);
- assert.match(html,/Escena conceptual: personas, paquetes y arquitectura urbana/);
+ assert.match(html,/Escena conceptual: comercio, tecnología, distribución y entrega\. No representa operaciones comerciales activas de DESSET\./);
  assert.match(html,/deliver-assets-mark\.png/);
  assert.match(html,/Conoce nuestro propósito/);
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/Representación conceptual/);

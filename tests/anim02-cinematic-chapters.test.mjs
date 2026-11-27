@@ -8,7 +8,7 @@ const html=read("index.html"),css=read("styles-hero-photo.css"),motion=read("scr
 test("ANIM-02 approved real-world photo, 2 mirrors disclosure, official identity and commercial CTA",()=>{
  assert.match(html,/desset-hero-editorial-poster\.webp/);
  assert.match(html,/data-src="\.\/assets\/desset-hero-editorial\.mp4"/);
- assert.match(html,/Escena conceptual: personas, paquetes y arquitectura urbana/);
+ assert.match(html,/Escena conceptual: comercio, tecnología, distribución y entrega\. No representa operaciones comerciales activas de DESSET\./);
  assert.match(html,/Conoce nuestro propósito/);
  assert.match(html,/deliver-assets-mark\.png/);
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/Representación conceptual/);
