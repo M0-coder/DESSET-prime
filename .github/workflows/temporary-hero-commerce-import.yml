@@ -1,0 +1,24 @@
+name: Temporary isolated HERO-COMMERCE-B media import
+on:
+  push:
+    branches: ["media-import/hero-commerce-b-hd-20261127"]
+permissions:
+  contents: write
+jobs:
+  import:
+    if: github.ref == 'refs/heads/media-import/hero-commerce-b-hd-20261127' && github.repository == 'M0-coder/DESSET-prime'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Verify exact approved HD video and create Git blob
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --proto '=https' --max-time 60 'https://d2ol7oe51mr4n9.cloudfront.net/user_3HH0TaBtA9IDvh7TNM59DmsRnqH/ebbc2a0c-cd06-4a77-971e-b04401026bcc.mp4' -o video.mp4
+          test "$(wc -c < video.mp4)" = 6958330
+          echo '76944235866393f12d88c4ce3869cdf984a13805638af441747f59f318a725b0  video.mp4' | sha256sum -c -
+          python3 -c 'import base64,json;print(json.dumps({"encoding":"base64","content":base64.b64encode(open("video.mp4","rb").read()).decode()}))' > blob.json
+          gh api --method POST repos/M0-coder/DESSET-prime/git/blobs --input blob.json --jq '.sha'
+          rm -f blob.json video.mp4
