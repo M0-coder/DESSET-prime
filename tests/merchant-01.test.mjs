@@ -29,7 +29,7 @@ for(const dir of ["","dist/"]){
   assert.equal((html.match(/<figure class="ap-hero-image">/g)||[]).length,1);
   assert.doesNotMatch(html,/<video\b/);
  }else {assert.match(html,/no representa una operación activa/);const hero=html.match(/<section class="ap-hero ap-hero--rider-photo"[^>]*>[\s\S]*?<\/section>/)[0];assert.ok(hero.includes('src="./assets/repartidores-hero-original.jpg"'));assert.doesNotMatch(hero,/<(?:p|figcaption)\b/);assert.equal((hero.match(/class="ap-button"/g)||[]).length,1);assert.match(hero,/href="#modelo">Conoce el modelo/);}
- assert.match(html,/cuando estén aprobados/);
+ assert.match(html,page==="comercios"?/Las condiciones económicas se comunicarán cuando estén aprobadas\./:/cuando estén aprobados/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/form-action 'none'/);
  assert.doesNotMatch(html.replace('<script defer src="./scripts/app.js"></script>',""),/<(?:form|input|script|iframe)\b/i);
