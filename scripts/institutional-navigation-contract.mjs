@@ -13,7 +13,15 @@ export function sharedFooterNav(home,page){
  assert.ok(institutionalPages.includes(page));
  const nav=home.match(/<nav class="corporate-footer"[\s\S]*?<\/nav>/)?.[0];
  assert.ok(nav,"Missing canonical footer navigation");
- return nav.replace('href="#soluciones"','href="./index.html#soluciones"').replace('href="./'+(companyRoutes.includes(page)?'empresa':page)+'.html"','href="./'+(companyRoutes.includes(page)?'empresa':page)+'.html" aria-current="page"');
+ // The approved home footer uses two presentation labels; internal pages retain
+ // their canonical wording. Compare the complete navigation after only those
+ // two exact, scoped title substitutions (all links and other markup stay strict).
+ const homeDark=home.includes('<footer class="site-footer home-footer-dark">');
+ if(homeDark){
+  assert.ok(nav.includes('<strong>Aplicaciones</strong>')&&nav.includes('<strong>Contacto</strong>'),"Missing approved home footer labels");
+ }
+ const canonical=homeDark?nav.replace('<strong>Aplicaciones</strong>','<strong>Ecosistema</strong>').replace('<strong>Contacto</strong>','<strong>Información institucional</strong>'):nav;
+ return canonical.replace('href="#soluciones"','href="./index.html#soluciones"').replace('href="./'+(companyRoutes.includes(page)?'empresa':page)+'.html"','href="./'+(companyRoutes.includes(page)?'empresa':page)+'.html" aria-current="page"');
 }
 export function assertInstitutionalNavigation(home,doc,page){
  assert.equal(doc.match(/<header class="site-header">[\s\S]*?<\/header>/)?.[0],sharedHeader(home,page),"Header differs from canonical navigation");
