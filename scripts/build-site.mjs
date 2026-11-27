@@ -15,7 +15,7 @@ const assets=await readdir(resolve(root,"assets"));
 const allowStatic=assets.filter(name=>!/^roles-geometry-(?:v2|es|mobile-es)\.svg$/.test(name)&&/^[a-z0-9-]+\.(?:png|svg|webp)$/.test(name))
  .map(name=>"assets/"+name);
 if(assets.includes("repartidores-hero-original.jpg"))allowStatic.push("assets/repartidores-hero-original.jpg");
-for(const name of ["servicio-desset.mp4","servicio-prime.mp4"])allowStatic.push("assets/"+name);
+for(const name of ["servicio-desset.mp4","servicio-prime.mp4","aplicaciones-hero.mp4"])allowStatic.push("assets/"+name);
 const compiled=["assets/v6-three.bundle.js",
  "assets/v62-commerce.glb","assets/v62-courier.glb","assets/v62-destination.glb"];
 const typefaces=["fonts/inter-latin-variable.woff2","fonts/plus-jakarta-sans-latin-variable.woff2",
@@ -44,9 +44,9 @@ if(!loader.includes('activationObserver.observe(stage)')||
  !loader.includes('threeStart?.addEventListener("click",loadThree)')||
  !loader.includes('./assets/v6-three.bundle.js'))
  throw Error("Viewport-activated 3D scene is not connected to bundled WebGL or manual fallback.");
-if(files.length!==82)throw Error("Too many release files for DESSET Prime: "+files.length);
+if(files.length!==83)throw Error("Too many release files for DESSET Prime: "+files.length);
 for(const path of files){
- if(path.split("/").includes("..") || !(companyFiles.includes(path)||path===companyCss||path==="assets/v6-three.bundle.js" || path==="assets/repartidores-hero-original.jpg" || /^assets\/servicio-(?:desset|prime)\.mp4$/.test(path) || path==="styles-service-video.css" || /^(?:(?:index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios|registro-repartidores|incorporacion-repartidores|capacitacion-repartidores|aplicaciones|aplicaciones-clientes|aplicaciones-comercios|aplicaciones-repartidores)\.html|styles(?:-v5|-system|-hero-photo|-visual02|-typography|-audiences|-prime|-contact|-trust|-news|-careers|-onboarding|-applications)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb)|fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2|fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt)$/.test(path)))
+ if(path.split("/").includes("..") || !(companyFiles.includes(path)||path===companyCss||path==="assets/v6-three.bundle.js" || path==="assets/repartidores-hero-original.jpg" || path==="assets/aplicaciones-hero.mp4" || /^assets\/servicio-(?:desset|prime)\.mp4$/.test(path) || path==="styles-service-video.css" || /^(?:(?:index|empresa|comercios|repartidores|prime|contacto|confianza|noticias|talento|en|registro-comercios|incorporacion-comercios|registro-repartidores|incorporacion-repartidores|capacitacion-repartidores|aplicaciones|aplicaciones-clientes|aplicaciones-comercios|aplicaciones-repartidores)\.html|styles(?:-v5|-system|-hero-photo|-visual02|-typography|-audiences|-prime|-contact|-trust|-news|-careers|-onboarding|-applications)?\.css|_headers|scripts\/(?:app|motion|v5-cinematic|service-state)\.js|assets\/[a-z0-9-]+\.(?:png|svg|webp|glb)|fonts\/(?:inter-latin-variable|plus-jakarta-sans-latin-variable)\.woff2|fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt)$/.test(path)))
    throw Error("Unexpected package path: "+path);
  const info=await stat(resolve(root,path));
  if(!info.isFile()||info.size===0)throw Error("Required website file missing/empty: "+path);

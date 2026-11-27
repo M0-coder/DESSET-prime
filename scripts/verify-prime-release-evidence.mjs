@@ -16,7 +16,7 @@ export function verifyPrimeReleaseEvidence({publicDir,evidencePath,expectedSha})
  check(/^[a-f0-9]{40}$/.test(expectedSha)&&info.origin_sha===expectedSha&&info.checkout_sha===expectedSha,'SHA mismatch');
  check(info.release_authorized===false&&info.release_decision==='NO-GO','not an offline-only candidate');
  check(info.noindex===true&&info.robots_disallow_all===true,'indexing policy changed');
- check(info.original_files===82&&info.staged_files===85,'package shape mismatch');
+ check(info.original_files===83&&info.staged_files===86,'package shape mismatch');
  check(info.repeated_packaging_identical===true&&info.independently_compiled_twice===false,'evidence claims changed');
  check(Array.isArray(info.files)&&info.files.length===85,'missing per-asset manifest');
  check(sha(Buffer.from(JSON.stringify(info.files)))===info.artifacts_sha256,'manifest checksum mismatch');

@@ -87,6 +87,12 @@ export function reviewRiderHeroPhoto(media){
  return {accepted:true,basis:'owner-supplied-and-approved-use',individual_source_verified:false,release_authorized:false};
 }
 // VIDEO-01: scoped owner attestation, not independent license verification or deployment approval.
+export function reviewApplicationsHeroVideo(media){
+ const a=media?.applications_hero_video;
+ const expected={"path":"assets/aplicaciones-hero.mp4","sha256":"a355c981174fa77631890fa3f0c94fe15b96af9fbe50d52533989b895c53f01f","bytes":71003,"kind":"video","source_filename":"3315-168567021.mp4","source":"conversation-upload","verification":"owner-supplied-and-approved-use","independent_legal_verification":false,"release_authorized":false};
+ const accepted=!!a&&Object.keys(a).length===Object.keys(expected).length&&Object.entries(expected).every(([k,v])=>a[k]===v);
+ return {accepted,basis:accepted?"owner-supplied-and-approved-use":"pending",individual_source_verified:false,release_authorized:false};
+}
 export function reviewServiceVideos(media){
  const rejected={accepted:false,basis:'pending',individual_source_verified:false,release_authorized:false};
  const v=media?.service_videos,d=v?.owner_attestation;
@@ -143,6 +149,8 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    if(!talentReview.accepted)throw Error('PHOTO-01: scoped photographic rights review required before production');
    const homeTalentReview=reviewHomeTalentPhoto(media);
    if(!homeTalentReview.accepted)throw Error('PHOTO-05: scoped homepage photograph review required before production');
+   const appHeroReview=reviewApplicationsHeroVideo(media);
+   if(!appHeroReview.accepted)throw Error('APP-HERO-VIDEO-01: scoped usage approval required before production');
    const serviceReview=reviewServiceVideos(media);
    if(!serviceReview.accepted)throw Error("VIDEO-01: scoped usage rights declaration required before production");
    const riderReview=reviewRiderHeroPhoto(media);
