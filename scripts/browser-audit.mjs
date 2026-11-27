@@ -272,7 +272,7 @@ async function viewport(width,height,reduce=false,entry=URL){
     fails.push("Partner cards responsive parity: "+JSON.stringify(partners));
   if(width<=700){
    const g=diag.mobileGeometry;
-   if(g.criticalPaint.length!==6||g.criticalPaint.some(s=>s.animation!=="none"||s.opacity!=="1"||s.filter!=="none"||s.transform!=="none"||s.clip!=="none")||!g.photoFull||!g.ctaInside||Math.abs(g.header-64)>1||g.heroCTA<48||g.heroCTAWidth>g.heroColumn+2||g.corporateColumns!==(width<320?1:2))fails.push("MOBILE-01 compact geometry: "+JSON.stringify(g));
+   if(g.criticalPaint.length!==5||g.criticalPaint.some(s=>s.animation!=="none"||s.opacity!=="1"||s.filter!=="none"||s.transform!=="none"||s.clip!=="none")||!g.photoFull||!g.ctaInside||Math.abs(g.header-64)>1||g.heroCTA<48||g.heroCTAWidth>g.heroColumn+2||g.corporateColumns!==(width<320?1:2))fails.push("MOBILE-01 compact geometry: "+JSON.stringify(g));
    if(!diag.menuLabel?.startsWith("Menú"))fails.push("Mobile menu accessible name must include visible Menú label: "+diag.menuLabel);
   if(diag.typeSizes.heroCTA<14||diag.typeSizes.serviceTitle<23||diag.typeSizes.storyTitle<13)fails.push("mobile content typography below release thresholds: "+JSON.stringify(diag.typeSizes));
  }

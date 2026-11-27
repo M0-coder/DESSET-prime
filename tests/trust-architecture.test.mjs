@@ -6,12 +6,12 @@ const html=readFileSync(new URL("../index.html",import.meta.url),"utf8");
 const css=readFileSync(new URL("../styles.css",import.meta.url),"utf8");
 
 test("institutional statement retains business direction without fictitious operations or registration",()=>{
- assert.match(html,/AUMENTA EL VALOR/);
- assert.match(html,/A TU TIEMPO/);
+ assert.match(html,/TU TIEMPO/);
+ assert.match(html,/VALE MÁS/);
  assert.match(html,/NO ES SOLO/);
  assert.match(html,/ES CONECTAR/);
- assert.match(html,/Conectamos personas, negocios y mercados/);
- assert.match(html,/<p class="hero-lead">Conectamos personas, negocios y mercados\.<\/p>/);
+ assert.doesNotMatch(html,/Conectamos personas, negocios y mercados/);
+ assert.doesNotMatch(html,/<p class="hero-lead">/);
  assert.doesNotMatch(html,/somos líderes|miles de clientes|servicios disponibles hoy|empresa registrada|RUC:\s*\d+|seguimiento en tiempo real/i);
  assert.doesNotMatch(html,/Comercio, tecnología y distribución se integran en una misma arquitectura/);
  assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
