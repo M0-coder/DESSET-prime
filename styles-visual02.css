@@ -194,9 +194,10 @@ body:has(#inicio) .home-footer-dark .corporate-footer{
 body:has(#inicio) .home-footer-dark .footer-social{
  grid-column:1/-1;background:#f5f5f5;
 }
+/* Keep the existing copyright typography, text color and margins.
+   A local light background preserves the original contrast. */
 body:has(#inicio) .site-footer.home-footer-dark>p{
- grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;
- color:#c7c7c7;font-size:12px;line-height:1.6;border-top:1px solid #444;padding-top:16px;margin:0;
+ grid-column:1/-1;background:#f5f5f5;
 }
 .home-footer-dark a:not(.footer-social a):focus-visible,.home-footer-dark summary:focus-visible{outline:3px solid #ffc62f;outline-offset:3px}
 @media(max-width:960px){
