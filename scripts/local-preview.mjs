@@ -20,7 +20,7 @@ const permitted=rel=>companyFiles.includes(rel)||rel===companyCss||rel==="index.
  || /^fonts\/LICENSE-(?:Inter|Plus-Jakarta-Sans)-OFL\.txt$/.test(rel)
  || /^scripts\/(?:app|motion|v5-cinematic|service-state)\.js$/.test(rel)
  || /^assets\/[a-z0-9-]+\.(?:png|svg|webp)$/.test(rel)
- || /^assets\/servicio-(?:desset|prime)\.mp4$/.test(rel)
+ || rel==="assets/aplicaciones-hero.mp4" || /^assets\/servicio-(?:desset|prime)\.mp4$/.test(rel)
  || rel==="assets/v6-three.bundle.js"
  || /^assets\/v62-(?:commerce|courier|destination)\.glb$/.test(rel);
 const server=createServer(async(req,res)=>{

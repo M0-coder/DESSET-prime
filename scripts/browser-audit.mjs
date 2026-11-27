@@ -934,7 +934,19 @@ try{
     if(page==="aplicaciones"){await js('document.fonts.ready');await verifySharedNavigation(root,page,w);}
     const a=await js(`(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,panels:document.querySelectorAll("[data-app-role]").length,downloads:[...document.querySelectorAll("[data-app-download]")].every(e=>e.textContent==="Descarga no disponible."),links:document.querySelectorAll("[data-app-links] a, a[download], form, iframe").length,country:document.querySelector("[data-app-country]").value,buttons:document.querySelectorAll("[data-app-platform]").length}))()`);
     if(a.scroll>a.width+2||a.panels!==(page==="aplicaciones"?3:1)||!a.downloads||a.links||a.country!=="PE"||a.buttons!==(page==="aplicaciones"?0:3))report.failures.push("APP-DISTRIBUTION "+root+page+w+": "+JSON.stringify(a));
-    if(page!=="aplicaciones"){
+    if(page==="aplicaciones"){
+     await js("window.scrollTo(0,0)");
+     await until(async()=>await js('(()=>{const v=document.querySelector(".apps-hero-video");return !!v&&v.readyState>=2&&v.videoWidth===1920&&v.videoHeight===1080&&!v.paused&&v.currentTime>0})()'),"application hero video playing");
+     const hero=await js(`(()=>{const t=document.querySelector(".apps-hero--video"),v=t.querySelector("video"),h=t.querySelector("h1"),p=t.querySelector("p"),r=t.getBoundingClientRect(),b=v.getBoundingClientRect(),copy=t.querySelector(".apps-hero-copy").getBoundingClientRect();return {source:v.dataset.src,loop:v.loop,muted:v.muted,inline:v.playsInline,controls:v.controls,buttons:t.querySelectorAll("button").length,poster:v.hasAttribute("poster"),fit:getComputedStyle(v).objectFit,full:Math.abs(b.width-r.width)<2&&Math.abs(b.height-r.height)<2,ink:getComputedStyle(h).color,bodyInk:getComputedStyle(p).color,inside:copy.left>=r.left-2&&copy.right<=r.right+2&&copy.top>=r.top-2&&copy.bottom<=r.bottom+2,duration:v.duration,overflow:h.scrollWidth>h.clientWidth+2||p.scrollWidth>p.clientWidth+2}})()`);
+     if(hero.source!=="./assets/aplicaciones-hero.mp4"||!hero.loop||!hero.muted||!hero.inline||hero.controls||hero.buttons||hero.poster||hero.fit!=="cover"||!hero.full||hero.ink!=="rgb(255, 255, 255)"||hero.bodyInk!=="rgb(255, 255, 255)"||!hero.inside||hero.overflow||hero.duration<1||hero.duration>1.2)report.failures.push("APP-HERO-VIDEO-01 "+root+w+": "+JSON.stringify(hero));
+     await js('(()=>{const v=document.querySelector(".apps-hero-video");v.currentTime=v.duration-.15})()');
+     await until(async()=>await js('(()=>{const v=document.querySelector(".apps-hero-video");return v.currentTime<.7&&!v.paused&&!v.ended})()'),"application hero crosses loop boundary");
+     await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:"reduce"}]});
+     await until(async()=>await js('(()=>{const v=document.querySelector(".apps-hero-video");return v.paused&&getComputedStyle(v).display==="none"})()'),"application hero reduced motion");
+     await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:"no-preference"}]});
+     await until(async()=>await js('!document.querySelector(".apps-hero-video").paused'),"application hero resumes");
+     report.tests.push({name:"APP-HERO-VIDEO-01 "+root+w,hero});
+    }else{
      const manual=await js(`(()=>{document.querySelector('[data-app-platform="ios"]').click();const country=document.querySelector("[data-app-country]");country.value="OTHER";country.dispatchEvent(new Event("change"));return {selected:document.querySelector('[data-app-platform="ios"]').getAttribute("aria-pressed"),hidden:document.querySelector("[data-app-links]").hidden,count:document.querySelectorAll("[data-app-links] a").length}})()`);
      if(manual.selected!=="true"||!manual.hidden||manual.count)report.failures.push("APP-DISTRIBUTION manual selection "+root+page+w);
     }

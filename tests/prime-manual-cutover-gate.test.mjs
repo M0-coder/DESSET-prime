@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto,reviewRiderHeroPhoto,reviewServiceVideos} from '../scripts/prime-manual-cutover-gate.mjs';
+import {validateReleaseIntent,validateCloudflareSnapshot,reviewSelectedMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto,reviewRiderHeroPhoto,reviewServiceVideos,reviewApplicationsHeroVideo} from '../scripts/prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const target=JSON.parse(readFileSync(root+'/config/prime-release-target.json','utf8'));
 const sha='a'.repeat(40);
@@ -154,3 +154,5 @@ test('VIDEO-01 owner declaration binds only four exact assets and never authoriz
  const m=copyMedia();assert.deepEqual(reviewServiceVideos(m),{accepted:true,basis:'owner-attested-free-use',individual_source_verified:false,release_authorized:false});
  for(const mutate of [x=>delete x.service_videos.owner_attestation,x=>x.service_videos.assets.pop(),x=>x.service_videos.assets[0].sha256='0'.repeat(64),x=>x.service_videos.owner_attestation.assets[1]=x.service_videos.owner_attestation.assets[0],x=>x.service_videos.owner_attestation.scope='unlimited',x=>x.service_videos.owner_attestation.individual_source_verification=true,x=>x.service_videos.owner_attestation.exclusive_ownership_claim=true,x=>x.service_videos.release_authorized=true]){const bad=copyMedia();mutate(bad);assert.equal(reviewServiceVideos(bad).accepted,false);}
 });
+
+test("APP-HERO-VIDEO-01 only exact owner-supplied video, no legal or release assertion",()=>{const m=copyMedia();assert.equal(reviewApplicationsHeroVideo(m).accepted,true);for(const key of ["path","sha256","bytes","verification","independent_legal_verification","release_authorized"]){const bad=copyMedia();bad.applications_hero_video[key]=null;assert.equal(reviewApplicationsHeroVideo(bad).accepted,false);}});
