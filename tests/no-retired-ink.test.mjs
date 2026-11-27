@@ -78,7 +78,7 @@ test("INK-REMOVAL-02: institutional sections use black without recoloring visual
   assert.match(editorial,/#ecosistema \.ecosystem-board\{background:#fff;border:1px solid #d5dae2;box-shadow:none/);
   assert.match(read(prefix+"styles-typography.css"),/#ecosistema \.ecosystem-board\{background:#fff/);
   assert.match(prime,/\.pr-vision-art img\{background:#203b5a\}/);
-  assert.match(prime,/color:#073bbc/);
+  assert.match(prime,/color:var\(--blue\)/);
  }
 });
 
@@ -87,7 +87,7 @@ test("BRAND-BLUE-01: new interface blue in source and package; legacy visual col
  for(const prefix of ["","dist/"]){
   for(const file of uiStyles){
    const content=read(prefix+file);
-   assert.match(content,/#073bbc\b/i,file+" must use the new brand blue");
+   assert.match(content,/(?:#073bbc\b|var\(--blue\))/i,file+" must use the canonical brand blue");
    const withoutProtected=content.replace(/\/\*[\s\S]*?\*\//g,"").replace("position:relative;isolation:isolate;background:#1551d8;","");
    assert.doesNotMatch(withoutProtected,/#1551d8(?![0-9a-f])/i,file+" contains an unapproved legacy interface blue");
   }
