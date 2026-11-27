@@ -382,5 +382,16 @@
         }
       ]
     }
+  },
+  "applications_hero_video": {
+    "path": "assets/aplicaciones-hero.mp4",
+    "sha256": "a355c981174fa77631890fa3f0c94fe15b96af9fbe50d52533989b895c53f01f",
+    "bytes": 71003,
+    "kind": "video",
+    "source_filename": "3315-168567021.mp4",
+    "source": "conversation-upload",
+    "verification": "owner-supplied-and-approved-use",
+    "independent_legal_verification": false,
+    "release_authorized": false
   }
 }

@@ -7,7 +7,7 @@ const approved={
   "aplicaciones-clientes.html": "7d0e5c952c839fc4429e05d0680c0654b98c6760",
   "aplicaciones-comercios.html": "ea71ad8fd7f36a41bc9e87129a01d2e21fe22bdd",
   "aplicaciones-repartidores.html": "c6899ff1771948abb63e14a768c61b8e87cc7918",
-  "aplicaciones.html": "f415c4ae0806239b473c4b1c7f98266d18dc995f",
+  "aplicaciones.html": "ebf82343f2fc2fe449ff754614a25b401f0ed8dc",
   "capacitacion-repartidores.html": "c1b536785ed0b7303f76e40f05eb95d7e081c872",
   "confianza.html": "9c3947d3df2da1c66505fc5841d43d99b8ca0a8f",
   "historia.html": "47f0a2bf36e47c9a9cea1d98d0ea446c0812eeae",

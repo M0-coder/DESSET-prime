@@ -41,7 +41,7 @@ for(const [page,doc] of pages){
   assert(csp.split(";").map(x=>x.trim()).includes(directive),page+": Missing or weakened local CSP directive "+directive);
  assert(!/<(?:form|iframe)\b/i.test(doc),page+": Unauthorized form/iframe");
  const videoTags=[...doc.matchAll(/<video\b[^>]*>/gi)].map(m=>m[0]);
- if(page==="index.html"){const section=doc.match(/<section class="solutions" id="soluciones"[\s\S]*?<\/section>/)?.[0]||"";assert(videoTags.length===2&&["desset","prime"].every(n=>videoTags.some(tag=>section.includes(tag)&&tag.includes('data-src="./assets/servicio-'+n+'.mp4"')&&tag.includes('poster="./assets/servicio-'+n+'-poster.webp"')&&tag.includes('muted loop playsinline preload="none"')&&!/\s(?:src|autoplay)\b/i.test(tag))),"VIDEO-01: only the two approved deferred local videos");}else assert(videoTags.length===0,page+": Unauthorized video");
+ if(page==="index.html"){const section=doc.match(/<section class="solutions" id="soluciones"[\s\S]*?<\/section>/)?.[0]||"";assert(videoTags.length===2&&["desset","prime"].every(n=>videoTags.some(tag=>section.includes(tag)&&tag.includes('data-src="./assets/servicio-'+n+'.mp4"')&&tag.includes('poster="./assets/servicio-'+n+'-poster.webp"')&&tag.includes('muted loop playsinline preload="none"')&&!/\s(?:src|autoplay)\b/i.test(tag))),"VIDEO-01: only the two approved deferred local videos");}else if(page==="aplicaciones.html"){const hero=doc.match(/<section class="apps-hero apps-hero--video">[\s\S]*?<\/section>/)?.[0]||"";assert(videoTags.length===1&&hero.includes(videoTags[0])&&videoTags[0].includes('data-src="./assets/aplicaciones-hero.mp4"')&&videoTags[0].includes('muted loop playsinline preload="none"')&&!/\s(?:src|autoplay|controls|poster)\b/i.test(videoTags[0]),"APP-HERO-VIDEO-01: approved local deferred video only");}else assert(videoTags.length===0,page+": Unauthorized video");
  assert(!/(?:\s)on[a-z]+\s*=/i.test(doc),page+": Inline event attribute detected");
  if(["registro-comercios.html","registro-repartidores.html"].includes(page))for(const field of doc.matchAll(/<(?:input|select|textarea|button)\b[^>]*>/gi))assert(/\bdisabled\b/.test(field[0]),page+": Enabled data entry in inactive preview");
  if(appPages.includes(page.replace(/\.html$/,""))){try{assertClosedAppPage(doc,page.replace(/\.html$/,""));}catch(e){issues.push(page+": "+e.message);}}else if(page==="prime.html"){const scripts=[...doc.matchAll(/<script\b[^>]*src="([^"]+)"[^>]*>/gi)].map(m=>m[1]);assert(scripts.length===1&&scripts[0]==="./scripts/v5-cinematic.js",page+": Unexpected Prime script");}else if(page!=="index.html"&&!institutionalPages.includes(page.replace(/\.html$/,"")))assert(!/<script\b/i.test(doc),page+": Unexpected script on institutional page");
@@ -57,7 +57,7 @@ for(const [i,s] of js.entries()){
 }
 assert(styles.every(s=>!/@import\b|url\(\s*['"]?https?:/i.test(s)),"Remote CSS dependency");
 assert(!/\b(?:pages:\s*write|id-token:\s*write)\b/.test(read(".github/workflows/preview-checks.yml")),"CI write token permission");
-const budget={company_css_bytes:6500,html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:14000,hero_css_bytes:17000,visual02_css_bytes:8200,audiences_css_bytes:18000,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:6500,onboarding_css_bytes:4000,applications_css_bytes:5000,service_video_css_bytes:4500,service_desset_video_bytes:1200000,service_prime_video_bytes:1650000,service_desset_poster_bytes:20000,service_prime_poster_bytes:50000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000,merchant_hero_webp_bytes:210000};
+const budget={company_css_bytes:6500,html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:14000,hero_css_bytes:17000,visual02_css_bytes:8200,audiences_css_bytes:18000,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:6500,onboarding_css_bytes:4000,applications_css_bytes:5000,applications_hero_video_bytes:75000,service_video_css_bytes:4500,service_desset_video_bytes:1200000,service_prime_video_bytes:1650000,service_desset_poster_bytes:20000,service_prime_poster_bytes:50000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000,merchant_hero_webp_bytes:210000};
 const sizes={company_css_bytes:statSync(resolve(root,companyCss)).size,html_bytes:statSync(resolve(root,"index.html")).size,
  typography_css_bytes:statSync(resolve(root,"styles-typography.css")).size,
  v5_css_bytes:statSync(resolve(root,"styles-v5.css")).size,
@@ -71,6 +71,7 @@ const sizes={company_css_bytes:statSync(resolve(root,companyCss)).size,html_byte
  news_css_bytes:statSync(resolve(root,"styles-news.css")).size,
  careers_css_bytes:statSync(resolve(root,"styles-careers.css")).size,
  applications_css_bytes:statSync(resolve(root,"styles-applications.css")).size,
+ applications_hero_video_bytes:statSync(resolve(root,"assets/aplicaciones-hero.mp4")).size,
  onboarding_css_bytes:statSync(resolve(root,"styles-onboarding.css")).size,
  service_video_css_bytes:statSync(resolve(root,"styles-service-video.css")).size,
  service_desset_video_bytes:statSync(resolve(root,"assets/servicio-desset.mp4")).size,

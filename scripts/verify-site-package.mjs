@@ -14,7 +14,7 @@ const check=(ok,message)=>{if(!ok)throw Error("Packaged website NOT VERIFIED: "+
 const manifest=JSON.parse(await readFile(resolve(dist,"site-manifest.json"),"utf8"));
 check(manifest.schema==="desset-prime-static-web-package-v1","unknown manifest");
 check(manifest.noindex===true&&manifest.domain==="none","unapproved publication metadata");
-check(manifest.files.length===82,"unexpected file count");
+check(manifest.files.length===83,"unexpected file count");
 const expected=new Set(manifest.files.map(x=>x.path));
 check(expected.size===manifest.files.length,"duplicate entries");
 let total=0;
@@ -110,6 +110,7 @@ check(expected.has("assets/desset-hero-entrega-mobile.webp")&&html.includes('src
 check(!html.includes("IDEAS</span>")&&!html.includes("ACCIÓN</span>"),"Unrelated old slogan was left");
 check(expected.has("scripts/service-state.js")&&html.includes('src="./scripts/service-state.js"'),"Institutional availability module not packaged");
 for(const name of appPages){const path=name+".html";check(expected.has(path),"Missing app directory page");assertClosedAppPage(await readFile(resolve(dist,path),"utf8"),name);}
+check(expected.has("assets/aplicaciones-hero.mp4")&& (await readFile(resolve(dist,"aplicaciones.html"),"utf8")).includes('data-src="./assets/aplicaciones-hero.mp4"'),"Applications hero video missing");
 check(expected.has("styles-applications.css"),"Missing app directory stylesheet");
 const availability=await readFile(resolve(dist,"scripts/service-state.js"),"utf8");
 assertClosedDistribution(availability);
