@@ -27,7 +27,7 @@ test("HERO-MESSAGES-01 playback, real cut points, looping, pause and reduced mot
  Object.defineProperty(v,"src",{set(s){this.attrs.src=s}});
  const doc=make({hidden:false,querySelector:s=>({"#desset-editorial-video":v,"#hero-messages":copy,".hero-message-pause":control}[s])});
  runInNewContext(read("scripts/hero-editorial.js").toString(),{document:doc,matchMedia:()=>reduced});
- await Promise.resolve();await Promise.resolve();
+ await new Promise(resolve=>setImmediate(resolve));
  assert.equal(control.hidden,false);
  const active=()=>cues.findIndex(c=>c.attrs["aria-hidden"]==="false");
  for(const [t,i] of [[0,0],[2.39,0],[2.4,1],[4.39,1],[4.4,2],[6,2],[7.8,3],[9.99,3],[0,0]]){
@@ -35,6 +35,6 @@ test("HERO-MESSAGES-01 playback, real cut points, looping, pause and reduced mot
  }
  control.events.click();assert.equal(v.paused,true);assert.match(control.attrs["aria-label"],/Reanudar/);
  doc.events.visibilitychange();assert.equal(v.paused,true);
- control.events.click();await Promise.resolve();await Promise.resolve();assert.equal(v.paused,false);
+ control.events.click();await new Promise(resolve=>setImmediate(resolve));assert.equal(v.paused,false);
  reduced.matches=true;reduced.events.change();assert.equal(v.paused,true);assert.equal(control.hidden,true);assert.equal(active(),0);
 });
