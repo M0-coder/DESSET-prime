@@ -24,3 +24,17 @@ test('approved layout stays scoped to homepage and collapses on mobile',()=>{
   assert.match(css,/body:has\(#inicio\) \.site-footer\.home-footer-dark\{[^}]*background:#0a0a0a/);
   assert.match(css,/@media\(max-width:700px\)\{\s*body\.desset-home-cinematic #empresa-destacada\.corporate-summary \.institutional-home-grid\{grid-template-columns:minmax\(0,1fr\)/);
 });
+
+test('homepage labels do not weaken the canonical internal navigation checks', async()=>{
+  const {assertInstitutionalNavigation}=await import('../scripts/institutional-navigation-contract.mjs');
+  const company=read('empresa.html');
+  assert.doesNotThrow(()=>assertInstitutionalNavigation(html,company,'empresa'));
+  assert.throws(()=>assertInstitutionalNavigation(html,company.replace('<strong>Ecosistema</strong>','<strong>Unexpected</strong>'),'empresa'),/Footer differs/);
+  assert.throws(()=>assertInstitutionalNavigation(html,company.replace('href="./prime.html">DESSET prime','href="./contacto.html">DESSET prime'),'empresa'),/Footer differs/);
+});
+test('social strip preserves its existing icon appearance and layout rules',()=>{
+  const scoped=css.split('/* CORPORATE-FOOTER-02')[1];
+  assert.match(scoped,/\.footer-social\{\s*grid-column:1\/-1;background:#f5f5f5;\s*\}/);
+  assert.doesNotMatch(scoped,/\.footer-social a(?:\:hover)?\s*\{/);
+  assert.match(scoped,/a:not\(\.footer-social a\):focus-visible/);
+});
