@@ -11,7 +11,7 @@ for(const dir of ["","dist/"]){
  for(const id of ["presentacion","beneficios","modelo","incorporacion","preguntas","canales-oficiales"])assert.equal((html.match(new RegExp('id="'+id+'"','g'))||[]).length,1);
  assert.equal((html.match(/class="ap-card"/g)||[]).length,3);
  assert.equal((html.match(/class="ap-step"/g)||[]).length,4);
- assert.equal((html.match(/<details>/g)||[]).length,3);
+ assert.equal((html.match(/<details>/g)||[]).length,page==="comercios"?6:3);
  if(page==="comercios"){
   const hero=html.match(/<section class="ap-hero[^"]*"[^>]*>[\s\S]*?<\/section>/)[0];
   const flow=html.match(/<section class="ap-block ap-flow"[^>]*>[\s\S]*?<\/section>/)[0];
@@ -21,8 +21,15 @@ for(const dir of ["","dist/"]){
   assert.doesNotMatch(flow,/<strong>|Recorrido conceptual|class="ap-note"/);
   assert.match(read(dir+"styles-audiences.css"),/\.audience-page--comercios \.ap-step\{border-top:0;/);
   assert.match(html,/No se anuncia disponibilidad comercial activa en este sitio/);
+  const main=html.match(/<main\b[^>]*>[\s\S]*?<\/main>/)[0];
+  assert.deepEqual([...main.matchAll(/<section\b[^>]*id="([^"]+)"/g)].map(x=>x[1]),["presentacion","beneficios","categorias","modelo","condiciones","aplicacion","incorporacion","preguntas","cierre-comercial"]);
+  assert.equal((html.match(/<dd>Pendiente de aprobación<\/dd>/g)||[]).length,4);
+  assert.match(html,/href="\.\/aplicaciones-comercios\.html"/);
+  assert.match(html,/Aplicación prevista · Descarga no disponible/);
+  assert.equal((html.match(/<figure class="ap-hero-image">/g)||[]).length,1);
+  assert.doesNotMatch(html,/<video\b/);
  }else {assert.match(html,/no representa una operación activa/);const hero=html.match(/<section class="ap-hero ap-hero--rider-photo"[^>]*>[\s\S]*?<\/section>/)[0];assert.ok(hero.includes('src="./assets/repartidores-hero-original.jpg"'));assert.doesNotMatch(hero,/<(?:p|figcaption)\b/);assert.equal((hero.match(/class="ap-button"/g)||[]).length,1);assert.match(hero,/href="#modelo">Conoce el modelo/);}
- assert.match(html,/cuando estén aprobados/);
+ assert.match(html,page==="comercios"?/Las condiciones económicas se comunicarán cuando estén aprobadas\./:/cuando estén aprobados/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/form-action 'none'/);
  assert.doesNotMatch(html.replace('<script defer src="./scripts/app.js"></script>',""),/<(?:form|input|script|iframe)\b/i);
@@ -30,7 +37,7 @@ for(const dir of ["","dist/"]){
  assert.ok(html.includes('href="./styles-audiences.css"'));
  assert.ok(!home.includes("styles-audiences.css"));
  assert.ok(!read(dir+"empresa.html").includes("styles-audiences.css"));
- assert.ok(Buffer.byteLength(read(dir+"styles-audiences.css"),"utf8")<8000);
+ assert.ok(Buffer.byteLength(read(dir+"styles-audiences.css"),"utf8")<=12500);
  assert.doesNotMatch(read(dir+"styles-audiences.css"),/@import\b|url\(\s*['"]?https?:/i);
  });
  }

@@ -58,3 +58,28 @@
 .ap-hero--rider-photo .ap-button:focus-visible{outline:3px solid #ffc62f;outline-offset:3px}
 @media(min-width:1500px){.audience-page .ap-hero--rider-photo{min-height:700px}.audience-page .ap-hero--rider-photo .ap-hero-image img{right:5%;top:-10%}}
 @media(max-width:780px){.audience-page .ap-hero--rider-photo{flex-direction:column;align-items:stretch;justify-content:flex-end;min-height:clamp(495px,138vw,640px)}.audience-page .ap-hero--rider-photo .ap-hero-image img{width:120%;max-width:none;right:-4%;top:-5%;height:auto}.ap-hero--rider-photo::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(0deg,#000 1%,rgba(0,0,0,.95) 14%,rgba(0,0,0,.82) 34%,rgba(0,0,0,.43) 55%,transparent 76%)}.audience-page .ap-hero--rider-photo .ap-hero-copy{position:relative;align-self:stretch;width:100%;max-width:none;padding:0 6% clamp(48px,14vw,72px)}.audience-page .ap-hero--rider-photo h1{font-size:clamp(32px,9.1vw,46px);letter-spacing:-.045em;line-height:1.02;margin-bottom:14px}.audience-page .ap-hero--rider-photo .ap-button{font-size:14px;padding:14px 18px}}
+
+/* COMERCIOS-02: approved commercial structure; all rules scoped to Comercios. */
+.audience-page--comercios .ap-hero-actions a:last-child{background:transparent;color:#fff;border-color:#fff}
+.audience-page--comercios .ap-hero-actions a:last-child:hover{background:#ffffff22}
+.audience-page--comercios .mc-intro{margin:0 0 24px;color:#414141;max-width:75ch}
+.audience-page--comercios .mc-categories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;list-style:none;padding:0;margin:0}
+.audience-page--comercios .mc-categories li{display:grid;justify-items:center;align-content:center;gap:14px;padding:24px 12px;min-height:124px;border:1px solid #d8dce2;background:#fff;border-radius:12px;text-align:center;font-weight:700;overflow-wrap:anywhere}
+.audience-page--comercios .mc-categories svg,.audience-page--comercios .ap-step svg{width:40px;height:40px;color:#073bbc}
+.audience-page--comercios .ap-step{position:relative;display:grid;justify-items:center;text-align:center;align-content:start;gap:10px;padding:0}
+.audience-page--comercios .ap-step svg{box-sizing:content-box;background:#eef3ff;border-radius:50%;padding:18px}
+.audience-page--comercios .ap-step h3{font-size:clamp(18px,2vw,26px);margin:0;overflow-wrap:anywhere}
+.audience-page--comercios .ap-step:not(:last-child)::after{content:"";position:absolute;width:12px;height:1px;top:38px;right:0;background:#a3aab5}
+.audience-page--comercios .mc-flow-note{margin:24px auto 0;text-align:center}
+.audience-page--comercios .mc-terms{margin:0 0 20px;border-top:1px solid #d8dce2}
+.audience-page--comercios .mc-terms>div{display:flex;justify-content:space-between;gap:12px;padding:18px 0;border-bottom:1px solid #d8dce2;flex-wrap:wrap}
+.audience-page--comercios .mc-terms dt{font-weight:700}.audience-page--comercios .mc-terms dd{margin:0;color:#414141}
+.audience-page--comercios .mc-app{background:#fff;border:1px solid #d8dce2;border-radius:16px;padding:clamp(20px,4vw,48px);max-width:840px;margin:auto}
+.audience-page--comercios .mc-app-heading{display:flex;align-items:center;gap:16px}.audience-page--comercios .mc-app-heading svg{width:48px;height:48px;flex:none;color:#073bbc}.audience-page--comercios .mc-app h3,.audience-page--comercios .mc-app p{margin:0}
+.audience-page--comercios .mc-app ul{padding:0;margin:24px 0;list-style:none;display:grid;gap:12px}.audience-page--comercios .mc-app li{display:flex;align-items:center;gap:12px}.audience-page--comercios .mc-app li svg{width:24px;height:24px;flex:none;color:#073bbc}
+.audience-page--comercios .mc-app .ap-button,.audience-page--comercios .mc-actions .ap-button{background:#073bbc;color:#fff;border-color:#073bbc}.audience-page--comercios .mc-app .ap-button{width:100%}
+.audience-page--comercios .mc-journey{list-style:none;padding:0;margin:0 0 24px;counter-reset:mc-step;display:grid;gap:0}.audience-page--comercios .mc-journey li{counter-increment:mc-step;position:relative;padding:16px 12px 16px 64px;border-bottom:1px solid #d8dce2;min-height:56px;font-weight:650}.audience-page--comercios .mc-journey li::before{content:counter(mc-step,decimal-leading-zero);position:absolute;left:0;top:12px;color:#073bbc;font-weight:800;background:#e8efff;border-radius:50%;width:40px;height:40px;display:grid;place-items:center}
+.audience-page--comercios .mc-actions{display:flex;align-items:center;flex-wrap:wrap;gap:16px}.audience-page--comercios .mc-actions>a:last-child{color:#073bbc;text-decoration:underline}
+.audience-page--comercios .mc-closing{background:#073bbc;color:#fff;border-radius:16px;text-align:center;padding:clamp(24px,5vw,64px)}.audience-page--comercios .mc-closing h2{font-family:var(--ds-type-display);font-size:clamp(28px,4vw,48px);line-height:1.15;margin:0 0 16px}.audience-page--comercios .mc-closing p{margin:0 0 24px}.audience-page--comercios .mc-closing .ap-button{width:min(100%,380px)}
+.audience-page--comercios a:focus-visible,.audience-page--comercios summary:focus-visible{outline:3px solid #073bbc;outline-offset:4px}.audience-page--comercios .mc-closing a:focus-visible,.audience-page--comercios .ap-hero a:focus-visible{outline-color:#fff}
+@media(max-width:700px){.audience-page--comercios .mc-categories{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.audience-page--comercios .ap-step:not(:last-child)::after{display:none}.audience-page--comercios .mc-actions{align-items:stretch;flex-direction:column}.audience-page--comercios .mc-terms>div{display:grid;gap:4px}}

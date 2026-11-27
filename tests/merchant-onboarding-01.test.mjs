@@ -11,7 +11,7 @@ for(const dir of ["","dist/"])test("Merchant registration remains inactive witho
  assert.match(merchant,/href="\.\/incorporacion-comercios.html"/);
  assert.match(reg,/recepción de solicitudes aún no está habilitada/);
  for(const field of reg.matchAll(/<(?:input|select|textarea|button)\b[^>]*>/g))assert.match(field[0],/\bdisabled\b/);
- assert.equal((reg.match(/<fieldset disabled/g)||[]).length,2);
+ assert.equal((reg.match(/<fieldset disabled/g)||[]).length,2);assert.doesNotMatch(reg,/pronunciacion|Pronunciación del nombre/);
  assert.match(reg,/Esta página no recibe solicitudes ni almacena datos/);
  assert.doesNotMatch(reg,/correo@ejemplo\.com|ubicaciones ilustrativas|<option>(?:Lima|Huaura|Huacho)<\/option>/i);
  assert.equal((guide.match(/<li><h2>/g)||[]).length,7);
