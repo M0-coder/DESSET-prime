@@ -1,0 +1,43 @@
+name: CONTACT-READY — local workerd D1 integration (NO DEPLOY)
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  local-workerd:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22.16.0'
+      - name: Install isolated pinned local runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/contact-workerd
+          prefix="$RUNNER_TEMP/contact-workerd"
+          mkdir -p "$prefix"
+          printf '{"private":true}\n' > "$prefix/package.json"
+          npm install --prefix "$prefix" --save-exact --no-audit --no-fund miniflare@4.20260210.0
+          cp "$prefix/package-lock.json" reports/contact-workerd/package-lock.json
+          npm ls --prefix "$prefix" --all > reports/contact-workerd/runtime-dependencies.txt
+          echo "CONTACT_LAB_PREFIX=$prefix" >> "$GITHUB_ENV"
+      - name: Execute local runtime and synthetic D1 tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check scripts/contact-workerd-fixture.mjs
+          node --check scripts/contact-workerd-lab.mjs
+          node scripts/contact-workerd-lab.mjs | tee reports/contact-workerd/results.txt
+          git diff --exit-code
+      - name: Preserve lab evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: contact-workerd-local-evidence
+          path: reports/contact-workerd/
+          retention-days: 14

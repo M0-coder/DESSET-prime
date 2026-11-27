@@ -957,7 +957,7 @@ try{
     await until(async()=>await js("document.readyState==='complete' && !!document.querySelector('.apps-page')"),"app directory render");
     if(page==="aplicaciones"){await js('document.fonts.ready');await verifySharedNavigation(root,page,w);}
     const a=await js(`(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,panels:document.querySelectorAll("[data-app-role]").length,downloads:[...document.querySelectorAll("[data-app-download]")].every(e=>e.textContent==="Descarga no disponible."),links:document.querySelectorAll("[data-app-links] a, a[download], form, iframe").length,country:document.querySelector("[data-app-country]").value,buttons:document.querySelectorAll("[data-app-platform]").length}))()`);
-    if(a.scroll>a.width+2||a.panels!==(page==="aplicaciones"?3:1)||!a.downloads||a.links||a.country!=="PE"||a.buttons!==(page==="aplicaciones"?0:3))report.failures.push("APP-DISTRIBUTION "+root+page+w+": "+JSON.stringify(a));
+    if(a.scroll>a.width+2||a.panels!==(page==="aplicaciones"?3:1)||!a.downloads||a.links||a.country!=="PE"||a.buttons!==(["aplicaciones","aplicaciones-clientes"].includes(page)?0:3))report.failures.push("APP-DISTRIBUTION "+root+page+w+": "+JSON.stringify(a));
     if(page==="aplicaciones"){
      await js("window.scrollTo(0,0)");
      await until(async()=>await js('(()=>{const v=document.querySelector(".apps-hero-video");return !!v&&v.readyState>=2&&v.videoWidth===1920&&v.videoHeight===1080&&!v.paused&&v.currentTime>0})()'),"application hero video playing");
@@ -970,6 +970,9 @@ try{
      await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:"no-preference"}]});
      await until(async()=>await js('!document.querySelector(".apps-hero-video").paused'),"application hero resumes");
      report.tests.push({name:"APP-HERO-VIDEO-01 "+root+w,hero});
+    }else if(page==="aplicaciones-clientes"){
+     const c=await js(`(()=>{const p=document.querySelector(".consumer-compact"),buttons=[...p.querySelectorAll(".consumer-accesses button")],menu=document.querySelector(".consumer-menu"),coverage=document.querySelector(".consumer-coverage");menu.querySelector("summary").click();const menuOpened=menu.open;menu.querySelector("summary").click();coverage.querySelector("summary").click();const coverageOpened=coverage.open;coverage.querySelector("summary").click();return {buttons:buttons.length,closed:buttons.every(b=>b.disabled),categories:p.querySelectorAll(".consumer-category").length,menuOpened,coverageOpened,logo:p.querySelector("img").naturalWidth,ctaVisible:buttons.every(b=>b.getBoundingClientRect().bottom<=innerHeight+2)}})()`);
+     if(c.buttons!==3||!c.closed||c.categories!==4||!c.menuOpened||!c.coverageOpened||!c.logo||!c.ctaVisible)report.failures.push("APP-CONSUMER-02 compact "+root+w+": "+JSON.stringify(c));
     }else{
      const manual=await js(`(()=>{document.querySelector('[data-app-platform="ios"]').click();const country=document.querySelector("[data-app-country]");country.value="OTHER";country.dispatchEvent(new Event("change"));return {selected:document.querySelector('[data-app-platform="ios"]').getAttribute("aria-pressed"),hidden:document.querySelector("[data-app-links]").hidden,count:document.querySelectorAll("[data-app-links] a").length}})()`);
      if(manual.selected!=="true"||!manual.hidden||manual.count)report.failures.push("APP-DISTRIBUTION manual selection "+root+page+w);
