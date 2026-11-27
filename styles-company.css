@@ -33,3 +33,26 @@
 .company-hub a:focus-visible,.company-detail a:focus-visible{outline:3px solid #073bbc;outline-offset:4px}
 .company-hub .co-intro a:focus-visible,.company-detail .co-intro a:focus-visible{outline-color:#fff}
 @media(max-width:700px){.company-hub .co-directory{grid-template-columns:1fr;gap:24px}.company-hub .co-art{height:clamp(140px,45vw,210px)}.company-hub .co-card:last-child{grid-column:auto}.company-hub .co-intro,.company-detail .co-intro{padding:32px var(--edge,24px) 42px}.company-detail .co-body section{padding:24px 0}}
+
+/* COMPANY-PROFILE-01: corporate information, scoped only to profile body. */
+.company-detail .co-profile section{max-width:none}
+.company-detail .co-profile #quienes-somos p{max-width:75ch}
+.company-detail .co-profile .cp-facts{width:100%;border-collapse:collapse;table-layout:fixed;font-size:16px;line-height:1.55}
+.company-detail .co-profile .cp-facts th,.company-detail .co-profile .cp-facts td{border-bottom:1px solid #d8dce2;border-top:1px solid #d8dce2;padding:18px 16px;text-align:left;vertical-align:top;overflow-wrap:anywhere}
+.company-detail .co-profile .cp-facts th{width:40%;background:#f4f8fe;font-weight:700}
+.company-detail .co-profile .cp-facts td{color:#000}
+.company-detail .co-profile .cp-note{color:#414141;font-size:14px;line-height:1.6;margin:16px 0 0}
+.company-detail .co-profile .cp-businesses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.company-detail .co-profile .cp-business{min-width:0;padding:16px 0}
+.company-detail .co-profile .cp-business h3{font-size:clamp(24px,3vw,38px);margin:0 0 8px}
+.company-detail .co-profile .cp-business--prime h3{color:#073bbc}
+.company-detail .co-profile .cp-label{font-size:13px;font-weight:700;letter-spacing:.04em;color:#414141;margin:0 0 16px}
+.company-detail .co-profile .cp-business ul,.company-detail .co-profile .cp-directory ul{list-style:none;margin:0;padding:0}
+.company-detail .co-profile .cp-business li{display:flex;align-items:center;gap:12px;min-height:40px;overflow-wrap:anywhere}
+.company-detail .co-profile .cp-business li svg{color:#073bbc;width:22px;height:22px;flex:none}
+.company-detail .co-profile .cp-business a,.company-detail .co-profile .cp-directory a{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:48px;color:#073bbc;font-weight:700;text-decoration:none}
+.company-detail .co-profile .cp-business a{margin-top:12px;border-top:1px solid #d8dce2}
+.company-detail .co-profile .cp-directory a{color:#000;padding:12px 0;border-bottom:1px solid #d8dce2}
+.company-detail .co-profile .cp-directory a span{color:#073bbc;font-size:24px;flex:none}
+.company-detail .co-profile .cp-business a:hover,.company-detail .co-profile .cp-directory a:hover{color:#073bbc;text-decoration:underline}
+@media(max-width:700px){.company-detail .co-profile .cp-facts{font-size:14px}.company-detail .co-profile .cp-facts th,.company-detail .co-profile .cp-facts td{padding:14px 10px}.company-detail .co-profile .cp-businesses{grid-template-columns:1fr;gap:0}.company-detail .co-profile .cp-business+.cp-business{border-top:1px solid #d8dce2;padding-top:24px}}

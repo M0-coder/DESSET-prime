@@ -27,9 +27,22 @@ for(const dir of ["","dist/"])test("COMPANY-02 modular directory, legacy anchors
   assert.match(doc,/name="robots" content="noindex,nofollow"/);
   assert.match(doc,/form-action 'none'/);assert.doesNotMatch(doc,/<(?:form|iframe|input|video)\b/i);
  }
+ const profile=read(dir+"perfil-corporativo.html"),main=profile.match(/<main\b[^>]*>[\s\S]*?<\/main>/)[0];
+ assert.deepEqual([...main.matchAll(/<section id="([^"]+)"/g)].map(x=>x[1]),["quienes-somos","informacion-corporativa","areas","informacion-empresa"]);
+ assert.equal((main.match(/<tr>/g)||[]).length,8);
+ assert.equal((main.match(/<th scope="row">/g)||[]).length,8);
+ assert.match(main,/<th scope="row">Denominación reservada<\/th><td>DELIVER ASSETS E\.I\.R\.L\.<\/td>/);
+ assert.match(main,/<th scope="row">Constitución<\/th><td>En proceso<\/td>/);
+ assert.match(main,/una vez acreditada la constitución/);
+ assert.match(main,/No representan servicios actualmente operativos/);
+ assert.equal((main.match(/class="cp-business(?: cp-business--prime)?"/g)||[]).length,2);
+ assert.equal((main.match(/<li><svg/g)||[]).length,10);
+ const directory=main.match(/<nav class="cp-directory"[\s\S]*?<\/nav>/)[0];
+ assert.deepEqual([...directory.matchAll(/href="([^"]+)"/g)].map(x=>x[1]),["./mensaje-direccion.html","./mision-vision-valores.html","./principios.html","./gobierno-corporativo.html","./historia.html","./inversores.html","./confianza.html"]);
+ assert.doesNotMatch(main,/<(?:img|video|figure|form|input)\b/);
  const investor=read(dir+"inversores.html"),governance=read(dir+"gobierno-corporativo.html");
  assert.match(investor,/No existe un mecanismo de captación de fondos/);
  assert.match(governance,/La estructura jurídica y las responsabilidades formales se comunicarán cuando exista documentación acreditada/);
  assert.doesNotMatch(read(dir+"index.html"),/styles-company\.css/);
- assert.ok(Buffer.byteLength(read(dir+companyCss))<=4500);
+ assert.ok(Buffer.byteLength(read(dir+companyCss))<=6500);
 });
