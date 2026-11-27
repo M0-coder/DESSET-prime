@@ -1,0 +1,41 @@
+/* CONTACT-READY: strictly internal preview, scoped to contact page. */
+.contact-page [hidden]{display:none!important}
+.ct-mock-notice{font-size:12px;color:#414141;border-bottom:1px solid #d8dce2;background:#f4f8fe;padding:9px 20px;text-align:center;line-height:1.4}
+.contact-page .ct-directory .ct-item{display:grid;grid-template-columns:26px minmax(0,1fr) 20px;align-items:center;gap:16px;min-height:64px;padding:16px 0;font-size:clamp(16px,1.5vw,19px);font-weight:700;line-height:1.45;text-decoration:none;color:#000}
+.contact-page .ct-item svg{width:24px;height:24px;color:var(--blue)}
+.contact-page .ct-item .ct-chevron{width:20px;height:20px}
+.contact-page .ct-item:hover{color:var(--blue);background:#f4f8fe}
+.contact-page .ct-item:focus-visible,.ct-return:focus-visible,.ct-send:focus-visible{outline:3px solid #073bbc;outline-offset:4px}
+.ct-breadcrumb{font-size:13px;color:#414141;margin:0 0 16px;line-height:1.5}
+.ct-breadcrumb a,.ct-return{color:#073bbc;text-decoration:underline;text-underline-offset:3px}
+.ct-form-area{padding-block:clamp(30px,4vw,58px)}
+.ct-form-area h2{font-size:23px;font-weight:800;letter-spacing:-.025em;margin:0 0 12px;line-height:1.3}
+.ct-form-area p{line-height:1.6;color:#414141;font-size:15px}
+.ct-form-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,260px);gap:clamp(25px,5vw,70px);align-items:start}
+.ct-form{display:grid;gap:22px;min-width:0}
+.ct-field{display:grid;gap:8px;min-width:0}
+.ct-field label{font-weight:700;font-size:15px;line-height:1.45;color:#000}
+.ct-required{font-size:11px;font-weight:650;color:#073bbc;margin-left:8px}
+.ct-field input,.ct-field textarea{border:1px solid #aeb7c4;border-radius:4px;font:inherit;font-size:16px;background:#fff;color:#101010;padding:12px 14px;min-height:48px;width:100%;box-sizing:border-box}
+.ct-field textarea{resize:vertical;min-height:150px}
+.ct-field :is(input,textarea):focus{outline:2px solid #073bbc;outline-offset:2px}
+.ct-count{text-align:right;color:#565656;font-size:12px}
+.ct-consent{display:flex;gap:10px;align-items:flex-start;color:#414141;font-size:14px;line-height:1.6}
+.ct-consent input{margin-top:5px;width:17px;height:17px;accent-color:#073bbc;flex:0 0 auto}
+.ct-send{border:0;background:#073bbc;color:white;font:inherit;font-weight:700;padding:15px 22px;border-radius:4px;cursor:pointer;justify-self:start;min-width:215px}
+.ct-send:hover{background:#052c8d}
+.ct-send:disabled{cursor:not-allowed;opacity:.6}
+.ct-aside{border-top:2px solid #073bbc;background:#f4f8fe;padding:20px}
+.ct-aside h3{font-size:16px;margin:0 0 9px;line-height:1.4}
+.ct-aside p{font-size:14px;margin:0}
+.ct-aside p+p{margin-top:14px}
+.ct-result{padding:24px;background:#f4f8fe;border-left:4px solid #073bbc;line-height:1.6}
+.ct-result h2{margin:0 0 8px}
+.ct-result p{margin:0 0 16px}
+.ct-back{display:inline-block;margin-top:28px;font-size:15px;font-weight:700}
+.ct-directory .ct-status{margin-bottom:25px}
+.ct-demo-meta{font-size:13px;color:#414141;margin:0 0 24px}
+.ct-form-area .ct-intro{margin:0 0 24px}
+.ct-field input::placeholder,.ct-field textarea::placeholder{color:#737373}
+@media(max-width:740px){.ct-form-layout{grid-template-columns:1fr}.ct-aside{order:-1}.ct-send{width:100%}}
+@media(max-width:480px){.contact-page .ct-directory .ct-item{grid-template-columns:24px minmax(0,1fr) 20px;gap:12px}.ct-mock-notice{font-size:11px}}
