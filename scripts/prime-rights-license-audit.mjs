@@ -8,11 +8,11 @@ import {createHash} from 'node:crypto';
 import {join,resolve,dirname,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {checkPrimeFonts} from './prime-font-licenses.mjs';
-import {reviewSelectedMedia,reviewPrimePageMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto,reviewRiderHeroPhoto,reviewServiceVideos,reviewApplicationsHeroVideo} from './prime-manual-cutover-gate.mjs';
+import {reviewSelectedMedia,reviewPrimePageMedia,reviewTalentPhoto,reviewMerchantHeroPhoto,reviewHomeTalentPhoto,reviewRiderHeroPhoto,reviewServiceVideos,reviewApplicationsHeroVideo,reviewEditorialHomeHero} from './prime-manual-cutover-gate.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const requireSafe=(okay,reason)=>{if(!okay)throw Error('NO-GO: '+reason)};
-const isMedia=p=>p==='assets/aplicaciones-hero.mp4'||/^assets\/servicio-(?:desset|prime)\.mp4$/.test(p)||p==='assets/repartidores-hero-original.jpg'||/^assets\/[a-z0-9-]+\.(?:png|webp|svg|glb)$/.test(p);
+const isMedia=p=>p==='assets/desset-hero-editorial.mp4'||p==='assets/aplicaciones-hero.mp4'||/^assets\/servicio-(?:desset|prime)\.mp4$/.test(p)||p==='assets/repartidores-hero-original.jpg'||/^assets\/[a-z0-9-]+\.(?:png|webp|svg|glb)$/.test(p);
 export function checkAssetRightsAndLicenses({
   dist,register=JSON.parse(readFileSync(join(root,'config/prime-original-assets.json'),'utf8')),
   lock=JSON.parse(readFileSync(join(root,'package-lock.json'),'utf8')),
@@ -83,6 +83,9 @@ export function checkAssetRightsAndLicenses({
  const appHero=selected.applications_hero_video;
  requireSafe(reviewApplicationsHeroVideo(selected).accepted&&!expected.has(appHero.path),'invalid applications hero registry');
  expected.set(appHero.path,appHero.sha256);serviceByPath.set(appHero.path,appHero);
+ const editorial=selected.editorial_home_hero;
+ requireSafe(reviewEditorialHomeHero(selected).accepted,"invalid home editorial media registry");
+ for(const x of editorial.assets){requireSafe(!expected.has(x.path),"duplicate editorial asset");expected.set(x.path,x.sha256);serviceByPath.set(x.path,x);}
  const sources=source.files.filter(f=>isMedia(f.path));
  requireSafe(sources.length===expected.size,'unexpected original-media inventory');
  const verified=[],selectedVerified=[],primePageVerified=[];
@@ -132,6 +135,7 @@ export function checkAssetRightsAndLicenses({
   owner_declaration_status:'owner-declared',legal_title_independently_verified:false,
   assets_checked:verified.length,assets:verified,archived_media_checked:archived.length,archived_media:archived,
   merchant_hero_media:{...merchant,individual_source_verified:merchant.verification==='individual-source-verified'},merchant_hero_media_review:reviewMerchantHeroPhoto(selected),
+  editorial_home_hero:{...editorial,individual_source_verified:false},editorial_home_hero_review:reviewEditorialHomeHero(selected),
   applications_hero_media:{...appHero,individual_source_verified:false},applications_hero_media_review:reviewApplicationsHeroVideo(selected),
   service_video_media:{...service,individual_source_verified:false},service_video_media_review:reviewServiceVideos(selected),
   rider_hero_media:{...rider,individual_source_verified:false},rider_hero_media_review:reviewRiderHeroPhoto(selected),

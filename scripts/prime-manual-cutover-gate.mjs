@@ -93,6 +93,12 @@ export function reviewApplicationsHeroVideo(media){
  const accepted=!!a&&Object.keys(a).length===Object.keys(expected).length&&Object.entries(expected).every(([k,v])=>a[k]===v);
  return {accepted,basis:accepted?"owner-supplied-and-approved-use":"pending",individual_source_verified:false,release_authorized:false};
 }
+export function reviewEditorialHomeHero(media){
+ const expected={"scope":"HERO-EDITORIAL-01; illustrative home hero only","source":"AI-generated imagery selected in the project conversation; owner-approved integration","verification":"owner-selected","independent_legal_verification":false,"exclusive_ownership_claim":false,"release_authorized":false,"assets":[{"path":"assets/desset-hero-editorial.mp4","sha256":"8020a3d83a7845e57117296ef5c98145ae2dbabd306f9a5b3423a51237bb2c07","bytes":537136,"kind":"video"},{"path":"assets/desset-hero-editorial-poster.webp","sha256":"ad396da5b20626d67ca30345c5df1061fe75c8f51be21db4f7294ef2df00f88d","bytes":61484,"kind":"poster"}]};
+ const a=media?.editorial_home_hero;
+ const accepted=!!a&&Object.keys(expected).every(k=>k==="assets"?Array.isArray(a.assets)&&a.assets.length===2&&expected.assets.every(x=>a.assets.some(y=>Object.keys(x).every(f=>x[f]===y[f]))):a[k]===expected[k]);
+ return {accepted,basis:accepted?"owner-selected-ai-generated":"pending",individual_source_verified:false,release_authorized:false};
+}
 export function reviewServiceVideos(media){
  const rejected={accepted:false,basis:'pending',individual_source_verified:false,release_authorized:false};
  const v=media?.service_videos,d=v?.owner_attestation;
@@ -149,6 +155,7 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
    if(!talentReview.accepted)throw Error('PHOTO-01: scoped photographic rights review required before production');
    const homeTalentReview=reviewHomeTalentPhoto(media);
    if(!homeTalentReview.accepted)throw Error('PHOTO-05: scoped homepage photograph review required before production');
+   if(!reviewEditorialHomeHero(media).accepted)throw Error("HERO-EDITORIAL-01: scoped usage approval required before production");
    const appHeroReview=reviewApplicationsHeroVideo(media);
    if(!appHeroReview.accepted)throw Error('APP-HERO-VIDEO-01: scoped usage approval required before production');
    const serviceReview=reviewServiceVideos(media);

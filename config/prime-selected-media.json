@@ -393,5 +393,27 @@
     "verification": "owner-supplied-and-approved-use",
     "independent_legal_verification": false,
     "release_authorized": false
+  },
+  "editorial_home_hero": {
+    "scope": "HERO-EDITORIAL-01; illustrative home hero only",
+    "source": "AI-generated imagery selected in the project conversation; owner-approved integration",
+    "verification": "owner-selected",
+    "independent_legal_verification": false,
+    "exclusive_ownership_claim": false,
+    "release_authorized": false,
+    "assets": [
+      {
+        "path": "assets/desset-hero-editorial.mp4",
+        "sha256": "8020a3d83a7845e57117296ef5c98145ae2dbabd306f9a5b3423a51237bb2c07",
+        "bytes": 537136,
+        "kind": "video"
+      },
+      {
+        "path": "assets/desset-hero-editorial-poster.webp",
+        "sha256": "ad396da5b20626d67ca30345c5df1061fe75c8f51be21db4f7294ef2df00f88d",
+        "bytes": 61484,
+        "kind": "poster"
+      }
+    ]
   }
 }
