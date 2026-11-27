@@ -17,7 +17,7 @@ test('homepage footer retains real links and responsive navigation',()=>{
   assert.deepEqual([...footer.matchAll(/<strong>([^<]+)<\/strong>/g)].map(m=>m[1]),['Empresa','Servicios','Aplicaciones','Contacto']);
   assert.deepEqual([...footer.matchAll(/<summary>([^<]+)<\/summary>/g)].map(m=>m[1]),['Empresa','Servicios','Aplicaciones','Contacto']);
   assert.equal((footer.match(/data-footer-channel=/g)||[]).length,5);
-  assert.match(footer,/Todos los derechos reservados/);
+  assert.match(footer,/<p>© 2026 DESSET\. Todos los derechos reservados\.<\/p>\s*<\/footer>/);
 });
 test('approved layout stays scoped to homepage and collapses on mobile',()=>{
   assert.match(css,/body\.desset-home-cinematic #empresa-destacada\.corporate-summary \.institutional-home-grid\{\s*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
@@ -37,4 +37,9 @@ test('social strip preserves its existing icon appearance and layout rules',()=>
   assert.match(scoped,/\.footer-social\{\s*grid-column:1\/-1;background:#f5f5f5;\s*\}/);
   assert.doesNotMatch(scoped,/\.footer-social a(?:\:hover)?\s*\{/);
   assert.match(scoped,/a:not\(\.footer-social a\):focus-visible/);
+});
+
+test('copyright retains original markup and typography',()=>{
+ const scoped=css.split('/* CORPORATE-FOOTER-02')[1];
+ assert.match(scoped,/\.site-footer\.home-footer-dark>p\{\s*grid-column:1\/-1;background:#f5f5f5;\s*\}/);
 });
