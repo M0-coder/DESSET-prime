@@ -41,3 +41,7 @@
 @media(max-width:780px){.apps-page .apps-hero--video{min-height:clamp(435px,120vw,600px);align-items:flex-end;padding-bottom:clamp(42px,12vw,72px)}.apps-page .apps-hero--video::after{background:linear-gradient(0deg,rgba(0,0,0,.92),rgba(0,0,0,.65) 34%,rgba(0,0,0,.15) 65%,transparent 90%)}.apps-page .apps-hero--video h1{font-size:clamp(30px,9vw,44px)}}
 
 @media(prefers-reduced-motion:reduce){.apps-page .apps-hero--video .apps-hero-video{display:none}}
+
+/* APP-IDENTITY-01: approved DESSET consumer app icon; corporate mark unchanged. */
+.apps-page .apps-icon-desset{width:clamp(88px,9vw,112px);height:auto;aspect-ratio:1;background:#fff;border:1px solid #ddd;border-radius:20%;overflow:hidden}
+.apps-page .apps-icon-desset img{display:block;width:100%;height:100%;object-fit:contain}
