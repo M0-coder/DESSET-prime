@@ -90,4 +90,5 @@ try{
   }
  }
  await writeFile(join(output,"checks.json"),JSON.stringify(checks,null,2));console.log("CONTACT-READY PASS: "+checks.length+" category/viewport simulations, no network intake");
-}finally{child.kill();await new Promise(r=>{if(child.exitCode!==null)r();else child.once("exit",r)});await rm(profile,{recursive:true,force:true});}
+}finally{child.kill();await new Promise(r=>{if(child.exitCode!==null)r();else child.once("exit",r)});// Chrome child processes may briefly retain profile files after the parent exits.
+ await rm(profile,{recursive:true,force:true,maxRetries:12,retryDelay:250});}
