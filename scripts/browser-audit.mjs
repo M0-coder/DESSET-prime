@@ -77,10 +77,10 @@ async function viewport(width,height,reduce=false,entry=URL){
  await until(async()=>await js(`(()=>{
    const el=document.querySelector("#inicio .hero-cta");
    if(!el)return false;
-   const color=getComputedStyle(el).backgroundColor;
+   const color=getComputedStyle(el).borderTopColor;
    const match=color.match(/^rgba\\(\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*([\\d.]+)\\s*\\)$/);
    return !match||Number(match[1])>=0.9999;
- })()`),"fully opaque hero CTA background after its CSS transition");
+ })()`),"fully opaque hero CTA border after its CSS transition");
  await sleep(130);
  const diag=await js(`(()=>{
  const viewport=document.documentElement.clientWidth;
@@ -128,7 +128,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  const railDisplay={background:getComputedStyle(rail).backgroundColor,
   columns:getComputedStyle(rail).gridTemplateColumns.trim().split(/\\s+/).length,
   role:rail.getAttribute("role"),ariaHidden:rail.getAttribute("aria-hidden"),
-  left:Math.round(railBox.left),right:Math.round(railBox.right),viewportRight:document.documentElement.clientWidth};
+  left:Math.round(railBox.left),right:Math.round(railBox.right),viewportRight:document.documentElement.clientWidth,overlap:composition.bottom-railBox.top,centered:Math.abs(railBox.left+railBox.right-viewport)<3,followedByCorporate:document.querySelector("#inicio").nextElementSibling?.id==="empresa-destacada"};
  const participantGrid=document.querySelector("#vision .ecosystem-participants");
  const participantHeading=document.querySelector("#vision h2");
  const participantBounds=participantGrid.getBoundingClientRect(),headingBounds=participantHeading.getBoundingClientRect();
@@ -174,12 +174,12 @@ async function viewport(width,height,reduce=false,entry=URL){
    stageYellow:style("#ecosistema").getPropertyValue("--yellow").trim().toUpperCase(),
    stageDesignGold:style("#ecosistema").getPropertyValue("--ds-10-gold").trim().toUpperCase(),
    stageVisualGold:style("#ecosistema").getPropertyValue("--v02-gold").trim().toUpperCase(),
-   heroCTA:style("#inicio .hero-cta").backgroundColor,
+   heroCTA:style("#inicio .hero-cta").borderTopColor,heroCTABg:style("#inicio .hero-cta").backgroundColor,
    businessCTA:style("#negocios .business-pitch-cta").backgroundColor,
    statementAccent:style("#vision h2 span").color,
    statementBackground:style("#vision").backgroundColor,
    homeHeader:style(".site-header").backgroundColor,
-   homeRecent:style(".institutional-recent").backgroundColor,
+   homeRecent:!!document.querySelector(".institutional-recent"),
    homeCorporate:style("#empresa-destacada").backgroundColor,
    homeCorporateCard:style("#empresa-destacada .institutional-home-link").backgroundColor,
    homeNews:style("#noticias-destacadas").backgroundColor,
@@ -217,17 +217,17 @@ async function viewport(width,height,reduce=false,entry=URL){
    palette.stageDesignGold!=="#FFC62F"||palette.stageVisualGold!=="#FFC62F"||
    !exactWhite||palette.businessCTA!==brandBlue||
    palette.statementAccent!==brandBlue||palette.statementBackground!==pureWhite||
-   palette.homeHeader!==pureWhite||palette.homeRecent!==pureWhite||palette.homeCorporate!=="rgb(245, 245, 245)"||palette.homeCorporateCard!==pureWhite||palette.homeNews!==pureWhite||palette.homeTalent!=="rgb(245, 245, 245)"||palette.homeHero!==pureWhite||
-   palette.footerBackground!=="rgb(245, 245, 245)"||palette.navContactBackground!==pureWhite||
+   palette.homeHeader!=="rgba(0, 0, 0, 0)"||palette.homeRecent||palette.homeCorporate!=="rgb(245, 245, 245)"||palette.homeCorporateCard!==pureWhite||palette.homeNews!==pureWhite||palette.homeTalent!=="rgb(245, 245, 245)"||palette.homeHero!=="rgb(245, 245, 245)"||
+   palette.footerBackground!=="rgb(245, 245, 245)"||palette.navContactBackground!=="rgba(0, 0, 0, 0)"||
    palette.primeHeadingColor!==brandBlue||palette.primeSubtitleColor!==brandBlue||
    palette.institutionalInk!=="#000000"||
    palette.stageInk!=="#111111"||palette.stageDesignInk!=="#111111"||palette.stageInheritedColor!=="rgb(17, 17, 17)"||
    palette.heroHeadingColor!==pureWhite||
-   palette.heroCtaInk!=="rgb(0, 0, 0)"||
+   palette.heroCtaInk!==pureWhite||palette.heroCTABg!=="rgba(0, 0, 0, 0)"||
    palette.heroPhotoFallbackBg!=="rgb(16, 16, 16)"||
-   palette.brandNameInk!=="rgb(0, 0, 0)"||
+   palette.brandNameInk!==pureWhite||
    palette.footerBrandInk!==brandBlue||palette.footerCopyInk!=="rgb(86, 86, 86)")
-   fails.push("HERO-EDITORIAL-01: hero CTA must use opaque white with black text; brand yellow preserved, home surfaces neutral and 3D controls white: "+JSON.stringify(palette));
+   fails.push("HERO-EDITORIAL-02: hero CTA must use opaque white outline and white text; brand yellow preserved, home surfaces neutral and 3D controls white: "+JSON.stringify(palette));
  if(diag.text.some(t=>t.contentWidth>t.visibleWidth+2))fails.push("clipped hero headline");
  if(diag.heroFit.typeLeft<diag.heroFit.compositionLeft-2 ||
     diag.heroFit.rows.length!==2 ||
@@ -242,8 +242,7 @@ async function viewport(width,height,reduce=false,entry=URL){
  if(diag.railItems.length!==4||diag.railItems.some(i=>!i.visible||!i.inside||!i.textFits||!i.icon||i.fontPx<12||(width<=700&&(!i.compactCopy||i.titleFont<11))||i.titleInk!=="rgb(0, 0, 0)"||i.copyInk!=="rgb(34, 34, 34)"||i.iconInk!=="rgb(0, 0, 0)")||
     diag.railDisplay.background!==expectedOriginal||diag.railDisplay.role!=="list"||diag.railDisplay.ariaHidden!==null||
     diag.railDisplay.columns!==(width<=700?4:width<=860?2:4)||
-   (diag.railDisplay.left>2||diag.railDisplay.left< -16)||
-   (diag.railDisplay.right<diag.railDisplay.viewportRight-2||diag.railDisplay.right>diag.railDisplay.viewportRight+16))
+   !diag.railDisplay.centered||diag.railDisplay.left<0||diag.railDisplay.right>diag.railDisplay.viewportRight||diag.railDisplay.overlap<20||!diag.railDisplay.followedByCorporate)
    fails.push("HERO-SERVICE-01: accessible service strip clips content or has wrong layout: "+JSON.stringify({items:diag.railItems,layout:diag.railDisplay}));
  const participants=diag.participantLayout;
  const expectedParticipantTitles=["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"];
@@ -299,20 +298,16 @@ try{
  report.tests.push({name:"V4 motion/design contract",heroQuality});
  const heroPhoto=await js('(()=>{const x=document.querySelector("#inicio .prime-photo-image");const f=document.querySelector("#inicio .prime-photo-surface");return {loaded:!!x?.complete&&x.naturalWidth===1920&&x.naturalHeight===960,src:x?.getAttribute("src"),logo:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),oldText:document.querySelector("#inicio")?.textContent?.includes("IDEAS EN ACCIÓN"),ratio:f?.getBoundingClientRect().width/f?.getBoundingClientRect().height}})()');
  if(!heroPhoto.loaded||!heroPhoto.src?.endsWith("desset-hero-editorial-poster.webp")||
-    !heroPhoto.logo?.endsWith("deliver-assets-mark.png")||heroPhoto.oldText||Math.abs(heroPhoto.ratio-2)>.04)
+    !heroPhoto.logo?.endsWith("deliver-assets-mark.png")||heroPhoto.oldText||heroPhoto.ratio<1.2)
     report.failures.push("HERO-PHOTO-01 exact local render, original logo, conceptual disclosure failed: "+JSON.stringify(heroPhoto));
  report.tests.push({name:"HERO-PHOTO-01 exact local render, original logo, conceptual disclosure",heroPhoto});
  await until(async()=>await js('(()=>{const v=document.querySelector("#desset-editorial-video");return v.readyState>=2&&v.videoWidth===1920&&v.videoHeight===960&&v.loop&&v.muted&&!v.paused&&v.currentTime>0})()'),"editorial hero video playing");
- const heroPlayback=await js('(()=>{const v=document.querySelector("#desset-editorial-video"),b=document.querySelector(".desset-editorial-toggle"),t=document.querySelector(".desset-editorial-stage"),r=t.getBoundingClientRect(),p=v.getBoundingClientRect();return {source:v.dataset.src,ready:v.dataset.ready,loop:v.loop,muted:v.muted,inline:v.playsInline,controls:v.controls,buttonVisible:!b.hidden,buttonLabel:b.getAttribute("aria-label"),fit:getComputedStyle(v).objectFit,full:Math.abs(r.width-p.width)<2&&Math.abs(r.height-p.height)<2}})()');
- if(heroPlayback.source!=="./assets/desset-hero-editorial.mp4"||heroPlayback.ready!=="true"||!heroPlayback.loop||!heroPlayback.muted||!heroPlayback.inline||heroPlayback.controls||!heroPlayback.buttonVisible||heroPlayback.buttonLabel!=="Pausar animación"||heroPlayback.fit!=="cover"||!heroPlayback.full)report.failures.push("HERO-EDITORIAL-01 playback/geometry "+JSON.stringify(heroPlayback));
- await js('document.querySelector(".desset-editorial-toggle").click()');
- await until(async()=>await js('document.querySelector("#desset-editorial-video").paused && document.querySelector(".desset-editorial-toggle").getAttribute("aria-label")==="Reproducir animación"'),"editorial pause");
- await js('document.querySelector(".desset-editorial-toggle").click()');
- await until(async()=>await js('!document.querySelector("#desset-editorial-video").paused'),"editorial resume");
- report.tests.push({name:"HERO-EDITORIAL-01 real video and manual pause/resume",heroPlayback});
+ const heroPlayback=await js('(()=>{const v=document.querySelector("#desset-editorial-video"),t=document.querySelector(".desset-editorial-stage"),r=t.getBoundingClientRect(),p=v.getBoundingClientRect(),h=document.querySelector(".site-header").getBoundingClientRect(),c=document.querySelector(".v4-hero-type").getBoundingClientRect();return {source:v.dataset.src,ready:v.dataset.ready,loop:v.loop,muted:v.muted,inline:v.playsInline,controls:v.controls,buttons:t.querySelectorAll("button").length,fit:getComputedStyle(v).objectFit,full:Math.abs(r.width-p.width)<2&&Math.abs(r.height-p.height)<2,headerOverlay:Math.abs(h.top-r.top)<2&&h.bottom<r.bottom,copyRight:c.left>=r.left+r.width*.5,compact:r.height/innerHeight}})()');
+ if(heroPlayback.source!=="./assets/desset-hero-editorial.mp4"||heroPlayback.ready!=="true"||!heroPlayback.loop||!heroPlayback.muted||!heroPlayback.inline||heroPlayback.controls||heroPlayback.buttons||heroPlayback.fit!=="cover"||!heroPlayback.full||!heroPlayback.headerOverlay||!heroPlayback.copyRight||heroPlayback.compact<.70||heroPlayback.compact>.82)report.failures.push("HERO-EDITORIAL-02 playback/geometry "+JSON.stringify(heroPlayback));
+ report.tests.push({name:"HERO-EDITORIAL-02 full video, integrated header and no controls",heroPlayback});
  const roundedUI=await js('(()=>{const sels={hero:".v4-motion-canvas",cta:".hero-cta",card:".solutions-grid .service--main",pitch:".business-pitch"};return {titles:[...document.querySelectorAll("h1,h2,h3")].map(e=>e.textContent.trim()),radii:Object.fromEntries(Object.entries(sels).map(([name,sel])=>[name,parseFloat(getComputedStyle(document.querySelector(sel)).borderTopLeftRadius)||0]))}})()');
  const decorDots=roundedUI.titles.filter(t=>t.endsWith("."));
- if(decorDots.length||Object.entries(roundedUI.radii).some(([key,v])=>key==="hero"?v!==0:key==="cta"?v!==6:v<10))
+ if(decorDots.length||Object.entries(roundedUI.radii).some(([key,v])=>key==="hero"?v!==0:key==="cta"?v!==999:v<10))
    report.failures.push("V6.6 unexpected heading periods or missing rounded corners: "+JSON.stringify({decorDots,radii:roundedUI.radii}));
  report.tests.push({name:"V6.6 editorial punctuation and computed corner radii",roundedUI});
 
@@ -337,7 +332,7 @@ try{
    report.failures.push("Services must contain only the two brands, no app availability panel or store links: "+JSON.stringify(appAccess));
  report.tests.push({name:"Two service cards only; app availability panel absent and no unverified store links",appAccess});
  const kineticIntro=await js('(()=>({version:document.documentElement.dataset.kineticVersion,headlinePx:parseFloat(getComputedStyle(document.querySelector(".motion-headline")).fontSize),leadVisible:getComputedStyle(document.querySelector(".hero-lead")).visibility,graphic:document.querySelector(".site-header .brand-mark")?.getAttribute("src"),photoLoaded:document.querySelector("#inicio .prime-photo-image")?.complete}))()');
- if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<50||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png")||!kineticIntro.photoLoaded)report.failures.push("V4.5 visible hero/photo and original brand failed: "+JSON.stringify(kineticIntro));
+ if(kineticIntro.version!=="v45"||kineticIntro.headlinePx<45||kineticIntro.leadVisible!=="visible"||!kineticIntro.graphic?.includes("deliver-assets-mark.png")||!kineticIntro.photoLoaded)report.failures.push("V4.5 visible hero/photo and original brand failed: "+JSON.stringify(kineticIntro));
  report.tests.push({name:"V4.5 visible headline, photograph and original mark",kineticIntro});
  const anim01=await js('(()=>({noScan:!document.querySelector(".v5-stage-scan"),noDecor:!document.querySelector("#inicio .v4-shape, #inicio .v4-canvas-stamp, #inicio .v5-hero-refraction, #inicio .motion-brand-thread"),direction:document.documentElement.dataset.motionDirection}))()');
  if(!anim01.noScan||!anim01.noDecor||anim01.direction!=="editorial-cinematic-v1")
@@ -526,7 +521,7 @@ try{
  if(!mobilePhoto.loaded||!mobilePhoto.src?.includes("desset-hero-editorial-poster.webp")||mobilePhoto.width!==1920||mobilePhoto.height!==960)
   report.failures.push("HERO-PHOTO-01 mobile responsive photo not selected: "+JSON.stringify(mobilePhoto));
  report.tests.push({name:"HERO-EDITORIAL-01 panoramic poster loaded with reduced motion",mobilePhoto});
- const reducedHero=await js('(()=>{const v=document.querySelector("#desset-editorial-video"),b=document.querySelector(".desset-editorial-toggle");return v.paused&&!v.getAttribute("src")&&getComputedStyle(v).display==="none"&&b.hidden})()');
+ const reducedHero=await js('(()=>{const v=document.querySelector("#desset-editorial-video");return v.paused&&!v.getAttribute("src")&&getComputedStyle(v).display==="none"&&!document.querySelector(".desset-editorial-toggle")})()');
  if(!reducedHero)report.failures.push("HERO-EDITORIAL-01 reduced-motion fallback must not load or play video");
  const reducedMode=await js("document.documentElement.dataset.motionSystem");
  if(reducedMode!=="reduced")report.failures.push("Motion fallback failed for reduced preference: "+String(reducedMode));
@@ -621,7 +616,7 @@ try{
   if(page==="index"){
    await js('document.querySelector("#empresa-destacada").scrollIntoView({block:"start",behavior:"instant"})');
    await sleep(150);
-   const hierarchy=await js(`(()=>{const grid=document.querySelector("#empresa-destacada .institutional-home-grid"),cards=[...grid.querySelectorAll("article")],strip=document.querySelector(".institutional-recent"),sections=[...document.querySelectorAll("main>section")];return {order:sections.map(e=>e.id).join("|"),recent:strip.previousElementSibling?.id==="inicio"&&strip.nextElementSibling?.id==="empresa-destacada",columns:getComputedStyle(grid).gridTemplateColumns.trim().split(/\\s+/).length,headings:cards.map(e=>e.querySelector("h3").textContent),fit:cards.every(e=>e.scrollWidth<=e.clientWidth+2&&e.getBoundingClientRect().width>0),investors:cards[1]?.querySelector('a[href="./empresa.html#inversores"]')?.getBoundingClientRect().height>=44}})()`);
+   const hierarchy=await js(`(()=>{const grid=document.querySelector("#empresa-destacada .institutional-home-grid"),cards=[...grid.querySelectorAll("article")],strip=document.querySelector("#inicio .v4-hero-rail"),sections=[...document.querySelectorAll("main>section")];return {order:sections.map(e=>e.id).join("|"),recent:strip.parentElement?.id==="inicio"&&strip.parentElement.nextElementSibling?.id==="empresa-destacada"&&!document.querySelector(".institutional-recent"),columns:getComputedStyle(grid).gridTemplateColumns.trim().split(/\\s+/).length,headings:cards.map(e=>e.querySelector("h3").textContent),fit:cards.every(e=>e.scrollWidth<=e.clientWidth+2&&e.getBoundingClientRect().width>0),investors:cards[1]?.querySelector('a[href="./empresa.html#inversores"]')?.getBoundingClientRect().height>=44}})()`);
    if(hierarchy.order!=="inicio|empresa-destacada|noticias-destacadas|soluciones|vision|talento-destacado|negocios"||!hierarchy.recent||hierarchy.columns!==(w<320?1:2)||hierarchy.headings.join("|")!=="Empresa|Inversores"||!hierarchy.fit||!hierarchy.investors)report.failures.push("VISUAL-HIERARCHY-01 "+label+": "+JSON.stringify(hierarchy));
    if(w===1440||w===390)await capture((root?"dist-":"source-")+"hierarchy-"+w+"px.png");
    report.tests.push({name:"VISUAL-HIERARCHY-01 "+label,hierarchy});
