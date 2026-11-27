@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "status": "preparation-only",
+  "audited_base_sha": "4fbfd604eacafbab294486f3ed7924bbe6b0948c",
+  "approval_basis": "Two palettes by function, confirmed by owner in conversation 2026-11-27; page assignments and migration exceptions below are implementation proposals",
+  "palettes": {
+    "corporate": {
+      "blue": "#1748BF",
+      "red": "#E8342A",
+      "yellow": "#FFC011",
+      "cream": "#F7F2E1",
+      "ink": "#111111",
+      "white": "#FFFFFF",
+      "scope": "DELIVER ASSETS corporate documents, brand manuals and institutional collateral"
+    },
+    "digital": {
+      "blue": "#073BBC",
+      "red": "#FF3328",
+      "yellow": "#FFC62F",
+      "paper": "#F7F5EE",
+      "ink": "#000000",
+      "white": "#FFFFFF",
+      "scope": "DESSET and DESSET prime website UI; corporate-content pages retain digital shell; future applications subject to their own implementation review"
+    }
+  },
+  "common_styles": [
+    "styles.css",
+    "styles-system.css",
+    "styles-typography.css"
+  ],
+  "page_groups": [
+    {
+      "name": "Portada",
+      "pages": [
+        "index.html"
+      ],
+      "styles": [
+        "styles-v5.css",
+        "styles-hero-photo.css",
+        "styles-visual02.css",
+        "styles-service-video.css",
+        "styles-hero-editorial.css"
+      ]
+    },
+    {
+      "name": "Información institucional web",
+      "pages": [
+        "empresa.html",
+        "inversores.html",
+        "perfil-corporativo.html",
+        "mensaje-direccion.html",
+        "mision-vision-valores.html",
+        "gobierno-corporativo.html",
+        "historia.html",
+        "principios.html"
+      ],
+      "styles": [
+        "styles-company.css"
+      ]
+    },
+    {
+      "name": "Aplicaciones",
+      "pages": [
+        "aplicaciones.html",
+        "aplicaciones-clientes.html",
+        "aplicaciones-comercios.html",
+        "aplicaciones-repartidores.html"
+      ],
+      "styles": [
+        "styles-applications.css"
+      ]
+    },
+    {
+      "name": "Comercios y repartidores",
+      "pages": [
+        "comercios.html",
+        "repartidores.html"
+      ],
+      "styles": [
+        "styles-audiences.css"
+      ]
+    },
+    {
+      "name": "Incorporación, registro y capacitación",
+      "pages": [
+        "capacitacion-repartidores.html",
+        "incorporacion-comercios.html",
+        "incorporacion-repartidores.html",
+        "registro-comercios.html",
+        "registro-repartidores.html"
+      ],
+      "styles": [
+        "styles-onboarding.css"
+      ]
+    },
+    {
+      "name": "Prime",
+      "pages": [
+        "prime.html"
+      ],
+      "styles": [
+        "styles-v5.css",
+        "styles-prime.css"
+      ]
+    },
+    {
+      "name": "Talento",
+      "pages": [
+        "talento.html"
+      ],
+      "styles": [
+        "styles-careers.css"
+      ]
+    },
+    {
+      "name": "Contacto",
+      "pages": [
+        "contacto.html"
+      ],
+      "styles": [
+        "styles-contact.css"
+      ]
+    },
+    {
+      "name": "Confianza",
+      "pages": [
+        "confianza.html"
+      ],
+      "styles": [
+        "styles-trust.css"
+      ]
+    },
+    {
+      "name": "Noticias",
+      "pages": [
+        "noticias.html"
+      ],
+      "styles": [
+        "styles-news.css"
+      ]
+    },
+    {
+      "name": "Inglés",
+      "pages": [
+        "en.html"
+      ],
+      "styles": []
+    }
+  ],
+  "existing_auxiliary_colors": {
+    "hover_blue": "#062E96",
+    "light_blue": "#B7CAFF",
+    "theme_color": "#F4F8FE",
+    "cream": "#FAF3DF",
+    "surface": "#FFFDF8",
+    "ink": "#111111"
+  },
+  "protected": [
+    "logo binaries",
+    "photos",
+    "all video and posters",
+    "GLB",
+    "3D source colors",
+    "legacy SVG original assets",
+    "page geometry",
+    "typography",
+    "routing",
+    "functional states",
+    "NOINDEX",
+    "DNS",
+    "deployment workflows"
+  ],
+  "legacy_review": [
+    "#1551D8 in v5, SVG, 3D and confianza.html",
+    "other auxiliary hues by semantic role and contrast"
+  ],
+  "release_authorized": false
+}

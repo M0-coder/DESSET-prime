@@ -58,7 +58,19 @@ async function js(expression){
  if(response.exceptionDetails)throw new Error("Browser evaluation failed: "+JSON.stringify(response.exceptionDetails));
  return response.result.result.value;
 }
+// BRAND-DUAL-PALETTE-01: sample computed tokens on existing public QA captures.
+const brandPlan=JSON.parse(await readFile(resolve("config/brand-dual-palette-plan.json"),"utf8"));
+const brandRoutes=new Map(["","dist/"].flatMap(prefix=>brandPlan.page_groups.flatMap(g=>g.pages).map(page=>[pathToFileURL(resolve(prefix+page)).href,prefix+page])));
+const brandSamples=new Set();
+async function auditBrandTokens(){
+ const state=await js(`(()=>({url:location.href,width:innerWidth,tokens:[document.documentElement,document.body].map(e=>getComputedStyle(e).getPropertyValue("--blue").trim().toUpperCase())}))()`);
+ const page=brandRoutes.get(state.url);if(!page)return;
+ const key=page+":"+state.width;if(brandSamples.has(key))return;brandSamples.add(key);
+ if(state.tokens.some(c=>c!==brandPlan.palettes.digital.blue))report.failures.push("BRAND-DUAL-PALETTE-01 computed blue "+key+": "+JSON.stringify(state.tokens));
+ report.tests.push({name:"BRAND-DUAL-PALETTE-01 computed blue "+key,pass:state.tokens.every(c=>c===brandPlan.palettes.digital.blue),tokens:state.tokens});
+}
 async function capture(name,full=false){
+ await auditBrandTokens();
  const x=await call("Page.captureScreenshot",{format:"png",captureBeyondViewport:full,fromSurface:true});
  const buf=Buffer.from(x.result.data,"base64");
  assert.ok(buf.length>2000,"Screenshot unexpectedly empty: "+name);
