@@ -83,3 +83,33 @@
 .audience-page--comercios .mc-closing{background:#073bbc;color:#fff;border-radius:16px;text-align:center;padding:clamp(24px,5vw,64px)}.audience-page--comercios .mc-closing h2{font-family:var(--ds-type-display);font-size:clamp(28px,4vw,48px);line-height:1.15;margin:0 0 16px}.audience-page--comercios .mc-closing p{margin:0 0 24px}.audience-page--comercios .mc-closing .ap-button{width:min(100%,380px)}
 .audience-page--comercios a:focus-visible,.audience-page--comercios summary:focus-visible{outline:3px solid #073bbc;outline-offset:4px}.audience-page--comercios .mc-closing a:focus-visible,.audience-page--comercios .ap-hero a:focus-visible{outline-color:#fff}
 @media(max-width:700px){.audience-page--comercios .mc-categories{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.audience-page--comercios .ap-step:not(:last-child)::after{display:none}.audience-page--comercios .mc-actions{align-items:stretch;flex-direction:column}.audience-page--comercios .mc-terms>div{display:grid;gap:4px}}
+
+/* REPARTIDORES-02: approved rider presentation, scoped exclusively to Repartidores. */
+.audience-page--repartidores .mc-intro{margin:0 0 24px;color:#414141;max-width:75ch}
+.audience-page--repartidores .mc-categories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;list-style:none;padding:0;margin:0}
+.audience-page--repartidores .mc-categories li{display:grid;justify-items:center;align-content:center;gap:14px;padding:24px 12px;min-height:124px;border:1px solid #d8dce2;background:#fff;border-radius:12px;text-align:center;font-weight:700;overflow-wrap:anywhere}
+.audience-page--repartidores .mc-categories svg,.audience-page--repartidores .ap-step svg{width:40px;height:40px;color:#073bbc}
+.audience-page--repartidores .ap-step{border-top:0;position:relative;display:grid;justify-items:center;text-align:center;align-content:start;gap:10px;padding:0}
+.audience-page--repartidores .ap-step svg{box-sizing:content-box;background:#eef3ff;border-radius:50%;padding:18px}
+.audience-page--repartidores .ap-step h3{font-size:clamp(18px,2vw,26px);margin:0;overflow-wrap:anywhere}
+.audience-page--repartidores .ap-step:not(:last-child)::after{content:"";position:absolute;width:12px;height:1px;top:38px;right:0;background:#a3aab5}
+.audience-page--repartidores .mc-flow-note{margin:24px auto 0;text-align:center}
+.audience-page--repartidores .mc-terms{margin:0 0 20px;border-top:1px solid #d8dce2}
+.audience-page--repartidores .mc-terms>div{display:flex;justify-content:space-between;gap:12px;padding:18px 0;border-bottom:1px solid #d8dce2;flex-wrap:wrap}
+.audience-page--repartidores .mc-terms dt{font-weight:700}.audience-page--repartidores .mc-terms dd{margin:0;color:#414141}
+.audience-page--repartidores .mc-app{background:#fff;border:1px solid #d8dce2;border-radius:16px;padding:clamp(20px,4vw,48px);max-width:840px;margin:auto}
+.audience-page--repartidores .mc-app-heading{display:flex;align-items:center;gap:16px}.audience-page--repartidores .mc-app-heading svg{width:48px;height:48px;flex:none;color:#073bbc}.audience-page--repartidores .mc-app h3,.audience-page--repartidores .mc-app p{margin:0}
+.audience-page--repartidores .mc-app ul{padding:0;margin:24px 0;list-style:none;display:grid;gap:12px}.audience-page--repartidores .mc-app li{display:flex;align-items:center;gap:12px}.audience-page--repartidores .mc-app li svg{width:24px;height:24px;flex:none;color:#073bbc}
+.audience-page--repartidores .mc-app .ap-button,.audience-page--repartidores .mc-actions .ap-button{background:#073bbc;color:#fff;border-color:#073bbc}.audience-page--repartidores .mc-app .ap-button{width:100%}
+.audience-page--repartidores .mc-journey{list-style:none;padding:0;margin:0 0 24px;counter-reset:mc-step;display:grid;gap:0}.audience-page--repartidores .mc-journey li{counter-increment:mc-step;position:relative;padding:16px 12px 16px 64px;border-bottom:1px solid #d8dce2;min-height:56px;font-weight:650}.audience-page--repartidores .mc-journey li::before{content:counter(mc-step,decimal-leading-zero);position:absolute;left:0;top:12px;color:#073bbc;font-weight:800;background:#e8efff;border-radius:50%;width:40px;height:40px;display:grid;place-items:center}
+.audience-page--repartidores .mc-actions{display:flex;align-items:center;flex-wrap:wrap;gap:16px}.audience-page--repartidores .mc-actions>a:last-child{color:#073bbc;text-decoration:underline}
+.audience-page--repartidores .mc-closing{background:#073bbc;color:#fff;border-radius:16px;text-align:center;padding:clamp(24px,5vw,64px)}.audience-page--repartidores .mc-closing h2{font-family:var(--ds-type-display);font-size:clamp(28px,4vw,48px);line-height:1.15;margin:0 0 16px}.audience-page--repartidores .mc-closing p{margin:0 0 24px}.audience-page--repartidores .mc-closing .ap-button{width:min(100%,380px)}
+.audience-page--repartidores a:focus-visible,.audience-page--repartidores summary:focus-visible{outline:3px solid #073bbc;outline-offset:4px}.audience-page--repartidores .mc-closing a:focus-visible{outline-color:#fff}
+@media(max-width:700px){.audience-page--repartidores .mc-categories{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.audience-page--repartidores .ap-step:not(:last-child)::after{display:none}.audience-page--repartidores .mc-actions{align-items:stretch;flex-direction:column}.audience-page--repartidores .mc-terms>div{display:grid;gap:4px}}
+
+.audience-page--repartidores .rd-requirements{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.audience-page--repartidores .rd-requirements li{display:flex;align-items:center;gap:14px;min-width:0;padding:16px 0;border-bottom:1px solid #d8dce2;overflow-wrap:anywhere;font-weight:650}
+.audience-page--repartidores .rd-requirements svg{width:36px;height:36px;flex:none;color:#073bbc}
+.audience-page--repartidores .rd-academy{background:#f4f8fe}
+@media(max-width:700px){.audience-page--repartidores .mc-categories{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.audience-page--repartidores .mc-categories li{padding:16px 5px;font-size:14px}.audience-page--repartidores .rd-requirements{gap:10px}.audience-page--repartidores .rd-requirements li{gap:8px;font-size:14px}.audience-page--repartidores .rd-requirements svg{width:26px;height:26px}}
+@media(max-width:360px){.audience-page--repartidores .mc-categories,.audience-page--repartidores .rd-requirements{grid-template-columns:1fr}}
