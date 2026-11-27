@@ -16,7 +16,7 @@ for(const dir of ["","dist/"]){
   const hero=html.match(/<section class="ap-hero[^"]*"[^>]*>[\s\S]*?<\/section>/)[0];
   const flow=html.match(/<section class="ap-block ap-flow"[^>]*>[\s\S]*?<\/section>/)[0];
   assert.doesNotMatch(hero,/<(?:p|figcaption)\b|No implica afiliación|DESSET \/ Comercios|Comercio digital, tecnología/);
-  assert.match(hero,/alt="Fotografía referencial de la fachada nocturna/);
+  assert.match(hero,/alt="Fotografía referencial de la fachada de un mercadito/);
   assert.equal((hero.match(/class="ap-button"/g)||[]).length,2);
   assert.doesNotMatch(flow,/<strong>|Recorrido conceptual|class="ap-note"/);
   assert.match(read(dir+"styles-audiences.css"),/\.audience-page--comercios \.ap-step\{border-top:0;/);
