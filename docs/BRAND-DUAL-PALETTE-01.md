@@ -52,3 +52,7 @@ Todas cargan styles.css, styles-system.css y styles-typography.css. Todas declar
 ## 5. Estado
 
 Preparación solamente. El manifiesto config/brand-dual-palette-plan.json no se consume en el runtime ni forma parte de la lista de publicación existente. No se han ejecutado nuevas capturas de las 26 páginas para esta preparación: el inventario es de código fuente. Las capturas y mediciones computadas quedan como criterios de aceptación de la implementación.
+
+## 6. Primera intervención de aplicación — fase A
+
+Se sustituyeron 77 declaraciones exactas de #073bbc por var(--blue) en nueve hojas interiores: company (13), contact (4), news (8), trust (5), applications (3), onboarding (5), careers (7), audiences (27) y prime (5). Cada archivo candidato se comprobó por reversión exacta de la sustitución antes del commit. No se cambiaron los valores de la raíz, ni el color computado intencional, ni el orden de reglas. Se conservan las hojas de portada y compartidas, los assets y 3D. Dos contratos existentes se adaptan a la referencia canónica y uno nuevo verifica las dos paletas, el inventario de 26 rutas, la raíz y los alias en fuente y dist. El audit de navegador registra el token calculado durante las capturas públicas existentes, sin alterar la página. CI y revisión de evidencias pendientes; no se afirma paridad visual hasta comprobarlas. La centralización de otros pigmentos y hojas compartidas queda fuera de esta fase por el presupuesto y los contratos históricos.
