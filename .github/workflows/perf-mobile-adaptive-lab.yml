@@ -1,0 +1,68 @@
+name: PERF-MOBILE — adaptive media feasibility (NO DEPLOY)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/perf-mobile-adaptive-lab.yml'
+      - 'scripts/perf-mobile-adaptive-lab.mjs'
+      - 'scripts/perf-mobile-adaptive-lab.py'
+      - 'docs/PERF-MOBILE-04.md'
+permissions:
+  contents: read
+jobs:
+  paired-adaptive-lab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22.16.0'
+      - name: Build and verify approved package
+        run: |
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build:site
+          npm run verify:site
+          node scripts/static-gate.mjs
+      - name: Install laboratory encoder
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/perf-adaptive
+          {
+            if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+              sudo apt-get update
+              sudo apt-get install --yes --no-install-recommends ffmpeg
+            fi
+            ffmpeg -version
+            ffprobe -version
+          } 2>&1 | tee reports/perf-adaptive/encoder.log
+      - name: Compare original and low-bandwidth rendition
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/perf-adaptive
+          DESSET_PRIME_WEB_ROOT=dist node scripts/local-preview.mjs > reports/perf-adaptive/server.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ -o /dev/null && break; sleep 1; done
+          curl -fsS http://127.0.0.1:4173/ -o /dev/null
+          google-chrome --version | tee reports/perf-adaptive/chrome-version.txt
+          node --check scripts/perf-mobile-adaptive-lab.mjs
+          python3 scripts/perf-mobile-adaptive-lab.py 2>&1 | tee reports/perf-adaptive/experiment.log
+      - name: Verify original package unchanged
+        if: always()
+        run: |
+          npm run verify:site
+          git diff --exit-code
+      - name: Preserve all diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: perf-mobile-adaptive-evidence
+          path: reports/perf-adaptive/
+          if-no-files-found: error
+          retention-days: 14
