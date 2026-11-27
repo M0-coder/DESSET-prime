@@ -9,15 +9,15 @@ const html=read("index.html"),css=read("styles-visual02.css"),
 const visual02Css=css.split("/* VISUAL-03:")[0];
 assert.ok(css.includes("/* VISUAL-03:"),"Must retain isolated VISUAL-03 marker");
 test("VISUAL-02 leaves the approved photographic hero and real official identity untouched",()=>{
- assert.match(html,/desset-hero-entrega-dos-espejos\.webp/);
- assert.match(html,/desset-hero-entrega-mobile\.webp/);
- assert.match(html,/motocicleta de dos espejos/);
+ assert.match(html,/desset-hero-editorial-poster\.webp/);
+ assert.match(html,/data-src="\.\/assets\/desset-hero-editorial\.mp4"/);
+ assert.match(html,/Escena conceptual: personas, paquetes y arquitectura urbana/);
  assert.match(html,/deliver-assets-mark\.png/);
- assert.match(html,/Hablemos de tu negocio/);
+ assert.match(html,/Conoce nuestro propósito/);
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/Representación conceptual/);
  assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
- assert.doesNotMatch(html,/IDEAS EN ACCIÓN|<form\b/);assert.equal((html.match(/<video\b/g)||[]).length,2);
+ assert.doesNotMatch(html,/IDEAS EN ACCIÓN|<form\b/);assert.equal((html.match(/<video\b/g)||[]).length,3);
 });
 test("VISUAL-02 concentrates editorial retouching below hero, no image, typeface or animation replacements",()=>{
  assert.ok(css.startsWith("/* VISUAL-02"));

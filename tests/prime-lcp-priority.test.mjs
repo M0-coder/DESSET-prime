@@ -3,28 +3,21 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 const source=readFileSync(new URL("../index.html",import.meta.url),"utf8");
 const output=readFileSync(new URL("../dist/index.html",import.meta.url),"utf8");
-const mobile="./assets/desset-hero-entrega-mobile.webp";
-const desktop="./assets/desset-hero-entrega-dos-espejos.webp";
-const media=["(max-width: 700px)","(min-width: 701px)"];
+const poster="./assets/desset-hero-editorial-poster.webp";
 function check(html){
  const all=[...html.matchAll(/<link\s+[^>]*rel="preload"[^>]*>/g)].map(x=>({tag:x[0],index:x.index}));
  const assets=all.filter(x=>x.tag.includes('as="image"'));
- assert.equal(assets.length,2,"Only two strictly exclusive approved hero image preloads");
- for(const [i,path] of [mobile,desktop].entries()){
-  const found=assets.filter(x=>x.tag.includes('href="'+path+'"'));
-  assert.equal(found.length,1,"Missing/doubled hero image preload "+path);
-  const {tag}=found[0];
-  assert.ok(tag.includes('type="image/webp"')&&tag.includes('fetchpriority="high"'));
-  assert.ok(tag.includes('media="'+media[i]+'"'),"Wrong viewport preloading condition");
- }
- assert.ok(assets.every(x=>x.index<html.indexOf('href="./fonts/')),"Hero image must take priority over fonts");
+ assert.equal(assets.length,1,"Exactly one approved panoramic poster preload");
+ const {tag,index}=assets[0];
+ assert.ok(tag.includes('href="'+poster+'"')&&tag.includes('type="image/webp"')&&tag.includes('fetchpriority="high"')&&!tag.includes('media='));
+ assert.ok(index<html.indexOf('href="./fonts/'));
  const mainStyle=html.match(/href="\.\/styles\.css\?v=[a-f0-9]{40}"/);
- assert.ok(mainStyle&&assets.every(x=>x.index<mainStyle.index),"Hero image discovered before versioned render-blocking CSS");
- assert.match(html,/<source type="image\/webp" media="\(max-width: 700px\)" srcset="\.\/assets\/desset-hero-entrega-mobile\.webp">/);
- assert.match(html,/class="prime-photo-image"[^>]*src="\.\/assets\/desset-hero-entrega-dos-espejos\.webp"[^>]*loading="eager" fetchpriority="high"/);
+ assert.ok(mainStyle&&index<mainStyle.index);
+ assert.match(html,/class="prime-photo-image"[^>]*src="\.\/assets\/desset-hero-editorial-poster\.webp"[^>]*loading="eager" fetchpriority="high"/);
+ assert.match(html,/data-src="\.\/assets\/desset-hero-editorial\.mp4" muted loop playsinline preload="none"/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 }
-test("Hero source and signed package preload only matching mobile/desktop LCP art",()=>{check(source);check(output)});
+test("Hero source and packaged output preload the single approved poster",()=>{check(source);check(output)});
 test("No photo bytes, fonts, WebGL or typography were replaced to obtain the performance result",()=>{
  assert.match(source,/fonts\/inter-latin-variable\.woff2/);
  assert.match(source,/fonts\/plus-jakarta-sans-latin-variable\.woff2/);

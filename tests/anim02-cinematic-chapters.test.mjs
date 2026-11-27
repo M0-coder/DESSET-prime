@@ -6,10 +6,10 @@ const read=p=>readFileSync(new URL(p,root),"utf8");
 const html=read("index.html"),css=read("styles-hero-photo.css"),motion=read("scripts/motion.js"),audit=read("scripts/browser-audit.mjs");
 
 test("ANIM-02 approved real-world photo, 2 mirrors disclosure, official identity and commercial CTA",()=>{
- assert.match(html,/desset-hero-entrega-dos-espejos\.webp/);
- assert.match(html,/desset-hero-entrega-mobile\.webp/);
- assert.match(html,/mochila negra y motocicleta de dos espejos/);
- assert.match(html,/Hablemos de tu negocio/);
+ assert.match(html,/desset-hero-editorial-poster\.webp/);
+ assert.match(html,/data-src="\.\/assets\/desset-hero-editorial\.mp4"/);
+ assert.match(html,/Escena conceptual: personas, paquetes y arquitectura urbana/);
+ assert.match(html,/Conoce nuestro propósito/);
  assert.match(html,/deliver-assets-mark\.png/);
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/Representación conceptual/);
  assert.doesNotMatch(html,/IDEAS EN ACCIÓN/);

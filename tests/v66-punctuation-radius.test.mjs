@@ -29,7 +29,7 @@ test("V6.6 all presentation headings and standalone labels omit terminal ornamen
 });
 
 test("V6.6 punctuation stays in natural prose and legal availability disclosures",()=>{
- assert.match(html,/DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla/);
+ assert.match(html,/Conectamos personas, negocios y mercados/);
  assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
  assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/no procesa pedidos ni pagos\./i);
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/);
@@ -64,7 +64,7 @@ test("V6.6 change is limited to presentation: no commerce launch or public publi
  assert.match(html,/class="service-body" id="ecosistema"/);assert.doesNotMatch(html,/<section class="ecosystem"/);
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v63-tour"/);
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v6-three-mount" aria-hidden="true"/);
- assert.match(html,/href="#contacto"/);
+ assert.match(html,/href="\.\/mision-vision-valores\.html#proposito"/);
  assert.doesNotMatch(html,/<form\b|<iframe\b/i);
  assert.equal((html.match(/data-channel-review="owner-attested" data-channel-basis="owner-attested"/g)||[]).length,5);
 });

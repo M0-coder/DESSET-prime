@@ -38,13 +38,13 @@ test("V4.5 chooses IntersectionObserver once, never drives scroll positions, and
  assert.match(photoCss,/@media\(prefers-reduced-motion:reduce\)/);
  assert.doesNotMatch(script,/addEventListener\(["']scroll|setInterval|setTimeout|requestAnimationFrame|scrollTo|localStorage|fetch\s*\(/);
  assert.doesNotMatch(html,/<canvas\b|<iframe\b|<form\b/i);
- const services=html.match(/<section class="solutions"[^>]*>[\s\S]*?<\/section>/)[0];assert.equal((html.match(/<video\b/g)||[]).length,2);assert.equal((services.match(/<video\b/g)||[]).length,2);assert.doesNotMatch(services,/<video[^>]*\sautoplay\b/);
+ const services=html.match(/<section class="solutions"[^>]*>[\s\S]*?<\/section>/)[0];assert.equal((html.match(/<video\b/g)||[]).length,3);assert.equal((services.match(/<video\b/g)||[]).length,2);assert.doesNotMatch(services,/<video[^>]*\sautoplay\b/);
 });
 
 test("V4.5 enlarges typography while keeping narrow-phone and semantic link fallbacks",()=>{
  assert.match(css,/@media\(min-width:1181px\)\{[\s\S]*?font-size:clamp\(65px,8\.05vw,143px\)/);
  assert.match(css,/@media\(max-width:360px\)\{[\s\S]*?font-size:38px/);
- assert.match(html,/<a class="hero-cta" href="#contacto">/);
+ assert.match(html,/<a class="hero-cta" href="\.\/mision-vision-valores\.html#proposito">/);
  assert.match(html,/data-footer-channel="Instagram" aria-label="Instagram"/);
  assert.match(html,/data-footer-channel="TikTok" aria-label="TikTok"/);
  assert.match(html,/data-footer-channel="YouTube" aria-label="YouTube"/);

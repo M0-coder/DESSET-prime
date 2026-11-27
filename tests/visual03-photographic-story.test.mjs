@@ -15,8 +15,8 @@ test("ECOSYSTEM-PARTICIPANTS-01 four exact photographs, no hero duplication",()=
  assert.equal((vision.match(/loading="lazy"/g)||[]).length,4);
  assert.equal((vision.match(/alt="[^"]+"/g)||[]).length,4);
  assert.doesNotMatch(vision,/desset-hero-entrega|scene-(?:choose|prepare|move)\./);
- assert.match(html,/motocicleta de dos espejos/);
- assert.match(html,/Hablemos de tu negocio/);
+ assert.match(html,/Escena conceptual: personas, paquetes y arquitectura urbana/);
+ assert.match(html,/Conoce nuestro propósito/);
  assert.match(html,/deliver-assets-mark\.png/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
 });

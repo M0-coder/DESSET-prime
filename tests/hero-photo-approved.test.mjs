@@ -6,7 +6,7 @@ const root=new URL('../',import.meta.url), read=p=>readFileSync(new URL(p,root),
 const html=read('index.html'),css=read('styles-hero-photo.css'),build=read('scripts/build-site.mjs'),verify=read('scripts/verify-site-package.mjs'),gate=read('scripts/static-gate.mjs');
 test('HERO-PHOTO-01 official brand and direct commerce CTA are retained',()=>{
  assert.match(html,/class="brand-mark" src="\.\/assets\/deliver-assets-mark\.png"/);
- assert.match(html,/Hablemos de tu negocio/);
+ assert.match(html,/Conoce nuestro propósito/);
  assert.match(html,/class="motion-line v4-headline-a"><span class="motion-line__inner">AUMENTA EL VALOR<\/span>/);assert.match(html,/class="motion-line v4-headline-b"><span class="motion-line__inner">A TU TIEMPO<\/span>/);
  assert.doesNotMatch(html,/data-v64-tour-launch/);
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v5-city-stage"/);
@@ -21,9 +21,9 @@ test('HERO-PHOTO-01 exact locally packaged user-approved image with two mirrors'
  assert.equal(data.subarray(0,4).toString(),'RIFF');assert.equal(data.subarray(8,12).toString(),'WEBP');
  assert.ok(data.length>100000&&data.length<=210000);
  assert.equal(createHash('sha256').update(data).digest('hex'),'9f7940ed40dac21dcd286655930750ffd1008cf84830ed8b2e086a40c4cd00f1');
- assert.match(html,/src="\.\/assets\/desset-hero-entrega-dos-espejos\.webp"/);
- assert.match(html,/width="1671" height="941"/);
- assert.match(html,/srcset="\.\/assets\/desset-hero-entrega-mobile\.webp"/);
+ assert.match(html,/src="\.\/assets\/desset-hero-editorial-poster\.webp"/);
+ assert.match(html,/width="1920" height="960"/);
+ assert.match(html,/data-src="\.\/assets\/desset-hero-editorial\.mp4"/);
  const mobile=readFileSync(new URL("assets/desset-hero-entrega-mobile.webp",root));
  assert.ok(mobile.length<=85000);
  assert.equal(createHash("sha256").update(mobile).digest("hex"),"4a2043a8dfceb15d5f4cc008904feb49467a42f79f8f9c54db2bdcad0e33767e");
@@ -41,7 +41,7 @@ test('HERO-PHOTO-01 two-column mockup, responsive, reduced motion and real 3D re
 });
 test('HERO-PHOTO-01 real site build, local browser proof, security gate include asset',()=>{
  assert.match(build,/styles-hero-photo\.css/);
- assert.match(verify,/Approved photographic render is not packaged/);
+ assert.match(verify,/Historical approved photo assets preserved/);
  assert.match(gate,/hero_webp_bytes:210000/);
  assert.match(read('scripts/browser-audit.mjs'),/HERO-PHOTO-01 exact local render, original logo, conceptual disclosure/);
  assert.match(html,/href="\.\/styles-hero-photo\.css"/);
