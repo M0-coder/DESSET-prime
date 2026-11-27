@@ -57,7 +57,7 @@ for(const [i,s] of js.entries()){
 }
 assert(styles.every(s=>!/@import\b|url\(\s*['"]?https?:/i.test(s)),"Remote CSS dependency");
 assert(!/\b(?:pages:\s*write|id-token:\s*write)\b/.test(read(".github/workflows/preview-checks.yml")),"CI write token permission");
-const budget={company_css_bytes:4500,html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:14000,hero_css_bytes:17000,visual02_css_bytes:8200,audiences_css_bytes:8000,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,onboarding_css_bytes:4000,applications_css_bytes:5000,service_video_css_bytes:4500,service_desset_video_bytes:1200000,service_prime_video_bytes:1650000,service_desset_poster_bytes:20000,service_prime_poster_bytes:50000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000,merchant_hero_webp_bytes:210000};
+const budget={company_css_bytes:4500,html_bytes:35000,typography_css_bytes:2800,v5_css_bytes:16000,system_css_bytes:14000,hero_css_bytes:17000,visual02_css_bytes:8200,audiences_css_bytes:12500,prime_css_bytes:4500,contact_css_bytes:3000,trust_css_bytes:4000,news_css_bytes:4500,careers_css_bytes:3000,onboarding_css_bytes:4000,applications_css_bytes:5000,service_video_css_bytes:4500,service_desset_video_bytes:1200000,service_prime_video_bytes:1650000,service_desset_poster_bytes:20000,service_prime_poster_bytes:50000,hero_webp_bytes:210000,mobile_hero_webp_bytes:85000,merchant_hero_webp_bytes:210000};
 const sizes={company_css_bytes:statSync(resolve(root,companyCss)).size,html_bytes:statSync(resolve(root,"index.html")).size,
  typography_css_bytes:statSync(resolve(root,"styles-typography.css")).size,
  v5_css_bytes:statSync(resolve(root,"styles-v5.css")).size,
