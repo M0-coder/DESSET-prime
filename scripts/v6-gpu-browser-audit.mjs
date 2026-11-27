@@ -213,6 +213,18 @@ try{
  const reduced=await evalJS('(()=>({script:!![...document.scripts].find(s=>s.src.includes("v6-three.bundle")),button:document.querySelector(".v6-enable-webgl")?.hidden,staticText:!!document.querySelector(".v6-static-fallback"),image:!!document.querySelector(".v5-responsive-art")}))()');
  check("Reduced-motion uses accessible text, never deleted image",!reduced.script&&reduced.button===true&&reduced.staticText&&!reduced.image,{reduced});
  await screenshot("mobile-reduced-static.png");
+ const reducedStatus=await evalJS('(()=>{const s=document.querySelector(".v65-load-status");return {visible:!s.hidden&&getComputedStyle(s).display!=="none",text:s.textContent}})()');
+ check("Reduced-motion fallback explains why 3D is inactive",reducedStatus.visible&&reducedStatus.text.includes("Movimiento reducido"),{reducedStatus});
+ const noGPU=await send("Page.addScriptToEvaluateOnNewDocument",{source:`(()=>{const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...args){return type==="webgl2"?null:original.call(this,type,...args)}})()`});
+ await viewport(1440,900);
+ await evalJS('document.querySelector(".v5-city-stage").scrollIntoView({block:"center",behavior:"instant"})');
+ const unsupported=await waitUntil("unsupported WebGL shows retry and explanation",async()=>evalJS('(()=>{const e=document.querySelector(".v5-city-stage"),b=e.querySelector(".v6-enable-webgl"),s=e.querySelector(".v65-load-status");return e.dataset.v6State==="unsupported"?{visible:!b.hidden&&getComputedStyle(b).display!=="none"&&b.getBoundingClientRect().width>0,status:!s.hidden&&getComputedStyle(s).display!=="none"&&s.textContent.includes("WebGL2"),noBundle:![...document.scripts].some(x=>x.src.includes("v6-three.bundle")),fallback:getComputedStyle(e.querySelector(".v6-static-fallback")).visibility==="visible"}:null})()'),8000);
+ check("Unsupported WebGL leaves visible retry, explanation and fallback",unsupported.visible&&unsupported.status&&unsupported.noBundle&&unsupported.fallback,{unsupported});
+ await evalJS('document.querySelector(".v6-enable-webgl").click()');
+ const retry=await evalJS('(()=>{const b=document.querySelector(".v6-enable-webgl"),s=document.querySelector(".v65-load-status");return {visible:!b.hidden&&getComputedStyle(b).display!=="none",status:!s.hidden,noBundle:![...document.scripts].some(x=>x.src.includes("v6-three.bundle"))}})()');
+ check("Retry on unsupported browser never hides the button or silently loads GPU",retry.visible&&retry.status&&retry.noBundle,{retry});
+ await screenshot("desktop-webgl-unavailable-retry.png");
+ await send("Page.removeScriptToEvaluateOnNewDocument",{identifier:noGPU.result.identifier});
 }catch(e){failures.push(String(e.stack||e))}
 finally{
  server.kill("SIGTERM");
