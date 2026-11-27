@@ -574,7 +574,7 @@ try{
  const nodes=tree.result?.nodes||[];
  const headings=nodes.filter(n=>!n.ignored&&n.role?.value==="heading").map(n=>String(n.name?.value||"").trim());
  const accessible={nodeCount:nodes.length,headingCount:headings.length,
-   hasHero:headings.some(n=>n.includes("AUMENTA EL VALOR")),hasContact:headings.some(n=>n.includes("CONEXIONES"))};
+   hasHero:nodes.some(n=>!n.ignored&&n.role?.value==="heading"&&n.properties?.some(p=>p.name==="level"&&p.value?.value===1)&&/^Aumenta el valor\s+a tu tiempo$/i.test(String(n.name?.value||"").trim().replace(/\s+/g," "))),hasContact:headings.some(n=>n.includes("CONEXIONES"))};
  if(!accessible.hasHero||!accessible.hasContact||accessible.headingCount<6)
   report.failures.push("V5.4 accessibility tree missing landmarks or headlines: "+JSON.stringify(accessible));
  report.tests.push({name:"V5.4 Chromium accessibility tree structural smoke",accessible});
