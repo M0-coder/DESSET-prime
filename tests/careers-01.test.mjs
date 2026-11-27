@@ -29,6 +29,16 @@ for(const dir of ["","dist/"]){
  const doc=read(dir+page+".html");assert.ok(doc.includes('href="./talento.html">Talento y cultura</a>'));assert.ok(!doc.includes("styles-careers.css"));
  }
  assert.match(read(dir+"contacto.html"),/href="\.\/talento\.html">Conoce Talento y cultura/);
- assert.ok(Buffer.byteLength(css,"utf8")<=3000);
+ const main=html.match(/<main\b[^>]*>[\s\S]*?<\/main>/)[0];
+ assert.equal((main.match(/<section\b/g)||[]).length,9);
+ assert.deepEqual([...main.matchAll(/<section\b[^>]*id="([^"]+)"/g)].map(x=>x[1]),["proposito","cultura","areas","trabajo","seleccion","oportunidades","preguntas","cierre"]);
+ for(const [cls,n] of [["ca-areas",8],["ca-principles",5],["ca-selection",7]]){const block=main.match(new RegExp('<(?:ul|ol) class="'+cls+'">[\\s\\S]*?<\\/(?:ul|ol)>'))[0];assert.equal((block.match(/<li>/g)||[]).length,n);}
+ assert.equal((main.match(/<details>/g)||[]).length,6);
+ assert.equal((main.match(/<img\b/g)||[]).length,1);
+ assert.doesNotMatch(main,/<video\b/);
+ assert.match(main,/No representan vacantes ni departamentos actualmente constituidos/);
+ assert.match(main,/Proceso previsto, todavía no habilitado/);
+ assert.match(main,/href="\.\/empresa\.html">Conoce DESSET/);
+ assert.ok(Buffer.byteLength(css,"utf8")<=6500);
  });
 }

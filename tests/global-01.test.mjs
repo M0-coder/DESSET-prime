@@ -6,7 +6,7 @@ const reviewed={
  "contacto.html":"a60fcbfac1412a9813c3dcea1dd45db2a4fc9b51",
  "confianza.html":"390cb4277bc255ed48eb901a536449eeef63e812",
  "noticias.html":"8abcb3ac7bc72f89ca06a565d1d199d903021a53",
- "talento.html":"46be811e0041310c0547ab2f064eabb3176145b8"
+ "talento.html":"ab092b24171da815fc87185329591b6ffb1e0939" // CAREERS-02 reviewed against unchanged English overview; recruitment remains inactive.
 };
 for(const dir of ["","dist/"]){test("GLOBAL-01 English overview and source editorial review lock "+(dir||"source"),()=>{
  const html=read(dir+"en.html").toString();
