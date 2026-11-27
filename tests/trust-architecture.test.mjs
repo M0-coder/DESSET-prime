@@ -47,8 +47,8 @@ test("contact profiles carry owner declaration, not platform-admin proof or DM r
  assert.doesNotMatch(html,/<form\b|<input\b/i);
 });
 
-test("seven-section hierarchy and mobile typography remain after deleting redundant trust ledger",()=>{
- assert.equal((html.match(/<section\b/g)||[]).length,7);
+test("six-section hierarchy and mobile typography remain after deleting redundant trust ledger",()=>{
+ assert.equal((html.match(/<section\b/g)||[]).length,6);
  const s1=html.indexOf('id="vision"'),s2=html.indexOf('id="soluciones"'),s3=html.indexOf('id="ecosistema"');
  assert.ok(0<s2 && s2<s3 && s3<s1);
  assert.match(css,/\.statement-body\{display:grid;grid-template-columns:minmax\(0,1fr\)/);
