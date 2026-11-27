@@ -188,16 +188,17 @@ body:has(#inicio) .home-footer-dark .corporate-footer{
 .home-footer-dark .corporate-footer a:hover,.home-footer-dark .mobile-footer a:hover{
  color:#fff;text-decoration:underline;
 }
+/* Preserve the original social strip: centered icons, colors, spacing,
+   borders and hover remain in the existing styles. Restore its light canvas
+   locally because the surrounding footer is now black. */
 body:has(#inicio) .home-footer-dark .footer-social{
- grid-column:1/-1;justify-content:flex-end;border:0;padding:0;gap:8px;
+ grid-column:1/-1;background:#f5f5f5;
 }
-.home-footer-dark .footer-social a{color:#fff}
-.home-footer-dark .footer-social a:hover{color:#ffc62f}
 body:has(#inicio) .site-footer.home-footer-dark>p{
  grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;
  color:#c7c7c7;font-size:12px;line-height:1.6;border-top:1px solid #444;padding-top:16px;margin:0;
 }
-.home-footer-dark a:focus-visible,.home-footer-dark summary:focus-visible{outline:3px solid #ffc62f;outline-offset:3px}
+.home-footer-dark a:not(.footer-social a):focus-visible,.home-footer-dark summary:focus-visible{outline:3px solid #ffc62f;outline-offset:3px}
 @media(max-width:960px){
  body:has(#inicio) .site-footer.home-footer-dark{grid-template-columns:minmax(0,1fr)}
 }
@@ -207,5 +208,4 @@ body:has(#inicio) .site-footer.home-footer-dark>p{
  #empresa-destacada.corporate-summary h2{font-size:26px;margin-bottom:16px}
  body:has(#inicio) .site-footer.home-footer-dark{gap:16px;padding-block:28px 20px}
  body:has(#inicio) .home-footer-dark .mobile-footer{border-top:1px solid #444;gap:8px 16px}
- body:has(#inicio) .home-footer-dark .footer-social{justify-content:flex-start}
 }
