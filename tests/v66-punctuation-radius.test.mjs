@@ -29,7 +29,7 @@ test("V6.6 all presentation headings and standalone labels omit terminal ornamen
 });
 
 test("V6.6 punctuation stays in natural prose and legal availability disclosures",()=>{
- assert.match(html,/Conectamos personas, negocios y mercados/);
+ assert.doesNotMatch(html,/Conectamos personas, negocios y mercados/);
  assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);
  assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/no procesa pedidos ni pagos\./i);
  assert.doesNotMatch(html,/prime-photo-caption|Representación conceptual · No corresponde a operaciones activas de DESSET/);

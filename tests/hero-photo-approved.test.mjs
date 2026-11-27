@@ -7,7 +7,7 @@ const html=read('index.html'),css=read('styles-hero-photo.css'),build=read('scri
 test('HERO-PHOTO-01 official brand and direct commerce CTA are retained',()=>{
  assert.match(html,/class="brand-mark" src="\.\/assets\/deliver-assets-mark\.png"/);
  assert.match(html,/Conoce nuestro propósito/);
- assert.match(html,/class="motion-line v4-headline-a"><span class="motion-line__inner">AUMENTA EL VALOR<\/span>/);assert.match(html,/class="motion-line v4-headline-b"><span class="motion-line__inner">A TU TIEMPO<\/span>/);
+ assert.match(html,/class="motion-line v4-headline-a"><span class="motion-line__inner">TU TIEMPO<\/span>/);assert.match(html,/class="motion-line v4-headline-b"><span class="motion-line__inner">VALE MÁS<\/span>/);
  assert.doesNotMatch(html,/data-v64-tour-launch/);
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v5-city-stage"/);
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v63-tour"/);
