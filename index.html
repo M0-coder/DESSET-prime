@@ -9,7 +9,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>DESSET — Comercio en movimiento</title>
   <link rel="icon" type="image/png" href="./assets/deliver-assets-mark.png">
-  <!-- Only the viewport-selected approved photograph is high-priority. Both assets are unchanged. -->
+  <!-- Approved local poster is the first paint; video loads progressively. -->
   <link rel="preload" as="image" type="image/webp" href="./assets/desset-hero-editorial-poster.webp" fetchpriority="high">
   <link rel="preload" href="./fonts/inter-latin-variable.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
   <link rel="preload" href="./fonts/plus-jakarta-sans-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
@@ -27,7 +27,7 @@
   <script defer src="./scripts/service-state.js"></script>
   <script defer src="./scripts/hero-editorial.js"></script>
 </head>
-<body>
+<body class="desset-home-cinematic">
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
   <header class="site-header">
     <a href="#inicio" class="brand" aria-label="DESSET, ir al inicio">
@@ -69,8 +69,7 @@
           <img class="prime-photo-image" src="./assets/desset-hero-editorial-poster.webp" width="1920" height="960" alt="" decoding="async" loading="eager" fetchpriority="high">
           <video id="desset-editorial-video" data-src="./assets/desset-hero-editorial.mp4" muted loop playsinline preload="none" tabindex="-1" aria-hidden="true"></video>
         </div>
-        <button type="button" class="desset-editorial-toggle" aria-controls="desset-editorial-video" aria-label="Pausar animación" hidden><span aria-hidden="true">Ⅱ</span></button>
-      </div>
+        </div>
       <div class="v4-hero-rail" role="list" aria-label="Áreas de servicios de DESSET">
         <div class="v4-rail-item" role="listitem">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10h18M5 10v10h14V10M3 10l2-6h14l2 6M9 20v-6h6v6"/></svg>
@@ -90,8 +89,6 @@
         </div>
       </div>
     </section>
-
-    <div class="institutional-recent" role="region" aria-label="Información reciente"><strong>Información reciente</strong><a href="./noticias.html">Consultar novedades oficiales</a></div>
 
     <section class="institutional-home" id="empresa-destacada" aria-labelledby="empresa-destacada-title">
       <div class="institutional-home-inner">

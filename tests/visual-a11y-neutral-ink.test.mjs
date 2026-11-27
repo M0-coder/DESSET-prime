@@ -21,9 +21,11 @@ test("VISUAL-A11Y-01 neutral black text does not replace brand blue",()=>{
 test("VISUAL-A11Y-01 no cropped DESSET service band at wide viewports",()=>{
  assert.match(hero,/left:50%;width:100vw;transform:translateX\(-50%\);margin:0/);
  assert.doesNotMatch(mainCss,/\.v4-hero-rail\{animation:v4-rail-enter/,"Banner must not be masked while loading");
- assert.match(audit,/diag\.railDisplay\.left< -16/);
- assert.match(audit,/diag\.railDisplay\.right<diag\.railDisplay\.viewportRight-2/);
- assert.match(audit,/diag\.railDisplay\.right>diag\.railDisplay\.viewportRight\+16/);
+ assert.match(read("styles-hero-editorial.css"),/width:min\(88%,1320px\);max-width:100%;box-sizing:border-box;margin:-36px auto 0/);
+ assert.match(audit,/!diag\.railDisplay\.centered/);
+ assert.match(audit,/diag\.railDisplay\.left<0/);
+ assert.match(audit,/diag\.railDisplay\.right>diag\.railDisplay\.viewportRight/);
+ assert.match(audit,/diag\.railDisplay\.overlap<20/);
  assert.match(html,/class="v4-hero-rail" role="list"/);
  assert.equal((html.match(/class="v4-rail-item" role="listitem"/g)||[]).length,4);
 });

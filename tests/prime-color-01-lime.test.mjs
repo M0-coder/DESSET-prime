@@ -18,7 +18,7 @@ test("Historical blue override stays intact; editorial hero owns the white CTA",
  assert.match(css.slice(cut),/^\n\/\* PRIME-COLOR-03[\s\S]*?#inicio \.hero-cta,#inicio \.hero-cta:hover\{background:#073BBC;color:#FFFFFF;box-shadow:0 4px 0 rgba\(7,59,188,\.25\)\}\s*$/);
  assert.doesNotMatch(css.slice(cut),/:root|#ecosistema|\.business-pitch|\.v4-motion-canvas|--yellow|--ds-10-gold|--v02-gold/);
  assert.match(html,/class="hero-cta" href="\.\/mision-vision-valores\.html#proposito">Conoce nuestro propósito/);
- assert.match(read("styles-hero-editorial.css"),/\.hero-cta\{[^}]*background:#fff;color:#000/);
+ assert.match(read("styles-hero-editorial.css"),/\.hero-cta:hover\{[^}]*background:transparent;color:#fff[^}]*border:1px solid #fff/);
  assert.equal(css.includes("PRIME-COLOR-01"),false,"Do not retain global lime overrides");
  assert.ok(statSync(new URL("styles-visual02.css",root)).size<=8200);
 });
@@ -51,7 +51,7 @@ test("The blue CTA retains WCAG AA contrast and 3D markup remains unchanged",()=
 test("Browser QA enforces gold on other elements, blue in hero, and reproducible dist",()=>{
  for(const key of ["heroCTA","businessCTA","statementAccent","railDisplay","titleInk","threeTourButton","rootYellow","stageYellow","stageDesignGold","stageVisualGold"])
   assert.ok(audit.includes(key),"Missing computed-color measurement "+key);
- assert.match(audit,/HERO-EDITORIAL-01: hero CTA must use opaque white with black text/);
+ assert.match(audit,/HERO-EDITORIAL-02: hero CTA must use opaque white outline and white text/);
  assert.equal(read("dist/styles-visual02.css"),css,"Dist must match the source exactly");
  const manifest=JSON.parse(read("dist/site-manifest.json"));
  assert.equal(manifest.noindex,true);assert.equal(manifest.domain,"none");
@@ -60,11 +60,11 @@ test("Browser QA enforces gold on other elements, blue in hero, and reproducible
 });
 
 test("Browser QA waits for the final opaque CTA instead of accepting a transient alpha",()=>{
- const settle=audit.indexOf("fully opaque hero CTA background after its CSS transition");
+ const settle=audit.indexOf("fully opaque hero CTA border after its CSS transition");
  const sample=audit.indexOf("const palette={");
  assert.ok(settle>0&&sample>settle,"Color must settle BEFORE browser palette sampling");
  assert.match(audit,/return !match\|\|Number\(match\[1\]\)>=0\.9999/);
  assert.match(audit,/Number\(whiteChannels\[1\]\)>=\.9999/);
  assert.doesNotMatch(audit,/Number\(whiteChannels\[1\]\)>=\.99&&/,"Do not weaken final alpha threshold");
- assert.match(audit,/HERO-EDITORIAL-01: hero CTA must use opaque white with black text/);
+ assert.match(audit,/HERO-EDITORIAL-02: hero CTA must use opaque white outline and white text/);
 });
