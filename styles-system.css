@@ -1,15 +1,16 @@
 /* DESSET PRIME V6.7 — VISUAL SYSTEM / PRE-PUBLICATION EXPERIMENT
  * 60/30/10 is a visual-area hierarchy, not a pixel-exact CSS calculation.
- * 60% neutral canvas, ~30% ink / established DESSET royal blue, <=10% gold/red
- * accents. Keep the existing brand's original pigment values.
+ * 60% neutral canvas, ~30% black/ink, ~10% DESSET royal blue and restrained
+ * complementary signals. This is a visual target, not a measured area ratio.
  *
  * Loaded after styles.css and styles-v5.css; no external fonts or assets.
  */
 :root {
- --ds-60-paper:#F7F5EE;
- --ds-60-surface:#FFFDF8;
+ --ds-60-paper:#F4F8FE;
+ --ds-60-surface:#FFFFFF;
  --ds-30-ink:#000000;
- --ds-30-blue:#073BBC;
+ --ds-accent-blue:#073BBC;
+ --ds-30-blue:var(--ds-accent-blue); /* legacy compatibility */
  --ds-10-gold:#FFC62F;
  --ds-10-signal:#FF3328;
  --ds-copy:#202020;
@@ -18,13 +19,13 @@
  --ds-radius-compact:12px;
  --ds-radius-surface:18px;
  --ds-radius-feature:26px;
- --ds-shadow-soft:0 20px 54px rgba(10,23,47,.13);
+ --ds-shadow-soft:0 20px 54px rgba(0,0,0,.12);
 }
 body {background:var(--ds-60-paper);color:var(--ds-copy);}
 .site-header {background:var(--ds-60-surface);border-bottom-color:var(--ds-stroke);}
 .brand-name {color:var(--ds-30-ink);}
 .main-nav a:hover,.audience a {color:var(--ds-30-blue);}
-.main-nav .nav-contact {background:var(--ds-30-ink);color:#FFFDF8;border-radius:var(--ds-radius-compact);}
+.main-nav .nav-contact {background:var(--ds-30-ink);color:var(--ds-60-surface);border-radius:var(--ds-radius-compact);}
 .main-nav .nav-contact:hover {background:var(--ds-30-blue);color:#fff;}
 .solutions {background:var(--ds-60-paper);}
 .audiences {background:var(--ds-60-surface);}
@@ -64,10 +65,10 @@ a:focus-visible,button:focus-visible {outline-offset:3px;}
 .contact-bottom p {color:var(--ds-copy);}
 .contact-copy .contact-status {color:var(--ds-muted);font-size:13px;line-height:1.6;}
 .contact-primary {
- color:#FFFDF8;background:var(--ds-30-blue);
+ color:var(--ds-60-surface);background:var(--ds-30-blue);
  border-color:var(--ds-30-blue);
 }
-.contact-primary:hover {background:var(--ds-30-ink);color:#FFFDF8;}
+.contact-primary:hover {background:var(--ds-30-ink);color:var(--ds-60-surface);}
 /* SOCIAL-05 layout lives in styles.css; palette tokens remain in this design-system file. */
 /* Keep closing headlines fully legible on the new neutral background
    throughout entry motion: transform moves, but opacity never fades to 35%. */
