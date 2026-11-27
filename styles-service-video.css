@@ -10,7 +10,7 @@
 #soluciones.solutions .service .service-body h3 span{display:block;color:inherit;font-size:.52em;letter-spacing:-.025em;line-height:1.1;margin-top:4px}
 #soluciones.solutions .service .service-body a{position:absolute;bottom:clamp(16px,2.7vw,38px);left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:12px;width:65%;max-width:560px;min-width:0;min-height:56px;margin:0;padding:12px 24px;border:1px solid #fff;border-radius:8px;background:#fff;color:#073bbc;font-size:16px;font-weight:750;white-space:nowrap;pointer-events:auto;text-decoration:none;overflow-wrap:normal}
 #soluciones.solutions .service .service-body a:hover{background:#073bbc;color:#fff;border-color:#073bbc}
-#soluciones.solutions .service .service-body a:focus-visible{outline:3px solid #fff;outline-offset:4px}
+#soluciones.solutions .service .service-body a:focus-visible{outline:3px solid #fff;outline-offset:4px;box-shadow:0 0 0 4px #073bbc,0 0 0 9px #000}
 #soluciones.solutions .service .service-body a svg{width:16px;height:16px;flex:none}
 @media(max-width:700px){#soluciones.solutions .solutions-grid{grid-template-columns:minmax(0,1fr);gap:12px}#soluciones.solutions .service .service-body h3{top:20px;font-size:clamp(28px,9vw,34px)}#soluciones.solutions .service .service-body a{bottom:16px;width:78%;min-height:48px;font-size:14px;padding:10px 12px}}
 @media(prefers-reduced-motion:reduce){#soluciones .service *{transition:none!important;animation:none!important}}
