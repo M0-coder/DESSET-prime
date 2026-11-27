@@ -10,8 +10,8 @@ test("institutional statement retains business direction without fictitious oper
  assert.match(html,/A TU TIEMPO/);
  assert.match(html,/NO ES SOLO/);
  assert.match(html,/ES CONECTAR/);
- assert.match(html,/DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla/);
- assert.match(html,/<p class="hero-lead">DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla\.<\/p>/);
+ assert.match(html,/Conectamos personas, negocios y mercados/);
+ assert.match(html,/<p class="hero-lead">Conectamos personas, negocios y mercados\.<\/p>/);
  assert.doesNotMatch(html,/somos líderes|miles de clientes|servicios disponibles hoy|empresa registrada|RUC:\s*\d+|seguimiento en tiempo real/i);
  assert.doesNotMatch(html,/Comercio, tecnología y distribución se integran en una misma arquitectura/);
  assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);

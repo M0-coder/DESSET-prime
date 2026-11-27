@@ -17,7 +17,7 @@ test("Prime 3D has no hidden static WebP/SVG illustration or permanently hidden 
  assert.doesNotMatch(html,/v5-cinematic-(?:desktop|mobile)\.webp|v5-logistics-(?:scene|mobile)\.svg/);
  assert.doesNotMatch(read("prime.html"),/v5-responsive-art|v5-stage-render|v5-stage-scan|data-v6-camera|v6-poster/);
  assert.doesNotMatch(html,/<canvas\b|<iframe\b|<form\b/i);
- const services=html.match(/<section class="solutions"[^>]*>[\s\S]*?<\/section>/)[0];assert.equal((html.match(/<video\b/g)||[]).length,2);assert.equal((services.match(/<video\b/g)||[]).length,2);assert.doesNotMatch(services,/<video[^>]*\sautoplay\b/);
+ const services=html.match(/<section class="solutions"[^>]*>[\s\S]*?<\/section>/)[0];assert.equal((html.match(/<video\b/g)||[]).length,3);assert.equal((services.match(/<video\b/g)||[]).length,2);assert.doesNotMatch(services,/<video[^>]*\sautoplay\b/);
  assert.ok(statSync(new URL("index.html",root)).size<35000);
  assert.ok(statSync(new URL("styles-v5.css",root)).size<16000);
 });
@@ -49,7 +49,7 @@ test("V5 reduction disables motion, the backup remains readable, WebGL stays pro
  assert.doesNotMatch(loader,/\bfetch\s*\(|localStorage|sendBeacon|WebSocket/);
 });
 test("Correct original assets and noindex cannot regress",()=>{
- assert.match(html,/src="\.\/assets\/desset-hero-entrega-dos-espejos\.webp"/);
+ assert.match(html,/src="\.\/assets\/desset-hero-editorial-poster\.webp"/);
  assert.match(html,/name="robots" content="noindex,nofollow"/);
  assert.match(html,/src="\.\/assets\/deliver-assets-mark\.png"/);
  assert.match(read("prime.html"),/class="v5-city-stage"/);

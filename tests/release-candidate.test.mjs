@@ -40,7 +40,7 @@ test("Two independent visible service brands without implied availability",()=>{
 
 test("V4.3: hero CTA reaches the unique primary contact path and is accessible",()=>{
  const hero=html.match(/<div class="hero-actions">([\s\S]*?)<\/div>/)?.[1]||"";
- assert.match(hero,/<a class="hero-cta" href="#contacto">Hablemos de tu negocio/);
+ assert.match(hero,/<a class="hero-cta" href="\.\/mision-vision-valores\.html#proposito">Conoce nuestro propósito/);
  assert.doesNotMatch(hero,/hero-secondary|data-v64-tour-launch/);
  assert.equal((hero.match(/<a\b/g)||[]).length,1,"Only one primary hero CTA survives");
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/class="v63-tour"/);

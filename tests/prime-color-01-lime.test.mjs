@@ -12,12 +12,13 @@ function luminance(hex){
  return c[0]*.2126+c[1]*.7152+c[2]*.0722;
 }
 function contrast(a,b){const x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
-test("Only the hero CTA receives the owner-approved institutional blue override",()=>{
+test("Historical blue override stays intact; editorial hero owns the white CTA",()=>{
  assert.ok(cut>0,"Narrow, append-only override required");
  assert.doesNotMatch(css,/#cdfc8a/i,"The retired lime must not remain");
  assert.match(css.slice(cut),/^\n\/\* PRIME-COLOR-03[\s\S]*?#inicio \.hero-cta,#inicio \.hero-cta:hover\{background:#073BBC;color:#FFFFFF;box-shadow:0 4px 0 rgba\(7,59,188,\.25\)\}\s*$/);
  assert.doesNotMatch(css.slice(cut),/:root|#ecosistema|\.business-pitch|\.v4-motion-canvas|--yellow|--ds-10-gold|--v02-gold/);
- assert.match(html,/class="hero-cta" href="#contacto">Hablemos de tu negocio/);
+ assert.match(html,/class="hero-cta" href="\.\/mision-vision-valores\.html#proposito">Conoce nuestro propósito/);
+ assert.match(read("styles-hero-editorial.css"),/\.hero-cta\{[^}]*background:#fff;color:#000/);
  assert.equal(css.includes("PRIME-COLOR-01"),false,"Do not retain global lime overrides");
  assert.ok(statSync(new URL("styles-visual02.css",root)).size<=8200);
 });
@@ -50,7 +51,7 @@ test("The blue CTA retains WCAG AA contrast and 3D markup remains unchanged",()=
 test("Browser QA enforces gold on other elements, blue in hero, and reproducible dist",()=>{
  for(const key of ["heroCTA","businessCTA","statementAccent","railDisplay","titleInk","threeTourButton","rootYellow","stageYellow","stageDesignGold","stageVisualGold"])
   assert.ok(audit.includes(key),"Missing computed-color measurement "+key);
- assert.match(audit,/PRIME-COLOR-03: hero CTA must use institutional blue with white text/);
+ assert.match(audit,/HERO-EDITORIAL-01: hero CTA must use opaque white with black text/);
  assert.equal(read("dist/styles-visual02.css"),css,"Dist must match the source exactly");
  const manifest=JSON.parse(read("dist/site-manifest.json"));
  assert.equal(manifest.noindex,true);assert.equal(manifest.domain,"none");
@@ -63,7 +64,7 @@ test("Browser QA waits for the final opaque CTA instead of accepting a transient
  const sample=audit.indexOf("const palette={");
  assert.ok(settle>0&&sample>settle,"Color must settle BEFORE browser palette sampling");
  assert.match(audit,/return !match\|\|Number\(match\[1\]\)>=0\.9999/);
- assert.match(audit,/Number\(blueChannels\[1\]\)>=\.9999/);
- assert.doesNotMatch(audit,/Number\(blueChannels\[1\]\)>=\.99&&/,"Do not weaken final alpha threshold");
- assert.match(audit,/PRIME-COLOR-03: hero CTA must use institutional blue with white text/);
+ assert.match(audit,/Number\(whiteChannels\[1\]\)>=\.9999/);
+ assert.doesNotMatch(audit,/Number\(whiteChannels\[1\]\)>=\.99&&/,"Do not weaken final alpha threshold");
+ assert.match(audit,/HERO-EDITORIAL-01: hero CTA must use opaque white with black text/);
 });

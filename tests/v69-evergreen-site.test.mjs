@@ -11,7 +11,7 @@ const css=read("styles-system.css");
 const pack=read("scripts/build-site.mjs");
 const preview=read("scripts/local-preview.mjs");
 test("V6.9 describes services as a lasting institutional identity, not as a startup pitch",()=>{
- assert.match(html,/<p class="hero-lead">DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla\.<\/p>/);
+ assert.match(html,/<p class="hero-lead">Conectamos personas, negocios y mercados\.<\/p>/);
  assert.doesNotMatch(html,/UN ECOSISTEMA, TRES PILARES/);
  assert.match(html,/class="business-pitch"/);
  for(const phrase of ["PROVEEDORES","COMERCIOS","PERSONAS","OPERADORES LOGÍSTICOS"])
@@ -22,7 +22,7 @@ test("V6.9 describes services as a lasting institutional identity, not as a star
  assert.match(html,/href="#ecosistema">Cómo funciona/);
  assert.match(html,/href="\.\/contacto\.html">Canales DESSET/);
  assert.match(read("contacto.html"),/<h1>Contacto institucional<\/h1>/);
- assert.match(html,/href="#contacto"/);
+ assert.match(html,/href="\.\/mision-vision-valores\.html#proposito"/);
 });
 test("V6.9 keeps website informational, operations gated to apps, no invented launch",()=>{
  assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/Este sitio no procesa pedidos ni pagos\./);

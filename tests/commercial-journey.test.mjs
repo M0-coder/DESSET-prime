@@ -14,7 +14,7 @@ test("Two direct commercial contact paths replace generic stakeholder cards",()=
  assert.match(cards[0][2],/<h3>Comercios<\/h3>/);
  assert.match(cards[1][2],/<h3>Repartidores<\/h3>/);
  assert.doesNotMatch(section,/¿TU NEGOCIO|<h3>Personas|<h3>Aliados|business-pitch-body|Plantear una colaboración/);
- assert.match(html,/DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla/);assert.match(html,/href="\.\/aplicaciones\.html" aria-label="Conocer más sobre las aplicaciones DESSET"/);
+ assert.match(html,/Conectamos personas, negocios y mercados/);assert.match(html,/href="\.\/aplicaciones\.html" aria-label="Conocer más sobre las aplicaciones DESSET"/);
  assert.match(readFileSync(new URL("../prime.html",import.meta.url),"utf8"),/No corresponde a pedidos ni entregas activas/i);
  assert.match(readFileSync(new URL("../empresa.html",import.meta.url),"utf8"),/no procesa pedidos ni pagos\./i);
  assert.doesNotMatch(html,/más de [0-9]+ (?:comercios|clientes|repartidores)|entregas en tiempo real|compra ahora/i);
@@ -47,7 +47,7 @@ test("four independently chosen local photographs and concrete participant roles
 });
 
 test("no fake availability, brand replacement, remote imagery or public checkout",()=>{
- assert.match(html,/DESSET integra una visión de comercio digital y coordinación logística, con servicios de última milla/);
+ assert.match(html,/Conectamos personas, negocios y mercados/);
  assert.doesNotMatch(html,/APLICACIONES DESSET|Acceso público no habilitado|data-service-access|data-app-links/);
  assert.match(html,/assets\/deliver-assets-mark\.png/);
  assert.doesNotMatch(html,/<form\b|<input\b|<button[^>]*comprar|https?:\/\/images\./i);
