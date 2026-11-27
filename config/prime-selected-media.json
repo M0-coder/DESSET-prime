@@ -252,11 +252,11 @@
   },
   "merchant_hero_photo": {
     "path": "assets/comercios-hero-minimercado.webp",
-    "sha256": "a58e84d5f4f4dbe6d02e4a9462c8a1f3ab98e8d395473e99441524f600dea751",
-    "bytes": 204420,
+    "sha256": "6ea849ad800f94803e4c9496cf9d3b327887d2f396640b94acc56e159ff16bcf",
+    "bytes": 205946,
     "width": 1800,
     "height": 1200,
-    "alt": "Fachada de un mercadito con frutas y verduras en blanco y negro.",
+    "alt": "Fachada de un mercadito con frutas y verduras.",
     "claim": "third-party",
     "author": "Andres Alaniz (attribution from supplied filename)",
     "source": "https://www.pexels.com/photo/32441031/",
@@ -277,7 +277,7 @@
       "exclusive_ownership_claim": false,
       "asset": {
         "path": "assets/comercios-hero-minimercado.webp",
-        "sha256": "a58e84d5f4f4dbe6d02e4a9462c8a1f3ab98e8d395473e99441524f600dea751",
+        "sha256": "6ea849ad800f94803e4c9496cf9d3b327887d2f396640b94acc56e159ff16bcf",
         "source_id": "32441031",
         "license": "Pexels License",
         "license_url": "https://www.pexels.com/license/"
