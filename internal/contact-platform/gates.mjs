@@ -6,19 +6,24 @@ const ref=v=>typeof v==="string"&&/^[A-Za-z0-9][A-Za-z0-9_.:-]{2,119}$/.test(v);
 const hex=v=>typeof v==="string"&&/^[a-f0-9]{64}$/.test(v);
 const digest=async v=>Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v))),x=>x.toString(16).padStart(2,"0")).join("");
 export const proposedOrigin="https://contacto.desset.lat";
-export async function intakePreflight(env){
- if(env.CONTACT_INTAKE_ENABLED!=="true"||env.CONTACT_POLICY_VERIFIED!=="true"||env.ENVIRONMENT!=="production"||env.CONTACT_ORIGIN!==proposedOrigin||!ref(env.CONTACT_AUTHORIZATION_REF)||!ref(env.CONTACT_PRIVACY_VERSION)||!hex(env.CONTACT_PRIVACY_SHA256)||typeof env.CONTACT_PRIVACY_NOTICE!=="string"||env.CONTACT_PRIVACY_NOTICE.trim().length<200||new TextEncoder().encode(env.CONTACT_PRIVACY_NOTICE).length>8000||await digest(env.CONTACT_PRIVACY_NOTICE)!==env.CONTACT_PRIVACY_SHA256||!env.CONTACT_DB||!env.CONTACT_LIMIT||!env.CONTACT_TURNSTILE_SECRET)throw fail(503,"CONTACT_DISABLED");
+export const productionScope=Object.freeze({environment:"production",origin:proposedOrigin});
+export const stagingScope=Object.freeze({environment:"staging",origin:"https://contacto-staging.desset.lat"});
+export function requireContactScope(scope){if(scope!==productionScope&&scope!==stagingScope)throw fail(503,"CONTACT_DISABLED");return scope;}
+export async function intakePreflight(env,scope=productionScope){
+ requireContactScope(scope);
+ if(env.CONTACT_INTAKE_ENABLED!=="true"||env.CONTACT_POLICY_VERIFIED!=="true"||env.ENVIRONMENT!==scope.environment||env.CONTACT_ORIGIN!==scope.origin||!ref(env.CONTACT_AUTHORIZATION_REF)||!ref(env.CONTACT_PRIVACY_VERSION)||!hex(env.CONTACT_PRIVACY_SHA256)||typeof env.CONTACT_PRIVACY_NOTICE!=="string"||env.CONTACT_PRIVACY_NOTICE.trim().length<200||new TextEncoder().encode(env.CONTACT_PRIVACY_NOTICE).length>8000||await digest(env.CONTACT_PRIVACY_NOTICE)!==env.CONTACT_PRIVACY_SHA256||!env.CONTACT_DB||!env.CONTACT_LIMIT||!env.CONTACT_TURNSTILE_SECRET)throw fail(503,"CONTACT_DISABLED");
  const row=await env.CONTACT_DB.prepare("SELECT environment,intake_enabled,privacy_version,privacy_sha256,authorization_ref FROM contact_runtime WHERE id=1").first();
- if(!row||row.environment!=="production"||row.intake_enabled!==1||row.privacy_version!==env.CONTACT_PRIVACY_VERSION||row.privacy_sha256!==env.CONTACT_PRIVACY_SHA256||row.authorization_ref!==env.CONTACT_AUTHORIZATION_REF)throw fail(503,"CONTACT_DISABLED");
+ if(!row||row.environment!==scope.environment||row.intake_enabled!==1||row.privacy_version!==env.CONTACT_PRIVACY_VERSION||row.privacy_sha256!==env.CONTACT_PRIVACY_SHA256||row.authorization_ref!==env.CONTACT_AUTHORIZATION_REF)throw fail(503,"CONTACT_DISABLED");
  return Object.freeze({privacyVersion:row.privacy_version,authorizationRef:row.authorization_ref});
 }
-export async function verifyContactChallenge(token,env,fetcher=fetch){
- if(typeof token!=="string"||!token||token.length>2048||typeof env.CONTACT_TURNSTILE_SECRET!=="string"||!env.CONTACT_TURNSTILE_SECRET||env.CONTACT_ORIGIN!==proposedOrigin)throw fail(403,"CHALLENGE_INVALID");
+export async function verifyContactChallenge(token,env,fetcher=fetch,scope=productionScope){
+ requireContactScope(scope);
+ if(typeof token!=="string"||!token||token.length>2048||typeof env.CONTACT_TURNSTILE_SECRET!=="string"||!env.CONTACT_TURNSTILE_SECRET||env.CONTACT_ORIGIN!==scope.origin)throw fail(403,"CHALLENGE_INVALID");
  try{
   const r=await fetcher("https://challenges.cloudflare.com/turnstile/v0/siteverify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({secret:env.CONTACT_TURNSTILE_SECRET,response:token}),redirect:"error",signal:AbortSignal.timeout(5000)});
   if(!r.ok)throw Error();
   const v=await r.json();
-  if(v.success!==true||v.hostname!==new URL(proposedOrigin).hostname||v.action!=="contact_intake")throw fail(403,"CHALLENGE_INVALID");
+  if(v.success!==true||v.hostname!==new URL(scope.origin).hostname||v.action!=="contact_intake")throw fail(403,"CHALLENGE_INVALID");
   return true;
  }catch(e){if(e.code==="CHALLENGE_INVALID")throw e;throw fail(503,"CHALLENGE_UNAVAILABLE");}
 }

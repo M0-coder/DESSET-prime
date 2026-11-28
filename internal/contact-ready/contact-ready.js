@@ -69,7 +69,8 @@
   }else if(key==="directorio"){dir.querySelector("a").focus({preventScroll:true});}
   window.scrollTo(0,0);
  }
- f.addEventListener("submit",event=>{
+ const managed=f.dataset.contactMode==="managed";
+ if(!managed)f.addEventListener("submit",event=>{
   event.preventDefault();
   if(view.hidden||!f.reportValidity())return;
   reset();f.hidden=true;result.hidden=false;result.focus();
@@ -78,5 +79,5 @@
  window.addEventListener("hashchange",route);
  window.addEventListener("pagehide",reset);
  route();
- f.querySelector("button[type=submit]").disabled=false;
+ if(!managed)f.querySelector("button[type=submit]").disabled=false;
 })();

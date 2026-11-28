@@ -9,7 +9,10 @@
     "publicIntake": false,
     "databaseId": null,
     "accessApplicationId": null,
-    "turnstileSiteKey": null
+    "turnstileSiteKey": null,
+    "proposedOrigin": "https://contacto-staging.desset.lat",
+    "databaseBinding": "CONTACT_STAGING_DB",
+    "candidate": "staging-candidate.mjs"
   },
   "production": {
     "worker": "desset-contact-production",
@@ -18,7 +21,8 @@
     "notificationsEnabled": false,
     "databaseId": null,
     "accessApplicationId": null,
-    "turnstileSiteKey": null
+    "turnstileSiteKey": null,
+    "candidate": "production-candidate.mjs"
   },
   "requiredBindings": [
     "CONTACT_DB",
@@ -75,5 +79,14 @@
     "journalRetentionApprovalRef": null,
     "alertPreviewCandidate": "LOCAL_ONLY",
     "alertPreviewEnabled": false
+  },
+  "formReadiness": {
+    "status": "LOCAL_CANDIDATE_ONLY",
+    "enabled": false,
+    "assetBinding": "CONTACT_FORM_ASSETS",
+    "siteKeyBinding": "CONTACT_TURNSTILE_SITE_KEY",
+    "requiresWorkerFirstAccess": true,
+    "publicPackage": false,
+    "realProviderVerified": false
   }
 }

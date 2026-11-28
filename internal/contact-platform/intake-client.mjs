@@ -1,7 +1,7 @@
 // Internal candidate only: no DOM, fetch, credentials, storage or live wiring.
 // One immutable normalized submission per attempt; caller must explicitly start a new attempt for changed data.
 // Transport is injected by a separately reviewed same-origin adapter. Never publish this module as-is.
-import {normalizeContact,uuid} from "./d1-store.mjs";
+import {normalizeContact,uuid} from "./contact-contract.mjs";
 const result=(state,extra={})=>Object.freeze({state,...extra});
 const newKey=()=>Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,"0")).join("");
 export function createIntakeAttempt({input,privacyVersion,transport,requestKey=newKey()}={}){

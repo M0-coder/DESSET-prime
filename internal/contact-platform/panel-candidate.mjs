@@ -1,5 +1,5 @@
 // Disconnected D1 panel candidate. No listener, global fetch, deployment entrypoint or public asset.
-import {authorizeContact,proposedOrigin} from "./gates.mjs";
+import {authorizeContact,productionScope,requireContactScope} from "./gates.mjs";
 import {categories,uuid,queuePage,detail,transition} from "./d1-store.mjs";
 const labels={alianzas:"Alianzas",inversion:"Inversionistas",marketing:"Marketing",prensa:"Prensa",instituciones:"Instituciones",profesionales:"Talento",legal:"Legal",seguridad:"Seguridad y privacidad",otras:"Otras consultas"};
 const states={RECEIVED:"Recibida",IN_REVIEW:"En revisión",CLOSED:"Cerrada"};
@@ -16,12 +16,13 @@ async function form(req){
  const p=new URLSearchParams(s),keys=[...p.keys()];if(keys.length!==4||new Set(keys).size!==4||!["id","state","version","csrf"].every(k=>p.has(k)))return null;
  return Object.fromEntries(p);}catch{return null;}finally{reader.releaseLock();}
 }
-export function createPanelCandidate({authorize=authorizeContact,now=Date.now}={}){
+export function createPanelCandidate({scope=productionScope,authorize=authorizeContact,now=Date.now}={}){
+ requireContactScope(scope);
  return async(req,env,ctx)=>{
   try{
-   if(env?.CONTACT_PANEL_ENABLED!=="true"||env.CONTACT_ADMIN_ENABLED!=="true"||env.ENVIRONMENT!=="production"||!env.CONTACT_DB)return error(503);
-   const url=new URL(req.url);if(url.origin!==proposedOrigin||env.CONTACT_ORIGIN!==proposedOrigin)return error(403);
-   if(req.method==="POST"&&(req.headers.get("Origin")!==proposedOrigin||req.headers.get("Sec-Fetch-Site")==="cross-site"))return error(403);
+   if(env?.CONTACT_PANEL_ENABLED!=="true"||env.CONTACT_ADMIN_ENABLED!=="true"||env.ENVIRONMENT!==scope.environment||!env.CONTACT_DB)return error(503);
+   const url=new URL(req.url);if(url.origin!==scope.origin||env.CONTACT_ORIGIN!==scope.origin)return error(403);
+   if(req.method==="POST"&&(req.headers.get("Origin")!==scope.origin||req.headers.get("Sec-Fetch-Site")==="cross-site"))return error(403);
    const a=await authorize(req,env,ctx);if(!validActor(a))return error(403);
    const actor=Object.freeze({actor:a.actor,categories:Object.freeze([...a.categories]),csrf:a.csrf}),at=now();
    if(!Number.isSafeInteger(at)||at<0)return error(503);

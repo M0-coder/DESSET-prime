@@ -3,6 +3,7 @@ import locked,{candidateHandler} from "../internal/contact-platform/worker.mjs";
 import {purgeExpired} from "../internal/contact-platform/d1-store.mjs";
 import {authorizeContact} from "../internal/contact-platform/gates.mjs";
 import {createPanelCandidate} from "../internal/contact-platform/panel-candidate.mjs";
+import {createStagingCandidate} from "../internal/contact-platform/staging-candidate.mjs";
 import {operationalSnapshot} from "../internal/contact-platform/operations.mjs";
 import {maintenanceCycle} from "../internal/contact-platform/maintenance.mjs";
 import {coordinatedMaintenance} from "../internal/contact-platform/coordinated-maintenance.mjs";
@@ -11,6 +12,18 @@ const now=1700000000000;
 export default {async fetch(req,env,ctx){
  if(env.LAB_ONLY!=="synthetic-local-only")return new Response(null,{status:503});
  const path=new URL(req.url).pathname;
+ if(env.LAB_STAGING==="true"){
+  if(path==="/__purge")return Response.json({deleted:await purgeExpired(env.CONTACT_STAGING_DB,now+7*86400000)});
+  const email=req.headers.get("X-Lab-Identity"),runtime=email?{access:{aud:env.CONTACT_ACCESS_AUD,getIdentity:async()=>({email})}}:{};
+  const fetcher=async(url,options)=>{
+   if(url===env.CONTACT_ACCESS_ISSUER+"/cdn-cgi/access/certs"&&options.redirect==="error")return Response.json(JSON.parse(env.LAB_JWKS));
+   if(url==="https://challenges.cloudflare.com/turnstile/v0/siteverify"&&options.redirect==="error"){
+    const v=JSON.parse(options.body);return Response.json({success:/^synthetic-test(?:-[0-9]+)?$/.test(v.response??""),hostname:"contacto-staging.desset.lat",action:"contact_intake"});
+   }
+   throw Error("Unexpected external request");
+  };
+  return createStagingCandidate({fetcher,limit:async()=>true,now:()=>now})(req,env,runtime);
+ }
  if(path==="/__locked")return locked.fetch(req,env,ctx);
  if(path==="/__operations"){
   try{return Response.json(await operationalSnapshot({...env,CONTACT_OPERATIONS_ENABLED:req.headers.get("X-Lab-Operations")==="enabled"?"true":"false"},req.headers.get("X-Lab-Clock")==="expiry"?now+7*86400000:now));}
