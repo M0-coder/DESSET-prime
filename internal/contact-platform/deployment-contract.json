@@ -38,5 +38,20 @@
     "notification delivery and monitoring",
     "isolated staging validation and rollback",
     "separate owner approval"
-  ]
+  ],
+  "accessReadiness": {
+    "status": "LOCAL_CONTRACT_ONLY",
+    "applicationId": null,
+    "policyEvidenceRef": null,
+    "mfaEvidenceRef": null,
+    "verified": false,
+    "requiredDirectInvocation": true,
+    "sessionMaxSeconds": 900,
+    "staticAssetsRouterAllowed": false,
+    "serviceBindingPropagationAssumed": false,
+    "requireRuntimeIdentity": true,
+    "requireSignedJwt": true,
+    "rosterSource": "approved deployment configuration; default empty",
+    "revocationEvidenceRef": null
+  }
 }

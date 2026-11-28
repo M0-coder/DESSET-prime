@@ -38,11 +38,14 @@ export async function authorizeContact(req,env,ctx,fetcher=fetch,now){
  // Reuse the existing verified JWT + trusted runtime identity pattern; no browser-declared actor.
  if(env.CONTACT_ADMIN_POLICY_VERIFIED!=="true")throw fail(503,"ADMIN_DISABLED");
  let roster;try{roster=JSON.parse(env.CONTACT_ADMIN_ROSTER??"[]");}catch{throw fail(503,"ADMIN_DISABLED");}
- if(!Array.isArray(roster)||!roster.length||roster.length>100||roster.some(a=>!a||typeof a.subject!=="string"||!/^[A-Za-z0-9_.:-]{1,128}$/.test(a.subject)||typeof a.email!=="string"||!a.email.includes("@")||!Array.isArray(a.categories)||!a.categories.length||new Set(a.categories).size!==a.categories.length||a.categories.some(c=>!categories.includes(c)))||new Set(roster.map(a=>a.subject)).size!==roster.length||new Set(roster.map(a=>a.email.toLowerCase())).size!==roster.length)throw fail(503,"ADMIN_DISABLED");
+ if(!Array.isArray(roster)||!roster.length||roster.length>100||roster.some(a=>!a||typeof a.subject!=="string"||!/^[A-Za-z0-9_.:-]{1,128}$/.test(a.subject)||typeof a.email!=="string"||a.email.length>254||!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(a.email)||!Array.isArray(a.categories)||!a.categories.length||new Set(a.categories).size!==a.categories.length||a.categories.some(c=>!categories.includes(c)))||new Set(roster.map(a=>a.subject)).size!==roster.length||new Set(roster.map(a=>a.email.toLowerCase())).size!==roster.length)throw fail(503,"ADMIN_DISABLED");
  if(!ctx?.access||typeof ctx.access.getIdentity!=="function"||ctx.access.aud!==env.CONTACT_ACCESS_AUD)throw fail(403,"ACCESS_CONTEXT_REQUIRED");
- const identity=await ctx.access.getIdentity();
- const entry=roster.find(a=>a.email.toLowerCase()===identity?.email?.toLowerCase());if(!entry)throw fail(403,"ACCESS_DENIED");
- const verified=await authorizeRider(req,{RIDER_ADMIN_POLICY_VERIFIED:"true",RIDER_ACCESS_ISSUER:env.CONTACT_ACCESS_ISSUER,RIDER_ACCESS_AUD:env.CONTACT_ACCESS_AUD,RIDER_ADMIN_SUBJECTS:entry.subject,RIDER_ADMIN_EMAIL:entry.email},ctx,fetcher,now);
+ // Snapshot the authenticated runtime identity once, not a caller-supplied header.
+ let identity;try{identity=await ctx.access.getIdentity();}catch{throw fail(403,"ACCESS_DENIED");}
+ if(typeof identity?.email!=="string"||!identity.email||identity.email.length>254)throw fail(403,"ACCESS_DENIED");
+ const email=identity.email;
+ const entry=roster.find(a=>a.email.toLowerCase()===email.toLowerCase());if(!entry)throw fail(403,"ACCESS_DENIED");
+ const verified=await authorizeRider(req,{RIDER_ADMIN_POLICY_VERIFIED:"true",RIDER_ACCESS_ISSUER:env.CONTACT_ACCESS_ISSUER,RIDER_ACCESS_AUD:env.CONTACT_ACCESS_AUD,RIDER_ADMIN_SUBJECTS:entry.subject,RIDER_ADMIN_EMAIL:entry.email},{access:{aud:ctx.access.aud,getIdentity:async()=>({email})}},fetcher,now);
  if(verified.actor!==entry.subject)throw fail(403,"ACCESS_DENIED");
  // Separate CSRF namespace from the rider application.
  return {actor:verified.actor,categories:[...entry.categories],csrf:await digest("desset-contact-admin-v1:"+req.headers.get("Cf-Access-Jwt-Assertion"))};

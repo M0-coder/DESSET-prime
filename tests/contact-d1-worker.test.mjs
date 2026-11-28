@@ -2,11 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {DatabaseSync} from "node:sqlite";
 import {readFileSync} from "node:fs";
-import {createHash} from "node:crypto";
+import {createHash,generateKeyPairSync,sign} from "node:crypto";
 import {candidateHandler} from "../internal/contact-platform/worker.mjs";
 import worker from "../internal/contact-platform/worker.mjs";
 import {purgeExpired} from "../internal/contact-platform/d1-store.mjs";
-import {proposedOrigin} from "../internal/contact-platform/gates.mjs";
+import {proposedOrigin,authorizeContact} from "../internal/contact-platform/gates.mjs";
 const read=p=>readFileSync(new URL("../internal/contact-platform/"+p,import.meta.url),"utf8");
 const now=1700000000000,csrf="c".repeat(64),auth={Authorization:"Synthetic admin","X-CSRF-Token":csrf};
 const sample={category:"marketing",person:"Synthetic Person",email:"synthetic1@example.invalid",organization:"Synthetic Organization",phone:"",subject:"Synthetic subject",message:"Synthetic message",consent:true,privacyVersion:"synthetic-v1",requestKey:"a".repeat(64),challenge:"synthetic-test"};
@@ -29,3 +29,55 @@ test("conditional insertion, replay, conflicting payload, capacity and receipt m
 test("kill switch after challenge blocks the actual write",async t=>{const f=fixture(t);f.enable();const invoke=candidateHandler({...f.deps,challenge:async()=>{f.db.exec("UPDATE contact_runtime SET intake_enabled=0");return true;}});assert.equal((await invoke(req("/api/contact","POST",sample),f.env,{})).status,503);assert.equal(f.db.prepare("SELECT count(*) n FROM contact_requests").get().n,0);});
 test("department isolation, CSRF, optimistic state transition and atomic audit",async t=>{const f=fixture(t);f.enable();const {id}=await (await submit(f)).json();const other=await (await submit(f,{...sample,category:"legal",requestKey:"b".repeat(64)})).json();assert.equal((await f.call(req("/admin/request/"+id))).status,403);assert.equal((await f.call(req("/admin/request/"+other.id,"GET",undefined,auth))).status,404);const q=await (await f.call(req("/admin/queue?category=marketing","GET",undefined,auth))).json();assert.equal(q.items.length,1);assert.equal(q.items[0].email,undefined);const move=(state,version,h=auth)=>f.call(req("/admin/transition","POST",{id,state,version},h));assert.equal((await move("IN_REVIEW",0,{Authorization:"Synthetic admin"})).status,403);assert.equal((await move("CLOSED",0)).status,409);assert.equal((await move("IN_REVIEW",0)).status,200);assert.equal((await move("IN_REVIEW",0)).status,409);f.db.exec("CREATE TRIGGER deny_audit BEFORE INSERT ON contact_events BEGIN SELECT RAISE(ABORT,'test rollback'); END;");assert.equal((await move("CLOSED",1)).status,503);assert.equal(f.db.prepare("SELECT state FROM contact_requests WHERE id=?").get(id).state,"IN_REVIEW");f.db.exec("DROP TRIGGER deny_audit");assert.equal((await move("CLOSED",1)).status,200);assert.equal(f.db.prepare("SELECT count(*) n FROM contact_events").get().n,2);assert.throws(()=>f.db.exec("UPDATE contact_requests SET message='modified'"));});
 test("expiry, restricted access and bounded cascade purge",async t=>{const f=fixture(t);f.enable();const {id}=await (await submit(f)).json();await f.call(req("/admin/transition","POST",{id,state:"IN_REVIEW",version:0},auth));const expiry=now+7*86400000;const later=candidateHandler({...f.deps,now:()=>expiry});assert.equal((await later(req("/admin/request/"+id,"GET",undefined,auth),f.env,{})).status,404);assert.equal(await purgeExpired(f.env.CONTACT_DB,expiry),1);assert.equal(f.db.prepare("SELECT count(*) n FROM contact_events").get().n,0);});
+
+test("signed Access identity across real candidate routes, least privilege and revocation",async t=>{
+ const f=fixture(t);f.enable();
+ const {id}=await (await submit(f)).json();
+ const other=(await (await submit(f,{...sample,category:"legal",requestKey:"b".repeat(64)})).json()).id;
+ const seconds=now/1000,issuer="https://synthetic.cloudflareaccess.com",aud="a".repeat(64),email="synthetic@example.invalid",subject="synthetic-subject";
+ const {publicKey,privateKey}=generateKeyPairSync("rsa",{modulusLength:2048});
+ const wrongKey=generateKeyPairSync("rsa",{modulusLength:2048}).privateKey;
+ const jwk={...publicKey.export({format:"jwk"}),kid:"lab-key",alg:"RS256",use:"sig"};
+ const enc=v=>Buffer.from(JSON.stringify(v)).toString("base64url");
+ const token=(patch={},head={},key=privateKey)=>{const u=enc({alg:"RS256",kid:"lab-key",...head})+"."+enc({iss:issuer,aud:[aud],iat:seconds-10,exp:seconds+100,sub:subject,email,type:"app",...patch});return u+"."+sign("RSA-SHA256",Buffer.from(u),key).toString("base64url");};
+ const roster=[{subject,email,categories:["marketing"]}];
+ const env={...f.env,CONTACT_ADMIN_POLICY_VERIFIED:"true",CONTACT_ACCESS_AUD:aud,CONTACT_ACCESS_ISSUER:issuer,CONTACT_ADMIN_ROSTER:JSON.stringify(roster)};
+ let identityReads=0;
+ const ctx={access:{aud,getIdentity:async()=>{identityReads++;return {email};}}};
+ const fetcher=async(url,opt)=>{assert.equal(url,issuer+"/cdn-cgi/access/certs");assert.equal(opt.redirect,"error");return Response.json({keys:[jwk]});};
+ const handler=(getKeys=fetcher)=>candidateHandler({...f.deps,authorize:(r,e,c)=>authorizeContact(r,e,c,getKeys,seconds)});
+ const raw=token(), csrf=createHash("sha256").update("desset-contact-admin-v1:"+raw).digest("hex");
+ const call=(path,options={})=>{const {method="GET",data,headers={},jwt=raw,context=ctx,environment=env,getKeys=fetcher}=options;return handler(getKeys)(req(path,method,data,{...(jwt?{"Cf-Access-Jwt-Assertion":jwt}:{}),...headers}),environment,context);};
+ const queuePath="/admin/queue?category=marketing",detailPath="/admin/request/"+id;
+ assert.equal((await call(queuePath)).status,200);assert.equal(identityReads,1);
+ const list=await (await call(queuePath)).json();assert.equal(list.items.length,1);assert.equal(list.items[0].email,undefined);
+ assert.equal((await call(detailPath)).status,200);
+ assert.equal((await call("/admin/queue?category=legal")).status,403);
+ assert.equal((await call("/admin/request/"+other)).status,404);
+ for(const options of [
+  {jwt:""},{jwt:token({}, {},wrongKey)},{jwt:token({aud:["wrong"]})},{jwt:token({iss:"https://other.cloudflareaccess.com"})},
+  {jwt:token({exp:seconds-1})},{jwt:token({iat:seconds+60})},{jwt:token({nbf:seconds+1})},{jwt:token({exp:seconds+901})},
+  {jwt:token({sub:"another"})},{jwt:token({email:"other@example.invalid"})},{jwt:token({type:"service"})},
+  {jwt:token({},{alg:"none"})},{jwt:token({},{kid:"unknown"})},{context:{}},{context:{access:{aud:"wrong",getIdentity:async()=>({email})}}},
+  {context:{access:{aud,getIdentity:async()=>({email:"other@example.invalid"})}}},
+  {context:{access:{aud,getIdentity:async()=>({email:123})}}},
+  {context:{access:{aud,getIdentity:async()=>{throw Error("synthetic failure");}}}},
+  {getKeys:async()=>Response.json({keys:[jwk,jwk]})},{getKeys:async()=>new Response(null,{status:503})}
+ ]){const result=await call(detailPath,options);assert.equal(result.status,403,JSON.stringify({jwt:options.jwt?.slice(0,30),status:result.status}));assert.doesNotMatch(await result.text(),/synthetic1@example.invalid/);}
+ for(const patch of [{CONTACT_ADMIN_POLICY_VERIFIED:"false"},{CONTACT_ADMIN_ENABLED:"false"},{CONTACT_ADMIN_ROSTER:"[]"},{CONTACT_ADMIN_ROSTER:JSON.stringify([...roster,...roster])}]){
+  assert.equal((await call(detailPath,{environment:{...env,...patch}})).status,503);
+ }
+ const removed={...env,CONTACT_ADMIN_ROSTER:JSON.stringify([{subject:"other",email:"other@example.invalid",categories:["legal"]}])};
+ assert.equal((await call(detailPath,{environment:removed})).status,403);
+ const reassigned={...env,CONTACT_ADMIN_ROSTER:JSON.stringify([{subject,email,categories:["legal"]}])};
+ assert.equal((await call(detailPath,{environment:reassigned})).status,404);
+ assert.equal((await call("/admin/request/"+other,{environment:reassigned})).status,200);
+ const move=(target,headers={},options={})=>call("/admin/transition",{method:"POST",data:{id:target,state:"IN_REVIEW",version:0},headers,...options});
+ assert.equal((await move(id)).status,403);
+ assert.equal((await move(id,{"X-CSRF-Token":csrf},{jwt:token({iat:seconds-5})})).status,403);
+ assert.equal((await move(other,{"X-CSRF-Token":csrf})).status,404);
+ assert.equal(f.db.prepare("SELECT count(*) n FROM contact_events").get().n,0);
+ assert.equal((await move(id,{"X-CSRF-Token":csrf})).status,200);
+ const event=f.db.prepare("SELECT actor FROM contact_events WHERE request_id=?").get(id);assert.equal(event.actor,subject);
+ assert.equal((await worker.fetch(req(detailPath,"GET",undefined,{"Cf-Access-Jwt-Assertion":raw}),env,ctx)).status,503);
+});
