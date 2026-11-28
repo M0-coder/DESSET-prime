@@ -8,13 +8,11 @@
 .apps-page .apps-country{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:24px}
 .apps-page label{font-weight:650}
 .apps-page select,.apps-page button{min-height:44px;padding:8px 12px;font:inherit;border:1px solid #ccc;border-radius:8px;background:white;color:#000000;max-width:100%}
-.apps-page .apps-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .apps-page .apps-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0;border:1px solid #ddd;border-radius:12px;padding:clamp(16px,3vw,26px);overflow-wrap:anywhere}
 .apps-page .apps-card h2,.apps-page .apps-card p{margin:0}
 .apps-page .apps-icon{display:grid;place-items:center;width:56px;height:56px;border-radius:12px;background:#000000;color:white;flex:none}
 .apps-page .apps-icon-business{background:var(--blue)}
 .apps-page .apps-icon svg{width:30px;height:30px}
-.apps-page .apps-status{border-top:1px solid #ddd;margin-top:auto;padding-top:14px;width:100%}
 .apps-page a{display:inline-block;color:var(--blue);min-height:44px;align-content:center;font-weight:650;text-decoration:underline;text-underline-offset:3px}
 .apps-page .apps-muted,.apps-page [data-app-download]{color:#555;font-size:14px}
 .apps-page .apps-safety{border-top:1px solid #ddd;margin-top:32px;padding-top:20px}
@@ -29,7 +27,7 @@
 .apps-page .apps-states dt{font-weight:650}
 .apps-page .apps-states dd{margin:0;color:#555}
 .apps-page :focus-visible{outline:3px solid var(--blue);outline-offset:3px}
-@media(max-width:700px){.apps-page .apps-grid{grid-template-columns:1fr}.apps-page .apps-states{grid-template-columns:1fr;gap:6px}.apps-page .apps-states dd{margin-bottom:8px}}
+@media(max-width:700px){.apps-page .apps-states{grid-template-columns:1fr;gap:6px}.apps-page .apps-states dd{margin-bottom:8px}}
 
 /* APP-HERO-VIDEO-01: only the main applications directory; role pages unchanged. */
 .apps-page .apps-hero--video{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;min-height:clamp(350px,31vw,540px);background:#000;color:#fff;padding-block:clamp(36px,6vw,84px)}
@@ -86,4 +84,9 @@ body.desset-consumer{margin:0;background:#fff;color:#000000;min-height:100svh;di
 
 .desset-consumer .consumer-footer p{text-align:center;margin:0;padding:0 0 8px;color:#555;font-size:11px;line-height:1.4}
 
-.apps-page .apps-card>a.apps-icon-desset{margin-inline:auto}
+
+/* APP-LAUNCHER-COMPACT-01: approved icon-only directory. */
+.apps-page .apps-launcher{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.65vw,16px);margin:calc(-1 * clamp(42px,5.75vw,56px)) auto 0;padding:0 0 48px;width:max-content;max-width:100%}
+.apps-page .apps-launcher>a{display:grid;place-items:center;width:clamp(72px,9.8vw,96px);height:auto;aspect-ratio:1;border-radius:20%;color:#fff;text-decoration:none;box-shadow:0 6px 18px #0001}
+.apps-page .apps-launcher>a.apps-icon-desset{width:clamp(84px,11.5vw,112px)}
+.apps-page .apps-launcher svg{width:40%;height:40%}
