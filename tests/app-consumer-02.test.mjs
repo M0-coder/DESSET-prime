@@ -8,8 +8,16 @@ for(const dir of ["","dist/"])test("APP-CONSUMER-02 approved compact entry, no f
  assertClosedAppPage(h,"aplicaciones-clientes");
  assert.match(h,/Tu ciudad, en una aplicación\./);
  assert.equal((h.match(/<button[^>]* disabled>/g)||[]).length,3);
- for(const label of ["Abrir DESSET Web","App Store","Google Play","Accesos previstos, todavía no operativos.","Comidas","Mercados","Cafeterías","Tiendas"])assert.ok(h.includes(label),label);
+ for(const label of ["Desktop","App Store","Google Play","Accesos previstos, todavía no operativos.","Compra, vende, pide a domicilio, viaja y reserva."])assert.ok(h.includes(label),label);
  assert.equal((h.match(/class="consumer-category"/g)||[]).length,4);
+ const categories=[...h.matchAll(/<div class="consumer-category">[\s\S]*?<span>([^<]+)<\/span><\/div>/g)].map(m=>m[1]);
+ assert.deepEqual(categories,["Comercios","Marketplace","Viajes","Alojamientos"]);
+ const desktop=h.match(/<button class="consumer-web" type="button" disabled>([\s\S]*?)<\/button>/)?.[1];
+ assert.ok(desktop,"Desktop button must remain disabled");
+ assert.equal((desktop.match(/<svg\b/g)||[]).length,1,"Only the monitor icon is approved");
+ assert.match(desktop,/<rect x="3" y="3" width="18" height="13" rx="2"\/>/);
+ assert.match(desktop,/<span>Desktop<\/span>$/);
+ assert.doesNotMatch(desktop,/M7 17 17 7|Abrir DESSET Web/);
  assert.doesNotMatch(h,/data-app-platform=|<form\b|<iframe\b|<video\b|consumer-hero-media|href="https?:/);
  assert.ok(h.includes('href="./confianza.html#privacidad"'));
  assert.ok(h.includes('href="./confianza.html#seguridad"'));
