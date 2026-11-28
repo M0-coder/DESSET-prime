@@ -2,11 +2,16 @@
 import locked,{candidateHandler} from "../internal/contact-platform/worker.mjs";
 import {purgeExpired} from "../internal/contact-platform/d1-store.mjs";
 import {authorizeContact} from "../internal/contact-platform/gates.mjs";
+import {operationalSnapshot} from "../internal/contact-platform/operations.mjs";
 const now=1700000000000;
 export default {async fetch(req,env,ctx){
  if(env.LAB_ONLY!=="synthetic-local-only")return new Response(null,{status:503});
  const path=new URL(req.url).pathname;
  if(path==="/__locked")return locked.fetch(req,env,ctx);
+ if(path==="/__operations"){
+  try{return Response.json(await operationalSnapshot({...env,CONTACT_OPERATIONS_ENABLED:req.headers.get("X-Lab-Operations")==="enabled"?"true":"false"},req.headers.get("X-Lab-Clock")==="expiry"?now+7*86400000:now));}
+  catch{return Response.json({error:"OPERATIONS_UNAVAILABLE"},{status:503});}
+ }
  if(path==="/__purge")return Response.json({deleted:await purgeExpired(env.CONTACT_DB,now+7*86400000)});
  // The test-only identity header emulates provider context. It is never trusted by the production candidate.
  const email=req.headers.get("X-Lab-Identity");

@@ -53,5 +53,17 @@
     "requireSignedJwt": true,
     "rosterSource": "approved deployment configuration; default empty",
     "revocationEvidenceRef": null
+  },
+  "operationsReadiness": {
+    "status": "LOCAL_CANDIDATE_ONLY",
+    "metricsEnabled": false,
+    "scheduledPurgeEnabled": false,
+    "notificationsEnabled": false,
+    "incidentOwner": null,
+    "monitoringEvidenceRef": null,
+    "retentionApprovalRef": null,
+    "backupDeletionEvidenceRef": null,
+    "deliveryEvidenceRef": null,
+    "alertThresholdApprovalRef": null
   }
 }

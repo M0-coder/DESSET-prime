@@ -33,6 +33,11 @@ try{
  const enable=()=>db.prepare("UPDATE contact_runtime SET environment='production',intake_enabled=1,privacy_version=?,privacy_sha256=?,authorization_ref=? WHERE id=1").bind(bindings.CONTACT_PRIVACY_VERSION,hash,bindings.CONTACT_AUTHORIZATION_REF).run();
  assert.equal((await submit()).status,503);assert.equal(await count("contact_requests"),0);pass("local D1 migrations and closed default runtime");
  await enable();assert.equal((await call("/__locked","POST",sample)).status,503);assert.equal(await count("contact_requests"),0);pass("actual Worker default export remains locked");
+ const ops=(expired=false)=>call("/__operations","GET",undefined,{"X-Lab-Operations":"enabled",...(expired?{"X-Lab-Clock":"expiry"}:{})});
+ assert.equal((await call("/__operations")).status,503);
+ assert.equal((await call("/admin/operations","GET",undefined,auth)).status,404);
+ const empty=await (await ops()).json();
+ assert.deepEqual(empty,{observedAt:now,intakeDatabaseEnabled:true,intakeConfigurationEnabled:true,stored:0,expiredAwaitingPurge:0,received:0,inReview:0,closed:0,capacity:500,capacityRemaining:500,oldestReceivedAgeMs:null});
  const replay=await Promise.all(Array.from({length:8},()=>submit()));
  assert.equal(replay.filter(x=>x.status===201).length,1);assert.equal(replay.filter(x=>x.status===200).length,7);
  const receipts=await Promise.all(replay.map(x=>x.json()));const id=receipts[0].id;assert(receipts.every(x=>x.id===id&&Object.keys(x).sort().join(",")==="id,replayed"));assert.equal(await count("contact_requests"),1);
@@ -62,6 +67,11 @@ try{
  await db.prepare("DELETE FROM contact_events WHERE request_id=? AND version=2").bind(id).run();
  assert.equal((await move("CLOSED",1)).status,200);assert.equal(await count("contact_events"),2);pass("trigger failure rolls back state; audit atomic");
  assert.equal((await submit({...sample,requestKey:"d".repeat(64),challenge:"kill-switch"})).status,503);assert.equal(await count("contact_requests"),2);pass("kill switch at transaction boundary");
+ const snapshot=await (await ops()).json();
+ assert.deepEqual(snapshot,{observedAt:now,intakeDatabaseEnabled:false,intakeConfigurationEnabled:true,stored:2,expiredAwaitingPurge:0,received:1,inReview:0,closed:1,capacity:500,capacityRemaining:498,oldestReceivedAgeMs:0});
+ const expiredSnapshot=await (await ops(true)).json();assert.equal(expiredSnapshot.expiredAwaitingPurge,2);assert.equal(expiredSnapshot.received,0);assert.equal(expiredSnapshot.closed,0);assert.equal(expiredSnapshot.oldestReceivedAgeMs,null);
+ assert.doesNotMatch(JSON.stringify(snapshot),/test@example.invalid|Synthetic Person|Synthetic message|request_key|payload_hash/);
+ pass("internal aggregate metrics reflect kill switch, capacity and expiry without personal fields");
  const purge=await call("/__purge");assert.equal(purge.status,200);assert.equal((await purge.json()).deleted,2);assert.equal(await count("contact_requests"),0);assert.equal(await count("contact_events"),0);pass("local deletion count excludes cascade and all events removed");
  // 101 expired requests plus one still valid; enforce the per-call bound and no early purge.
  const expiry=now+7*86400000;
@@ -69,5 +79,7 @@ try{
  assert.equal(seeded.success,true);assert.equal(await count("contact_requests"),102);
  for(const [expected,remaining] of [[100,2],[1,1],[0,1]]){const p=await call("/__purge");assert.equal(p.status,200);assert.equal((await p.json()).deleted,expected);assert.equal(await count("contact_requests"),remaining);}
  assert.equal((await db.prepare("SELECT expires_at FROM contact_requests").first()).expires_at,expiry+1);pass("100-request purge bound and unexpired record preserved");
+ const remaining=await (await ops(true)).json();assert.equal(remaining.stored,1);assert.equal(remaining.expiredAwaitingPurge,0);assert.equal(remaining.capacityRemaining,499);
+ pass("operational snapshot reconciles after bounded purge");
  console.log(JSON.stringify({status:"PASS",checks,scope:"workerd local D1 and RSA JWT verification; synthetic runtime identity/JWKS/challenge/limit; no hosted resources"}));
 }finally{await mf.dispose();}
