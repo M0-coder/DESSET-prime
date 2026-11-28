@@ -4,7 +4,8 @@ import {join,resolve} from "node:path";
 import {tmpdir} from "node:os";
 import {startFixture} from "./contact-e2e-fixture.mjs";
 import assert from "node:assert/strict";
-const output=resolve("reports/contact-e2e");
+const d1=process.argv.includes("--d1");
+const output=resolve(d1?"reports/contact-e2e/d1":"reports/contact-e2e/legacy");
 await mkdir(output,{recursive:true});
 const profile=await mkdtemp(join(tmpdir(),"desset-chrome-"));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -60,7 +61,7 @@ async function js(expression){
 let fixture;
 const ids=["alianzas","inversion","marketing","prensa","instituciones","profesionales","legal","seguridad","otras"],checks=[];
 try{
- fixture=await startFixture();
+ fixture=await startFixture({d1});
  const entry=fixture.origin+"/internal/contact-ready/index.html";
  const target=await call("Target.createTarget",{url:"about:blank"},false);
  const attached=await call("Target.attachToTarget",{targetId:target.result.targetId,flatten:true},false);
@@ -80,8 +81,8 @@ try{
    await js("document.getElementById('demo-form').requestSubmit()");
    await until(async()=>await js("!document.getElementById('demo-result').hidden && !!document.getElementById('demo-result').dataset.receipt"),"receipt");
    const id=await js("document.getElementById('demo-result').dataset.receipt");
-   assert.equal(fixture.db.prepare("SELECT category,state,email FROM contact_requests WHERE id=?").get(id).category,category);
-   assert.equal(fixture.db.prepare("SELECT email FROM contact_requests WHERE id=?").get(id).email,email);
+   assert.equal((await fixture.db.prepare("SELECT category,state,email FROM contact_requests WHERE id=?").get(id)).category,category);
+   assert.equal((await fixture.db.prepare("SELECT email FROM contact_requests WHERE id=?").get(id)).email,email);
    if(category==="marketing")await screenshot("receipt-"+width);
    await auth(null);await nav(fixture.origin+"/panel/request/"+id);
    assert.match(await js("document.body.innerText"),/Acceso o solicitud no disponible/);
@@ -97,9 +98,9 @@ try{
    assert.equal(await js("document.querySelector('form button')?.textContent"),"Cerrar consulta");
    await js("document.querySelector('form button').click()");
    await until(async()=>await js("document.readyState==='complete' && document.body.innerText.includes('Consulta cerrada.')"),"close");
-   const row=fixture.db.prepare("SELECT state,version FROM contact_requests WHERE id=?").get(id);
+   const row=await fixture.db.prepare("SELECT state,version FROM contact_requests WHERE id=?").get(id);
    assert.equal(row.state,"CLOSED");assert.equal(row.version,2);
-   assert.equal(fixture.db.prepare("SELECT count(*) n FROM contact_events WHERE request_id=?").get(id).n,2);
+   assert.equal((await fixture.db.prepare("SELECT count(*) n FROM contact_events WHERE request_id=?").get(id)).n,2);
    checks.push({width,category,pass:true});
   }
  }
@@ -109,12 +110,12 @@ try{
  const bad=await fetch(fixture.origin+"/api/contact",{method:"POST",headers:{Origin:fixture.origin,"Content-Type":"application/json"},body:JSON.stringify({category:"marketing",person:"Not synthetic",email:"not-synthetic@example.invalid",organization:"",phone:"",subject:"Synthetic subject",message:"Synthetic message",consent:true,privacyVersion:"synthetic-v1",requestKey:"a".repeat(64),challenge:"synthetic-test"})});assert.equal(bad.status,400);
  fixture.challenge(false);
  const denied=await fetch(fixture.origin+"/api/contact",{method:"POST",headers:{Origin:fixture.origin,"Content-Type":"application/json"},body:JSON.stringify({category:"marketing",person:"Synthetic Person",email:"synthetic999@example.invalid",organization:"",phone:"",subject:"Synthetic subject",message:"Synthetic message",consent:true,privacyVersion:"synthetic-v1",requestKey:"b".repeat(64),challenge:"synthetic-test"})});assert.equal(denied.status,403);
- assert.equal(fixture.db.prepare("SELECT count(*) n FROM contact_requests").get().n,36);assert.equal(fixture.db.prepare("SELECT count(*) n FROM contact_events").get().n,72);
- assert.equal(fixture.purge(),36);assert.equal(fixture.db.prepare("SELECT count(*) n FROM contact_events").get().n,0);
+ assert.equal((await fixture.db.prepare("SELECT count(*) n FROM contact_requests").get()).n,36);assert.equal((await fixture.db.prepare("SELECT count(*) n FROM contact_events").get()).n,72);
+ assert.equal(await fixture.purge(),36);assert.equal((await fixture.db.prepare("SELECT count(*) n FROM contact_events").get()).n,0);
  fixture.disable();assert.equal((await fetch(fixture.origin+"/panel")).status,503);
  await writeFile(join(output,"checks.json"),JSON.stringify({checks,negativeControls:["unauthenticated","department","synthetic-only","challenge","expiry","disabled"],rowsAfterPurge:0,eventsAfterPurge:0},null,2));
  assert.equal(fixture.transitions.length,72);assert.ok(fixture.transitions.every(t=>t.status===303&&t.origin==="same-origin"&&t.authorized));
- console.log("CONTACT-READY-04 PASS: "+checks.length+" full browser circuits, 72 audit transitions, purge and negative controls");
+ console.log((d1?"CONTACT-INTEGRATION-03B D1 PASS: ":"CONTACT-READY-04 PASS: ")+checks.length+" full browser circuits, 72 audit transitions, purge and negative controls");
 }catch(e){if(fixture){await writeFile(join(output,"transition-diagnostics.json"),JSON.stringify(fixture.transitions,null,2));console.error("Synthetic transition diagnostics",JSON.stringify(fixture.transitions));}throw e;
 }finally{
  child.kill();await new Promise(r=>{if(child.exitCode!==null)r();else child.once("exit",r)});

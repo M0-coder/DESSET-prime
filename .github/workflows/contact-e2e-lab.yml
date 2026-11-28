@@ -5,6 +5,8 @@ on:
       - 'scripts/contact-e2e-*'
       - 'internal/contact-ready/**'
       - 'internal/contact-service/**'
+      - 'internal/contact-platform/**'
+      - 'scripts/contact-workerd-fixture.mjs'
       - '.github/workflows/contact-e2e-lab.yml'
 permissions:
   contents: read
@@ -28,6 +30,21 @@ jobs:
           node --check scripts/contact-e2e-fixture.mjs
           node --check scripts/contact-e2e-browser.mjs
           node scripts/contact-e2e-browser.mjs
+      - name: Install pinned isolated D1 runtime and run same browser circuit
+        env:
+          DESSET_CONTACT_SYNTHETIC_E2E: '1'
+        run: |
+          set -euo pipefail
+          prefix="$RUNNER_TEMP/contact-browser-d1"
+          mkdir -p "$prefix"
+          cp internal/contact-platform/lab/package.json internal/contact-platform/lab/package-lock.json "$prefix/"
+          echo '6bfc26d5d2e17bd50953b5136e3b58ce06a437b4a6b08975ac3bb354639501a5  internal/contact-platform/lab/package-lock.json' | sha256sum -c -
+          npm audit --prefix "$prefix" --audit-level=low
+          npm ci --prefix "$prefix" --no-audit --no-fund --engine-strict
+          cmp internal/contact-platform/lab/package-lock.json "$prefix/package-lock.json"
+          node --check scripts/contact-e2e-d1-backend.mjs
+          node --check scripts/contact-e2e-d1-bridge.mjs
+          CONTACT_LAB_PREFIX="$prefix" node scripts/contact-e2e-browser.mjs --d1
       - name: Verify closed public package
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
