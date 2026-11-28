@@ -5,6 +5,7 @@ import {authorizeContact} from "../internal/contact-platform/gates.mjs";
 import {operationalSnapshot} from "../internal/contact-platform/operations.mjs";
 import {maintenanceCycle} from "../internal/contact-platform/maintenance.mjs";
 import {coordinatedMaintenance} from "../internal/contact-platform/coordinated-maintenance.mjs";
+import {previewAlert} from "../internal/contact-platform/alert-preview.mjs";
 const now=1700000000000;
 export default {async fetch(req,env,ctx){
  if(env.LAB_ONLY!=="synthetic-local-only")return new Response(null,{status:503});
@@ -13,6 +14,10 @@ export default {async fetch(req,env,ctx){
  if(path==="/__operations"){
   try{return Response.json(await operationalSnapshot({...env,CONTACT_OPERATIONS_ENABLED:req.headers.get("X-Lab-Operations")==="enabled"?"true":"false"},req.headers.get("X-Lab-Clock")==="expiry"?now+7*86400000:now));}
   catch{return Response.json({error:"OPERATIONS_UNAVAILABLE"},{status:503});}
+ }
+ if(path==="/__alert_preview"){
+  try{return Response.json(await previewAlert({...env,CONTACT_ALERT_PREVIEW_ENABLED:req.headers.get("X-Lab-Alert")==="enabled"?"true":"false"},Number(new URL(req.url).searchParams.get("slot")??"-1")));}
+  catch{return Response.json({error:"ALERT_PREVIEW_UNAVAILABLE"},{status:503});}
  }
  if(path==="/__coordinated"){
   const kind=req.headers.get("X-Lab-Maintenance");

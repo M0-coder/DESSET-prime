@@ -11,3 +11,6 @@ Integration baseline 27816aaaee434317d0480927c26ea9956d408e56 (APP-IDENTITY-01).
 
 ## Current limitations
 Synthetic handler is deliberately Node/SQLite, not a deployable Cloudflare Worker. Panel tests invoke Request/Response directly; no browser render test of this panel yet. No actual admin identity provider, persistent production storage, notification service or frontend-to-backend binding. Seven-day synthetic expiry not a legal retention decision. Production release remains NO-GO.
+
+## Later phases
+This document describes the original synthetic integration baseline. For subsequent local D1, signed identity, maintenance, and current activation blockers, use ../contact-platform/ACTIVATION-HANDOFF.md and activation-readiness.json. Do not interpret historical limitations as a current release approval.

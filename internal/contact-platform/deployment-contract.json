@@ -32,7 +32,7 @@
   "pending": [
     "legal identity and approved privacy notice",
     "retention including backup deletion",
-    "actual Worker entrypoint and D1 storage adapter",
+    "approved real Worker entrypoint and hosted D1 validation (local adapter implemented)",
     "verified administrator identity and MFA",
     "real Turnstile and rate limit bindings",
     "notification delivery and monitoring",
@@ -72,6 +72,8 @@
     "schedulerEvidenceRef": null,
     "coordinatedMaintenance": "LOCAL_CANDIDATE_ONLY",
     "journalMigrationApproved": false,
-    "journalRetentionApprovalRef": null
+    "journalRetentionApprovalRef": null,
+    "alertPreviewCandidate": "LOCAL_ONLY",
+    "alertPreviewEnabled": false
   }
 }

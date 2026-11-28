@@ -116,5 +116,22 @@ try{
  const recovery=await (await coordinated("approved",true)).json();assert.equal(recovery.deleted,2);assert.equal(recovery.expiredAfter,0);assert.equal(recovery.replayed,false);assert.equal(await count("contact_requests"),0);assert.equal(await count("contact_maintenance_cycles"),2);assert(!recovery.alerts.includes("EXPIRED_PENDING_PURGE"));
  const replayOld=await (await coordinated()).json();assert.equal(replayOld.replayed,true);assert.equal(replayOld.deleted,100);
  pass("maintenance journal failure rolls back deletion; retry recovers without external delivery");
+ const previewAlertFor=(slot,enabled=true)=>call("/__alert_preview?slot="+slot,"GET",undefined,{"X-Lab-Alert":enabled?"enabled":"disabled"});
+ const slot=records[0].slot;
+ assert.equal((await previewAlertFor(slot,false)).status,503);assert.equal((await previewAlertFor(slot+500)).status,503);assert.equal((await previewAlertFor(-1)).status,503);
+ assert.equal((await call("/admin/alert_preview?slot="+slot,"GET",undefined,auth)).status,404);
+ const envelopes=await Promise.all(Array.from({length:8},async()=>{const x=await previewAlertFor(slot);assert.equal(x.status,200);return x.json();}));
+ assert(envelopes.every(x=>JSON.stringify(x)===JSON.stringify(envelopes[0])));
+ const envelope=envelopes[0];assert.equal(envelope.status,"PREVIEW_ONLY");assert.equal(envelope.deliveryAttempted,false);assert.equal(envelope.envelope.idempotencyKey,"contact-maintenance-v1:"+slot);assert.equal(envelope.envelope.deleted,100);assert.equal(envelope.envelope.expiredRemaining,1);assert(envelope.envelope.codes.includes("EXPIRED_PENDING_PURGE"));
+ assert.deepEqual(Object.keys(envelope.envelope).sort(),["codes","deleted","expiredRemaining","idempotencyKey","observedAt","schema"]);
+ assert.doesNotMatch(JSON.stringify(envelope),/test@example.invalid|Synthetic Person|Synthetic message|request_key|payload_hash|synthetic-maintenance/);
+ assert.equal(await count("contact_maintenance_cycles"),2);assert.equal(await count("contact_requests"),0);
+ // New synthetic interval with aligned flags and no pending rows: no alert envelope.
+ await db.prepare("UPDATE contact_runtime SET intake_enabled=1 WHERE id=1").run();
+ const quietSlot=slot+2;
+ const quietAt=quietSlot*300000;
+ const quiet=await db.prepare("INSERT INTO contact_maintenance_cycles(slot,token,observed_at,policy_ref,capacity,capacity_percent,oldest_age_ms,expired_before,expired_after,deleted,alert_mask) VALUES(?, 'lab-quiet',?,'synthetic-maintenance',500,20,1,0,0,0,0)").bind(quietSlot,quietAt).run();assert.equal(quiet.success,true);
+ assert.deepEqual(await (await previewAlertFor(quietSlot)).json(),{status:"NO_ALERT",envelope:null,deliveryAttempted:false});
+ pass("read-only deterministic redacted alert envelope; no delivery or duplicate side effects");
  console.log(JSON.stringify({status:"PASS",checks,scope:"workerd local D1 and RSA JWT verification; synthetic runtime identity/JWKS/challenge/limit; no hosted resources"}));
 }finally{await mf.dispose();}
