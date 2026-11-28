@@ -1,0 +1,88 @@
+{
+  "schema": "desset-contact-activation-readiness-v1",
+  "decision": "NO_GO",
+  "productionLocked": true,
+  "automaticActivation": false,
+  "validatedBaseline": {
+    "sha": "53042127fed61cdac0c00283f9330f62cb42f1bf",
+    "workflowCount": 11,
+    "instrumentedChecks": 22,
+    "runId": "46099824681",
+    "jobId": "140839502066",
+    "artifactId": "15245017025",
+    "scope": "local synthetic workerd D1 and browser adapters, not hosted infrastructure"
+  },
+  "gates": {
+    "registeredController": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "privacyNotice": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "retentionAndBackups": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "departmentOwners": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "accessAndMfa": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "trustedIngressAndChallenge": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "isolatedHostedD1": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "publicFrontendAndPanelIntegration": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "schedulerAndJournalRetention": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "notificationDeliveryAndMonitoring": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "physicalDeviceAndAccessibility": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "rollbackRehearsal": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "exactReleaseCi": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    },
+    "ownerReleaseApproval": {
+      "status": "PENDING",
+      "evidenceRef": null,
+      "approvedBy": null
+    }
+  },
+  "proposedOrigin": "https://contacto.desset.lat"
+}

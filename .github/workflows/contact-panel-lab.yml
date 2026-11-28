@@ -1,0 +1,42 @@
+name: CONTACT-READY — integrated panel contract (NO DEPLOY)
+on:
+  pull_request:
+    paths:
+      - 'internal/contact-service/**'
+      - 'internal/contact-ready/**'
+      - 'tests/contact-panel.test.mjs'
+      - '.github/workflows/contact-panel-lab.yml'
+permissions:
+  contents: read
+jobs:
+  panel-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22.16.0'
+      - name: Check synthetic end-to-end service and panel
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/contact-panel
+          node --test tests/contact-service.test.mjs tests/contact-panel.test.mjs tests/contact-ready-preview.test.mjs | tee reports/contact-panel/tests.txt
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build:site
+          npm run verify:site
+          node scripts/static-gate.mjs
+          test ! -e dist/internal
+          git diff --exit-code
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: contact-panel-integration-evidence
+          path: reports/contact-panel/
+          if-no-files-found: error
+          retention-days: 14

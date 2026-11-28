@@ -1,0 +1,5 @@
+# CONTACT-INTEGRATION-03B — browser closure candidate (NO DEPLOY)
+Reuse the existing 36-circuit regression runner twice: historical SQLite fixture and local workerd D1 with the actual intake adapter and panel candidate, signed synthetic identity, loopback only, ephemeral DB, external outbound denied in workerd. Both modes use the existing internal contact markup; D1 uses a test-only module binding. No public route or assets; no new dependencies; original Worker hard lock remains. Browser evidence, real identity/MFA, UI lifecycle for production, accessibility and hosted staging still require review. Do not deploy the fixture.
+
+## Superseding D1 browser circuit
+The same runner exercises the managed form controller against the private staging candidate and dedicated staging schema in local workerd. The provider is simulated in CI; no hosted resources or real identity. See ACTIVATION-INTEGRATION.md. New CI required.
