@@ -1,0 +1,66 @@
+# DESSET — expediente único de activación institucional
+Estado: **BORRADOR INTERNO, NO PUBLICADO, NO-GO para recibir datos reales o indexar**. No contiene datos personales, contraseñas ni identificadores de infraestructura nuevos. Fecha: 27/11/2026. Este expediente reúne contenido reutilizable y decisiones propuestas; no es una política jurídica vigente ni autorización para activar.
+
+## 1. Propósito y rutas
+La web informa, orienta, presenta y recibe correspondencia institucional. Las aplicaciones realizan incorporación comercial, pedidos, pagos, movilidad, entregas y soporte operativo. Referencias públicas existentes (rutas canónicas por confirmar tras despliegue):
+| Público | Entrada | Acción preparada | Destino de activación |
+|---|---|---|---|
+| Socios y proveedores | /contacto#alianzas | Propuesta de colaboración | formulario categoría alianzas |
+| Inversores | /inversores#inversores-contacto y /contacto#inversion | Consulta estratégica, no oferta | formulario inversión |
+| Marketing | /contacto#marketing | Propuesta publicitaria | formulario marketing |
+| Prensa | /noticias y /contacto#prensa | Solicitar información y recursos aprobados | formulario prensa |
+| Instituciones | /contacto#instituciones | Correspondencia institucional | formulario instituciones |
+| Talento | /talento y /contacto#profesionales | Consulta profesional | formulario profesionales |
+| Legal | /contacto#legal | Comunicación jurídica | formulario legal |
+| Privacidad / seguridad | /confianza y /contacto#seguridad | Reportar incidente o ejercer derechos | formulario seguridad, mecanismo alternativo aprobado |
+| General | /contacto#otras | Consulta no clasificada | formulario otras |
+| Clientes, comercios, repartidores | /aplicaciones | Acceder a aplicación oficial cuando se publique | fichas de aplicaciones, no operación en la web |
+Destinos del formulario: https://contacto.desset.lat/internal/contact-ready/index.html#consulta-<categoría>. Host y ruta **candidatos**, no enlaces activos. Antes de mostrar los enlaces, comprobar el host aprobado, recibo real de prueba, política y acceso. Verificar todas las rutas y fragmentos en el artefacto exacto. No insertar enlaces a host inaccesible. Mantener alternativa de correspondencia aprobada para incidencias.
+
+## 2. Textos institucionales preparados (revisión del titular)
+### Ficha para socios, medios e instituciones
+DESSET reúne tecnología, comercio digital y logística bajo una identidad común. Su propósito es facilitar la conexión entre personas, empresas y mercados. DESSET comprende soluciones de comercio y entregas de última milla, con líneas adicionales contempladas en su evolución. DESSET prime se orienta a la paquetería, el transporte y la distribución, con una visión de crecimiento gradual. Los servicios previstos no implican disponibilidad comercial actual. La web institucional comunica y orienta; las operaciones se realizan mediante las aplicaciones cuando estén habilitadas. Información oficial: https://desset.lat.
+### Invitación a alianzas
+DESSET considera propuestas de cooperación en tecnología, abastecimiento, distribución, transporte y desarrollo empresarial. Para evaluar una iniciativa, indica tu organización, ámbito de actividad, propuesta, objetivos compartidos y medio de contacto. No envíes información confidencial ni documentación personal en el primer contacto. Las propuestas se revisan según su viabilidad y compatibilidad con el proyecto. No implica aceptación ni obligación contractual.
+### Relaciones con inversores
+El portal presenta el modelo de negocio, las áreas de actividad y la orientación estratégica. Las consultas de potenciales inversores y socios se reciben por el canal institucional aprobado. La información no constituye una oferta pública o privada de valores, una recomendación de inversión ni una garantía de rentabilidad. Cualquier negociación requerirá evaluación y documentación jurídica específica. No publicar balances, valoración, tracción, captación ni indicadores inexistentes.
+### Prensa y recursos de marca
+Los medios pueden solicitar información corporativa, declaraciones y materiales de marca para un uso determinado. Indica el medio, tema, finalidad, plazo y datos de contacto. La disponibilidad de archivos y autorización de uso se confirmarán individualmente. El logotipo, fotografías y videos no adquieren licencia por aparecer en la web. Entregar solo versiones y derechos aprobados.
+### Comunicado de apertura (solo cuando se apruebe la apertura)
+DESSET habilita su canal de correspondencia institucional para propuestas empresariales, consultas de socios, prensa, instituciones y demás comunicaciones. El portal informa y orienta hacia las aplicaciones oficiales. Esta habilitación no anuncia el inicio de operaciones comerciales ni la disponibilidad de servicios que aún se encuentren en preparación.
+
+## 3. Aviso de privacidad de correspondencia — texto base, NO VIGENTE
+Responsable: [denominación jurídica acreditada], RUC [RUC], domicilio [domicilio aplicable], contacto para protección de datos [canal verificable]. Tratamiento: nombres, correo, organización y teléfono cuando procedan, asunto, mensaje, categoría y datos técnicos imprescindibles para seguridad y trazabilidad. Finalidad: recibir, clasificar, responder y gestionar correspondencia institucional, proteger el canal y atender derechos; no utilizar para publicidad no autorizada ni decisiones comerciales automatizadas. Base jurídica: [validar por finalidad, incluido consentimiento cuando proceda]. Campos obligatorios y opcionales se identifican en el formulario; sin los indispensables no se puede tramitar la consulta. Los destinatarios autorizados y encargados serán [identificación/rol/proveedor y condiciones aprobadas]; transferencias nacionales o internacionales [detallar si aplican], banco de datos [identificación/registro si corresponde], conservación [plazo aprobado por finalidad, copias y eliminación]. Los titulares podrán ejercer los derechos reconocidos en la Ley 29733 por [canal y procedimiento aprobado], y acudir a la autoridad competente. No adjuntes documentos personales, credenciales ni datos bancarios en la consulta inicial. Versión [identificador], vigencia [fecha efectiva].
+Texto de consentimiento propuesto: He leído el aviso de privacidad de correspondencia institucional y acepto el tratamiento descrito para gestionar mi consulta cuando esta base jurídica sea aplicable.
+Antes de publicar: revisión legal de Ley 29733 y Reglamento DS 016-2024-JUS; completar datos y campos, eliminar marcadores, comprobar base jurídica, deber de información, derechos, transferencias, encargados, registro y respuesta a incidentes; versionar texto final UTF-8, calcular SHA-256 y vincular a la versión autorizada de formulario y D1. No introducir valores ficticios en producción. Fuentes oficiales: https://www.gob.pe/institucion/anpd/normas-legales/6554453-n-016-2024-jus y https://busquedas.elperuano.pe/dispositivo/SE/2349653-1. El aviso no sustituye revisión jurídica.
+
+## 4. Recepción y documentación de terceros
+Propuesta: un buzón corporativo con capacidad de recibir y contestar desde el dominio, acceso delegado, MFA y responsables autorizados para categorías. Nombre propuesto contacto@desset.lat; **no existe evidencia de que funcione**. No publicar hasta verificar. No hacen falta nueve buzones ni un CRM. Cloudflare Email Routing no acredita por sí solo un buzón humano bidireccional. Elegir proveedor de correo, confirmar coste, titular y destinatario, conservar DNS anterior, aplicar únicamente registros MX/SPF/DKIM/DMARC proporcionados por él, probar entrada/salida/respuesta y rebotes con datos ficticios. No activar catch-all. Nunca publicar credenciales, DNS privados ni destinos personales. Usar alias solo si se prueban.
+**Documentos:** primera consulta sin adjuntos. Cuando se necesite un dossier, propuesta, carta o documento, responder desde buzón verificado y solicitar solo el archivo imprescindible mediante canal privado aprobado. Para documentos confidenciales, usar enlace de carga autenticado y restringido al destinatario con vencimiento, escaneo antimalware, control de tipo/tamaño, acceso mínimo y eliminación según política; sin enlaces públicos, sin Drive público, sin ejecutables/macros y sin pedir DNI/banca por defecto. Si el canal de documentos no está aprobado y ensayado, no pedir archivos ni prometer recepción. Esta política prepara el proceso; no implementa un cargador de archivos nuevo.
+
+**Plantillas de atención, listas para revisión:**
+- Acuse: «Hemos recibido su comunicación [referencia]. El área responsable revisará su contenido. La recepción no implica aceptación de la propuesta. No envíe información sensible sin instrucciones específicas.»
+- Solicitud de documentación: «Para continuar la evaluación de [referencia], necesitamos [documento mínimo] con la finalidad de [finalidad]. Utilice únicamente [canal privado verificado] antes de [fecha acordada]. No incluya datos ajenos al trámite.»
+- Derivación: «Su consulta [referencia] corresponde a [área]. Le indicamos el canal oficial [destino verificado].» No reenviar información a terceros sin base y autorización.
+- Cierre: «Hemos concluido la revisión de [referencia]. Resultado: [resultado acreditado]. Para una nueva consulta, utilice el canal institucional oficial.»
+- Incidencia: «No hemos podido confirmar la recepción o entrega de su mensaje. No envíe duplicados ni datos sensibles; utilice la referencia [referencia] y el canal alternativo [verificado].»
+Registro mínimo: referencia, categoría, responsable, fecha de recepción, revisión, solicitud de documento, respuesta y cierre; ubicación autorizada de evidencia, no copiar contenido a repositorio. CLOSED no acredita entrega. Frecuencia y plazos requieren aprobación del responsable; no prometer atención 24/7.
+
+## 5. Visibilidad pública y SEO
+La publicación de Pages y la indexación son actos distintos. Actualmente el workflow protege NOINDEX. El empaquetador INDEX existente solo incluye la portada en sitemap y deja las demás páginas noindex; no confundir con lanzamiento SEO integral. Preparar una futura revisión específica con lista positiva de páginas institucionales (inicio, empresa, perfil, misión/visión, servicios, contacto, inversores, noticias, confianza, talento, aplicaciones informativas e inglés según contenido aprobado); mantener panel, staging, formularios de gestión, vistas desactivadas y rutas privadas fuera del sitemap y protegidas según su función. Confirmar canonical, redirecciones de www, títulos y descripciones únicos, consistencia ES/EN, OG, enlaces y respuesta HTTPS. Verificar meta robots y X-Robots-Tag coherentes, robots.txt accesible para URLs aprobadas y sitemap con solo URLs canónicas indexables. No quitar NOINDEX ni solicitar indexación sin revisión explícita. Verificar propiedad Search Console y enviar sitemap después de publicar la revisión aprobada; la indexación no está garantizada. Fuente https://developers.google.com/search/docs/crawling-indexing/block-indexing.
+Para socios y medios: publicar solo recursos aprobados, utilizar la ficha y rutas anteriores; preparar comunicado de apertura y enlaces desde perfiles oficiales, verificar control administrativo de cada perfil. No inventar audiencia, clientes o partners.
+
+## 6. Expediente de documentos y evidencias — entregar una vez, sin repetir solicitudes
+| Entregable | Estado de este expediente | Dato/evidencia real imprescindible |
+|---|---|---|
+| Perfil corporativo y ficha de socios | texto base preparado | denominación, RUC y domicilio acreditados |
+| Privacidad y consentimiento | borrador preparado | identidad, encargados, transferencias, plazos, revisión legal |
+| Procedimiento de atención y documentos | borrador preparado | responsables, buzón, canal privado y ensayo |
+| Formulario y panel | PR #140 validado en laboratorio | configuración alojada, MFA, Turnstile, D1 aislada, enlace público, prueba física, recuperación, rollback |
+| Prensa y comunicado | texto base preparado | recursos autorizados y fecha real |
+| Distribución de apps | vistas informativas y registro cerrado | destinos oficiales de Android/iOS/desktop emitidos por proyectos de apps |
+| Derechos audiovisuales | inventario existente | cuatro revisiones individuales y autorizaciones pendientes |
+| Visibilidad SEO | política y procedimiento definidos | implementación revisión indexable multipágina y Search Console |
+| Correspondencia | dirección propuesta, plantillas preparadas | proveedor y envío/recepción verificados; documentos seguros |
+| Publicación | PR #142 candidato | CI exacto, merge autorizado, nuevo SHA y entorno protegido; verificar ambos dominios |
+La preparación de documentos no equivale a aprobación de valores reales. No se exige que las aplicaciones estén operativas para publicar información institucional con estados veraces. Activar correo, formulario, recepción de documentos e indexación solamente según sus pruebas y aprobaciones. Referencias: ACTIVATION-INTEGRATION.md y acta PR #140. No duplicar desarrollo comercial ni crear subsistemas sin necesidad. 
