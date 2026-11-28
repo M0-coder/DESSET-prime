@@ -968,6 +968,33 @@ try{
      if(!near(parity.heroHeight,small?clamp(350,parity.vw,460):clamp(350,parity.vw*.31,540))||!near(parity.headingTop,small?44:clamp(64,parity.vw*.078,132))||!near(parity.headingLeft,small?22:clamp(24,parity.vw*.045,90))||!near(parity.font,small?clamp(29,parity.vw*.075,45):clamp(34,parity.vw*.041,68))||parity.sizes.some((v,i)=>!near(v,sizes[i]))||parity.radius!=="21%"||!near(parity.gap,small?12:16)||!near(parity.center,0)||parity.glyphs.some(g=>!near(g.w,glyph)||!near(g.h,glyph)||Math.abs(g.stroke-1.65)>.01)||!near(parity.safetyGap,small?36:48)||!near(parity.safetyWidth,Math.min(parity.vw-40,860))||parity.safetyTitle!=="Distribución oficial"||parity.safetyHref!=="./confianza.html"||parity.videoPosition!==(small?"58% 50%":"50% 50%"))report.failures.push("APP-LAUNCHER-EXACT-V2 "+root+w+": "+JSON.stringify(parity));
      report.tests.push({name:"APP-LAUNCHER-EXACT-V2 "+root+w,parity});
 
+     // Exact uploaded V2 pointer interaction: test real hover, interpolation contract, return and reduced motion.
+     if(w>800){
+      const motion=[];
+      await call("Input.dispatchMouseEvent",{type:"mouseMoved",x:2,y:2});
+      for(let i=0;i<3;i++){
+       const selector=".apps-launcher>a:nth-child("+(i+1)+")";
+       const point=await js(`(()=>{const a=document.querySelector("${selector}");a.scrollIntoView({block:"center",behavior:"instant"});a.__motionEvents=[];a.addEventListener("transitionrun",e=>a.__motionEvents.push(e.propertyName));const r=a.getBoundingClientRect(),s=getComputedStyle(a);return {x:r.left+r.width/2,y:r.top+r.height/2,duration:s.transitionDuration,timing:s.transitionTimingFunction,base:s.boxShadow}})()`);
+       await call("Input.dispatchMouseEvent",{type:"mouseMoved",x:point.x,y:point.y});
+       await sleep(220);
+       const hovered=await js(`(()=>{const a=document.querySelector("${selector}"),s=getComputedStyle(a);return {hover:a.matches(":hover"),y:new DOMMatrixReadOnly(s.transform).m42,shadow:s.boxShadow,events:a.__motionEvents}})()`);
+       await call("Input.dispatchMouseEvent",{type:"mouseMoved",x:2,y:2});
+       await sleep(220);
+       const returned=await js(`(()=>{const s=getComputedStyle(document.querySelector("${selector}"));return {y:new DOMMatrixReadOnly(s.transform).m42,shadow:s.boxShadow}})()`);
+       if(point.duration!=="0.16s, 0.16s"||point.timing!=="ease, ease"||!hovered.hover||Math.abs(hovered.y+5)>.1||hovered.shadow===point.base||!hovered.events.includes("transform")||!hovered.events.includes("box-shadow")||Math.abs(returned.y)>.1||returned.shadow!==point.base)report.failures.push("APP-LAUNCHER-MOTION-01 "+root+w+"/"+i+": "+JSON.stringify({point,hovered,returned}));
+       motion.push({point,hovered,returned});
+      }
+      await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:"reduce"}]});
+      const point=await js('(()=>{const r=document.querySelector(".apps-launcher>a").getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()');
+      await call("Input.dispatchMouseEvent",{type:"mouseMoved",x:point.x,y:point.y});
+      const reduced=await js('(()=>{const s=getComputedStyle(document.querySelector(".apps-launcher>a"));return {duration:s.transitionDuration,y:new DOMMatrixReadOnly(s.transform).m42}})()');
+      if(reduced.duration!=="0s"||Math.abs(reduced.y)>.1)report.failures.push("APP-LAUNCHER-MOTION-01 reduced "+root+w+": "+JSON.stringify(reduced));
+      await call("Input.dispatchMouseEvent",{type:"mouseMoved",x:2,y:2});
+      await call("Emulation.setEmulatedMedia",{media:"screen",features:[{name:"prefers-reduced-motion",value:"no-preference"}]});
+      report.tests.push({name:"APP-LAUNCHER-MOTION-01 "+root+w,motion,reduced});
+     }
+
+
      await js("window.scrollTo(0,0)");
      await until(async()=>await js('(()=>{const v=document.querySelector(".apps-hero-video");return !!v&&v.readyState>=2&&v.videoWidth===1920&&v.videoHeight===1080&&!v.paused&&v.currentTime>0})()'),"application hero video playing");
      const hero=await js(`(()=>{const t=document.querySelector(".apps-hero--video"),v=t.querySelector("video"),h=t.querySelector("h1"),p=t.querySelector("p"),r=t.getBoundingClientRect(),b=v.getBoundingClientRect(),copy=t.querySelector(".apps-hero-copy").getBoundingClientRect();return {source:v.dataset.src,loop:v.loop,muted:v.muted,inline:v.playsInline,controls:v.controls,buttons:t.querySelectorAll("button").length,poster:v.hasAttribute("poster"),fit:getComputedStyle(v).objectFit,full:Math.abs(b.width-r.width)<2&&Math.abs(b.height-r.height)<2,ink:getComputedStyle(h).color,subtitleAbsent:!p,inside:copy.left>=r.left-2&&copy.right<=r.right+2&&copy.top>=r.top-2&&copy.bottom<=r.bottom+2,duration:v.duration,overflow:h.scrollWidth>h.clientWidth+2}})()`);
