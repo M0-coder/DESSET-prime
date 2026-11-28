@@ -3,9 +3,10 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import {createHash} from "node:crypto";
 const read=p=>readFileSync(new URL("../"+p,import.meta.url));
+// Candidate #142: exact text-only changes reviewed against prior blobs. Owner approval remains pending.
 const approved={
-  "aplicaciones-clientes.html": "f3ef7a0fdbb6373ad3a4d639bbdc15e519d93af5",
-  "aplicaciones-comercios.html": "85a9e2ac6f7d15da1dffa1d647a847520ce38c55",
+  "aplicaciones-clientes.html": "276cd3984b871a3dff961ca561050d65765b94cd",
+  "aplicaciones-comercios.html": "721c447cfd7bb577311e0012afc1666a0ce6c7f2",
   "aplicaciones-repartidores.html": "c6899ff1771948abb63e14a768c61b8e87cc7918",
   "aplicaciones.html": "2bbf4f51efde08229451393145240611200875f9",
   "capacitacion-repartidores.html": "c1b536785ed0b7303f76e40f05eb95d7e081c872",
@@ -16,8 +17,8 @@ const approved={
   "noticias.html": "df5e11721bcfec864c7591a48218a6ebe4ad29d4",
   "perfil-corporativo.html": "0f34adb1a50c9b32e71e139046f28afacc5ba2f4",
   "prime.html": "1b5cd70582402a03eeda44fb9e5c07100e97b6e0",
-  "registro-comercios.html": "9944f53964637ed2704c339856b00db9385c7939",
-  "registro-repartidores.html": "af11c9a535bbefed166849db437f4d7470df5700"
+  "registro-comercios.html": "846c1dd2fce03dcbc792cd3d4da7e0ac7a7430f1",
+  "registro-repartidores.html": "134666efb48316f478b63e5396f274fd144160c9"
 };
 for(const dir of ["","dist/"])test("EDITORIAL-CLEAN-01 exact approved deletions, unchanged profile and remaining content "+(dir||"source"),()=>{
  for(const [page,expected] of Object.entries(approved)){

@@ -1,4 +1,5 @@
 import {companyRoutes} from "./company-routes.mjs";
+import {institutionalSitemap,assertSeoPage} from "./prime-institutional-seo.mjs";
 import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 /** Independent offline verifier for Prime's optional MANUAL publication package. */
 import {readFileSync,readdirSync,lstatSync} from 'node:fs';
@@ -50,29 +51,29 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(!notices.includes('PROPRIETARY'),'Third-party license misclassified');
  const html=readFileSync(join(publicDir,'index.html'),'utf8');
  const merchant=readFileSync(join(publicDir,'comercios.html'),'utf8');
- check(merchant.includes('name="robots" content="noindex,nofollow"')&&merchant.includes('rel="canonical" href="https://desset.lat/comercios"'),'Merchant page canonical or noindex changed');
+ assertSeoPage(merchant,'comercios',seoPolicy);
  const rider=readFileSync(join(publicDir,'repartidores.html'),'utf8');
- check(rider.includes('name="robots" content="noindex,nofollow"')&&rider.includes('rel="canonical" href="https://desset.lat/repartidores"'),'Rider page canonical or noindex changed');
+ assertSeoPage(rider,'repartidores',seoPolicy);
  const prime=readFileSync(join(publicDir,'prime.html'),'utf8');
- check(prime.includes('name="robots" content="noindex,nofollow"')&&prime.includes('rel="canonical" href="https://desset.lat/prime"'),'Prime page canonical or noindex changed');
+ assertSeoPage(prime,'prime',seoPolicy);
  const contact=readFileSync(join(publicDir,'contacto.html'),'utf8');
- check(contact.includes('name="robots" content="noindex,nofollow"')&&contact.includes('rel="canonical" href="https://desset.lat/contacto"'),'Contact page canonical or noindex changed');
+ assertSeoPage(contact,'contacto',seoPolicy);
  const trust=readFileSync(join(publicDir,'confianza.html'),'utf8');
- check(trust.includes('name="robots" content="noindex,nofollow"')&&trust.includes('rel="canonical" href="https://desset.lat/confianza"'),'Trust page canonical or noindex changed');
+ assertSeoPage(trust,'confianza',seoPolicy);
  const news=readFileSync(join(publicDir,'noticias.html'),'utf8');
- check(news.includes('name="robots" content="noindex,nofollow"')&&news.includes('rel="canonical" href="https://desset.lat/noticias"'),'News page canonical or noindex changed');
+ assertSeoPage(news,'noticias',seoPolicy);
  const careers=readFileSync(join(publicDir,'talento.html'),'utf8');
- check(careers.includes('name="robots" content="noindex,nofollow"')&&careers.includes('rel="canonical" href="https://desset.lat/talento"'),'Careers page canonical or noindex changed');
+ assertSeoPage(careers,'talento',seoPolicy);
  const english=readFileSync(join(publicDir,'en.html'),'utf8');
- check(english.includes('name="robots" content="noindex,nofollow"')&&english.includes('rel="canonical" href="https://desset.lat/en"'),'English page canonical or noindex changed');
+ assertSeoPage(english,'en',seoPolicy);
  const registration=readFileSync(join(publicDir,'registro-comercios.html'),'utf8');
  check(registration.includes('name="robots" content="noindex,nofollow"')&&registration.includes('rel="canonical" href="https://desset.lat/registro-comercios"'),'Registration page canonical or noindex changed');
  const guide=readFileSync(join(publicDir,'incorporacion-comercios.html'),'utf8');
  check(guide.includes('name="robots" content="noindex,nofollow"')&&guide.includes('rel="canonical" href="https://desset.lat/incorporacion-comercios"'),'Guide page canonical or noindex changed');
  for(const name of ["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){const p=readFileSync(join(publicDir,name+'.html'),'utf8');check(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Rider onboarding canonical or indexing gate: '+name);}
  const company=readFileSync(join(publicDir,'empresa.html'),'utf8');
- for(const name of companyRoutes){const p=readFileSync(join(publicDir,name+'.html'),'utf8');check(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Company detail canonical or indexing gate: '+name);}
- check(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page canonical or noindex changed');
+ for(const name of companyRoutes){const p=readFileSync(join(publicDir,name+'.html'),'utf8');assertSeoPage(p,name,seoPolicy);}
+ assertSeoPage(company,'empresa',seoPolicy);
  for(const name of appPages){const p=readFileSync(join(publicDir,name+'.html'),'utf8');assertClosedAppPage(p,name);check(p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'App directory canonical missing: '+name);}
  const robots=readFileSync(join(publicDir,'robots.txt'),'utf8');
  const map=readFileSync(join(publicDir,'sitemap.xml'),'utf8');
@@ -81,10 +82,11 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(html.includes('name="robots" content="'+(seoPolicy==='INDEX'?'index,follow':'noindex,nofollow')+'"'),'Robots meta wrong');
  if(seoPolicy==='INDEX'){
   check(robots==='User-agent: *\nAllow: /\nSitemap: https://desset.lat/sitemap.xml\n','Expected indexable robots');
-  check(map.includes('<loc>https://desset.lat/</loc>'),'Missing sitemap canonical');
+  check(map===institutionalSitemap(seoPolicy),'Institutional sitemap differs from allowlist');
  }else{
   check(robots==='User-agent: *\nDisallow: /\n'&&!map.includes('<loc>'),'Noindex staging not preserved');
  }
+ check(map===institutionalSitemap(seoPolicy),'Exact sitemap differs');
  check(head.includes("script-src 'self'")&&head.includes("frame-ancestors 'none'")&&head.includes('Cache-Control: no-cache, must-revalidate'),'Security/caching headers lost');
  check(!seen.has('site-manifest.json')&&!seen.has('prime-manual-release-package.json'),'Private evidence exposed publicly');
  for(const part of ['proveedores','comercios','consumidores','operadores-logisticos']){

@@ -1,4 +1,5 @@
 import {companyRoutes} from "./company-routes.mjs";
+import {institutionalIndexPages,indexPage,institutionalSitemap,assertSeoPage} from "./prime-institutional-seo.mjs";
 import {appPages,assertClosedDistribution,assertClosedAppPage} from "./app-distribution-contract.mjs";
 /**
  * Generate a RELEASE-SHAPED static folder from the native DESSET Prime artifact.
@@ -44,15 +45,14 @@ export function preparePrimeCutoverPackage({dist,sourceSha,seoPolicy,outputDir,e
   cpSync(scratch.publicDir,output,{recursive:true,force:false,errorOnExist:true});
   const htmlPath=join(output,'index.html'),headersPath=join(output,'_headers');
   writeFileSync(htmlPath,seoVariant(readFileSync(htmlPath,'utf8'),seoPolicy));
+  if(seoPolicy==='INDEX')for(const name of institutionalIndexPages.filter(x=>x!=='index')){const path=join(output,name+'.html');writeFileSync(path,indexPage(readFileSync(path,'utf8'),name,seoPolicy));}
   const origHeaders=readFileSync(headersPath,'utf8');
   assert(origHeaders.startsWith('/*\n')&&!origHeaders.includes('Cache-Control'),'Unexpected header policy');
   writeFileSync(headersPath,origHeaders+'  Cache-Control: no-cache, must-revalidate\n');
   const robots=seoPolicy==='INDEX'?
     'User-agent: *\nAllow: /\nSitemap: https://desset.lat/sitemap.xml\n' :
     'User-agent: *\nDisallow: /\n';
-  const sitemap=seoPolicy==='INDEX'?
-    '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://desset.lat/</loc></url></urlset>\n':
-    '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>\n';
+  const sitemap=institutionalSitemap(seoPolicy);
   writeFileSync(join(output,'robots.txt'),robots);
   writeFileSync(join(output,'sitemap.xml'),sitemap);
   const notices=generateThirdPartyNotices();
@@ -68,7 +68,7 @@ export function preparePrimeCutoverPackage({dist,sourceSha,seoPolicy,outputDir,e
   }scan(output);
   assert(paths.length===93&&paths.every(x=>expected.has(x)),'Unexpected candidate inventory');
   for(const path of requiredSpecial)assert(paths.includes(path),'Missing required static host policy '+path);
-  const modifiable=new Set(['index.html','_headers','robots.txt','sitemap.xml','THIRD-PARTY-NOTICES.txt']);
+  const modifiable=new Set(['index.html','_headers','robots.txt','sitemap.xml','THIRD-PARTY-NOTICES.txt',...(seoPolicy==='INDEX'?institutionalIndexPages.map(x=>x+'.html'):[])]);
   const inventory=paths.sort().map(path=>{
     const bytes=readFileSync(join(output,path));
     const initial=scratch.report.assets.find(x=>x.path===path);
@@ -76,29 +76,29 @@ export function preparePrimeCutoverPackage({dist,sourceSha,seoPolicy,outputDir,e
     return {path,bytes:bytes.length,sha256:sha256(bytes)};
   });
   const merchant=readFileSync(join(output,'comercios.html'),'utf8');
-  assert(merchant.includes('name="robots" content="noindex,nofollow"')&&merchant.includes('rel="canonical" href="https://desset.lat/comercios"'),'Merchant page must remain noindex');
+ assertSeoPage(merchant,'comercios',seoPolicy);
   const rider=readFileSync(join(output,'repartidores.html'),'utf8');
-  assert(rider.includes('name="robots" content="noindex,nofollow"')&&rider.includes('rel="canonical" href="https://desset.lat/repartidores"'),'Rider page must remain noindex');
+ assertSeoPage(rider,'repartidores',seoPolicy);
   const prime=readFileSync(join(output,'prime.html'),'utf8');
-  assert(prime.includes('name="robots" content="noindex,nofollow"')&&prime.includes('rel="canonical" href="https://desset.lat/prime"'),'Prime page must remain noindex');
+ assertSeoPage(prime,'prime',seoPolicy);
   const contact=readFileSync(join(output,'contacto.html'),'utf8');
-  assert(contact.includes('name="robots" content="noindex,nofollow"')&&contact.includes('rel="canonical" href="https://desset.lat/contacto"'),'Contact page must remain noindex');
+ assertSeoPage(contact,'contacto',seoPolicy);
   const trust=readFileSync(join(output,'confianza.html'),'utf8');
-  assert(trust.includes('name="robots" content="noindex,nofollow"')&&trust.includes('rel="canonical" href="https://desset.lat/confianza"'),'Trust page must remain noindex');
+ assertSeoPage(trust,'confianza',seoPolicy);
   const news=readFileSync(join(output,'noticias.html'),'utf8');
-  assert(news.includes('name="robots" content="noindex,nofollow"')&&news.includes('rel="canonical" href="https://desset.lat/noticias"'),'News page must remain noindex');
+ assertSeoPage(news,'noticias',seoPolicy);
   const careers=readFileSync(join(output,'talento.html'),'utf8');
-  assert(careers.includes('name="robots" content="noindex,nofollow"')&&careers.includes('rel="canonical" href="https://desset.lat/talento"'),'Careers page must remain noindex');
+ assertSeoPage(careers,'talento',seoPolicy);
   const english=readFileSync(join(output,'en.html'),'utf8');
-  assert(english.includes('name="robots" content="noindex,nofollow"')&&english.includes('rel="canonical" href="https://desset.lat/en"'),'English page must remain noindex');
+ assertSeoPage(english,'en',seoPolicy);
   const registration=readFileSync(join(output,'registro-comercios.html'),'utf8');
   assert(registration.includes('name="robots" content="noindex,nofollow"')&&registration.includes('rel="canonical" href="https://desset.lat/registro-comercios"'),'Registration page must remain noindex');
   const guide=readFileSync(join(output,'incorporacion-comercios.html'),'utf8');
   assert(guide.includes('name="robots" content="noindex,nofollow"')&&guide.includes('rel="canonical" href="https://desset.lat/incorporacion-comercios"'),'Guide page must remain noindex');
   for(const name of ["registro-repartidores","incorporacion-repartidores","capacitacion-repartidores"]){const p=readFileSync(join(output,name+'.html'),'utf8');assert(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Rider onboarding canonical or indexing gate: '+name);}
   const company=readFileSync(join(output,'empresa.html'),'utf8');
- for(const name of companyRoutes){const p=readFileSync(join(output,name+'.html'),'utf8');assert(p.includes('name="robots" content="noindex,nofollow"')&&p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'Company detail canonical or indexing gate: '+name);}
-  assert(company.includes('name="robots" content="noindex,nofollow"')&&company.includes('rel="canonical" href="https://desset.lat/empresa"'),'Company page must remain noindex independently of homepage policy');
+ for(const name of companyRoutes){const p=readFileSync(join(output,name+'.html'),'utf8');assertSeoPage(p,name,seoPolicy);}
+ assertSeoPage(company,'empresa',seoPolicy);
  for(const name of appPages){const p=readFileSync(join(output,name+'.html'),'utf8');assertClosedAppPage(p,name);assert(p.includes('rel="canonical" href="https://desset.lat/'+name+'"'),'App directory canonical missing: '+name);}
   const outHtml=readFileSync(htmlPath,'utf8');
   assert(outHtml.includes('rel="canonical" href="'+canonical+'"'),'Canonical absent');
