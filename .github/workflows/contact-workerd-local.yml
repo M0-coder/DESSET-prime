@@ -22,7 +22,7 @@ jobs:
           prefix="$RUNNER_TEMP/contact-workerd"
           mkdir -p "$prefix"
           cp internal/contact-platform/lab/package.json internal/contact-platform/lab/package-lock.json "$prefix/"
-          echo '781a9ee1fd0bc2926cbfd51d153e3cec7ab8d04f05ef51b05f28fea202a7f637  internal/contact-platform/lab/package-lock.json' | sha256sum -c -
+          echo '6bfc26d5d2e17bd50953b5136e3b58ce06a437b4a6b08975ac3bb354639501a5  internal/contact-platform/lab/package-lock.json' | sha256sum -c -
           cp "$prefix/package-lock.json" reports/contact-workerd/package-lock.json
           echo "CONTACT_LAB_PREFIX=$prefix" >> "$GITHUB_ENV"
           npm audit --prefix "$prefix" --audit-level=low --json > reports/contact-workerd/runtime-audit.json
@@ -30,7 +30,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm ci --prefix "$CONTACT_LAB_PREFIX" --no-audit --no-fund
+          npm ci --prefix "$CONTACT_LAB_PREFIX" --no-audit --no-fund --engine-strict
           cmp internal/contact-platform/lab/package-lock.json "$CONTACT_LAB_PREFIX/package-lock.json"
           npm ls --prefix "$CONTACT_LAB_PREFIX" --all > reports/contact-workerd/runtime-dependencies.txt
       - name: Execute local runtime and synthetic D1 tests
@@ -47,50 +47,4 @@ jobs:
         with:
           name: contact-workerd-local-evidence
           path: reports/contact-workerd/
-          retention-days: 14
-  remediation-candidate:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 12
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
-        with:
-          node-version: '22.16.0'
-      - name: Resolve candidate lock without executing package scripts
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p reports/contact-workerd-candidate
-          prefix="$RUNNER_TEMP/contact-workerd-candidate"
-          mkdir -p "$prefix"
-          cp internal/contact-platform/lab/remediation-candidate.json "$prefix/package.json"
-          echo "CONTACT_LAB_PREFIX=$prefix" >> "$GITHUB_ENV"
-          npm install --prefix "$prefix" --package-lock-only --ignore-scripts --no-audit --no-fund --engine-strict
-          cp "$prefix/package-lock.json" reports/contact-workerd-candidate/package-lock.json
-          node --input-type=module -e 'import fs from "node:fs"; import assert from "node:assert/strict"; const p=JSON.parse(fs.readFileSync(process.argv[1],"utf8")).packages; for(const [name,version] of Object.entries({miniflare:"4.20260730.0",sharp:"0.35.5",undici:"7.30.1"})){const matches=Object.entries(p).filter(([k])=>k.endsWith("/node_modules/"+name)||k==="node_modules/"+name); assert(matches.length>0,name); for(const [k,v] of matches)assert.equal(v.version,version,k); console.log(name,version);}' "$prefix/package-lock.json" | tee reports/contact-workerd-candidate/verified-versions.txt
-          sha256sum reports/contact-workerd-candidate/package-lock.json > reports/contact-workerd-candidate/lock-sha256.txt
-      - name: Audit candidate before installation
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm audit --prefix "$CONTACT_LAB_PREFIX" --audit-level=low --json > reports/contact-workerd-candidate/runtime-audit.json
-      - name: Install audited candidate and run all local D1 checks
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm ci --prefix "$CONTACT_LAB_PREFIX" --no-audit --no-fund --engine-strict
-          cmp reports/contact-workerd-candidate/package-lock.json "$CONTACT_LAB_PREFIX/package-lock.json"
-          npm ls --prefix "$CONTACT_LAB_PREFIX" --all > reports/contact-workerd-candidate/runtime-dependencies.txt
-          node --check scripts/contact-workerd-fixture.mjs
-          node --check scripts/contact-workerd-lab.mjs
-          node scripts/contact-workerd-lab.mjs | tee reports/contact-workerd-candidate/results.txt
-          git diff --exit-code
-      - name: Preserve candidate evidence
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: contact-workerd-remediation-candidate
-          path: reports/contact-workerd-candidate/
           retention-days: 14
