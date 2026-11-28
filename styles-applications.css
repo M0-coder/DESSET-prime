@@ -100,10 +100,10 @@ body.desset-consumer{margin:0;background:#fff;color:#000000;min-height:100svh;di
 @media(prefers-reduced-motion:reduce){.apps-page .apps-launcher>a{transition:none}.apps-page .apps-launcher>a:hover{transform:none}}
 
 /* DESSET NEGOCIOS — exact owner-approved yellow variant; only the supplier page and its directory tile. */
-.desset-merchant .consumer-header .consumer-brand{color:#111}
-.desset-merchant .apps-page.consumer-compact .merchant-app-icon{width:clamp(112px,12vw,144px);height:auto;aspect-ratio:1;border-radius:20%;margin:0 0 14px;background:#fff;color:#111;border:1px solid #e5e5e5}
+.desset-merchant .consumer-header .consumer-brand{color:#000000}
+.desset-merchant .apps-page.consumer-compact .merchant-app-icon{width:clamp(112px,12vw,144px);height:auto;aspect-ratio:1;border-radius:20%;margin:0 0 14px;background:#fff;color:#000000;border:1px solid #e5e5e5}
 .desset-merchant .merchant-app-icon svg{width:43%;height:43%}
-.desset-merchant .apps-page.consumer-compact .consumer-accesses .consumer-web{background:#FFC62F;color:#111}
+.desset-merchant .apps-page.consumer-compact .consumer-accesses .consumer-web{background:#FFC62F;color:#000000}
 .desset-merchant .consumer-compact .consumer-category svg{color:#916500}
 .desset-merchant .merchant-app-icon{overflow:hidden}.desset-merchant .merchant-app-icon img{display:block;width:100%;height:100%;object-fit:contain}
 .desset-merchant .consumer-compact .consumer-categories{grid-template-columns:repeat(5,minmax(0,1fr))}

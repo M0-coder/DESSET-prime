@@ -25,7 +25,7 @@ for(const dir of ["","dist/"])test("APP-NEGOCIOS-01 owner-approved five profiles
  const directory=read(dir+"aplicaciones.html");
  assert.match(directory,/<a class="apps-icon apps-icon-business apps-icon-negocios" href="\.\/aplicaciones-comercios\.html" aria-label="DESSET Negocios" data-app-role="comercios"><img src="\.\/assets\/desset-negocios-app-icon\.svg"/);
  const css=read(dir+"styles-applications.css");
- assert.ok(css.includes(".desset-merchant .apps-page.consumer-compact .consumer-accesses .consumer-web{background:#FFC62F;color:#111}"));
+ assert.ok(css.includes(".desset-merchant .apps-page.consumer-compact .consumer-accesses .consumer-web{background:#FFC62F;color:#000000}"));
  assert.ok(css.includes(".desset-merchant .consumer-compact .consumer-category svg{color:#916500}"));
  assert.ok(!read(dir+"aplicaciones-clientes.html").includes("desset-negocios-app-icon.svg"));
  assert.ok(!read(dir+"aplicaciones-repartidores.html").includes("desset-negocios-app-icon.svg"));

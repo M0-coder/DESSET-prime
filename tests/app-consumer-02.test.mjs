@@ -8,7 +8,7 @@ for(const dir of ["","dist/"])test("APP-CONSUMER-02 approved compact entry, no f
  assertClosedAppPage(h,"aplicaciones-clientes");
  assert.match(h,/Tu ciudad, en una aplicación\./);
  assert.equal((h.match(/<button[^>]* disabled>/g)||[]).length,3);
- for(const label of ["Desktop","App Store","Google Play","Accesos previstos, todavía no operativos.","Compra, vende, pide a domicilio, viaja y reserva."])assert.ok(h.includes(label),label);
+ for(const label of ["Desktop","App Store","Google Play","Accesos previstos, todavía no operativos.","Compra, pide a domicilio, viaja y reserva."])assert.ok(h.includes(label),label);
  assert.equal((h.match(/class="consumer-category"/g)||[]).length,4);
  const categories=[...h.matchAll(/<div class="consumer-category">[\s\S]*?<span>([^<]+)<\/span><\/div>/g)].map(m=>m[1]);
  assert.deepEqual(categories,["Comercios","Marketplace","Viajes","Alojamientos"]);

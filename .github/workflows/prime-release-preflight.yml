@@ -60,7 +60,7 @@ jobs:
             "$RUNNER_TEMP/prime-release-evidence" \
             "$RUNNER_TEMP/prime-prepared-public"
           node scripts/verify-prime-release-evidence.mjs "$RUNNER_TEMP/prime-prepared-public" "$RUNNER_TEMP/prime-release-evidence/prime-release-evidence.json" "$SOURCE_SHA"
-          test "$(find "$RUNNER_TEMP/prime-prepared-public" -type f | wc -l)" -eq 91
+          test "$(find "$RUNNER_TEMP/prime-prepared-public" -type f | wc -l)" -eq 92
           grep -Fq 'Disallow: /' "$RUNNER_TEMP/prime-prepared-public/robots.txt"
           test -z "$(find "$RUNNER_TEMP/prime-prepared-public" -name site-manifest.json)"
           node -e 'let r=require(process.env.RUNNER_TEMP+"/prime-release-evidence/prime-release-evidence.json");if(r.release_authorized!==false||r.release_decision!=="NO-GO"||!r.repeated_packaging_identical)process.exit(1)'
