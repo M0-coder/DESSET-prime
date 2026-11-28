@@ -55,6 +55,7 @@ export async function transition(db,actor,input,at){
 }
 export async function purgeExpired(db,at){
  if(!validTime(at))throw fail(400,"INVALID_TIME");
- const r=await db.prepare("DELETE FROM contact_requests WHERE id IN (SELECT id FROM contact_requests WHERE expires_at<=? ORDER BY expires_at LIMIT 100)").bind(at).run();
- if(r.success!==true)throw fail(503,"UNAVAILABLE");return r.meta.changes;
+ // D1 meta.changes can include rows deleted by foreign-key cascades. Count only returned request IDs.
+ const r=await db.prepare("DELETE FROM contact_requests WHERE id IN (SELECT id FROM contact_requests WHERE expires_at<=? ORDER BY expires_at,id LIMIT 100) RETURNING id").bind(at).all();
+ if(r.success!==true||!Array.isArray(r.results)||r.results.length>100||r.results.some(x=>typeof x.id!=="string"))throw fail(503,"UNAVAILABLE");return r.results.length;
 }

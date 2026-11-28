@@ -44,6 +44,12 @@ try{
  await db.prepare("DELETE FROM contact_events WHERE request_id=? AND version=2").bind(id).run();
  assert.equal((await move("CLOSED",1)).status,200);assert.equal(await count("contact_events"),2);pass("trigger failure rolls back state; audit atomic");
  assert.equal((await submit({...sample,requestKey:"d".repeat(64),challenge:"kill-switch"})).status,503);assert.equal(await count("contact_requests"),2);pass("kill switch at transaction boundary");
- const purge=await call("/__purge");assert.equal(purge.status,200);assert.equal((await purge.json()).deleted,2);assert.equal(await count("contact_requests"),0);assert.equal(await count("contact_events"),0);pass("local bounded deletion and foreign-key cascade");
+ const purge=await call("/__purge");assert.equal(purge.status,200);assert.equal((await purge.json()).deleted,2);assert.equal(await count("contact_requests"),0);assert.equal(await count("contact_events"),0);pass("local deletion count excludes cascade and all events removed");
+ // 101 expired requests plus one still valid; enforce the per-call bound and no early purge.
+ const expiry=now+7*86400000;
+ const seeded=await db.prepare("WITH RECURSIVE seq(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM seq WHERE n<102) INSERT INTO contact_requests(id,request_key,payload_hash,category,person,email,organization,phone,subject,message,privacy_version,privacy_sha256,authorization_ref,created_at,expires_at) SELECT printf('00000000-0000-4000-8000-%012d',n),printf('%064d',n),?,'marketing','Synthetic Person','test@example.invalid','','','Synthetic subject','Synthetic message',?,?,?, ?,?+CASE WHEN n=102 THEN 1 ELSE 0 END FROM seq").bind(hash,bindings.CONTACT_PRIVACY_VERSION,hash,bindings.CONTACT_AUTHORIZATION_REF,now,expiry).run();
+ assert.equal(seeded.success,true);assert.equal(await count("contact_requests"),102);
+ for(const [expected,remaining] of [[100,2],[1,1],[0,1]]){const p=await call("/__purge");assert.equal(p.status,200);assert.equal((await p.json()).deleted,expected);assert.equal(await count("contact_requests"),remaining);}
+ assert.equal((await db.prepare("SELECT expires_at FROM contact_requests").first()).expires_at,expiry+1);pass("100-request purge bound and unexpired record preserved");
  console.log(JSON.stringify({status:"PASS",checks,scope:"workerd local D1, synthetic identity/challenge/limit; no hosted resources"}));
 }finally{await mf.dispose();}

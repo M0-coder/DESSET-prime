@@ -85,3 +85,5 @@ body.desset-consumer{margin:0;background:#fff;color:#000000;min-height:100svh;di
 @media(max-width:380px){.consumer-compact .consumer-category{font-size:11px}.consumer-compact .consumer-stores strong{font-size:14px}}
 
 .desset-consumer .consumer-footer p{text-align:center;margin:0;padding:0 0 8px;color:#555;font-size:11px;line-height:1.4}
+
+.apps-page .apps-card>a.apps-icon-desset{margin-inline:auto}
