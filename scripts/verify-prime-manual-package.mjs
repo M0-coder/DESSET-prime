@@ -15,7 +15,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
  check(['INDEX','NOINDEX'].includes(seoPolicy)&&seoPolicy===m.seo_policy,'SEO policy differs');
  check(m.project==='desset-institucional'&&m.canonical==='https://desset.lat/','Wrong Pages destination');
  check(m.production_authorized===false&&m.production_deployed===false,'Report attempts to authorize production');
- check(m.original_files===88&&m.package_files===92&&Array.isArray(m.assets)&&m.assets.length===92,'Missing/extra source assets');
+ check(m.original_files===89&&m.package_files===93&&Array.isArray(m.assets)&&m.assets.length===93,'Missing/extra source assets');
  check(hash(Buffer.from(JSON.stringify(m.assets)))===m.assets_manifest_sha256,'Manifest SHA changed');
  const want=new Map(),seen=new Set();
  for(const a of m.assets){
@@ -32,7 +32,7 @@ export function verifyManualPackage({publicDir,reportPath,sourceSha,seoPolicy}){
    else {check(stat.isFile()&&!seen.has(rel),'Not a regular file: '+rel);seen.add(rel);}
   }
  }
- scan(publicDir);check(seen.size===92,'Unexpected file count');
+ scan(publicDir);check(seen.size===93,'Unexpected file count');
  for(const path of seen)check(want.has(path),'Unexpected file: '+path);
  for(const [path,spec] of want){
   check(seen.has(path),'Missing file: '+path);

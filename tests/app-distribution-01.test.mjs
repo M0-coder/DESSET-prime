@@ -48,7 +48,7 @@ for(const dir of ["","dist/"])test("Role pages and directory remain static, acce
  const html=read(dir+name+".html");assertClosedAppPage(html,name);
  if(name==="aplicaciones")assert.doesNotMatch(html,/País de consulta|data-app-country/);else assert.match(html,/País de consulta/);
  assert.doesNotMatch(html,/href=["'](?:https?:|market:|itms-apps:)/i);
- if(name!=="aplicaciones"){assert.match(html,/data-app-activation>No habilitada/);assert.match(html,/data-app-coverage>No confirmada/);assert.match(html,/data-app-links hidden/);if(name!=="aplicaciones-clientes")assert.match(html,/data-app-platforms hidden/);else assert.equal((html.match(/<button[^>]* disabled>/g)||[]).length,3);}
+ if(name!=="aplicaciones"){assert.match(html,/data-app-activation>No habilitada/);assert.match(html,/data-app-coverage>No confirmada/);assert.match(html,/data-app-links hidden/);if(name==="aplicaciones-repartidores")assert.match(html,/data-app-platforms hidden/);else assert.equal((html.match(/<button[^>]* disabled>/g)||[]).length,3);}
  }
  const home=read(dir+"index.html");assert.ok(home.includes('href="./aplicaciones.html"'));
  const directory=read(dir+"aplicaciones.html");for(const name of appPages.slice(1))assert.ok(directory.includes('href="./'+name+'.html"'));

@@ -461,5 +461,17 @@
     "font_source": "https://github.com/oliverlalan/Doto",
     "independent_legal_verification": false,
     "release_authorized": false
+  },
+  "negocios_app_icon": {
+    "path": "assets/desset-negocios-app-icon.svg",
+    "sha256": "2c8def4089ff6251bf5ff1de9b514881a5a135b250d4a34f038cd56b1baca67f",
+    "bytes": 22423,
+    "claim": "owner-approved-design",
+    "source": "conversation-upload",
+    "design": "Doto 700 / ROND 35; D personalizada; variante amarilla #FFC62F sobre blanco",
+    "font_license": "SIL Open Font License 1.1",
+    "font_source": "https://github.com/oliverlalan/Doto",
+    "independent_legal_verification": false,
+    "release_authorized": false
   }
 }

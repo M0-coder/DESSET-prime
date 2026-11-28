@@ -98,3 +98,15 @@ body.desset-consumer{margin:0;background:#fff;color:#000000;min-height:100svh;di
 .apps-page .apps-launcher+.apps-safety a{color:var(--blue);text-decoration:underline;text-underline-offset:3px;display:inline;min-height:0;font-weight:400}
 @media(max-width:700px){.apps-page .apps-launcher{--tile:72px;--primary:84px;gap:12px;max-width:calc(100% - 28px)}.apps-page .apps-launcher+.apps-safety{margin-top:36px}}
 @media(prefers-reduced-motion:reduce){.apps-page .apps-launcher>a{transition:none}.apps-page .apps-launcher>a:hover{transform:none}}
+
+/* DESSET NEGOCIOS — exact owner-approved yellow variant; only the supplier page and its directory tile. */
+.desset-merchant .consumer-header .consumer-brand{color:#000000}
+.desset-merchant .apps-page.consumer-compact .merchant-app-icon{width:clamp(112px,12vw,144px);height:auto;aspect-ratio:1;border-radius:20%;margin:0 0 14px;background:#fff;color:#000000;border:1px solid #e5e5e5}
+.desset-merchant .merchant-app-icon svg{width:43%;height:43%}
+.desset-merchant .apps-page.consumer-compact .consumer-accesses .consumer-web{background:#FFC62F;color:#000000}
+.desset-merchant .consumer-compact .consumer-category svg{color:#916500}
+.desset-merchant .merchant-app-icon{overflow:hidden}.desset-merchant .merchant-app-icon img{display:block;width:100%;height:100%;object-fit:contain}
+.desset-merchant .consumer-compact .consumer-categories{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:480px){.desset-merchant .consumer-compact .consumer-categories{grid-template-columns:repeat(6,minmax(0,1fr));row-gap:16px}.desset-merchant .consumer-category{grid-column:span 2}.desset-merchant .consumer-category:nth-child(4){grid-column:2/span 2}}
+.apps-page .apps-launcher>a.apps-icon-negocios{background:#fff;border-color:#e0e0e0}
+.apps-page .apps-launcher>a.apps-icon-negocios img{display:block;width:100%;height:100%;object-fit:contain}
