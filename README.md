@@ -15,11 +15,11 @@ Para publicar cambios en el sitio institucional, se utiliza exclusivamente `.git
 
 ## Objetivo del sitio
 
-Construir la experiencia institucional-comercial definitiva de **DESSET**, reconocible y atractiva para clientes, comercios y socios, con énfasis inicial en **delivery urbano en Huacho**. La visión empresarial incluye paquetería, comercio B2B/B2C y alojamientos en fases posteriores; esas capacidades no deben presentarse como disponibles antes de su puesta en marcha real.
+Construir el portal institucional definitivo de **DESSET**: presentar la empresa, comunicar, orientar hacia las aplicaciones oficiales y ofrecer correspondencia institucional cuando los canales estén verificados. El delivery urbano en Huacho y el desarrollo de Consumer, Negocios, Repartidores, backend comercial y piloto pertenecen a los proyectos de aplicaciones, no a esta web. La visión empresarial incluye paquetería, comercio B2B/B2C y alojamientos en fases posteriores; esas capacidades no deben presentarse como disponibles antes de su puesta en marcha real.
 
 ## Principios irrenunciables
 
-1. **La web comunica, las apps operan.** No introducir pedidos, pagos, paneles o autenticación en esta web sin un mandato arquitectónico nuevo.
+1. **La web comunica y orienta, las apps operan.** No introducir pedidos, pagos, cuentas, incorporación comercial operativa ni soporte transaccional en esta web. La correspondencia institucional es independiente; un panel de contacto privado no es un panel comercial. Su activación exige la aceptación separada del PR #140 y sus requisitos de seguridad, identidad y privacidad.
 2. **No fingir operaciones.** Sin testimonios, clientes, flota, tiempos, cobertura, precios, reservas o descargas inventados.
 3. **Reutilizar identidad propia.** Logo y assets aprobados, tokens originales, arte Rider/Business y patrones de movimiento útiles; no importar CSS experimental ni monolitos por comodidad.
 4. **Diseño responsive y accesible.** La composición editorial y cinematográfica de Prime prevalece sobre el Bento experimental antiguo. No ocultar contenido ni prohibir scroll por imitar ese prototipo.
