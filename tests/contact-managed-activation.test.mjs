@@ -56,6 +56,10 @@ test("stage uses a dedicated marked database, signed identity and synthetic-only
  const page=await handler(req("/internal/contact-ready/index.html",null),env,ctx);assert.equal(page.status,200);assert.match(await page.text(),/data-contact-mode="managed"/);
  assert.equal((await handler(req("/internal/contact-platform/d1-store.mjs",null),env,ctx)).status,404);
  const first=await handler(req(),env,ctx);assert.equal(first.status,201);const receipt=await first.json();const again=await handler(req(),env,ctx);assert.equal(again.status,200);assert.equal((await again.json()).id,receipt.id);
+ const blockedPanel=await handler(req("/panel/request/"+receipt.id,null,false),env,ctx);
+ assert.equal(blockedPanel.status,403);assert.match(blockedPanel.headers.get("Content-Type"),/^text\/html/);assert.equal(blockedPanel.headers.get("Cache-Control"),"no-store");assert.match(blockedPanel.headers.get("Content-Security-Policy"),/frame-ancestors 'none'/);
+ const deniedHtml=await blockedPanel.text();assert.match(deniedHtml,/Acceso o solicitud no disponible/);assert.ok(!deniedHtml.includes(receipt.id));assert.ok(!deniedHtml.includes(input.email));
+ const deniedApi=await handler(req("/api/contact",data,false),env,ctx);assert.equal(deniedApi.status,403);assert.match(deniedApi.headers.get("Content-Type"),/^application\/json/);
  assert.equal((await handler(req("/panel",null),env,ctx)).status,200);
  assert.equal((await handler(req("/panel?category=legal",null),env,ctx)).status,403);
  assert.equal(db.prepare("SELECT count(*) n FROM contact_requests").get().n,1);

@@ -4,6 +4,7 @@ import {createPanelCandidate} from "./panel-candidate.mjs";
 import {stagingScope,authorizeContact,verifyContactChallenge,limitContact} from "./gates.mjs";
 import {isContactSitePath,serveContactSite} from "./site-candidate.mjs";
 const response=(status,code)=>Response.json({error:code},{status,headers:{"Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow","X-Content-Type-Options":"nosniff","Content-Security-Policy":"default-src 'none'; frame-ancestors 'none'"}});
+const panelError=status=>new Response('<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>DESSET — Contacto institucional</title></head><body><main><h1>Acceso o solicitud no disponible</h1></main></body></html>',{status,headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow","X-Content-Type-Options":"nosniff","Referrer-Policy":"no-referrer","Content-Security-Policy":"default-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none'"}});
 export function createStagingCandidate({fetcher=fetch,limit=limitContact,now=Date.now}={}){
  return async(req,env,ctx)=>{
   try{
@@ -19,7 +20,12 @@ export function createStagingCandidate({fetcher=fetch,limit=limitContact,now=Dat
    const authorize=async()=>actor;
    if(url.pathname==="/api/contact")return candidateHandler({scope:stagingScope,authorize,limit,now,challenge:(token,e)=>verifyContactChallenge(token,e,fetcher,stagingScope)})(req,scoped,ctx);
    return createPanelCandidate({scope:stagingScope,authorize,now})(req,scoped,ctx);
-  }catch(e){return response([400,403,404,409,429,503].includes(e?.status)?e.status:503,"STAGING_UNAVAILABLE");}
+  }catch(e){
+   const status=[400,403,404,409,429,503].includes(e?.status)?e.status:503;
+   const path=new URL(req.url).pathname;
+   if(path==="/panel"||path.startsWith("/panel/"))return panelError(status);
+   return response(status,"STAGING_UNAVAILABLE");
+  }
  };
 }
 // A separately approved revision must explicitly wire the candidate; accidental deployment remains closed.
