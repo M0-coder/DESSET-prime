@@ -186,5 +186,19 @@ try{
  assert.equal((await (await call("/__purge")).json()).deleted,2);
  assert.equal(await count("contact_requests"),0);assert.equal(await count("contact_events"),0);
  pass("integrated retention purge and production entrypoint remains locked");
+ // Final local rollback: closed runtime is not bypassed; reopen only the ephemeral lab.
+ await db.prepare("UPDATE contact_runtime SET intake_enabled=0 WHERE id=1").run();
+ assert.equal((await submit({...sample,requestKey:"9".repeat(64)})).status,503);
+ assert.equal(await count("contact_requests"),0);
+ await enable();
+ const recoveredAfterLock=await submit({...sample,requestKey:"9".repeat(64)});assert.equal(recoveredAfterLock.status,201);
+ assert.equal(await count("contact_requests"),1);
+ await db.prepare("UPDATE contact_runtime SET intake_enabled=0 WHERE id=1").run();
+ assert.equal((await submit({...sample,requestKey:"8".repeat(64)})).status,503);
+ assert.equal(await count("contact_requests"),1);
+ assert.equal((await (await call("/__purge")).json()).deleted,1);
+ assert.equal(await count("contact_requests"),0);
+ assert.equal((await call("/__locked","POST",sample)).status,503);
+ pass("local intake shutdown and controlled recovery preserve database and default lock");
  console.log(JSON.stringify({status:"PASS",checks,scope:"workerd local D1 and RSA JWT verification; synthetic runtime identity/JWKS/challenge/limit; no hosted resources"}));
 }finally{await mf.dispose();}

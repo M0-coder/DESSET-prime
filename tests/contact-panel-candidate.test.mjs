@@ -57,3 +57,24 @@ test("identity is checked each request; rotated CSRF, expired records and revoca
  const f=fixture(t),id=await f.seed();assert.equal((await f.get("/panel/request/"+id)).status,200);f.rotate();assert.equal((await f.post(id)).status,403);
  f.expire();assert.equal((await f.get("/panel/request/"+id)).status,404);f.revoke();assert.equal((await f.get("/panel")).status,403);
 });
+
+test("keyset pagination covers more than 200 rows with timestamp ties and category isolation",async t=>{
+ const f=fixture(t),seed=f.db.prepare("INSERT INTO contact_requests(id,request_key,payload_hash,category,person,email,organization,phone,subject,message,privacy_version,privacy_sha256,authorization_ref,created_at,expires_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+ const ids=[];
+ for(let i=1;i<=205;i++){
+  const id="00000000-0000-4000-8000-"+String(i).padStart(12,"0");ids.push(id);
+  seed.run(id,i.toString(16).padStart(64,"0"),"a".repeat(64),"marketing","Synthetic Person","test@example.invalid","","","Synthetic subject","Synthetic message","synthetic-v1","b".repeat(64),"synthetic-approval",now,now+86400000);
+ }
+ const other="00000000-0000-4000-8000-000000000999";
+ seed.run(other,"f".repeat(64),"a".repeat(64),"legal","Synthetic Person","test@example.invalid","","","Synthetic subject","Synthetic message","synthetic-v1","b".repeat(64),"synthetic-approval",now,now+86400000);
+ const seen=[];let path="/panel?category=marketing";
+ for(const expected of [100,100,5]){
+  const res=await f.get(path);assert.equal(res.status,200);const html=await res.text();
+  const found=[...html.matchAll(/href="\/panel\/request\/([a-f0-9-]{36})"/g)].map(x=>x[1]);assert.equal(found.length,expected);assert.ok(!html.includes(other));assert.ok(!html.includes("test@example.invalid"));seen.push(...found);
+  const next=html.match(/href="([^"]+)">Siguiente página/);path=next?next[1].replaceAll("&amp;","&"):null;
+ }
+ assert.equal(path,null);assert.deepEqual(seen,ids);assert.equal(new Set(seen).size,205);
+ assert.equal((await f.get("/panel?category=legal&after="+encodeURIComponent(now+":"+ids[99]))).status,403);
+ for(const q of ["after=bad","after=","after=1&after=2","category=marketing&category=legal","unknown=x","after="+encodeURIComponent((now+1)+":"+ids[99])])assert.equal((await f.get("/panel?"+q)).status,400);
+ f.expire();const expired=await (await f.get("/panel?category=marketing")).text();assert.ok(!expired.includes("/panel/request/"));
+});

@@ -17,5 +17,8 @@ Use one D1 backend, nine routing categories, one authorized queue and the human 
 7. **Release:** require all evidence reviewed, exact release SHA fresh CI, separate explicit owner authorization for deployment, then separate authorization to enable intake. Default Worker hard locked until reviewed entrypoint change. Deploy closed first; verify no data collected, no index, no routes outside approved boundary. Enable only explicitly approved scope after positive and negative acceptance. If a gate fails, keep closed and record blocker.
 8. **Operate:** assigned owners monitor aggregate capacity, backlog, incident alerts, access and expiry; verify real receipt and escalation. If unauthorized access or loss occurs, disable relevant surfaces, preserve approved evidence and invoke incident procedure.
 
+## Local closure boundary
+See [CONTACT-CLOSURE.md](CONTACT-CLOSURE.md) for the frozen scope, historical evidence, candidate acceptance and the exact external/integration work remaining. No additional product features or local preparation cycles after this candidate is validated unless a concrete failure or security defect is found.
+
 ## Current stop point
 Do not deploy, configure DNS, create cloud resources, enable scheduled jobs, send notifications, or collect actual personal information. No new dependencies or public files in this increment. Technical decisions: deterministic one-envelope-per-maintenance-slot idempotency key and fixed aggregate fields. This is not a delivery queue, scheduler, provider integration or proof of delivery. Checklist is an auditable template, not a security authority; evidence requires independent human review. All activation gates intentionally pending.

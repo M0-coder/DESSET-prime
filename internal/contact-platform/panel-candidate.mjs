@@ -1,6 +1,6 @@
 // Disconnected D1 panel candidate. No listener, global fetch, deployment entrypoint or public asset.
 import {authorizeContact,proposedOrigin} from "./gates.mjs";
-import {categories,uuid,queue,detail,transition} from "./d1-store.mjs";
+import {categories,uuid,queuePage,detail,transition} from "./d1-store.mjs";
 const labels={alianzas:"Alianzas",inversion:"Inversionistas",marketing:"Marketing",prensa:"Prensa",instituciones:"Instituciones",profesionales:"Talento",legal:"Legal",seguridad:"Seguridad y privacidad",otras:"Otras consultas"};
 const states={RECEIVED:"Recibida",IN_REVIEW:"En revisión",CLOSED:"Cerrada"};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -27,10 +27,11 @@ export function createPanelCandidate({authorize=authorizeContact,now=Date.now}={
    if(!Number.isSafeInteger(at)||at<0)return error(503);
    if(req.method==="GET"&&url.pathname==="/panel"){
     const cat=url.searchParams.get("category")??actor.categories[0];if(!actor.categories.includes(cat))return error(403);
-    const rows=await queue(env.CONTACT_DB,actor,cat,at);
+    if([...url.searchParams.keys()].some(k=>!["category","after"].includes(k))||url.searchParams.getAll("category").length>1||url.searchParams.getAll("after").length>1)return error(400);
+    const {items:rows,nextCursor}=await queuePage(env.CONTACT_DB,actor,cat,at,url.searchParams.get("after"));
     if(!Array.isArray(rows)||rows.length>100||rows.some(x=>typeof x.id!=="string"||!uuid.test(x.id)||x.category!==cat||!Object.hasOwn(states,x.state)))return error(503);
     const nav='<nav aria-label="Departamentos">'+actor.categories.map(c=>'<a href="/panel?category='+esc(c)+'">'+esc(labels[c])+'</a> ').join("")+'</nav>';
-    return page('<h1>Consultas institucionales</h1>'+nav+'<h2>'+esc(labels[cat])+'</h2><p>'+rows.length+' registros (máximo 100 por vista; paginación pendiente).</p><ul>'+rows.map(x=>'<li><a href="/panel/request/'+esc(x.id)+'">Consulta '+esc(x.id)+'</a> · '+esc(states[x.state])+'</li>').join("")+'</ul>');
+    return page('<h1>Consultas institucionales</h1>'+nav+'<h2>'+esc(labels[cat])+'</h2><p>'+rows.length+' registros en esta página (máximo 100).</p><ul>'+rows.map(x=>'<li><a href="/panel/request/'+esc(x.id)+'">Consulta '+esc(x.id)+'</a> · '+esc(states[x.state])+'</li>').join("")+'</ul><nav aria-label="Paginación"><a href="/panel?category='+esc(cat)+'">Primera página</a>'+(nextCursor?' <a href="/panel?category='+esc(cat)+'&amp;after='+encodeURIComponent(nextCursor)+'">Siguiente página</a>':' <span>Fin de la bandeja</span>')+'</nav>');
    }
    if(req.method==="GET"&&url.pathname.startsWith("/panel/request/")){
     const id=url.pathname.slice("/panel/request/".length);if(!uuid.test(id))return error(404);

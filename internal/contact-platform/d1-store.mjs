@@ -40,6 +40,23 @@ export async function queue(db,actor,category,at){
  const r=await db.prepare("SELECT id,category,state,version,created_at,expires_at FROM contact_requests WHERE category=? AND expires_at>? ORDER BY created_at,id LIMIT 100").bind(category,at).all();
  if(r.success!==true)throw fail(503,"UNAVAILABLE");return r.results;
 }
+// Keyset pagination uses immutable (created_at,id), not offsets or mutable state.
+// Cursor is a position only, never an authorization token. Each page rechecks the department and expiry.
+export async function queuePage(db,actor,category,at,cursor=null){
+ actorCheck(actor);if(!actor.categories.includes(category))throw fail(403,"ACCESS_DENIED");
+ if(!validTime(at))throw fail(400,"INVALID_TIME");
+ let afterTime=0,afterId="";
+ if(cursor!==null){
+  if(typeof cursor!=="string"||cursor.length>80)throw fail(400,"INVALID_CURSOR");
+  const match=/^(0|[1-9][0-9]{0,15}):([a-f0-9-]{36})$/.exec(cursor);
+  if(!match||!validTime(Number(match[1]))||!uuid.test(match[2])||Number(match[1])>at)throw fail(400,"INVALID_CURSOR");
+  afterTime=Number(match[1]);afterId=match[2];
+ }
+ const r=await db.prepare("SELECT id,category,state,version,created_at,expires_at FROM contact_requests WHERE category=? AND expires_at>? AND created_at<=? AND (created_at>? OR (created_at=? AND id>?)) ORDER BY created_at,id LIMIT 101").bind(category,at,at,afterTime,afterTime,afterId).all();
+ if(r.success!==true||!Array.isArray(r.results)||r.results.length>101||r.results.some(x=>typeof x.id!=="string"||!uuid.test(x.id)||x.category!==category||!validTime(x.created_at)||x.created_at>at||x.expires_at<=at))throw fail(503,"UNAVAILABLE");
+ const items=r.results.slice(0,100),last=items.at(-1);
+ return {items,nextCursor:r.results.length===101?last.created_at+":"+last.id:null};
+}
 export async function detail(db,actor,id,at){
  actorCheck(actor);if(!uuid.test(id??""))throw fail(404,"NOT_FOUND");
  const r=await db.prepare("SELECT id,category,person,email,organization,phone,subject,message,state,version,created_at,expires_at FROM contact_requests WHERE id=? AND expires_at>? AND category IN (SELECT value FROM json_each(?))").bind(id,at,JSON.stringify(actor.categories)).first();
