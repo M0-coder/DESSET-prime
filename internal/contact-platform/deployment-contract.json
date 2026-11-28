@@ -64,6 +64,11 @@
     "retentionApprovalRef": null,
     "backupDeletionEvidenceRef": null,
     "deliveryEvidenceRef": null,
-    "alertThresholdApprovalRef": null
+    "alertThresholdApprovalRef": null,
+    "maintenanceCandidate": "LOCAL_ONLY",
+    "maintenanceEnabled": false,
+    "maintenanceApprovalRef": null,
+    "notificationTransport": null,
+    "schedulerEvidenceRef": null
   }
 }

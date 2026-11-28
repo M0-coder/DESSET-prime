@@ -3,6 +3,7 @@ import locked,{candidateHandler} from "../internal/contact-platform/worker.mjs";
 import {purgeExpired} from "../internal/contact-platform/d1-store.mjs";
 import {authorizeContact} from "../internal/contact-platform/gates.mjs";
 import {operationalSnapshot} from "../internal/contact-platform/operations.mjs";
+import {maintenanceCycle} from "../internal/contact-platform/maintenance.mjs";
 const now=1700000000000;
 export default {async fetch(req,env,ctx){
  if(env.LAB_ONLY!=="synthetic-local-only")return new Response(null,{status:503});
@@ -11,6 +12,12 @@ export default {async fetch(req,env,ctx){
  if(path==="/__operations"){
   try{return Response.json(await operationalSnapshot({...env,CONTACT_OPERATIONS_ENABLED:req.headers.get("X-Lab-Operations")==="enabled"?"true":"false"},req.headers.get("X-Lab-Clock")==="expiry"?now+7*86400000:now));}
   catch{return Response.json({error:"OPERATIONS_UNAVAILABLE"},{status:503});}
+ }
+ if(path==="/__maintenance"){
+  const kind=req.headers.get("X-Lab-Maintenance"),mode=req.headers.get("X-Lab-Mode")??"preview";
+  const policy={approvalRef:kind==="bad-ref"?"different":"synthetic-maintenance",capacityPercent:20,oldestAgeMs:1,maxBatches:kind==="bad-bound"?4:1};
+  try{return Response.json(await maintenanceCycle({...env,CONTACT_OPERATIONS_ENABLED:"true",CONTACT_MAINTENANCE_ENABLED:kind==="disabled"?"false":"true",CONTACT_MAINTENANCE_APPROVAL_REF:"synthetic-maintenance",CONTACT_PURGE_ENABLED:kind==="approved"?"true":"false",CONTACT_RETENTION_APPROVED:kind==="approved"?"true":"false"},now+7*86400000,policy,mode));}
+  catch{return Response.json({error:"MAINTENANCE_UNAVAILABLE"},{status:503});}
  }
  if(path==="/__purge")return Response.json({deleted:await purgeExpired(env.CONTACT_DB,now+7*86400000)});
  // The test-only identity header emulates provider context. It is never trusted by the production candidate.

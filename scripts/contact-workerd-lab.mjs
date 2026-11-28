@@ -81,5 +81,21 @@ try{
  assert.equal((await db.prepare("SELECT expires_at FROM contact_requests").first()).expires_at,expiry+1);pass("100-request purge bound and unexpired record preserved");
  const remaining=await (await ops(true)).json();assert.equal(remaining.stored,1);assert.equal(remaining.expiredAwaitingPurge,0);assert.equal(remaining.capacityRemaining,499);
  pass("operational snapshot reconciles after bounded purge");
+ // Independent maintenance fixtures: retain the existing valid row, add 101 expired rows.
+ const seededMaintenance=await db.prepare("WITH RECURSIVE seq(n) AS (SELECT 201 UNION ALL SELECT n+1 FROM seq WHERE n<301) INSERT INTO contact_requests(id,request_key,payload_hash,category,person,email,organization,phone,subject,message,privacy_version,privacy_sha256,authorization_ref,created_at,expires_at) SELECT printf('00000000-0000-4000-8000-%012d',n),printf('%064d',n),?,'marketing','Synthetic Person','test@example.invalid','','','Synthetic subject','Synthetic message',?,?,?, ?,? FROM seq").bind(hash,bindings.CONTACT_PRIVACY_VERSION,hash,bindings.CONTACT_AUTHORIZATION_REF,now,expiry).run();
+ assert.equal(seededMaintenance.success,true);assert.equal(await count("contact_requests"),102);
+ const maintenance=(kind,mode="preview")=>call("/__maintenance","GET",undefined,{"X-Lab-Maintenance":kind,"X-Lab-Mode":mode});
+ for(const [kind,mode] of [["disabled","preview"],["bad-ref","preview"],["bad-bound","preview"],["unapproved","purge"],["approved","unknown"]])assert.equal((await maintenance(kind,mode)).status,503);
+ assert.equal((await call("/admin/maintenance","GET",undefined,auth)).status,404);
+ assert.equal(await count("contact_requests"),102);
+ const preview=await (await maintenance("unapproved")).json();
+ assert.deepEqual(preview,{mode:"preview",observedAt:expiry,batches:0,deleted:0,expiredBefore:101,expiredAfter:101,alertsBefore:["INTAKE_FLAGS_DIFFER","CAPACITY_THRESHOLD","BACKLOG_AGE_THRESHOLD","EXPIRED_PENDING_PURGE"],alertsAfter:["INTAKE_FLAGS_DIFFER","CAPACITY_THRESHOLD","BACKLOG_AGE_THRESHOLD","EXPIRED_PENDING_PURGE"],deliveryAttempted:false});
+ assert.equal(await count("contact_requests"),102);
+ assert.doesNotMatch(JSON.stringify(preview),/test@example.invalid|Synthetic Person|Synthetic message|request_key|payload_hash/);
+ pass("maintenance preview is non-mutating; approval gates and redacted alert codes");
+ const first=await (await maintenance("approved","purge")).json();assert.equal(first.deleted,100);assert.equal(first.batches,1);assert.equal(first.expiredAfter,1);assert.equal(first.deliveryAttempted,false);assert(!first.alertsAfter.includes("CAPACITY_THRESHOLD"));
+ const second=await (await maintenance("approved","purge")).json();assert.equal(second.deleted,1);assert.equal(second.expiredAfter,0);assert(!second.alertsAfter.includes("EXPIRED_PENDING_PURGE"));
+ const third=await (await maintenance("approved","purge")).json();assert.equal(third.deleted,0);assert.equal(await count("contact_requests"),1);assert.equal((await db.prepare("SELECT expires_at FROM contact_requests").first()).expires_at,expiry+1);
+ pass("approved synthetic maintenance bounds deletion and reconciles alerts without delivery");
  console.log(JSON.stringify({status:"PASS",checks,scope:"workerd local D1 and RSA JWT verification; synthetic runtime identity/JWKS/challenge/limit; no hosted resources"}));
 }finally{await mf.dispose();}
