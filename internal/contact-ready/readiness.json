@@ -1,0 +1,73 @@
+{
+  "schema": "desset-contact-ready-v1",
+  "stage": "INTERNAL_PREVIEW_ONLY",
+  "intakeEnabled": false,
+  "publicPackage": false,
+  "storageEnabled": false,
+  "notificationsEnabled": false,
+  "productionDeploymentEnabled": false,
+  "requiredBeforeIntake": [
+    "verified legal identity and data controller",
+    "approved privacy notice and retention",
+    "verified recipient and authorized access",
+    "server validation and abuse prevention",
+    "delivery and incident tests",
+    "separate owner approval"
+  ],
+  "categories": [
+    {
+      "id": "alianzas",
+      "label": "Alianzas y cooperación empresarial",
+      "recipient": null,
+      "enabled": false
+    },
+    {
+      "id": "inversion",
+      "label": "Relaciones con inversionistas",
+      "recipient": null,
+      "enabled": false
+    },
+    {
+      "id": "marketing",
+      "label": "Marketing y publicidad",
+      "recipient": null,
+      "enabled": false
+    },
+    {
+      "id": "prensa",
+      "label": "Prensa y comunicaciones",
+      "recipient": null,
+      "enabled": false
+    },
+    {
+      "id": "instituciones",
+      "label": "Relaciones gubernamentales e institucionales",
+      "recipient": null,
+      "enabled": false
+    },
+    {
+      "id": "profesionales",
+      "label": "Oportunidades profesionales",
+      "recipient": null,
+      "enabled": false
+    },
+    {
+      "id": "legal",
+      "label": "Asuntos legales y cumplimiento",
+      "recipient": null,
+      "enabled": false
+    },
+    {
+      "id": "seguridad",
+      "label": "Seguridad y privacidad",
+      "recipient": null,
+      "enabled": false
+    },
+    {
+      "id": "otras",
+      "label": "Otras consultas",
+      "recipient": null,
+      "enabled": false
+    }
+  ]
+}

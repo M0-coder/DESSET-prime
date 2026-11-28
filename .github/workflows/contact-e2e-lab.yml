@@ -1,0 +1,47 @@
+name: CONTACT-READY — full synthetic browser circuit (NO DEPLOY)
+on:
+  pull_request:
+    paths:
+      - 'scripts/contact-e2e-*'
+      - 'internal/contact-ready/**'
+      - 'internal/contact-service/**'
+      - '.github/workflows/contact-e2e-lab.yml'
+permissions:
+  contents: read
+jobs:
+  synthetic-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22.16.0'
+      - name: Run isolated browser circuit
+        env:
+          DESSET_CONTACT_SYNTHETIC_E2E: '1'
+        run: |
+          node --check scripts/contact-e2e-bridge.js
+          node --check scripts/contact-e2e-fixture.mjs
+          node --check scripts/contact-e2e-browser.mjs
+          node scripts/contact-e2e-browser.mjs
+      - name: Verify closed public package
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build:site
+          npm run verify:site
+          node scripts/static-gate.mjs
+          test ! -e dist/internal
+          test ! -e dist/scripts/contact-e2e-bridge.js
+          git diff --exit-code
+      - name: Preserve synthetic evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: contact-e2e-browser-evidence
+          path: reports/contact-e2e/
+          if-no-files-found: warn
+          retention-days: 14

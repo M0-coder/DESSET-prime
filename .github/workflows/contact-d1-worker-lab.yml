@@ -1,0 +1,43 @@
+name: CONTACT-READY — D1 and locked Worker contract (NO DEPLOY)
+on:
+  pull_request:
+    paths:
+      - 'internal/contact-platform/**'
+      - 'tests/contact-d1-worker.test.mjs'
+      - '.github/workflows/contact-d1-worker-lab.yml'
+permissions:
+  contents: read
+jobs:
+  d1-worker-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22.16.0'
+      - name: Exercise D1-shaped offline contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/contact-d1
+          node --check internal/contact-platform/worker.mjs
+          node --check internal/contact-platform/d1-store.mjs
+          node --test tests/contact-d1-worker.test.mjs tests/contact-platform.test.mjs | tee reports/contact-d1/tests.txt
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build:site
+          npm run verify:site
+          node scripts/static-gate.mjs
+          test ! -e dist/internal
+          git diff --exit-code
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: contact-d1-worker-evidence
+          path: reports/contact-d1/
+          if-no-files-found: error
+          retention-days: 14
