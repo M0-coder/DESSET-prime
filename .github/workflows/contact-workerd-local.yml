@@ -69,6 +69,7 @@ jobs:
           echo "CONTACT_LAB_PREFIX=$prefix" >> "$GITHUB_ENV"
           npm install --prefix "$prefix" --package-lock-only --ignore-scripts --no-audit --no-fund --engine-strict
           cp "$prefix/package-lock.json" reports/contact-workerd-candidate/package-lock.json
+          node --input-type=module -e 'import fs from "node:fs"; import assert from "node:assert/strict"; const p=JSON.parse(fs.readFileSync(process.argv[1],"utf8")).packages; for(const [name,version] of Object.entries({miniflare:"4.20260730.0",sharp:"0.35.5",undici:"7.30.1"})){const matches=Object.entries(p).filter(([k])=>k.endsWith("/node_modules/"+name)||k==="node_modules/"+name); assert(matches.length>0,name); for(const [k,v] of matches)assert.equal(v.version,version,k); console.log(name,version);}' "$prefix/package-lock.json" | tee reports/contact-workerd-candidate/verified-versions.txt
           sha256sum reports/contact-workerd-candidate/package-lock.json > reports/contact-workerd-candidate/lock-sha256.txt
       - name: Audit candidate before installation
         shell: bash
