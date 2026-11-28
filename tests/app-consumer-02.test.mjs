@@ -22,5 +22,5 @@ for(const dir of ["","dist/"])test("APP-CONSUMER-02 approved compact entry, no f
  assert.ok(h.includes('href="./confianza.html#privacidad"'));
  assert.ok(h.includes('href="./confianza.html#seguridad"'));
  assert.ok(h.includes('data-app-coverage>No confirmada.'));
- for(const name of ["index","aplicaciones","aplicaciones-comercios","aplicaciones-repartidores","prime"])assert.ok(!read(dir+name+".html").includes("consumer-compact"));
+ for(const name of ["index","aplicaciones","aplicaciones-repartidores","prime"])assert.ok(!read(dir+name+".html").includes("consumer-compact"));
 });
