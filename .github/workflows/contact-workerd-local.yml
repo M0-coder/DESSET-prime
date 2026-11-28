@@ -21,8 +21,10 @@ jobs:
           mkdir -p reports/contact-workerd
           prefix="$RUNNER_TEMP/contact-workerd"
           mkdir -p "$prefix"
-          printf '{"private":true}\n' > "$prefix/package.json"
-          npm install --prefix "$prefix" --save-exact --no-audit --no-fund miniflare@4.20260210.0
+          cp internal/contact-platform/lab/package.json internal/contact-platform/lab/package-lock.json "$prefix/"
+          echo '781a9ee1fd0bc2926cbfd51d153e3cec7ab8d04f05ef51b05f28fea202a7f637  internal/contact-platform/lab/package-lock.json' | sha256sum -c -
+          npm ci --prefix "$prefix" --no-audit --no-fund
+          cmp internal/contact-platform/lab/package-lock.json "$prefix/package-lock.json"
           cp "$prefix/package-lock.json" reports/contact-workerd/package-lock.json
           npm ls --prefix "$prefix" --all > reports/contact-workerd/runtime-dependencies.txt
           echo "CONTACT_LAB_PREFIX=$prefix" >> "$GITHUB_ENV"
@@ -34,6 +36,12 @@ jobs:
           node --check scripts/contact-workerd-lab.mjs
           node scripts/contact-workerd-lab.mjs | tee reports/contact-workerd/results.txt
           git diff --exit-code
+      - name: Audit isolated runtime dependency graph
+        if: always() && env.CONTACT_LAB_PREFIX != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm audit --prefix "$CONTACT_LAB_PREFIX" --audit-level=low --json > reports/contact-workerd/runtime-audit.json
       - name: Preserve lab evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

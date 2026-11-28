@@ -1,0 +1,7 @@
+{
+  "name": "contact-workerd",
+  "private": true,
+  "dependencies": {
+    "miniflare": "4.20260210.0"
+  }
+}
