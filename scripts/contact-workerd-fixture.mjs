@@ -4,6 +4,7 @@ import {purgeExpired} from "../internal/contact-platform/d1-store.mjs";
 import {authorizeContact} from "../internal/contact-platform/gates.mjs";
 import {operationalSnapshot} from "../internal/contact-platform/operations.mjs";
 import {maintenanceCycle} from "../internal/contact-platform/maintenance.mjs";
+import {coordinatedMaintenance} from "../internal/contact-platform/coordinated-maintenance.mjs";
 const now=1700000000000;
 export default {async fetch(req,env,ctx){
  if(env.LAB_ONLY!=="synthetic-local-only")return new Response(null,{status:503});
@@ -12,6 +13,12 @@ export default {async fetch(req,env,ctx){
  if(path==="/__operations"){
   try{return Response.json(await operationalSnapshot({...env,CONTACT_OPERATIONS_ENABLED:req.headers.get("X-Lab-Operations")==="enabled"?"true":"false"},req.headers.get("X-Lab-Clock")==="expiry"?now+7*86400000:now));}
   catch{return Response.json({error:"OPERATIONS_UNAVAILABLE"},{status:503});}
+ }
+ if(path==="/__coordinated"){
+  const kind=req.headers.get("X-Lab-Maintenance");
+  const at=now+7*86400000+(req.headers.get("X-Lab-Clock")==="next"?300000:0);
+  try{return Response.json(await coordinatedMaintenance({...env,CONTACT_OPERATIONS_ENABLED:"true",CONTACT_MAINTENANCE_ENABLED:"true",CONTACT_MAINTENANCE_APPROVAL_REF:"synthetic-maintenance",CONTACT_PURGE_ENABLED:kind==="approved"||kind==="changed-policy"?"true":"false",CONTACT_RETENTION_APPROVED:"true"},at,{approvalRef:"synthetic-maintenance",capacityPercent:kind==="changed-policy"?21:20,oldestAgeMs:1,maxBatches:1}));}
+  catch{return Response.json({error:"COORDINATED_MAINTENANCE_UNAVAILABLE"},{status:503});}
  }
  if(path==="/__maintenance"){
   const kind=req.headers.get("X-Lab-Maintenance"),mode=req.headers.get("X-Lab-Mode")??"preview";

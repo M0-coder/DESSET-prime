@@ -28,7 +28,7 @@ function migration(file){
 }
 try{
  const db=await mf.getD1Database("CONTACT_DB");
- for(const file of ["runtime.sql","d1-schema.sql"]){const statements=migration(file);const result=await db.batch(statements.map(s=>db.prepare(s)));assert.equal(result.length,statements.length);assert(result.every(x=>x.success));}
+ for(const file of ["runtime.sql","d1-schema.sql","maintenance-schema.sql"]){const statements=migration(file);const result=await db.batch(statements.map(s=>db.prepare(s)));assert.equal(result.length,statements.length);assert(result.every(x=>x.success));}
  const count=async table=>Number((await db.prepare("SELECT count(*) AS n FROM "+table).first()).n);
  const enable=()=>db.prepare("UPDATE contact_runtime SET environment='production',intake_enabled=1,privacy_version=?,privacy_sha256=?,authorization_ref=? WHERE id=1").bind(bindings.CONTACT_PRIVACY_VERSION,hash,bindings.CONTACT_AUTHORIZATION_REF).run();
  assert.equal((await submit()).status,503);assert.equal(await count("contact_requests"),0);pass("local D1 migrations and closed default runtime");
@@ -97,5 +97,24 @@ try{
  const second=await (await maintenance("approved","purge")).json();assert.equal(second.deleted,1);assert.equal(second.expiredAfter,0);assert(!second.alertsAfter.includes("EXPIRED_PENDING_PURGE"));
  const third=await (await maintenance("approved","purge")).json();assert.equal(third.deleted,0);assert.equal(await count("contact_requests"),1);assert.equal((await db.prepare("SELECT expires_at FROM contact_requests").first()).expires_at,expiry+1);
  pass("approved synthetic maintenance bounds deletion and reconciles alerts without delivery");
+ const seedCoordinated=await db.prepare("WITH RECURSIVE seq(n) AS (SELECT 401 UNION ALL SELECT n+1 FROM seq WHERE n<501) INSERT INTO contact_requests(id,request_key,payload_hash,category,person,email,organization,phone,subject,message,privacy_version,privacy_sha256,authorization_ref,created_at,expires_at) SELECT printf('00000000-0000-4000-8000-%012d',n),printf('%064d',n),?,'marketing','Synthetic Person','test@example.invalid','','','Synthetic subject','Synthetic message',?,?,?, ?,? FROM seq").bind(hash,bindings.CONTACT_PRIVACY_VERSION,hash,bindings.CONTACT_AUTHORIZATION_REF,now,expiry).run();
+ assert.equal(seedCoordinated.success,true);
+ const coordinated=(kind="approved",next=false)=>call("/__coordinated","GET",undefined,{"X-Lab-Maintenance":kind,...(next?{"X-Lab-Clock":"next"}:{})});
+ assert.equal((await coordinated("unapproved")).status,503);assert.equal(await count("contact_maintenance_cycles"),0);
+ assert.equal((await call("/admin/coordinated","GET",undefined,auth)).status,404);
+ const runs=await Promise.all(Array.from({length:8},()=>coordinated()));assert(runs.every(x=>x.status===200));
+ const records=await Promise.all(runs.map(x=>x.json()));assert.equal(records.filter(x=>!x.replayed).length,1);
+ assert(records.every(x=>x.deleted===100&&x.expiredBefore===101&&x.expiredAfter===1&&x.deliveryAttempted===false&&x.alerts.includes("EXPIRED_PENDING_PURGE")));
+ assert.equal(await count("contact_maintenance_cycles"),1);assert.equal(await count("contact_requests"),2);
+ assert.equal((await coordinated("changed-policy")).status,503);assert.equal(await count("contact_requests"),2);
+ const journal=(await db.prepare("SELECT * FROM contact_maintenance_cycles").all()).results;
+ assert.doesNotMatch(JSON.stringify(journal),/test@example.invalid|Synthetic Person|Synthetic message|request_key|payload_hash/);
+ pass("atomic interval deduplication under eight concurrent maintenance requests");
+ await db.prepare("CREATE TRIGGER lab_abort_maintenance BEFORE UPDATE ON contact_maintenance_cycles BEGIN SELECT RAISE(ABORT,'SYNTHETIC_JOURNAL_FAILURE'); END;").run();
+ assert.equal((await coordinated("approved",true)).status,503);assert.equal(await count("contact_requests"),2);assert.equal(await count("contact_maintenance_cycles"),1);
+ await db.prepare("DROP TRIGGER lab_abort_maintenance").run();
+ const recovery=await (await coordinated("approved",true)).json();assert.equal(recovery.deleted,2);assert.equal(recovery.expiredAfter,0);assert.equal(recovery.replayed,false);assert.equal(await count("contact_requests"),0);assert.equal(await count("contact_maintenance_cycles"),2);assert(!recovery.alerts.includes("EXPIRED_PENDING_PURGE"));
+ const replayOld=await (await coordinated()).json();assert.equal(replayOld.replayed,true);assert.equal(replayOld.deleted,100);
+ pass("maintenance journal failure rolls back deletion; retry recovers without external delivery");
  console.log(JSON.stringify({status:"PASS",checks,scope:"workerd local D1 and RSA JWT verification; synthetic runtime identity/JWKS/challenge/limit; no hosted resources"}));
 }finally{await mf.dispose();}
