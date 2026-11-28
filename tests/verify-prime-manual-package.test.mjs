@@ -49,3 +49,5 @@ test('tampered MIT license evidence cannot pass independently',t=>{
  writeFileSync(f.reportPath,JSON.stringify(report));
  assert.throws(()=>verifyManualPackage(f),/NO-GO/);
 });
+
+test('indexable institutional route and closed application pages are independently checked',t=>{const f=fixture(t,'INDEX');const path=join(f.publicDir,'contacto.html');writeFileSync(path,readFileSync(path,'utf8').replace('index,follow','noindex,nofollow'));assert.throws(()=>verifyManualPackage(f),/NO-GO/);});

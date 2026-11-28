@@ -1,4 +1,5 @@
 import {companyFiles} from "../scripts/company-routes.mjs";
+import {institutionalIndexPages,institutionalSitemap,canonicalFor} from "../scripts/prime-institutional-seo.mjs";
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,cpSync,mkdtempSync,rmSync,existsSync,readdirSync} from 'node:fs';
@@ -34,7 +35,18 @@ test('INDEX release shape has explicit canonical, OG, robots and sitemap',t=>{
  assert.match(html,/property="og:image"/);
  assert.match(html,/name="twitter:card"/);
  assert.equal(readFileSync(join(f.outputDir,'robots.txt'),'utf8'),'User-agent: *\nAllow: /\nSitemap: https://desset.lat/sitemap.xml\n');
- assert.match(readFileSync(join(f.outputDir,'sitemap.xml'),'utf8'),/<loc>https:\/\/desset.lat\/<\/loc>/);
+ assert.equal(readFileSync(join(f.outputDir,'sitemap.xml'),'utf8'),institutionalSitemap('INDEX'));
+ const closed=fixture(t,'NOINDEX');
+ for(const name of institutionalIndexPages){
+  const doc=readFileSync(join(f.outputDir,name+'.html'),'utf8');
+  assert.ok(doc.includes('name="robots" content="index,follow"'),name);
+  assert.ok(doc.includes('rel="canonical" href="'+canonicalFor(name)+'"'),name);
+  if(name!=="index")assert.equal(doc.replace('name="robots" content="index,follow"','name="robots" content="noindex,nofollow"'),readFileSync(join(closed.outputDir,name+'.html'),'utf8'));
+ }
+ for(const name of ['registro-comercios','registro-repartidores','aplicaciones','aplicaciones-clientes','aplicaciones-comercios','aplicaciones-repartidores','404']){
+  assert.match(readFileSync(join(f.outputDir,name+'.html'),'utf8'),/name="robots" content="noindex,nofollow"/);
+  assert.ok(!institutionalSitemap('INDEX').includes('<loc>https://desset.lat/'+name+'</loc>'));
+ }
 });
 test('all non-SEO brand assets and security content are original bytes',t=>{
  const f=fixture(t,'INDEX'),original=JSON.parse(readFileSync(join(dist,'site-manifest.json'),'utf8'));
