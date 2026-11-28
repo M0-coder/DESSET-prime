@@ -2,7 +2,10 @@
 This is the consolidated handoff; earlier READMEs are historical phase evidence. It is not a deployment command or approval.
 
 ## Validated reference
-Exact baseline 04cab4420dc41fff3f084d10b463dca84e4b8990, main 5e36449c76e569c475826a43e5ea2fd88fb73b04, 11/11 CI workflows, 17/17 local workerd checkpoints, audited locked dependencies. Run 46092948143/job 140817805006/artifact 15241938133. New 07D alert preview and checklist tests require fresh CI. No hosted resources or actual identity, provider, or privacy approval.
+Exact historical validated baseline 53042127fed61cdac0c00283f9330f62cb42f1bf, main 58da16289aca0f1478a0d75b481f196553614a19, 11/11 CI workflows, 495/495 Node tests, 22/22 local workerd checkpoints, 36 legacy + 36 D1 browser circuits, 144 audited transitions across separate test databases, HTTP 30/30, targeted mutation smoke 4/4 (not global), coverage 97.83/87.69/95.89 line/branch/function, mobile Lighthouse 91 / desktop 100 (mobile LCP 3091.34 ms; performance debt remains). Workerd run 46099824681/job 140839502066/artifact 15245017025; browser run 46099824698/job 140839502208/artifact 15245331107; source/lighthouse run 46099824716. GitHub artifact metadata expires 2026-12-12 UTC; retain verified evidence under approved archive policy before expiry. Previous performance failure mobile 82 is not erased by its successful repeat. No hosted resources or actual identity, provider, or privacy approval. This baseline is historical, not approval of later commits.
+
+## Fixed operational scope
+Use one D1 backend, nine routing categories, one authorized queue and the human response procedure in [CONTACT-OPERATING-PROCEDURE.md](CONTACT-OPERATING-PROCEDURE.md). Legacy SQLite is regression-only. Local browser and workerd tests do not prove production integration. No extra product features are required for initial correspondence. All 14 gates stay pending until externally verified.
 
 ## Activation sequence (separate approvals)
 1. **Freeze release:** verify fresh main/head and public diff, full CI, reproducible build, tests, static/SCA, coverage scope, targeted mutation evidence, release inventory, NOINDEX. Review code and obtain exact-SHA merge authorization; do not merge simply because CI passes.

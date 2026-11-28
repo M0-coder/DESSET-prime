@@ -4,13 +4,13 @@
   "productionLocked": true,
   "automaticActivation": false,
   "validatedBaseline": {
-    "sha": "04cab4420dc41fff3f084d10b463dca84e4b8990",
+    "sha": "53042127fed61cdac0c00283f9330f62cb42f1bf",
     "workflowCount": 11,
-    "instrumentedChecks": 17,
-    "runId": "46092948143",
-    "jobId": "140817805006",
-    "artifactId": "15241938133",
-    "scope": "local synthetic workerd D1, not hosted infrastructure"
+    "instrumentedChecks": 22,
+    "runId": "46099824681",
+    "jobId": "140839502066",
+    "artifactId": "15245017025",
+    "scope": "local synthetic workerd D1 and browser adapters, not hosted infrastructure"
   },
   "gates": {
     "registeredController": {
